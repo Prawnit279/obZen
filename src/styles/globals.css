@@ -1,0 +1,221 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  /* ── Noircut base tokens (theme-invariant) ─────────────────────────── */
+  :root {
+    --bg:            #0a0a0a;
+    --surface:       #111111;
+    --elevated:      #181818;
+    --border:        #2a2a2a;
+    --border-strong: #3a3a3a;
+    --dim:           #555555;
+    --muted:         #888888;
+    --accent:        #d4d4d4;
+    --white:         #ffffff;
+    --red:           #cc3333;
+
+    /* Theme-variable tokens — defaults match Noircut */
+    --theme-primary:        #d4d4d4;
+    --theme-secondary:      #888888;
+    --theme-glow:           rgba(212,212,212,0.04);
+    --theme-border-active:  #d4d4d4;
+    --theme-text-active:    #ffffff;
+
+    /* Fixed semantic tokens — never change with theme */
+    --complete-border: #166534;
+    --complete-text:   #86efac;
+    --complete-bg:     rgba(22, 101, 52, 0.08);
+    --skip-border:     #7f1d1d;
+    --skip-text:       #fca5a5;
+    --skip-bg:         rgba(127, 29, 29, 0.06);
+
+    --duration-fast:   150ms;
+    --duration-normal: 300ms;
+    --ease-out-expo:   cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  /* ── Theme: Noircut (default — same as :root) ──────────────────────── */
+  [data-theme="noircut"] {
+    --bg:      #0a0a0a;
+    --surface: #111111;
+    --elevated:#181818;
+    --border:  #2a2a2a;
+    --theme-primary:       #d4d4d4;
+    --theme-secondary:     #888888;
+    --theme-glow:          rgba(212,212,212,0.04);
+    --theme-border-active: #d4d4d4;
+    --theme-text-active:   #ffffff;
+  }
+
+  /* ── Theme: Crimson ─────────────────────────────────────────────────── */
+  [data-theme="crimson"] {
+    --bg:      #0a0a0a;
+    --surface: #130a0a;
+    --elevated:#1a0d0d;
+    --border:  #2d1515;
+    --theme-primary:       #991b1b;
+    --theme-secondary:     #7f1d1d;
+    --theme-glow:          rgba(153,27,27,0.06);
+    --theme-border-active: #dc2626;
+    --theme-text-active:   #fca5a5;
+  }
+
+  /* ── Theme: Void Purple ─────────────────────────────────────────────── */
+  [data-theme="void"] {
+    --bg:      #0a0a0a;
+    --surface: #0d0a13;
+    --elevated:#130f1a;
+    --border:  #2a1f3d;
+    --theme-primary:       #6b21a8;
+    --theme-secondary:     #581c87;
+    --theme-glow:          rgba(107,33,168,0.06);
+    --theme-border-active: #9333ea;
+    --theme-text-active:   #d8b4fe;
+  }
+
+  /* ── Theme: Steel Blue ──────────────────────────────────────────────── */
+  [data-theme="steel"] {
+    --bg:      #0a0a0a;
+    --surface: #0a0d13;
+    --elevated:#0d1119;
+    --border:  #1a2236;
+    --theme-primary:       #1e3a5f;
+    --theme-secondary:     #1e3a8a;
+    --theme-glow:          rgba(30,58,95,0.08);
+    --theme-border-active: #3b82f6;
+    --theme-text-active:   #93c5fd;
+  }
+
+  /* ── Theme: Ember (true dark orange — distinct from Crimson red) ───── */
+  [data-theme="ember"] {
+    --bg:            #0a0a0a;
+    --surface:       #120b07;
+    --elevated:      #1a1009;
+    --border:        #2e1a0a;
+    --border-strong: #3d2210;
+    --theme-primary:       #c2410c;
+    --theme-secondary:     #9a3412;
+    --theme-glow:          rgba(194,65,12,0.07);
+    --theme-border-active: #f97316;
+    --theme-text-active:   #fdba74;
+  }
+
+  * {
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent;
+    /* Smooth theme transitions */
+    transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease;
+  }
+
+  /* Disable transition on layout-sensitive props to avoid jank */
+  * { transition-property: color, background-color, border-color, opacity, box-shadow, transform; }
+
+  html {
+    height: 100%;
+    overflow: hidden;
+  }
+
+  body {
+    margin: 0;
+    height: 100%;
+    overflow: hidden;
+    background-color: var(--bg);
+    color: var(--accent);
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  #root {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+
+  ::selection {
+    background: var(--border-strong);
+    color: var(--white);
+  }
+
+  ::-webkit-scrollbar { width: 2px; height: 2px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border-strong); }
+}
+
+@layer components {
+  .label {
+    @apply uppercase tracking-widest text-[10px] font-normal;
+    color: var(--muted);
+  }
+
+  .label-sm {
+    @apply uppercase tracking-widest text-[11px] font-normal;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    @apply rounded-[2px] p-4;
+  }
+
+  .card-elevated {
+    background: var(--elevated);
+    border: 1px solid var(--border);
+    @apply rounded-[2px] p-4;
+  }
+
+  .divider { border-top: 1px solid var(--border); }
+
+  .btn {
+    border: 1px solid var(--border);
+    color: var(--accent);
+    @apply bg-transparent px-3 py-1.5 text-[12px] uppercase tracking-widest rounded-[2px] transition-colors duration-150 cursor-pointer;
+  }
+  .btn:hover { border-color: var(--border-strong); color: var(--white); }
+
+  .btn-primary {
+    border: 1px solid var(--accent);
+    color: var(--bg);
+    background: var(--accent);
+    @apply px-3 py-1.5 text-[12px] uppercase tracking-widest rounded-[2px] transition-colors duration-150 cursor-pointer;
+  }
+
+  .btn-ghost {
+    @apply border-transparent px-3 py-1.5 text-[12px] uppercase tracking-widest rounded-[2px] transition-colors duration-150 cursor-pointer;
+    color: var(--muted);
+  }
+  .btn-ghost:hover { color: var(--accent); }
+
+  .btn-danger {
+    border: 1px solid var(--red);
+    color: var(--red);
+    @apply bg-transparent px-3 py-1.5 text-[12px] uppercase tracking-widest rounded-[2px] transition-colors duration-150 cursor-pointer;
+  }
+
+  .input {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--accent);
+    @apply rounded-[2px] px-3 py-2 text-[13px] focus:outline-none w-full;
+  }
+  .input:focus { border-color: var(--border-strong); }
+  .input::placeholder { color: var(--dim); }
+
+  .badge { @apply inline-flex items-center px-2 py-0.5 text-[10px] uppercase tracking-widest border rounded-[2px]; }
+  .badge-default { border-color: var(--border-strong); color: var(--muted); }
+  .badge-accent { border-color: var(--dim); color: var(--accent); }
+  .badge-red { border-color: var(--red); color: var(--red); }
+
+  .page-container {
+    @apply flex-1 overflow-y-auto px-4 py-4 pb-24 md:pb-4;
+  }
+
+  .section-title {
+    @apply text-[10px] uppercase tracking-widest mb-3;
+    color: var(--muted);
+  }
+}
