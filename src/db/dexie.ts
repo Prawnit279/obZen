@@ -290,8 +290,16 @@ export interface VedicLog {
   notes?: string
 }
 
+// --- Meta (seeding guards, flags) ---
+export interface MetaEntry {
+  id?: number
+  key: string
+  value: string
+}
+
 // --- Dexie DB ---
 export class ObzenDB extends Dexie {
+  meta!: EntityTable<MetaEntry, 'id'>
   workoutSessions!: EntityTable<WorkoutSession, 'id'>
   workoutDaySessions!: EntityTable<WorkoutDaySession, 'id'>
   exerciseLogs!: EntityTable<ExerciseLog, 'id'>
@@ -383,6 +391,32 @@ export class ObzenDB extends Dexie {
       drumNotations: '++id, bookId, lessonId, dateAdded',
       drumPDFs: '++id, bookId',
       cachedImages: '++id, key, type, generatedAt',
+    })
+    this.version(4).stores({
+      workoutSessions: '++id, date, dayLabel',
+      workoutDaySessions: '++id, date, dayLabel',
+      exerciseLogs: '++id, sessionId, exerciseId, date',
+      drumSessions: '++id, date, focusArea, duration',
+      rudimentLogs: '++id, sessionId, rudimentId, date',
+      songs: '++id, title, artist, status, purpose',
+      jamSessions: '++id, date, status',
+      calendarEvents: '++id, date, startTime, category, recurring',
+      nutritionLogs: '++id, date',
+      savedMeals: '++id, name',
+      boards: '++id, name, category',
+      tasks: '++id, boardId, status, dueDate, priority',
+      meetings: '++id, date, title, status',
+      actionItems: '++id, meetingId, status, dueDate',
+      yogaSessions: '++id, date, sequenceId',
+      checkIns: '++id, date',
+      progressPhotos: '++id, date',
+      ayurvedaLogs: '++id, date',
+      vedicLogs: '++id, date, planet',
+      drumBooks: '++id, title, author, category, dateAdded, type',
+      drumNotations: '++id, bookId, lessonId, dateAdded',
+      drumPDFs: '++id, bookId',
+      cachedImages: '++id, key, type, generatedAt',
+      meta: '++id, &key',
     })
   }
 }

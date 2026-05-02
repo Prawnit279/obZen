@@ -491,6 +491,27 @@ function BookCard({ book, onOpen, onDelete }: BookCardProps) {
 // Main DrumLibrary component
 // ---------------------------------------------------------------------------
 
+const INDEXED_BOOKS: Omit<DrumBook, 'id'>[] = [
+  { title: 'Stick Control', author: 'George Lawrence Stone', category: 'Technique', dateAdded: '2024-01-01', type: 'indexed', tags: ['rudiments', 'stickings'] },
+  { title: 'Progressive Steps to Syncopation', author: 'Ted Reed', category: 'Reading', dateAdded: '2024-01-01', type: 'indexed', tags: ['reading', 'syncopation'] },
+  { title: 'Advanced Techniques for the Modern Drummer', author: 'Jim Chapin', category: 'Independence', dateAdded: '2024-01-01', type: 'indexed', tags: ['independence', 'jazz'] },
+  { title: 'The New Breed', author: 'Gary Chester', category: 'Independence', dateAdded: '2024-01-01', type: 'indexed', tags: ['independence', 'grooves'] },
+  { title: 'Master Studies', author: 'Joe Morello', category: 'Technique', dateAdded: '2024-01-01', type: 'indexed', tags: ['control', 'accent'] },
+  { title: 'Bass Drum Control', author: 'Colin Bailey', category: 'Bass Drum', dateAdded: '2024-01-01', type: 'indexed', tags: ['bass drum', 'technique'] },
+  { title: 'Realistic Rock', author: 'Carmine Appice', category: 'Style', dateAdded: '2024-01-01', type: 'indexed', tags: ['rock', 'grooves'] },
+  { title: "The Drummer's Bible", author: 'Mick Berry & Jason Gianni', category: 'Theory', dateAdded: '2024-01-01', type: 'indexed', tags: ['styles', 'reference'] },
+  { title: 'Groove Essentials', author: 'Tommy Igoe', category: 'Grooves', dateAdded: '2024-01-01', type: 'indexed', tags: ['grooves', 'phrasing'] },
+  { title: 'The Language of Drumming', author: 'Benny Greb', category: 'Theory', dateAdded: '2024-01-01', type: 'indexed', tags: ['theory', 'creativity'] },
+  { title: 'Sticking Patterns', author: 'Gary Chaffee', category: 'Rudiments', dateAdded: '2024-01-01', type: 'indexed', tags: ['stickings', 'patterns'] },
+]
+
+async function seedIndexedBooks() {
+  const already = await db.meta.where('key').equals('books-seeded').first()
+  if (already) return
+  await db.drumBooks.bulkAdd(INDEXED_BOOKS)
+  await db.meta.add({ key: 'books-seeded', value: '1' })
+}
+
 export function DrumLibrary() {
   const [search, setSearch] = useState('')
   const [categoryFilter, setCategoryFilter] = useState<DrumBookCategory | 'all'>('all')
@@ -498,6 +519,11 @@ export function DrumLibrary() {
   const [viewingBook, setViewingBook] = useState<{ id: number; title: string } | null>(null)
   const [showFilters, setShowFilters] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
+
+  useEffect(() => {
+    seedIndexedBooks()
+    navigator.storage?.persist?.()
+  }, [])
 
   const books = useLiveQuery(
     () => db.drumBooks.orderBy('dateAdded').reverse().toArray(),

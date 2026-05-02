@@ -1,7 +1,6 @@
 import type { ReactNode } from 'react'
 import { Sidebar } from './Sidebar'
 import { BottomNav } from './BottomNav'
-import { SpeechUI } from '@/components/speech/SpeechUI'
 
 interface Props {
   children: ReactNode
@@ -15,7 +14,6 @@ export function AppShell({ children }: Props) {
         {children}
       </main>
       <BottomNav />
-      <SpeechUI />
     </div>
   )
 }

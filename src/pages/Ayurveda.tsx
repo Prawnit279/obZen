@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { PITTA_PROFILE, PITTA_DINACHARYA, PITTA_REMEDIES } from '@/data/ayurveda'
 import { useAyurvedaStore } from '@/store/useAyurvedaStore'
 import { Card, CardHeader } from '@/components/ui/Card'
 import { cn } from '@/lib/utils'
 import { CheckSquare, Square, ChevronDown, ChevronRight } from 'lucide-react'
+import { db } from '@/db/dexie'
 
 type Tab = 'profile' | 'routine' | 'remedies'
 
@@ -41,6 +42,20 @@ export default function Ayurveda() {
 
 function RoutineTab() {
   const { todayCompleted, toggleRoutineItem } = useAyurvedaStore()
+  const today = new Date().toISOString().split('T')[0]
+
+  // Persist to Dexie whenever completed items change
+  useEffect(() => {
+    const save = async () => {
+      const existing = await db.ayurvedaLogs.where('date').equals(today).first()
+      if (existing) {
+        await db.ayurvedaLogs.update(existing.id!, { completedItems: todayCompleted })
+      } else if (todayCompleted.length > 0) {
+        await db.ayurvedaLogs.add({ date: today, completedItems: todayCompleted })
+      }
+    }
+    save()
+  }, [todayCompleted, today])
 
   const morningTotal = PITTA_DINACHARYA.morningPractices.length
   const eveningTotal = PITTA_DINACHARYA.eveningPractices.length
