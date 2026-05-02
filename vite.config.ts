@@ -4,7 +4,7 @@ import { VitePWA } from 'vite-plugin-pwa'
 import path from 'path'
 
 export default defineConfig(({ command }) => ({
-  base: command === 'build' ? '/obzen/' : '/',
+  base: command === 'build' ? '/obZen/' : '/',
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
@@ -23,7 +23,7 @@ export default defineConfig(({ command }) => ({
         background_color: '#0a0a0a',
         display: 'standalone',
         orientation: 'portrait',
-        start_url: '/obzen/',
+        start_url: '/obZen/',
         icons: [
           { src: 'icons/192.png', sizes: '192x192', type: 'image/png' },
           { src: 'icons/512.png', sizes: '512x512', type: 'image/png' },
