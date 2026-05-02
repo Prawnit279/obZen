@@ -212,4 +212,4 @@ The app evolves based on real usage, not hypothetical users.
 
 ---
 
-*Owner: Pronit · INTJ-A · Active drummer
+*Owner: Pronit · Pitta dosha · INTJ-A · Active drummer · Saturn Atmakaraka*
