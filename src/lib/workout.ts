@@ -7,6 +7,8 @@ export async function startWorkoutSession(dayLabel: string): Promise<number> {
     date: todayISO(),
     dayLabel,
   })
+  // DEBUG — remove before shipping Phase 7
+  console.log('[obZen] workoutSessions.add →', { id, dayLabel, date: todayISO() })
   return id as number
 }
 
@@ -18,6 +20,8 @@ export async function completeWorkoutSession(sessionId: number): Promise<void> {
 
 export async function saveExerciseLog(log: Omit<ExerciseLog, 'id'>): Promise<number> {
   const id = await db.exerciseLogs.add(log)
+  // DEBUG — remove before shipping Phase 7
+  console.log('[obZen] exerciseLogs.add →', { id, exerciseName: log.exerciseName, sets: log.sets.length })
   return id as number
 }
 

@@ -3,6 +3,7 @@ import { Card, CardHeader } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher'
 import { StoragePanel } from '@/components/ui/StoragePanel'
+import { exportAllDataAsJSON } from '@/lib/export'
 
 function formatBytes(b: number) {
   if (b < 1024) return `${b} B`
@@ -29,8 +30,18 @@ function useStorageEstimate() {
 export default function Settings() {
   const { used, quota, persisted } = useStorageEstimate()
 
-  const handleExport = () => {
-    alert('Export: coming in Phase 7')
+  const [exporting, setExporting]   = useState(false)
+  const [exportDone, setExportDone] = useState(false)
+
+  const handleExport = async () => {
+    setExporting(true)
+    try {
+      await exportAllDataAsJSON()
+      setExportDone(true)
+      setTimeout(() => setExportDone(false), 3000)
+    } finally {
+      setExporting(false)
+    }
   }
 
   return (
@@ -74,8 +85,8 @@ export default function Settings() {
       <Card>
         <CardHeader label="Data" />
         <div className="space-y-2">
-          <Button variant="default" fullWidth onClick={handleExport}>
-            Export All Data (JSON)
+          <Button variant="default" fullWidth onClick={handleExport} disabled={exporting}>
+            {exporting ? 'Exporting...' : exportDone ? '✓ Backup downloaded' : 'Export All Data (JSON)'}
           </Button>
           <Button variant="ghost" fullWidth>
             Import Backup

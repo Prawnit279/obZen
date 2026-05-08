@@ -3,12 +3,15 @@ import type { DrumSession, RudimentLog, Song } from '@/db/dexie'
 import { todayISO } from '@/lib/utils'
 
 export async function startDrumSession(focusArea: string, bookRef?: string): Promise<number> {
-  return db.drumSessions.add({
+  const id = await db.drumSessions.add({
     date: todayISO(),
     focusArea,
     duration: 0,
     bookRef,
-  }) as Promise<number>
+  }) as number
+  // DEBUG — remove before shipping Phase 7
+  console.log('[obZen] drumSessions.add →', { id, focusArea, date: todayISO() })
+  return id
 }
 
 export async function completeDrumSession(
@@ -26,13 +29,16 @@ export async function completeDrumSession(
 }
 
 export async function logRudiment(sessionId: number, rudimentId: string, bpm: number, notes?: string): Promise<number> {
-  return db.rudimentLogs.add({
+  const id = await db.rudimentLogs.add({
     sessionId,
     rudimentId,
     bpm,
     date: todayISO(),
     notes,
-  }) as Promise<number>
+  }) as number
+  // DEBUG — remove before shipping Phase 7
+  console.log('[obZen] rudimentLogs.add →', { id, sessionId, rudimentId, bpm })
+  return id
 }
 
 export async function addSong(song: Omit<Song, 'id' | 'addedAt'>): Promise<number> {
