@@ -256,6 +256,42 @@ function BoardView({ board, onBack }: { board: Board; onBack: () => void }) {
   )
 }
 
+// ── Board Card (live task counts) ─────────────────────────────────────────────
+function BoardCard({ board, onClick }: { board: Board; onClick: () => void }) {
+  const tasks = useLiveQuery(
+    () => db.tasks.where('boardId').equals(board.id!).toArray(),
+    [board.id]
+  ) ?? []
+
+  const todo   = tasks.filter(t => t.status === 'todo').length
+  const inProg = tasks.filter(t => t.status === 'in-progress').length
+  const done   = tasks.filter(t => t.status === 'done').length
+  const total  = tasks.length
+
+  const countLabel = total === 0
+    ? 'No tasks'
+    : [todo > 0 && `${todo} Todo`, inProg > 0 && `${inProg} In Progress`, done > 0 && `${done} Done`]
+        .filter(Boolean).join(' · ')
+
+  return (
+    <button onClick={onClick}
+      className="w-full flex items-center justify-between p-4 rounded-[2px] text-left transition-colors hover:bg-noir-elevated"
+      style={{ background: '#111111', border: '1px solid #2a2a2a' }}>
+      <div>
+        <p className="text-[13px]" style={{ color: '#d4d4d4' }}>{board.name}</p>
+        <p className="text-[10px] mt-0.5 capitalize" style={{ color: '#555555' }}>{board.category}</p>
+      </div>
+      <div className="flex items-center gap-3">
+        <span className="text-[10px]" style={{ color: total === 0 ? '#3a3a3a' : '#555555' }}>{countLabel}</span>
+        <button onClick={e => { e.stopPropagation(); db.boards.delete(board.id!) }}
+          aria-label="Delete board" className="p-1">
+          <Trash2 size={13} style={{ color: '#3a3a3a' }} />
+        </button>
+      </div>
+    </button>
+  )
+}
+
 // ── Boards List ────────────────────────────────────────────────────────────────
 export default function Projects() {
   const [showNewBoard, setShowNewBoard] = useState(false)
@@ -291,26 +327,9 @@ export default function Projects() {
         </div>
       ) : (
         <div className="space-y-2">
-          {boards.map(board => {
-            const taskCount = 0 // Will be live once opened
-            return (
-              <button key={board.id} onClick={() => setActiveBoard(board)}
-                className="w-full flex items-center justify-between p-4 rounded-[2px] text-left transition-colors hover:bg-noir-elevated"
-                style={{ background: '#111111', border: '1px solid #2a2a2a' }}>
-                <div>
-                  <p className="text-[13px]" style={{ color: '#d4d4d4' }}>{board.name}</p>
-                  <p className="text-[10px] mt-0.5 capitalize" style={{ color: '#555555' }}>{board.category}</p>
-                </div>
-                <div className="flex items-center gap-3">
-                  <span className="text-[10px]" style={{ color: '#3a3a3a' }}>{taskCount} tasks</span>
-                  <button onClick={e => { e.stopPropagation(); db.boards.delete(board.id!) }}
-                    aria-label="Delete board" className="p-1">
-                    <Trash2 size={13} style={{ color: '#3a3a3a' }} />
-                  </button>
-                </div>
-              </button>
-            )
-          })}
+          {boards.map(board => (
+            <BoardCard key={board.id} board={board} onClick={() => setActiveBoard(board)} />
+          ))}
         </div>
       )}
 
