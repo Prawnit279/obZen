@@ -18,8 +18,7 @@ export function WideLegsForwardFoldAnim({ paused = false }: PoseAnimProps) {
           .wlf-torso { animation: none !important; }
         }
         .wlf-torso {
-          transform-box: fill-box;
-          transform-origin: bottom center;
+          transform-origin: 80px 118px;
           animation: wlf-fold 3s ease-in-out infinite alternate;
           animation-play-state: ${ps};
         }
@@ -342,7 +341,7 @@ export function BridgePoseAnim({ paused = false }: PoseAnimProps) {
         }
         @keyframes br-peel {
           0%   { transform: translateY(0px); }
-          100% { transform: translateY(-35px); }
+          100% { transform: translateY(-8px); }
         }
       `}</style>
       {/* ground */}
@@ -434,21 +433,11 @@ export function HeroPoseAnim({ paused = false }: PoseAnimProps) {
         @media (prefers-reduced-motion: reduce) {
           .hr-hips, .hr-torso { animation: none !important; }
         }
-        .hr-hips {
-          transform-box: fill-box;
-          transform-origin: center bottom;
-          animation: hr-settle 3s ease-in-out infinite alternate;
-          animation-play-state: ${ps};
-        }
         .hr-torso {
           transform-box: fill-box;
           transform-origin: bottom center;
           animation: hr-lengthen 3s ease-in-out infinite alternate;
           animation-play-state: ${ps};
-        }
-        @keyframes hr-settle {
-          0%   { transform: translateY(-14px); }
-          100% { transform: translateY(0px); }
         }
         @keyframes hr-lengthen {
           0%   { transform: scaleY(0.92); }
@@ -460,10 +449,8 @@ export function HeroPoseAnim({ paused = false }: PoseAnimProps) {
       {/* feet splayed to sides */}
       <line x1="80" y1="148" x2="58" y2="162" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round"/>
       <line x1="80" y1="148" x2="102" y2="162" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round"/>
-      {/* hips settling low group */}
-      <g className="hr-hips">
-        <circle cx="80" cy="148" r="5" fill="#d4d4d4"/>
-      </g>
+      {/* hip anchor */}
+      <circle cx="80" cy="148" r="5" fill="#d4d4d4"/>
       {/* torso lengthening group */}
       <g className="hr-torso">
         <line x1="80" y1="148" x2="80" y2="85" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>

@@ -190,15 +190,7 @@ export function HorsePoseAnim({ paused = false }: PoseAnimProps) {
       {/* ground */}
       <line x1="10" y1="170" x2="150" y2="170" stroke="#2a2a2a" strokeWidth="1.5" />
 
-      {/* wide stance legs — static end position */}
-      {/* left leg: wide, knee bent outward */}
-      <line x1="80" y1="120" x2="55" y2="138" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-      <line x1="55" y1="138" x2="45" y2="165" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-      {/* right leg */}
-      <line x1="80" y1="120" x2="105" y2="138" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-      <line x1="105" y1="138" x2="115" y2="165" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-
-      {/* upper body — animated sink */}
+      {/* full body — animated sink together */}
       <g className="hp-body">
         {/* head */}
         <circle cx="80" cy="25" r="13" fill="#d4d4d4" />
@@ -215,6 +207,11 @@ export function HorsePoseAnim({ paused = false }: PoseAnimProps) {
           <line x1="80" y1="60" x2="110" y2="68" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
           <line x1="110" y1="68" x2="110" y2="42" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
         </g>
+        {/* wide stance legs — move with body */}
+        <line x1="80" y1="120" x2="55" y2="138" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
+        <line x1="55" y1="138" x2="45" y2="165" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
+        <line x1="80" y1="120" x2="105" y2="138" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
+        <line x1="105" y1="138" x2="115" y2="165" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
       </g>
     </svg>
   )
@@ -403,14 +400,13 @@ export function CobraAnim({ paused = false }: PoseAnimProps) {
           .cb-chest { animation: none !important; }
         }
         .cb-chest {
-          transform-box: fill-box;
-          transform-origin: center;
+          transform-origin: 80px 130px;
           animation: cb-peel 3s ease-in-out infinite alternate;
           animation-play-state: ${ps};
         }
         @keyframes cb-peel {
-          0%   { transform: translateY(15px) rotate(5deg); }
-          100% { transform: translateY(0px) rotate(0deg); }
+          0%   { transform: rotate(-10deg); }
+          100% { transform: rotate(0deg); }
         }
       `}</style>
 
@@ -464,7 +460,7 @@ export function DownwardDogAnim({ paused = false }: PoseAnimProps) {
           animation-play-state: ${ps};
         }
         @keyframes dd-hips-rise {
-          0%   { transform: translateY(45px); }
+          0%   { transform: translateY(-6px); }
           100% { transform: translateY(0px); }
         }
       `}</style>
@@ -472,15 +468,7 @@ export function DownwardDogAnim({ paused = false }: PoseAnimProps) {
       {/* ground */}
       <line x1="10" y1="145" x2="150" y2="145" stroke="#2a2a2a" strokeWidth="1.5" />
 
-      {/* hands — static, planted */}
-      <circle cx="35" cy="135" r="4" fill="#d4d4d4" />
-      <circle cx="125" cy="135" r="4" fill="#d4d4d4" />
-
-      {/* feet — static */}
-      <circle cx="55" cy="140" r="4" fill="#d4d4d4" />
-      <circle cx="105" cy="140" r="4" fill="#d4d4d4" />
-
-      {/* inverted V — hips peak, arms and legs connect */}
+      {/* inverted V — gentle hip lift */}
       <g className="dd-hips">
         {/* left arm: hand to hip */}
         <line x1="35" y1="135" x2="80" y2="55" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
@@ -599,15 +587,7 @@ export function LowLungeAnim({ paused = false }: PoseAnimProps) {
       {/* ground */}
       <line x1="10" y1="165" x2="150" y2="165" stroke="#2a2a2a" strokeWidth="1.5" />
 
-      {/* back leg — left knee on floor, foot behind */}
-      <line x1="85" y1="118" x2="115" y2="140" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-      <line x1="115" y1="140" x2="122" y2="162" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-
-      {/* front leg — right foot forward, knee bent */}
-      <line x1="85" y1="118" x2="65" y2="128" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-      <line x1="65" y1="128" x2="60" y2="162" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-
-      {/* upper body — animated lunge sink */}
+      {/* animated lunge — full body sinks together */}
       <g className="ll-body">
         {/* torso upright */}
         <line x1="80" y1="70" x2="85" y2="118" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
@@ -615,7 +595,12 @@ export function LowLungeAnim({ paused = false }: PoseAnimProps) {
         <line x1="80" y1="58" x2="80" y2="70" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
         {/* head */}
         <circle cx="80" cy="45" r="13" fill="#d4d4d4" />
-
+        {/* back leg — moves with body */}
+        <line x1="85" y1="118" x2="115" y2="140" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
+        <line x1="115" y1="140" x2="122" y2="162" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
+        {/* front leg — moves with body */}
+        <line x1="85" y1="118" x2="65" y2="128" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
+        <line x1="65" y1="128" x2="60" y2="162" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
         {/* arms sweep overhead */}
         <g className="ll-rise">
           {/* left arm */}

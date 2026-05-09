@@ -14,8 +14,7 @@ export function HalfFrontSplitsAnim({ paused = false }: { paused?: boolean }) {
           .hfs-torso, .hfs-leg { animation: none !important; }
         }
         .hfs-torso {
-          transform-box: fill-box;
-          transform-origin: bottom center;
+          transform-origin: 88px 132px;
           animation: hfs-fold 3s ease-in-out infinite alternate;
           animation-play-state: ${ps};
         }
