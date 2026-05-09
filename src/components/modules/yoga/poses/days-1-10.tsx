@@ -25,14 +25,12 @@ export function MountainPoseAnim({ paused = false }: PoseAnimProps) {
           animation-play-state: ${ps};
         }
         .mp-larm {
-          transform-box: fill-box;
-          transform-origin: center;
+          transform-origin: 80px 58px;
           animation: mp-larm-out 3s ease-in-out infinite alternate;
           animation-play-state: ${ps};
         }
         .mp-rarm {
-          transform-box: fill-box;
-          transform-origin: center;
+          transform-origin: 80px 58px;
           animation: mp-rarm-out 3s ease-in-out infinite alternate;
           animation-play-state: ${ps};
         }
@@ -57,23 +55,36 @@ export function MountainPoseAnim({ paused = false }: PoseAnimProps) {
         {/* head */}
         <circle cx="80" cy="22" r="13" fill="#d4d4d4" />
         {/* neck + torso */}
-        <line x1="80" y1="35" x2="80" y2="108" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+        <line x1="80" y1="35" x2="80" y2="108" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round" />
+        {/* shoulder joint */}
+        <circle cx="80" cy="58" r="4" fill="#d4d4d4" />
+        {/* hip joints */}
+        <circle cx="76" cy="108" r="4" fill="#d4d4d4" />
+        <circle cx="84" cy="108" r="4" fill="#d4d4d4" />
         {/* left arm — straight down, slightly rotated outward */}
         <g className="mp-larm">
-          <line x1="80" y1="48" x2="67" y2="78" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
-          <line x1="67" y1="78" x2="60" y2="108" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
+          <line x1="80" y1="58" x2="67" y2="83" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+          {/* left elbow */}
+          <circle cx="67" cy="83" r="4" fill="#d4d4d4" />
+          <line x1="67" y1="83" x2="60" y2="110" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
         </g>
         {/* right arm — straight down, slightly rotated outward */}
         <g className="mp-rarm">
-          <line x1="80" y1="48" x2="93" y2="78" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
-          <line x1="93" y1="78" x2="100" y2="108" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
+          <line x1="80" y1="58" x2="93" y2="83" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+          {/* right elbow */}
+          <circle cx="93" cy="83" r="4" fill="#d4d4d4" />
+          <line x1="93" y1="83" x2="100" y2="110" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
         </g>
         {/* left leg — feet together */}
-        <line x1="80" y1="108" x2="72" y2="138" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-        <line x1="72" y1="138" x2="68" y2="168" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
+        <line x1="80" y1="108" x2="72" y2="138" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+        {/* left knee */}
+        <circle cx="72" cy="138" r="4" fill="#d4d4d4" />
+        <line x1="72" y1="138" x2="68" y2="168" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
         {/* right leg — feet together */}
-        <line x1="80" y1="108" x2="88" y2="138" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-        <line x1="88" y1="138" x2="92" y2="168" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
+        <line x1="80" y1="108" x2="88" y2="138" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+        {/* right knee */}
+        <circle cx="88" cy="138" r="4" fill="#d4d4d4" />
+        <line x1="88" y1="138" x2="92" y2="168" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
       </g>
     </svg>
   )
@@ -92,14 +103,12 @@ export function BirdDogAnim({ paused = false }: PoseAnimProps) {
           .bd-rarm, .bd-lleg { animation: none !important; }
         }
         .bd-rarm {
-          transform-box: fill-box;
-          transform-origin: center;
+          transform-origin: 113px 103px;
           animation: bd-arm-extend 3s ease-in-out infinite alternate;
           animation-play-state: ${ps};
         }
         .bd-lleg {
-          transform-box: fill-box;
-          transform-origin: center;
+          transform-origin: 55px 107px;
           animation: bd-leg-extend 3s ease-in-out infinite alternate;
           animation-play-state: ${ps};
         }
@@ -117,27 +126,39 @@ export function BirdDogAnim({ paused = false }: PoseAnimProps) {
       <line x1="10" y1="145" x2="150" y2="145" stroke="#2a2a2a" strokeWidth="1.5" />
 
       {/* tabletop spine — horizontal */}
-      <line x1="50" y1="103" x2="115" y2="103" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+      <line x1="50" y1="103" x2="115" y2="103" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round" />
+
+      {/* shoulder joint (front) */}
+      <circle cx="52" cy="103" r="4" fill="#d4d4d4" />
+      {/* shoulder joint (rear) */}
+      <circle cx="113" cy="103" r="4" fill="#d4d4d4" />
+      {/* hip joint (front) */}
+      <circle cx="55" cy="107" r="4" fill="#d4d4d4" />
+      {/* hip joint (rear) */}
+      <circle cx="113" cy="107" r="4" fill="#d4d4d4" />
 
       {/* head — left side, facing forward-left */}
       <circle cx="30" cy="93" r="13" fill="#d4d4d4" />
       {/* neck */}
-      <line x1="42" y1="96" x2="52" y2="103" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+      <line x1="42" y1="96" x2="52" y2="103" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
 
       {/* left arm planted — front shoulder to wrist on ground */}
-      <line x1="52" y1="103" x2="45" y2="128" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
+      <line x1="52" y1="103" x2="45" y2="128" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
 
       {/* right arm extends forward — from rear shoulder */}
       <g className="bd-rarm" style={{ transformOrigin: '113px 103px' }}>
-        <line x1="113" y1="103" x2="145" y2="103" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
+        <line x1="113" y1="103" x2="148" y2="103" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
       </g>
 
       {/* right leg planted — from rear hip down to knee */}
-      <line x1="113" y1="103" x2="118" y2="130" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
+      <line x1="113" y1="107" x2="118" y2="133" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+      {/* right knee */}
+      <circle cx="118" cy="133" r="4" fill="#d4d4d4" />
+      <line x1="118" y1="133" x2="120" y2="145" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
 
       {/* left leg extends back — from front hip */}
       <g className="bd-lleg" style={{ transformOrigin: '55px 107px' }}>
-        <line x1="55" y1="107" x2="20" y2="107" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
+        <line x1="55" y1="107" x2="18" y2="107" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
       </g>
     </svg>
   )
@@ -195,23 +216,36 @@ export function HorsePoseAnim({ paused = false }: PoseAnimProps) {
         {/* head */}
         <circle cx="80" cy="25" r="13" fill="#d4d4d4" />
         {/* torso — hip at 120 */}
-        <line x1="80" y1="38" x2="80" y2="120" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+        <line x1="80" y1="38" x2="80" y2="120" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round" />
+        {/* shoulder joints */}
+        <circle cx="80" cy="60" r="4" fill="#d4d4d4" />
+        {/* hip joints */}
+        <circle cx="74" cy="120" r="4" fill="#d4d4d4" />
+        <circle cx="86" cy="120" r="4" fill="#d4d4d4" />
 
         {/* left arm — upper arm horizontal, forearm vertical up (goal-post) */}
         <g className="hp-larm">
-          <line x1="80" y1="60" x2="50" y2="68" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
-          <line x1="50" y1="68" x2="50" y2="42" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
+          <line x1="80" y1="60" x2="50" y2="68" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+          {/* left elbow */}
+          <circle cx="50" cy="68" r="4" fill="#d4d4d4" />
+          <line x1="50" y1="68" x2="50" y2="42" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
         </g>
         {/* right arm */}
         <g className="hp-rarm">
-          <line x1="80" y1="60" x2="110" y2="68" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
-          <line x1="110" y1="68" x2="110" y2="42" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
+          <line x1="80" y1="60" x2="110" y2="68" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+          {/* right elbow */}
+          <circle cx="110" cy="68" r="4" fill="#d4d4d4" />
+          <line x1="110" y1="68" x2="110" y2="42" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
         </g>
         {/* wide stance legs — move with body */}
-        <line x1="80" y1="120" x2="55" y2="138" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-        <line x1="55" y1="138" x2="45" y2="165" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-        <line x1="80" y1="120" x2="105" y2="138" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-        <line x1="105" y1="138" x2="115" y2="165" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
+        <line x1="80" y1="120" x2="55" y2="140" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+        {/* left knee */}
+        <circle cx="55" cy="140" r="4" fill="#d4d4d4" />
+        <line x1="55" y1="140" x2="45" y2="165" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+        <line x1="80" y1="120" x2="105" y2="140" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+        {/* right knee */}
+        <circle cx="105" cy="140" r="4" fill="#d4d4d4" />
+        <line x1="105" y1="140" x2="115" y2="165" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
       </g>
     </svg>
   )
@@ -236,8 +270,7 @@ export function CatCowAnim({ paused = false }: PoseAnimProps) {
           animation-play-state: ${ps};
         }
         .cc-head {
-          transform-box: fill-box;
-          transform-origin: right center;
+          transform-origin: 42px 112px;
           animation: cc-head-wave 4s ease-in-out infinite;
           animation-play-state: ${ps};
         }
@@ -261,25 +294,31 @@ export function CatCowAnim({ paused = false }: PoseAnimProps) {
       <line x1="10" y1="162" x2="150" y2="162" stroke="#2a2a2a" strokeWidth="1.5" />
 
       {/* wrists — static, planted on ground */}
-      <line x1="40" y1="118" x2="40" y2="150" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
-      <line x1="120" y1="118" x2="120" y2="150" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
+      <line x1="40" y1="118" x2="40" y2="150" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+      <line x1="120" y1="118" x2="120" y2="150" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
 
       {/* knees — static */}
-      <line x1="50" y1="128" x2="50" y2="155" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-      <line x1="110" y1="128" x2="110" y2="155" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
+      <line x1="50" y1="128" x2="50" y2="155" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+      <line x1="110" y1="128" x2="110" y2="155" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+      {/* knee joint circles */}
+      <circle cx="50" cy="128" r="4" fill="#d4d4d4" />
+      <circle cx="110" cy="128" r="4" fill="#d4d4d4" />
 
       {/* animated spine group */}
       <g className="cc-spine">
         {/* spine bar */}
-        <line x1="40" y1="118" x2="120" y2="118" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
-        {/* upper arm connections to knees */}
-        <line x1="50" y1="118" x2="50" y2="128" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
-        <line x1="110" y1="118" x2="110" y2="128" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
+        <line x1="40" y1="118" x2="120" y2="118" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round" />
+        {/* shoulder/hip connectors to knees */}
+        <line x1="50" y1="118" x2="50" y2="128" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+        <line x1="110" y1="118" x2="110" y2="128" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+        {/* shoulder joint circles */}
+        <circle cx="40" cy="118" r="4" fill="#d4d4d4" />
+        <circle cx="120" cy="118" r="4" fill="#d4d4d4" />
       </g>
 
       {/* animated head — opposite phase to spine */}
       <g className="cc-head" style={{ transformOrigin: '42px 112px' }}>
-        <line x1="42" y1="112" x2="26" y2="106" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+        <line x1="42" y1="112" x2="26" y2="106" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
         <circle cx="15" cy="98" r="13" fill="#d4d4d4" />
       </g>
     </svg>
@@ -299,8 +338,7 @@ export function ForwardFoldAnim({ paused = false }: PoseAnimProps) {
           .ff-upper { animation: none !important; }
         }
         .ff-upper {
-          transform-box: fill-box;
-          transform-origin: center;
+          transform-origin: 80px 108px;
           animation: ff-fold 3s ease-in-out infinite alternate;
           animation-play-state: ${ps};
         }
@@ -314,24 +352,37 @@ export function ForwardFoldAnim({ paused = false }: PoseAnimProps) {
       <line x1="10" y1="170" x2="150" y2="170" stroke="#2a2a2a" strokeWidth="1.5" />
 
       {/* legs — static */}
-      <line x1="80" y1="108" x2="65" y2="138" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-      <line x1="65" y1="138" x2="58" y2="168" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-      <line x1="80" y1="108" x2="95" y2="138" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-      <line x1="95" y1="138" x2="102" y2="168" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
+      <line x1="80" y1="108" x2="65" y2="138" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+      {/* left knee */}
+      <circle cx="65" cy="138" r="4" fill="#d4d4d4" />
+      <line x1="65" y1="138" x2="58" y2="168" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+      <line x1="80" y1="108" x2="95" y2="138" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+      {/* right knee */}
+      <circle cx="95" cy="138" r="4" fill="#d4d4d4" />
+      <line x1="95" y1="138" x2="102" y2="168" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+      {/* hip joints */}
+      <circle cx="78" cy="108" r="4" fill="#d4d4d4" />
+      <circle cx="82" cy="108" r="4" fill="#d4d4d4" />
 
       {/* upper body rotates forward from hip pivot */}
       <g className="ff-upper" style={{ transformOrigin: '80px 108px' }}>
         {/* torso */}
-        <line x1="80" y1="48" x2="80" y2="108" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+        <line x1="80" y1="48" x2="80" y2="108" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round" />
         {/* neck + head */}
-        <line x1="80" y1="35" x2="80" y2="48" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+        <line x1="80" y1="35" x2="80" y2="48" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
         <circle cx="80" cy="22" r="13" fill="#d4d4d4" />
+        {/* shoulder joint */}
+        <circle cx="80" cy="62" r="4" fill="#d4d4d4" />
         {/* left arm hangs */}
-        <line x1="80" y1="60" x2="60" y2="80" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
-        <line x1="60" y1="80" x2="55" y2="108" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
+        <line x1="80" y1="62" x2="60" y2="82" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+        {/* left elbow */}
+        <circle cx="60" cy="82" r="4" fill="#d4d4d4" />
+        <line x1="60" y1="82" x2="55" y2="108" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
         {/* right arm hangs */}
-        <line x1="80" y1="60" x2="100" y2="80" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
-        <line x1="100" y1="80" x2="105" y2="108" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
+        <line x1="80" y1="62" x2="100" y2="82" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+        {/* right elbow */}
+        <circle cx="100" cy="82" r="4" fill="#d4d4d4" />
+        <line x1="100" y1="82" x2="105" y2="108" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
       </g>
     </svg>
   )
@@ -350,8 +401,7 @@ export function HalfForwardBendAnim({ paused = false }: PoseAnimProps) {
           .hfb-upper { animation: none !important; }
         }
         .hfb-upper {
-          transform-box: fill-box;
-          transform-origin: center;
+          transform-origin: 80px 108px;
           animation: hfb-spine 3s ease-in-out infinite alternate;
           animation-play-state: ${ps};
         }
@@ -365,23 +415,36 @@ export function HalfForwardBendAnim({ paused = false }: PoseAnimProps) {
       <line x1="10" y1="170" x2="150" y2="170" stroke="#2a2a2a" strokeWidth="1.5" />
 
       {/* legs — static, straight */}
-      <line x1="80" y1="108" x2="65" y2="138" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-      <line x1="65" y1="138" x2="60" y2="165" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-      <line x1="80" y1="108" x2="95" y2="138" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-      <line x1="95" y1="138" x2="100" y2="165" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
+      <line x1="80" y1="108" x2="65" y2="138" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+      {/* left knee */}
+      <circle cx="65" cy="138" r="4" fill="#d4d4d4" />
+      <line x1="65" y1="138" x2="60" y2="165" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+      <line x1="80" y1="108" x2="95" y2="138" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+      {/* right knee */}
+      <circle cx="95" cy="138" r="4" fill="#d4d4d4" />
+      <line x1="95" y1="138" x2="100" y2="165" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+      {/* hip joints */}
+      <circle cx="78" cy="108" r="4" fill="#d4d4d4" />
+      <circle cx="82" cy="108" r="4" fill="#d4d4d4" />
 
       {/* upper body — near horizontal, spine flat */}
       <g className="hfb-upper" style={{ transformOrigin: '80px 108px' }}>
         {/* spine horizontal */}
-        <line x1="80" y1="52" x2="80" y2="108" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+        <line x1="80" y1="52" x2="80" y2="108" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round" />
         {/* neck + head lifted */}
-        <line x1="80" y1="40" x2="80" y2="52" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+        <line x1="80" y1="40" x2="80" y2="52" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
         <circle cx="80" cy="27" r="13" fill="#d4d4d4" />
+        {/* shoulder joint */}
+        <circle cx="80" cy="65" r="4" fill="#d4d4d4" />
         {/* arms reach down to shins */}
-        <line x1="80" y1="65" x2="62" y2="76" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
-        <line x1="62" y1="76" x2="58" y2="93" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
-        <line x1="80" y1="65" x2="98" y2="76" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
-        <line x1="98" y1="76" x2="102" y2="93" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
+        <line x1="80" y1="65" x2="62" y2="76" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+        {/* left elbow */}
+        <circle cx="62" cy="76" r="4" fill="#d4d4d4" />
+        <line x1="62" y1="76" x2="58" y2="93" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+        <line x1="80" y1="65" x2="98" y2="76" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+        {/* right elbow */}
+        <circle cx="98" cy="76" r="4" fill="#d4d4d4" />
+        <line x1="98" y1="76" x2="102" y2="93" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
       </g>
     </svg>
   )
@@ -414,28 +477,35 @@ export function CobraAnim({ paused = false }: PoseAnimProps) {
       <line x1="10" y1="150" x2="150" y2="150" stroke="#2a2a2a" strokeWidth="1.5" />
 
       {/* legs flat on ground — static */}
-      <line x1="80" y1="132" x2="110" y2="134" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-      <line x1="110" y1="134" x2="148" y2="136" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-      <line x1="80" y1="136" x2="110" y2="140" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-      <line x1="110" y1="140" x2="148" y2="143" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
+      <line x1="80" y1="132" x2="110" y2="134" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+      <line x1="110" y1="134" x2="148" y2="136" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+      <line x1="80" y1="138" x2="110" y2="140" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+      <line x1="110" y1="140" x2="148" y2="143" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
 
       {/* hip/pelvis anchor */}
-      <circle cx="80" cy="134" r="5" fill="#d4d4d4" />
+      <circle cx="80" cy="135" r="5" fill="#d4d4d4" />
 
       {/* chest peels up — animated group */}
       <g className="cb-chest">
         {/* torso */}
-        <line x1="80" y1="130" x2="40" y2="124" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+        <line x1="80" y1="130" x2="40" y2="122" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round" />
         {/* neck */}
-        <line x1="40" y1="124" x2="30" y2="113" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+        <line x1="40" y1="122" x2="30" y2="111" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
         {/* head — lifted, chin up */}
-        <circle cx="20" cy="103" r="13" fill="#d4d4d4" />
+        <circle cx="20" cy="100" r="13" fill="#d4d4d4" />
+        {/* shoulder joints */}
+        <circle cx="72" cy="127" r="4" fill="#d4d4d4" />
+        <circle cx="82" cy="127" r="4" fill="#d4d4d4" />
         {/* left arm pressing into floor */}
-        <line x1="72" y1="127" x2="55" y2="132" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
-        <line x1="55" y1="132" x2="48" y2="147" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
+        <line x1="72" y1="127" x2="55" y2="132" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+        {/* left elbow */}
+        <circle cx="55" cy="132" r="4" fill="#d4d4d4" />
+        <line x1="55" y1="132" x2="48" y2="147" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
         {/* right arm pressing into floor */}
-        <line x1="82" y1="128" x2="100" y2="132" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
-        <line x1="100" y1="132" x2="108" y2="147" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
+        <line x1="82" y1="127" x2="100" y2="132" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+        {/* right elbow */}
+        <circle cx="100" cy="132" r="4" fill="#d4d4d4" />
+        <line x1="100" y1="132" x2="108" y2="147" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
       </g>
     </svg>
   )
@@ -470,19 +540,27 @@ export function DownwardDogAnim({ paused = false }: PoseAnimProps) {
 
       {/* inverted V — gentle hip lift */}
       <g className="dd-hips">
-        {/* left arm: hand to hip */}
-        <line x1="35" y1="135" x2="80" y2="55" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
-        {/* right arm: hip to right hand */}
-        <line x1="80" y1="55" x2="125" y2="135" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
-        {/* left leg: hip to left foot */}
-        <line x1="80" y1="55" x2="55" y2="140" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-        {/* right leg: hip to right foot */}
-        <line x1="80" y1="55" x2="105" y2="140" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
+        {/* left arm: hand to shoulder */}
+        <line x1="35" y1="135" x2="56" y2="100" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+        {/* shoulder joint left */}
+        <circle cx="56" cy="100" r="4" fill="#d4d4d4" />
+        {/* left shoulder to hip apex */}
+        <line x1="56" y1="100" x2="80" y2="55" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round" />
         {/* hip apex */}
         <circle cx="80" cy="55" r="5" fill="#d4d4d4" />
+        {/* hip to right shoulder */}
+        <line x1="80" y1="55" x2="107" y2="98" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round" />
+        {/* shoulder joint right */}
+        <circle cx="107" cy="98" r="4" fill="#d4d4d4" />
+        {/* right shoulder to hand */}
+        <line x1="107" y1="98" x2="125" y2="135" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+        {/* left leg: hip to left foot */}
+        <line x1="80" y1="55" x2="55" y2="140" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+        {/* right leg: hip to right foot */}
+        <line x1="80" y1="55" x2="105" y2="140" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
         {/* head between arms */}
-        <line x1="56" y1="100" x2="62" y2="87" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
-        <circle cx="62" cy="75" r="13" fill="#d4d4d4" />
+        <line x1="56" y1="100" x2="58" y2="87" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+        <circle cx="58" cy="75" r="13" fill="#d4d4d4" />
       </g>
     </svg>
   )
@@ -527,11 +605,16 @@ export function PlankAnim({ paused = false }: PoseAnimProps) {
 
       <g className="pl-body">
         {/* hands/arms — planted */}
-        <line x1="40" y1="113" x2="40" y2="135" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
-        <line x1="120" y1="113" x2="120" y2="135" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
+        <line x1="40" y1="113" x2="40" y2="135" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+        <line x1="120" y1="113" x2="120" y2="135" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
 
         {/* body straight line */}
-        <line x1="40" y1="113" x2="120" y2="113" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+        <line x1="40" y1="113" x2="120" y2="113" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round" />
+
+        {/* shoulder joint */}
+        <circle cx="40" cy="113" r="4" fill="#d4d4d4" />
+        {/* hip joint */}
+        <circle cx="120" cy="113" r="4" fill="#d4d4d4" />
 
         {/* core pulse */}
         <g className="pl-core">
@@ -539,12 +622,12 @@ export function PlankAnim({ paused = false }: PoseAnimProps) {
         </g>
 
         {/* neck + head */}
-        <line x1="40" y1="113" x2="28" y2="106" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+        <line x1="40" y1="113" x2="28" y2="106" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
         <circle cx="18" cy="99" r="13" fill="#d4d4d4" />
 
         {/* feet / toes */}
-        <line x1="120" y1="113" x2="140" y2="115" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-        <line x1="140" y1="115" x2="148" y2="122" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
+        <line x1="120" y1="113" x2="140" y2="115" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+        <line x1="140" y1="115" x2="148" y2="122" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
       </g>
     </svg>
   )
@@ -569,7 +652,6 @@ export function LowLungeAnim({ paused = false }: PoseAnimProps) {
           animation-play-state: ${ps};
         }
         .ll-rise {
-          transform-box: fill-box;
           transform-origin: 80px 80px;
           animation: ll-arms-sweep 3s ease-in-out infinite alternate;
           animation-play-state: ${ps};
@@ -590,25 +672,37 @@ export function LowLungeAnim({ paused = false }: PoseAnimProps) {
       {/* animated lunge — full body sinks together */}
       <g className="ll-body">
         {/* torso upright */}
-        <line x1="80" y1="70" x2="85" y2="118" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+        <line x1="80" y1="70" x2="85" y2="118" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round" />
         {/* neck */}
-        <line x1="80" y1="58" x2="80" y2="70" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
+        <line x1="80" y1="58" x2="80" y2="70" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
         {/* head */}
         <circle cx="80" cy="45" r="13" fill="#d4d4d4" />
+        {/* hip joint */}
+        <circle cx="85" cy="118" r="4" fill="#d4d4d4" />
         {/* back leg — moves with body */}
-        <line x1="85" y1="118" x2="115" y2="140" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-        <line x1="115" y1="140" x2="122" y2="162" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
+        <line x1="85" y1="118" x2="115" y2="140" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+        {/* back knee */}
+        <circle cx="115" cy="140" r="4" fill="#d4d4d4" />
+        <line x1="115" y1="140" x2="122" y2="162" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
         {/* front leg — moves with body */}
-        <line x1="85" y1="118" x2="65" y2="128" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
-        <line x1="65" y1="128" x2="60" y2="162" stroke="#d4d4d4" strokeWidth="3.5" strokeLinecap="round" />
+        <line x1="85" y1="118" x2="65" y2="128" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+        {/* front knee */}
+        <circle cx="65" cy="128" r="4" fill="#d4d4d4" />
+        <line x1="65" y1="128" x2="60" y2="162" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
         {/* arms sweep overhead */}
         <g className="ll-rise">
+          {/* shoulder joint */}
+          <circle cx="80" cy="80" r="4" fill="#d4d4d4" />
           {/* left arm */}
-          <line x1="80" y1="80" x2="62" y2="60" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
-          <line x1="62" y1="60" x2="55" y2="38" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
+          <line x1="80" y1="80" x2="62" y2="60" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+          {/* left elbow */}
+          <circle cx="62" cy="60" r="4" fill="#d4d4d4" />
+          <line x1="62" y1="60" x2="55" y2="38" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
           {/* right arm */}
-          <line x1="80" y1="80" x2="98" y2="60" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
-          <line x1="98" y1="60" x2="105" y2="38" stroke="#d4d4d4" strokeWidth="3" strokeLinecap="round" />
+          <line x1="80" y1="80" x2="98" y2="60" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round" />
+          {/* right elbow */}
+          <circle cx="98" cy="60" r="4" fill="#d4d4d4" />
+          <line x1="98" y1="60" x2="105" y2="38" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round" />
         </g>
       </g>
     </svg>
