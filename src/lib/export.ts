@@ -2,8 +2,14 @@
  * exportAllDataAsJSON — queries all 24 Dexie tables and triggers a browser download.
  * DrumPDF binary data (ArrayBuffer) is omitted — it's not JSON-serialisable and
  * would bloat the file. All other tables are exported in full.
+ *
+ * importAllDataFromJSON — reads an obZen backup JSON file and bulkPuts every record
+ * back into IndexedDB. Strategy is merge-by-ID: existing records with the same
+ * primary key are overwritten; records absent from the backup are left untouched.
+ * drumPDFs and cachedImages are skipped (binary / hollow metadata).
  */
 
+import { type Table } from 'dexie'
 import { db } from '@/db/dexie'
 
 function getDeviceId(): string {
@@ -199,4 +205,185 @@ export async function exportAllDataAsJSON(): Promise<void> {
   a.click()
   document.body.removeChild(a)
   URL.revokeObjectURL(url)
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Import
+// ─────────────────────────────────────────────────────────────────────────────
+
+export interface ImportResult {
+  /** Total number of records written across all tables. */
+  totalRecords: number
+  /** ISO timestamp from the backup's metadata.exportDate field. */
+  exportDate: string
+}
+
+// ── Structural validation ─────────────────────────────────────────────────────
+
+/** Maps each backup section to the table arrays it may contain. */
+const BACKUP_SHAPE: Record<string, string[]> = {
+  workout:   ['sessions', 'daySessions', 'exerciseLogs'],
+  drums:     ['sessions', 'rudiments', 'songs', 'jamSessions', 'books', 'notations'],
+  calendar:  ['events'],
+  nutrition: ['logs', 'savedMeals'],
+  meetings:  ['meetings', 'actionItems'],
+  projects:  ['boards', 'tasks'],
+  yoga:      ['sessions'],
+  ayurveda:  ['logs'],
+  vedic:     ['logs'],
+  app:       ['checkIns', 'progressPhotos', 'meta'],
+}
+
+function isPlainObject(value: unknown): value is Record<string, unknown> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value)
+}
+
+/**
+ * Validate the structural shape of a parsed backup's `data` field. Throws a
+ * descriptive Error on the first malformed section/table/row so a corrupt or
+ * hand-edited backup fails fast instead of silently writing bad records into
+ * IndexedDB. Field-level contents are intentionally not validated — Dexie's
+ * atomic transaction rolls back cleanly if bulkPut rejects a row.
+ */
+function validateBackupData(data: unknown): asserts data is BackupData {
+  if (!isPlainObject(data)) {
+    throw new Error('Backup "data" field must be an object.')
+  }
+  for (const [section, tables] of Object.entries(BACKUP_SHAPE)) {
+    const sectionValue = data[section]
+    if (sectionValue === undefined) continue
+    if (!isPlainObject(sectionValue)) {
+      throw new Error(`Backup section "${section}" must be an object.`)
+    }
+    for (const table of tables) {
+      const rows = sectionValue[table]
+      if (rows === undefined) continue
+      if (!Array.isArray(rows)) {
+        throw new Error(`"${section}.${table}" must be an array.`)
+      }
+      for (let i = 0; i < rows.length; i++) {
+        const row: unknown = rows[i]
+        if (!isPlainObject(row)) {
+          throw new Error(`"${section}.${table}[${i}]" must be an object.`)
+        }
+        const id = row['id']
+        if (id !== undefined && typeof id !== 'number' && typeof id !== 'string') {
+          throw new Error(`"${section}.${table}[${i}].id" must be a number or string.`)
+        }
+      }
+    }
+  }
+}
+
+/**
+ * Parse an obZen backup JSON file and merge its records into IndexedDB.
+ *
+ * Uses bulkPut so records are upserted by primary key — re-importing the same
+ * backup is safe and idempotent. Records that exist locally but are absent from
+ * the backup are never deleted.
+ *
+ * drumPDFs are absent from the backup by design (binary ArrayBuffer).
+ * cachedImages entries are skipped because the export omits imageData, making
+ * the metadata-only rows useless to restore.
+ *
+ * Throws on invalid JSON, missing required fields, or Dexie write errors.
+ */
+export async function importAllDataFromJSON(file: File): Promise<ImportResult> {
+  // ── Read and parse ──────────────────────────────────────────────────────────
+  const text = await file.text()
+
+  let raw: unknown
+  try {
+    raw = JSON.parse(text)
+  } catch {
+    throw new Error('Invalid file — could not parse JSON.')
+  }
+
+  if (!isPlainObject(raw) || !('data' in raw) || !('metadata' in raw)) {
+    throw new Error('Unrecognised backup format — missing "data" or "metadata" fields.')
+  }
+
+  const metadata = raw.metadata
+  if (!isPlainObject(metadata) || typeof metadata.exportDate !== 'string') {
+    throw new Error('Backup "metadata.exportDate" is missing or invalid.')
+  }
+
+  // Structural validation — throws with a descriptive path on the first bad node.
+  const data = raw.data
+  validateBackupData(data)
+
+  // ── Helper ──────────────────────────────────────────────────────────────────
+  let total = 0
+
+  async function put<T>(table: Table<T>, rows: unknown[] | undefined): Promise<void> {
+    if (!rows || rows.length === 0) return
+    await table.bulkPut(rows as T[])
+    total += rows.length
+  }
+
+  // ── Write all tables inside a single transaction ────────────────────────────
+  await db.transaction('rw', [
+    db.workoutSessions,
+    db.workoutDaySessions,
+    db.exerciseLogs,
+    db.drumSessions,
+    db.rudimentLogs,
+    db.songs,
+    db.jamSessions,
+    db.drumBooks,
+    db.drumNotations,
+    db.calendarEvents,
+    db.nutritionLogs,
+    db.savedMeals,
+    db.boards,
+    db.tasks,
+    db.meetings,
+    db.actionItems,
+    db.yogaSessions,
+    db.checkIns,
+    db.progressPhotos,
+    db.ayurvedaLogs,
+    db.vedicLogs,
+    db.meta,
+  ], async () => {
+    await put(db.workoutSessions,    data.workout?.sessions)
+    await put(db.workoutDaySessions, data.workout?.daySessions)
+    await put(db.exerciseLogs,       data.workout?.exerciseLogs)
+    await put(db.drumSessions,       data.drums?.sessions)
+    await put(db.rudimentLogs,       data.drums?.rudiments)
+    await put(db.songs,              data.drums?.songs)
+    await put(db.jamSessions,        data.drums?.jamSessions)
+    await put(db.drumBooks,          data.drums?.books)
+    await put(db.drumNotations,      data.drums?.notations)
+    await put(db.calendarEvents,     data.calendar?.events)
+    await put(db.nutritionLogs,      data.nutrition?.logs)
+    await put(db.savedMeals,         data.nutrition?.savedMeals)
+    await put(db.boards,             data.projects?.boards)
+    await put(db.tasks,              data.projects?.tasks)
+    await put(db.meetings,           data.meetings?.meetings)
+    await put(db.actionItems,        data.meetings?.actionItems)
+    await put(db.yogaSessions,       data.yoga?.sessions)
+    await put(db.checkIns,           data.app?.checkIns)
+    await put(db.progressPhotos,     data.app?.progressPhotos)
+    await put(db.ayurvedaLogs,       data.ayurveda?.logs)
+    await put(db.vedicLogs,          data.vedic?.logs)
+    await put(db.meta,               data.app?.meta)
+    // drumPDFs and cachedImages intentionally skipped — see JSDoc above
+  })
+
+  return { totalRecords: total, exportDate: metadata.exportDate }
+}
+
+// ── Backup shape (loosely typed for forward-compatibility) ────────────────────
+interface BackupData {
+  workout?:   { sessions?: unknown[]; daySessions?: unknown[]; exerciseLogs?: unknown[] }
+  drums?:     { sessions?: unknown[]; rudiments?: unknown[]; songs?: unknown[]; jamSessions?: unknown[]; books?: unknown[]; notations?: unknown[] }
+  calendar?:  { events?: unknown[] }
+  nutrition?: { logs?: unknown[]; savedMeals?: unknown[] }
+  meetings?:  { meetings?: unknown[]; actionItems?: unknown[] }
+  projects?:  { boards?: unknown[]; tasks?: unknown[] }
+  yoga?:      { sessions?: unknown[] }
+  ayurveda?:  { logs?: unknown[] }
+  vedic?:     { logs?: unknown[] }
+  app?:       { checkIns?: unknown[]; progressPhotos?: unknown[]; meta?: unknown[] }
 }

@@ -2,11 +2,12 @@ import { useState, useRef, useCallback, useEffect } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import {
   FileText, Plus, Search, X, ChevronDown, ChevronUp,
-  Trash2, Download, MoreHorizontal, AlertCircle,
+  Trash2, Download, MoreHorizontal, AlertCircle, RefreshCw,
 } from 'lucide-react'
 import { db } from '@/db/dexie'
 import type { DrumBook, DrumBookCategory } from '@/db/dexie'
 import { cn } from '@/lib/utils'
+import { importDrumBooks } from '@/utils/importDrumBooks'
 
 const MAX_BOOKS = 100
 const CATEGORIES: DrumBookCategory[] = [
@@ -90,8 +91,7 @@ function PDFViewer({ bookId, title, onClose }: PDFViewerProps) {
     }
   }
 
-  // Load on mount
-  useState(() => { loadPDF() })
+  useEffect(() => { loadPDF() }, [loadPDF])
 
   const goToPage = useCallback(async (p: number) => {
     if (!totalPages || p < 1 || p > totalPages) return
@@ -519,11 +519,35 @@ export function DrumLibrary() {
   const [viewingBook, setViewingBook] = useState<{ id: number; title: string } | null>(null)
   const [showFilters, setShowFilters] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
+  const [syncing, setSyncing] = useState(false)
+  const [syncMsg, setSyncMsg] = useState<string | null>(null)
 
   useEffect(() => {
     seedIndexedBooks()
     navigator.storage?.persist?.()
   }, [])
+
+  const handleSync = async () => {
+    setSyncing(true)
+    setSyncMsg(null)
+    try {
+      const result = await importDrumBooks()
+      if (result.imported.length === 0 && result.failed.length === 0) {
+        setSyncMsg('Up to date — no new books to add.')
+      } else {
+        const parts: string[] = []
+        if (result.imported.length > 0) parts.push(`+${result.imported.length} added`)
+        if (result.failed.length > 0) parts.push(`${result.failed.length} failed`)
+        setSyncMsg(parts.join(', '))
+      }
+      if (result.imported.length > 0) setRefreshKey(k => k + 1)
+    } catch (err: unknown) {
+      setSyncMsg(err instanceof Error ? err.message : 'Sync failed.')
+    } finally {
+      setSyncing(false)
+      setTimeout(() => setSyncMsg(null), 6000)
+    }
+  }
 
   const books = useLiveQuery(
     () => db.drumBooks.orderBy('dateAdded').reverse().toArray(),
@@ -559,16 +583,32 @@ export function DrumLibrary() {
             {bookCount} books · {formatBytes(totalSize)}
           </span>
         </div>
-        <button
-          onClick={() => setShowAdd(true)}
-          disabled={atLimit}
-          className="flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] text-[10px] uppercase tracking-widest disabled:opacity-30 transition-opacity hover:opacity-70"
-          style={{ border: '1px solid #d4d4d4', color: '#d4d4d4' }}
-          aria-label="Add book"
-        >
-          <Plus size={12} /> Add Book
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleSync}
+            disabled={syncing}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] text-[10px] uppercase tracking-widest disabled:opacity-30 transition-opacity hover:opacity-70"
+            style={{ border: '1px solid #2a2a2a', color: '#888888' }}
+            aria-label="Sync library"
+          >
+            <RefreshCw size={12} className={syncing ? 'animate-spin' : ''} /> {syncing ? 'Syncing…' : 'Sync'}
+          </button>
+          <button
+            onClick={() => setShowAdd(true)}
+            disabled={atLimit}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] text-[10px] uppercase tracking-widest disabled:opacity-30 transition-opacity hover:opacity-70"
+            style={{ border: '1px solid #d4d4d4', color: '#d4d4d4' }}
+            aria-label="Add book"
+          >
+            <Plus size={12} /> Add Book
+          </button>
+        </div>
       </div>
+
+      {/* Sync feedback */}
+      {syncMsg && (
+        <p className="text-[11px] text-center" style={{ color: '#888888' }}>{syncMsg}</p>
+      )}
 
       {/* Capacity warning */}
       {atLimit && (

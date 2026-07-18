@@ -1,6 +1,27 @@
+# Dependencies & build output
 node_modules
 dist
+.vite
+
+# Test coverage
+coverage
+
+# OS / editor
 .DS_Store
+
+# Environment
 .env
 .env.*
 *.local
+
+# Local Claude Code state (machine-specific)
+.claude/settings.local.json
+.claude/checkpoints.log
+
+# Large copyrighted drum method PDFs — kept out of git.
+# Present on disk for local dev/build; not distributed via the repo.
+public/drum-import/*.pdf
+
+# Personal workout exports (not project source)
+noircut_workout_log_week1.pdf
+obZen_Workout_Log_Consolidated.md
