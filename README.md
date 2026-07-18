@@ -187,6 +187,17 @@ npm run test
 npm run build
 ```
 
+### Drum library PDFs
+
+Reference-book PDFs are **not committed** (copyright + repo size). To bulk-load
+your own copies locally, drop the files into `public/drum-import/`, add matching
+entries to the `MANIFEST` in `src/utils/importDrumBooks.ts`, and click **Sync**
+in Drum → Library. Synced PDFs are stored in IndexedDB and persist on-device.
+
+Because those files are absent from the hosted GitHub Pages build, **Sync** there
+reports that no bundled PDFs are available and directs you to **Add Book** to
+upload individual PDFs instead — the app degrades gracefully rather than erroring.
+
 ---
 
 ## Current Status

@@ -531,16 +531,20 @@ export function DrumLibrary() {
     setSyncing(true)
     setSyncMsg(null)
     try {
-      const result = await importDrumBooks()
-      if (result.imported.length === 0 && result.failed.length === 0) {
+      const { imported, skipped, failed } = await importDrumBooks()
+      if (imported.length === 0 && skipped.length === 0 && failed.length > 0) {
+        // Nothing on disk to sync. Expected in the hosted build — bundled PDFs
+        // are copyright-restricted and not shipped, so point users to Add Book.
+        setSyncMsg('Bundled PDFs aren’t available here — use “Add Book” to upload your own.')
+      } else if (imported.length === 0 && failed.length === 0) {
         setSyncMsg('Up to date — no new books to add.')
       } else {
         const parts: string[] = []
-        if (result.imported.length > 0) parts.push(`+${result.imported.length} added`)
-        if (result.failed.length > 0) parts.push(`${result.failed.length} failed`)
+        if (imported.length > 0) parts.push(`+${imported.length} added`)
+        if (failed.length > 0) parts.push(`${failed.length} failed`)
         setSyncMsg(parts.join(', '))
       }
-      if (result.imported.length > 0) setRefreshKey(k => k + 1)
+      if (imported.length > 0) setRefreshKey(k => k + 1)
     } catch (err: unknown) {
       setSyncMsg(err instanceof Error ? err.message : 'Sync failed.')
     } finally {
