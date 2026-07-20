@@ -105,41 +105,47 @@ export async function importDrumBooks(): Promise<ImportDrumBooksResult> {
       const pageCount = await detectPageCount(buf)
       const today = new Date().toISOString().slice(0, 10)
 
-      let bookId: number
+      // Write the book, its PDF, and the sentinel atomically. If any step
+      // fails the whole book rolls back, so a re-sync never finds an
+      // un-sentineled book/PDF and duplicates it. (fetch/detectPageCount stay
+      // outside — a Dexie transaction cannot span non-Dexie async work.)
+      await db.transaction('rw', [db.drumBooks, db.drumPDFs, db.meta], async () => {
+        const existing = entry.matchTitle
+          ? await db.drumBooks.where('title').equals(entry.matchTitle).first()
+          : undefined
 
-      const existing = entry.matchTitle
-        ? await db.drumBooks.where('title').equals(entry.matchTitle).first()
-        : undefined
+        let bookId: number
+        if (existing) {
+          bookId = existing.id!
+          await db.drumBooks.update(bookId, {
+            type: 'uploaded',
+            fileSize: buf.byteLength,
+            pageCount,
+            dateAdded: today,
+          })
+        } else {
+          bookId = (await db.drumBooks.add({
+            title: entry.matchTitle ?? entry.title ?? entry.file,
+            author: entry.author ?? '',
+            category: entry.category ?? 'Other',
+            tags: entry.tags ?? [],
+            dateAdded: today,
+            pageCount,
+            fileSize: buf.byteLength,
+            type: 'uploaded',
+          })) as number
+        }
 
-      if (existing) {
-        bookId = existing.id!
-        await db.drumBooks.update(bookId, {
-          type: 'uploaded',
-          fileSize: buf.byteLength,
-          pageCount,
-          dateAdded: today,
+        await db.drumPDFs.add({
+          bookId,
+          data: buf,
+          mimeType: 'application/pdf',
+          size: buf.byteLength,
         })
-      } else {
-        bookId = (await db.drumBooks.add({
-          title: entry.matchTitle ?? entry.title ?? entry.file,
-          author: entry.author ?? '',
-          category: entry.category ?? 'Other',
-          tags: entry.tags ?? [],
-          dateAdded: today,
-          pageCount,
-          fileSize: buf.byteLength,
-          type: 'uploaded',
-        })) as number
-      }
 
-      await db.drumPDFs.add({
-        bookId,
-        data: buf,
-        mimeType: 'application/pdf',
-        size: buf.byteLength,
+        await db.meta.add({ key: sentinelKey, value: new Date().toISOString() })
       })
 
-      await db.meta.add({ key: sentinelKey, value: new Date().toISOString() })
       imported.push(entry.file)
     } catch (err: unknown) {
       failed.push({ file: entry.file, error: err instanceof Error ? err.message : 'Unknown error' })

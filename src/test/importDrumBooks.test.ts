@@ -108,4 +108,29 @@ describe('importDrumBooks — partial failure', () => {
     const retry = await importDrumBooks()
     expect(retry.imported).toEqual(['40-rudiments.pdf'])
   })
+
+  it('rolls back the book+PDF when the sentinel write fails, so a retry does not duplicate', async () => {
+    stubFetch()
+    // Fail only the first book's sentinel write (40-rudiments.pdf, first in MANIFEST).
+    const metaAdd = vi.spyOn(db.meta, 'add').mockRejectedValueOnce(new Error('quota exceeded'))
+
+    const first = await importDrumBooks()
+    metaAdd.mockRestore()
+
+    expect(first.failed.map(f => f.file)).toEqual(['40-rudiments.pdf'])
+    expect(first.imported).toHaveLength(4)
+
+    // The failed book rolled back entirely — no orphaned book or PDF.
+    expect(await db.drumBooks.count()).toBe(4)
+    expect(await db.drumPDFs.count()).toBe(4)
+
+    // Retry re-imports the rolled-back file without creating a duplicate.
+    const retry = await importDrumBooks()
+    expect(retry.imported).toEqual(['40-rudiments.pdf'])
+
+    const titles = (await db.drumBooks.toArray()).map(b => b.title)
+    expect(titles).toHaveLength(5)
+    expect(new Set(titles).size).toBe(5) // no duplicate titles
+    expect(await db.drumPDFs.count()).toBe(5)
+  })
 })
