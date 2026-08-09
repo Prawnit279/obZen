@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { X, Search, Plus } from 'lucide-react'
-import { OBZEN_PROGRAM, SWAP_OPTIONS } from '@/data/obzen-program'
+import { OBZEN_PROGRAM, EXERCISE_LIBRARY, formatTarget, toExerciseId } from '@/data/obzen-program'
 import type { MuscleGroup } from '@/data/obzen-program'
 import type { ExerciseSessionState } from '@/db/dexie'
 import { cn } from '@/lib/utils'
@@ -16,13 +16,16 @@ interface Props {
   onClose: () => void
 }
 
-function toId(name: string): string {
-  return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
-}
-
-function makeExerciseState(name: string, addedFrom: ExerciseSessionState['addedFrom']): ExerciseSessionState {
+function makeExerciseState(
+  name: string,
+  addedFrom: ExerciseSessionState['addedFrom'],
+  opts?: { muscle?: string; target?: string }
+): ExerciseSessionState {
   return {
-    exerciseId: toId(name),
+    exerciseId: toExerciseId(name),
+    name,
+    muscle: opts?.muscle,
+    target: opts?.target,
     status: 'pending',
     sets: [],
     addedFrom,
@@ -44,30 +47,33 @@ function OtherDaysTab({
     <div className="space-y-4">
       {otherDays.map(day => {
         const program = OBZEN_PROGRAM[day]
-        const available = program.exercises.filter(ex => !existingIds.includes(toId(ex.name)))
+        const available = program.exercises.filter(ex => !existingIds.includes(toExerciseId(ex.name)))
         return (
           <div key={day}>
-            <div className="text-[9px] uppercase tracking-widest mb-2" style={{ color: '#3a3a3a' }}>
+            <div className="text-[10px] uppercase tracking-widest mb-2" style={{ color: '#6f6f6f' }}>
               {day} — {program.focus}
             </div>
             {available.length === 0 ? (
-              <p className="text-[11px]" style={{ color: '#555555' }}>All exercises already added.</p>
+              <p className="text-[13px]" style={{ color: '#6f6f6f' }}>All exercises already added.</p>
             ) : (
               <div className="space-y-1">
                 {available.map(ex => (
                   <button
                     key={ex.name}
-                    onClick={() => onAdd(makeExerciseState(ex.name, day))}
-                    className="w-full flex items-center justify-between px-3 py-2 rounded-[2px] text-left transition-opacity hover:opacity-70"
-                    style={{ background: '#181818', border: '1px solid #2a2a2a' }}
+                    onClick={() => onAdd(makeExerciseState(ex.name, day, {
+                      muscle: ex.muscle,
+                      target: formatTarget(ex.sets, ex.reps, ex.rest),
+                    }))}
+                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-[2px] text-left transition-opacity hover:opacity-70"
+                    style={{ background: '#1e1e1e', border: '1px solid #323232' }}
                   >
                     <div>
-                      <div className="text-[12px]" style={{ color: '#d4d4d4' }}>{ex.name}</div>
-                      <div className="text-[10px] uppercase tracking-widest" style={{ color: '#555555' }}>
-                        {ex.muscle} · {ex.working}
+                      <div className="text-[14px]" style={{ color: '#e2e2e2' }}>{ex.name}</div>
+                      <div className="text-[11px] uppercase tracking-widest" style={{ color: '#6f6f6f' }}>
+                        {ex.muscle} · {ex.sets}×{ex.reps}
                       </div>
                     </div>
-                    <Plus size={13} style={{ color: '#555555' }} />
+                    <Plus size={14} style={{ color: '#a6a6a6' }} />
                   </button>
                 ))}
               </div>
@@ -90,14 +96,10 @@ function LibraryTab({
   const [search, setSearch] = useState('')
   const [muscle, setMuscle] = useState<MuscleGroup | 'all'>('all')
 
-  const allExercises = Object.entries(SWAP_OPTIONS).flatMap(([group, names]) =>
-    names.map(name => ({ name, muscle: group as MuscleGroup }))
-  )
-
-  const filtered = allExercises.filter(ex => {
+  const filtered = EXERCISE_LIBRARY.filter(ex => {
     const matchSearch = !search || ex.name.toLowerCase().includes(search.toLowerCase())
     const matchMuscle = muscle === 'all' || ex.muscle === muscle
-    return matchSearch && matchMuscle && !existingIds.includes(toId(ex.name))
+    return matchSearch && matchMuscle && !existingIds.includes(toExerciseId(ex.name))
   })
 
   return (
@@ -141,20 +143,28 @@ function LibraryTab({
         {filtered.length === 0 ? (
           <p className="text-[11px]" style={{ color: '#555555' }}>No exercises found.</p>
         ) : (
-          filtered.slice(0, 40).map(ex => (
+          filtered.slice(0, 50).map(ex => (
             <button
               key={ex.name}
-              onClick={() => onAdd(makeExerciseState(ex.name, 'library'))}
-              className="w-full flex items-center justify-between px-3 py-2 rounded-[2px] text-left transition-opacity hover:opacity-70"
-              style={{ background: '#181818', border: '1px solid #2a2a2a' }}
+              onClick={() => onAdd(makeExerciseState(ex.name, 'library', {
+                muscle: ex.muscle,
+                target: formatTarget(ex.sets, ex.reps, ex.rest),
+              }))}
+              className="w-full flex items-center justify-between px-3 py-2.5 rounded-[2px] text-left transition-opacity hover:opacity-70"
+              style={{ background: '#1e1e1e', border: '1px solid #323232' }}
             >
               <div>
-                <div className="text-[12px]" style={{ color: '#d4d4d4' }}>{ex.name}</div>
-                <div className="text-[10px] uppercase tracking-widest" style={{ color: '#555555' }}>
-                  {ex.muscle}
+                <div className="text-[14px] flex items-center gap-2" style={{ color: '#e2e2e2' }}>
+                  {ex.name}
+                  {ex.isCore && (
+                    <span className="text-[9px] uppercase tracking-widest px-1 py-0.5 rounded-[2px]" style={{ color: '#a6a6a6', border: '1px solid #454545' }}>Core</span>
+                  )}
+                </div>
+                <div className="text-[11px] uppercase tracking-widest" style={{ color: '#6f6f6f' }}>
+                  {ex.muscle} · {ex.sets}×{ex.reps}
                 </div>
               </div>
-              <Plus size={13} style={{ color: '#555555' }} />
+              <Plus size={14} style={{ color: '#a6a6a6' }} />
             </button>
           ))
         )}
@@ -173,7 +183,7 @@ function CustomTab({ onAdd }: { onAdd: (ex: ExerciseSessionState) => void }) {
 
   const handleSubmit = () => {
     if (!name.trim()) return
-    onAdd({ ...makeExerciseState(name.trim(), 'custom') })
+    onAdd(makeExerciseState(name.trim(), 'custom', { muscle }))
     setName('')
   }
 

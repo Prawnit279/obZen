@@ -183,6 +183,13 @@ export interface LoggedSet {
 
 export interface ExerciseSessionState {
   exerciseId: string
+  /** Display name — persisted so library/custom adds and past sessions render
+   *  without a program lookup. */
+  name?: string
+  /** Muscle group for display, e.g. 'legs'. */
+  muscle?: string
+  /** Prescription summary as written on the plan, e.g. '4 × 10–12 · 90s'. */
+  target?: string
   status: 'pending' | 'complete' | 'skipped'
   sets: LoggedSet[]
   note?: string
@@ -193,8 +200,12 @@ export interface WorkoutDaySession {
   id?: number
   date: string
   dayLabel: 'Day 1' | 'Day 2' | 'Day 3'
+  /** Muscle-focus label, e.g. 'Glutes & Hamstrings' — persisted for history/detail. */
+  focus?: string
   exercises: ExerciseSessionState[]
   order: string[] // exerciseId ordering
+  /** Set when the user marks the day's workout complete. */
+  completedAt?: string
 }
 
 // --- Drum Library ---

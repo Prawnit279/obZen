@@ -110,7 +110,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
       {/* Day summary bar */}
       <DaySummaryBar
         dayLabel={dayLabel}
-        focus={program.focus}
+        focus={session.focus ?? program.focus}
         exercises={session.exercises}
       />
 
@@ -138,28 +138,69 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
         </div>
       )}
 
+      {/* Empty state — load a template or build the day manually */}
+      {orderedExercises.length === 0 && (
+        <div
+          className="rounded-[2px] p-5 text-center space-y-3"
+          style={{ background: '#161616', border: '1px dashed #323232' }}
+        >
+          <p className="text-[14px]" style={{ color: '#a6a6a6' }}>
+            No exercises yet — load the {dayLabel} template as a starting point, or add your own below.
+          </p>
+          <button
+            onClick={() => store.loadTemplate(dayLabel)}
+            className="w-full py-3 rounded-[2px] text-[13px] uppercase tracking-widest transition-opacity hover:opacity-80"
+            style={{ border: '1px solid #e2e2e2', color: '#e2e2e2' }}
+          >
+            Load {dayLabel} · {program.focus}
+          </button>
+        </div>
+      )}
+
       {/* Sortable exercise list */}
-      <SortableExerciseList
-        exercises={orderedExercises}
-        programMap={PROGRAM_MAP}
-        forearmFatigue={forearmFatigue}
-        dayLabel={dayLabel}
-        onReorder={newOrder => store.reorderExercises(dayLabel, newOrder)}
-        onStatusChange={(exerciseId, status) => store.updateExerciseStatus(dayLabel, exerciseId, status)}
-        onAddSet={(exerciseId, set) => store.addLoggedSet(dayLabel, exerciseId, set)}
-        onUpdateSet={(exerciseId, index, set) => store.updateLoggedSet(dayLabel, exerciseId, index, set)}
-        onRemoveSet={(exerciseId, index) => store.removeLoggedSet(dayLabel, exerciseId, index)}
-      />
+      {orderedExercises.length > 0 && (
+        <SortableExerciseList
+          exercises={orderedExercises}
+          programMap={PROGRAM_MAP}
+          forearmFatigue={forearmFatigue}
+          dayLabel={dayLabel}
+          onReorder={newOrder => store.reorderExercises(dayLabel, newOrder)}
+          onStatusChange={(exerciseId, status) => store.updateExerciseStatus(dayLabel, exerciseId, status)}
+          onAddSet={(exerciseId, set) => store.addLoggedSet(dayLabel, exerciseId, set)}
+          onUpdateSet={(exerciseId, index, set) => store.updateLoggedSet(dayLabel, exerciseId, index, set)}
+          onRemoveSet={(exerciseId, index) => store.removeLoggedSet(dayLabel, exerciseId, index)}
+        />
+      )}
 
       {/* Add Exercise button */}
       <button
         onClick={() => setShowAddSheet(true)}
-        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[2px] text-[10px] uppercase tracking-widest transition-opacity hover:opacity-70"
-        style={{ border: '1px dashed #2a2a2a', color: '#555555' }}
+        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[2px] text-[12px] uppercase tracking-widest transition-opacity hover:opacity-70"
+        style={{ border: '1px dashed #323232', color: '#a6a6a6' }}
       >
-        <Plus size={12} />
+        <Plus size={13} />
         Add Exercise
       </button>
+
+      {/* Complete workout */}
+      {orderedExercises.length > 0 && (
+        session.completedAt ? (
+          <div
+            className="text-center text-[13px] uppercase tracking-widest py-2.5 rounded-[2px]"
+            style={{ color: '#86efac', border: '1px solid #166534', background: 'rgba(22,101,52,0.08)' }}
+          >
+            ✓ Workout Complete
+          </div>
+        ) : (
+          <button
+            onClick={() => store.completeSession(dayLabel)}
+            className="w-full py-3 rounded-[2px] text-[13px] uppercase tracking-widest transition-opacity hover:opacity-80"
+            style={{ border: '1px solid #166534', color: '#86efac' }}
+          >
+            Complete Workout
+          </button>
+        )
+      )}
 
       {/* Add exercise sheet */}
       {showAddSheet && (
@@ -195,8 +236,10 @@ export default function Workout() {
     () => {
       const cutoff = new Date()
       cutoff.setDate(cutoff.getDate() - 7)
-      return db.workoutSessions
-        .where('date').aboveOrEqual(cutoff.toISOString().split('T')[0])
+      const cutoffISO = cutoff.toISOString().split('T')[0]
+      // Read the table the live logging flow actually writes to.
+      return db.workoutDaySessions
+        .where('date').aboveOrEqual(cutoffISO)
         .filter(s => !!s.completedAt)
         .count()
     },

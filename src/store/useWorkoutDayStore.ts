@@ -2,25 +2,25 @@ import { create } from 'zustand'
 import { db } from '@/db/dexie'
 import type { WorkoutDaySession, ExerciseSessionState, LoggedSet } from '@/db/dexie'
 import { todayISO } from '@/lib/utils'
-import { OBZEN_PROGRAM } from '@/data/obzen-program'
+import { OBZEN_PROGRAM, formatTarget, toExerciseId } from '@/data/obzen-program'
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
-function buildDefaultExercises(dayLabel: 'Day 1' | 'Day 2' | 'Day 3'): ExerciseSessionState[] {
+/** Build session-state rows from a day template (name/muscle/target persisted). */
+function buildTemplateExercises(dayLabel: 'Day 1' | 'Day 2' | 'Day 3'): ExerciseSessionState[] {
   const program = OBZEN_PROGRAM[dayLabel]
   if (!program) return []
   return program.exercises.map(ex => ({
-    exerciseId: ex.name.toLowerCase().replace(/\s+/g, '-'),
+    exerciseId: toExerciseId(ex.name),
+    name: ex.name,
+    muscle: ex.muscle,
+    target: formatTarget(ex.sets, ex.reps, ex.rest),
     status: 'pending' as const,
     sets: [],
-    note: undefined,
+    addedFrom: dayLabel,
   }))
-}
-
-function buildDefaultOrder(exercises: ExerciseSessionState[]): string[] {
-  return exercises.map(e => e.exerciseId)
 }
 
 // ---------------------------------------------------------------------------
@@ -33,6 +33,8 @@ interface WorkoutDayState {
   loading: boolean
 
   loadSession: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', date?: string) => Promise<void>
+  loadTemplate: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', date?: string) => Promise<void>
+  completeSession: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', date?: string) => Promise<void>
   updateExerciseStatus: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, status: ExerciseSessionState['status'], date?: string) => Promise<void>
   addLoggedSet: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, set: LoggedSet, date?: string) => Promise<void>
   updateLoggedSet: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, setIndex: number, set: LoggedSet, date?: string) => Promise<void>
@@ -65,12 +67,12 @@ export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => ({
       if (existing) {
         set(s => ({ sessions: { ...s.sessions, [key]: existing }, loading: false }))
       } else {
-        const exercises = buildDefaultExercises(dayLabel)
+        // Days start empty — the user loads a template or adds from the library.
         const newSession: WorkoutDaySession = {
           date,
           dayLabel,
-          exercises,
-          order: buildDefaultOrder(exercises),
+          exercises: [],
+          order: [],
         }
         const id = await db.workoutDaySessions.add(newSession) as number
         const withId = { ...newSession, id }
@@ -79,6 +81,38 @@ export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => ({
     } catch {
       set({ loading: false })
     }
+  },
+
+  // Load a day template as a starting point. Non-destructive: appends any
+  // template exercise not already present and stamps the focus label.
+  loadTemplate: async (dayLabel, date = todayISO()) => {
+    const key = `${dayLabel}::${date}`
+    const session = get().sessions[key]
+    if (!session) return
+
+    const existingIds = new Set(session.exercises.map(e => e.exerciseId))
+    const additions = buildTemplateExercises(dayLabel).filter(e => !existingIds.has(e.exerciseId))
+    if (additions.length === 0 && session.focus) return
+
+    const exercises = [...session.exercises, ...additions]
+    const order = [...session.order, ...additions.map(e => e.exerciseId)]
+    const focus = session.focus ?? OBZEN_PROGRAM[dayLabel]?.focus
+    const updated = { ...session, exercises, order, focus }
+    set(s => ({ sessions: { ...s.sessions, [key]: updated } }))
+    if (session.id != null) await db.workoutDaySessions.update(session.id, { exercises, order, focus })
+  },
+
+  // Mark the day's workout complete (stamps completedAt for history/streaks).
+  completeSession: async (dayLabel, date = todayISO()) => {
+    const key = `${dayLabel}::${date}`
+    const session = get().sessions[key]
+    if (!session) return
+
+    const completedAt = new Date().toISOString()
+    const focus = session.focus ?? OBZEN_PROGRAM[dayLabel]?.focus
+    const updated = { ...session, completedAt, focus }
+    set(s => ({ sessions: { ...s.sessions, [key]: updated } }))
+    if (session.id != null) await db.workoutDaySessions.update(session.id, { completedAt, focus })
   },
 
   updateExerciseStatus: async (dayLabel, exerciseId, status, date = todayISO()) => {

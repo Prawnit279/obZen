@@ -48,8 +48,14 @@ export function ExerciseCard({
     id: exerciseState.exerciseId,
   })
 
-  const isPullHeavy = PULL_HEAVY_EXERCISES.includes(programExercise?.name ?? '')
-  const isForearmLoad = FOREARM_LOAD_EXERCISES.includes(programExercise?.name ?? '')
+  const displayName = exerciseState.name
+    ?? programExercise?.name
+    ?? exerciseState.exerciseId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
+  const muscle = exerciseState.muscle ?? programExercise?.muscle ?? ''
+  const target = exerciseState.target ?? ''
+
+  const isPullHeavy = PULL_HEAVY_EXERCISES.includes(displayName)
+  const isForearmLoad = FOREARM_LOAD_EXERCISES.includes(displayName)
   const hasWarning = forearmFatigue && (isPullHeavy || isForearmLoad)
 
   const style: React.CSSProperties = {
@@ -58,9 +64,6 @@ export function ExerciseCard({
     ...(isDragging ? { boxShadow: '0 4px 20px rgba(0,0,0,0.8)', scale: '1.02', zIndex: 50, position: 'relative' } : {}),
   }
 
-  const displayName = programExercise?.name ?? exerciseState.exerciseId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
-  const muscle = programExercise?.muscle ?? ''
-  const working = programExercise?.working ?? ''
   const { status } = exerciseState
 
   return (
@@ -88,11 +91,11 @@ export function ExerciseCard({
               <div className="flex items-center gap-2 flex-wrap">
                 <span
                   className={cn(
-                    'text-[13px] leading-snug',
+                    'text-[15px] leading-snug',
                     status === 'skipped' && 'opacity-50',
                     status === 'complete' && 'line-through opacity-60'
                   )}
-                  style={{ color: status === 'skipped' ? '#444444' : '#d4d4d4' }}
+                  style={{ color: status === 'skipped' ? '#5a5a5a' : '#e2e2e2' }}
                 >
                   {displayName}
                 </span>
@@ -112,10 +115,10 @@ export function ExerciseCard({
                 )}
               </div>
 
-              {/* Working sets label */}
-              {working && (
-                <div className="text-[10px] mt-0.5 uppercase tracking-widest" style={{ color: '#555555' }}>
-                  {working}
+              {/* Prescription / muscle label */}
+              {(target || muscle) && (
+                <div className="text-[11px] mt-0.5 uppercase tracking-widest" style={{ color: '#8a8a8a' }}>
+                  {target}
                   {muscle && <span className="ml-2 normal-case capitalize">{muscle}</span>}
                 </div>
               )}

@@ -12,6 +12,8 @@ import Ayurveda from '@/pages/Ayurveda'
 import VedicRemedies from '@/pages/VedicRemedies'
 import Settings from '@/pages/Settings'
 import More from '@/pages/More'
+import SessionDetail from '@/pages/SessionDetail'
+import { SHOW_NUTRITION, SHOW_VEDIC } from '@/config/features'
 
 export default function App() {
   return (
@@ -19,14 +21,15 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/workout" element={<Workout />} />
+        <Route path="/workout/session/:id" element={<SessionDetail />} />
         <Route path="/drum" element={<DrumStudio />} />
         <Route path="/yoga" element={<Yoga />} />
         <Route path="/calendar" element={<Calendar />} />
-        <Route path="/nutrition" element={<Nutrition />} />
+        {SHOW_NUTRITION && <Route path="/nutrition" element={<Nutrition />} />}
         <Route path="/projects" element={<Projects />} />
         <Route path="/meetings" element={<Meetings />} />
         <Route path="/ayurveda" element={<Ayurveda />} />
-        <Route path="/vedic" element={<VedicRemedies />} />
+        {SHOW_VEDIC && <Route path="/vedic" element={<VedicRemedies />} />}
         <Route path="/settings" element={<Settings />} />
         <Route path="/more" element={<More />} />
       </Routes>

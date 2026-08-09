@@ -12,6 +12,18 @@ export function formatDateLong(date: Date | string): string {
   return d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' })
 }
 
+/** Parse a 'YYYY-MM-DD' string as a local date (avoids UTC off-by-one weekday). */
+export function localDateFromISO(iso: string): Date {
+  const [y, m, d] = iso.split('T')[0].split('-').map(Number)
+  return new Date(y, (m ?? 1) - 1, d ?? 1)
+}
+
+/** Full written date, e.g. 'Monday, 12 August 2026'. */
+export function formatDateFull(date: Date | string): string {
+  const d = typeof date === 'string' ? localDateFromISO(date) : date
+  return d.toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+}
+
 export function todayISO(): string {
   return new Date().toISOString().split('T')[0]
 }

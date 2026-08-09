@@ -13,11 +13,13 @@ import {
 import { DAILY_AYURVEDA_TIPS } from '@/data/ayurveda'
 import { VEDIC_REMEDIES } from '@/data/vedic-remedies'
 import { OBZEN_PROGRAM } from '@/data/obzen-program'
+import { SHOW_NUTRITION, SHOW_VEDIC } from '@/config/features'
 import { Card, CardHeader } from '@/components/ui/Card'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { Badge } from '@/components/ui/Badge'
 import { CheckInModal } from '@/components/modules/dashboard/CheckInModal'
 import { WeeklyVolumeChart } from '@/components/modules/dashboard/WeeklyVolumeChart'
+import { WeekStrip } from '@/components/modules/dashboard/WeekStrip'
 import { DrumPieChart } from '@/components/modules/dashboard/DrumPieChart'
 import { MacroComplianceChart } from '@/components/modules/dashboard/MacroComplianceChart'
 import { ProgressOverloadChart } from '@/components/modules/dashboard/ProgressOverloadChart'
@@ -243,26 +245,31 @@ export default function Dashboard() {
         )}
       </Card>
 
+      {/* This week's training (Mon–Sun) */}
+      <WeekStrip />
+
       {/* Nutrition */}
-      <Card
-        className="cursor-pointer hover:border-noir-strong transition-colors"
-        onClick={() => navigate('/nutrition')}
-      >
-        <CardHeader
-          label="Nutrition"
-          action={
-            <Badge variant={isTrainingDay ? 'accent' : 'dim'}>
-              {isTrainingDay ? 'Training' : 'Rest'}
-            </Badge>
-          }
-        />
-        <div className="space-y-2.5">
-          <ProgressBar label="Protein" value={nutritionLog?.totalProtein ?? 0} max={targets.protein} showLabel compact />
-          <ProgressBar label="Carbs" value={nutritionLog?.totalCarbs ?? 0} max={targets.carbs} showLabel compact />
-          <ProgressBar label="Fat" value={nutritionLog?.totalFat ?? 0} max={targets.fat} showLabel compact />
-          <ProgressBar label="Calories" value={nutritionLog?.totalCalories ?? 0} max={targets.calories} showLabel compact />
-        </div>
-      </Card>
+      {SHOW_NUTRITION && (
+        <Card
+          className="cursor-pointer hover:border-noir-strong transition-colors"
+          onClick={() => navigate('/nutrition')}
+        >
+          <CardHeader
+            label="Nutrition"
+            action={
+              <Badge variant={isTrainingDay ? 'accent' : 'dim'}>
+                {isTrainingDay ? 'Training' : 'Rest'}
+              </Badge>
+            }
+          />
+          <div className="space-y-2.5">
+            <ProgressBar label="Protein" value={nutritionLog?.totalProtein ?? 0} max={targets.protein} showLabel compact />
+            <ProgressBar label="Carbs" value={nutritionLog?.totalCarbs ?? 0} max={targets.carbs} showLabel compact />
+            <ProgressBar label="Fat" value={nutritionLog?.totalFat ?? 0} max={targets.fat} showLabel compact />
+            <ProgressBar label="Calories" value={nutritionLog?.totalCalories ?? 0} max={targets.calories} showLabel compact />
+          </div>
+        </Card>
+      )}
 
       {/* Streaks */}
       <Card>
@@ -289,13 +296,15 @@ export default function Dashboard() {
       </Card>
 
       {/* Vedic remedy */}
-      <Card>
-        <CardHeader label={`Vedic · ${dailyRemedy.planet}`} />
-        <p className="text-[13px] text-noir-accent italic leading-relaxed">"{dailyRemedy.affirmation}"</p>
-        {dailyRemedy.remedies[0] && (
-          <p className="text-[12px] text-noir-muted mt-2">{dailyRemedy.remedies[0]}</p>
-        )}
-      </Card>
+      {SHOW_VEDIC && (
+        <Card>
+          <CardHeader label={`Vedic · ${dailyRemedy.planet}`} />
+          <p className="text-[13px] text-noir-accent italic leading-relaxed">"{dailyRemedy.affirmation}"</p>
+          {dailyRemedy.remedies[0] && (
+            <p className="text-[12px] text-noir-muted mt-2">{dailyRemedy.remedies[0]}</p>
+          )}
+        </Card>
+      )}
 
       {/* Upcoming events */}
       {upcomingEvents && upcomingEvents.length > 0 && (
@@ -334,9 +343,11 @@ function WeeklySummaryTab() {
       <div className="p-4 border border-noir-border rounded-[2px] bg-noir-surface">
         <WeeklyVolumeChart />
       </div>
-      <div className="p-4 border border-noir-border rounded-[2px] bg-noir-surface">
-        <MacroComplianceChart />
-      </div>
+      {SHOW_NUTRITION && (
+        <div className="p-4 border border-noir-border rounded-[2px] bg-noir-surface">
+          <MacroComplianceChart />
+        </div>
+      )}
       <div className="p-4 border border-noir-border rounded-[2px] bg-noir-surface">
         <DrumPieChart />
       </div>

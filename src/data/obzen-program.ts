@@ -1,8 +1,18 @@
+export type MuscleGroup = 'legs' | 'back' | 'shoulders' | 'arms' | 'chest' | 'core'
+
 export interface ProgramExercise {
   name: string
-  warmup: string
-  working: string
-  muscle: 'legs' | 'back' | 'shoulders' | 'arms' | 'chest' | 'core'
+  muscle: MuscleGroup
+  /** Prescribed working sets. */
+  sets: number
+  /** Rep target as written on the plan, e.g. '10–12', '8/leg', '20–30s'. */
+  reps: string
+  /** Rest between sets as written on the plan, e.g. '90s', '2–3 min'. */
+  rest: string
+  /** Core/ab movement — surfaced with a CORE tag in the UI. */
+  isCore?: boolean
+  /** Suggested alternatives for this movement. */
+  swaps: string[]
 }
 
 export interface ProgramDay {
@@ -10,94 +20,120 @@ export interface ProgramDay {
   exercises: ProgramExercise[]
 }
 
+/** Human-readable prescription summary, e.g. '4 × 10–12 · 90s'. */
+export function formatTarget(sets: number, reps: string, rest: string): string {
+  return `${sets} × ${reps} · rest ${rest}`
+}
+
+/** Slug used as the stable exerciseId for a movement name. */
+export function toExerciseId(name: string): string {
+  return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '')
+}
+
+/**
+ * The three loadable day templates. A day is no longer auto-loaded — the user
+ * either loads one of these as a starting point or builds a day from the
+ * exercise library, then edits freely. (Phase 1 glute/hamstring program.)
+ */
 export const OBZEN_PROGRAM: Record<string, ProgramDay> = {
   'Day 1': {
-    focus: 'Pull / Legs / Arms',
+    focus: 'Glutes & Hamstrings',
     exercises: [
-      { name: 'Leg Press', warmup: '45×10, 110×10', working: '140×8×2', muscle: 'legs' },
-      { name: 'Weighted Pull-ups', warmup: 'BW×5', working: '+25lbs×5×6', muscle: 'back' },
-      { name: 'Barbell Row', warmup: 'light', working: '20×10×3', muscle: 'back' },
-      { name: 'DB Lateral Raises', warmup: '10×10', working: '12×10×3', muscle: 'shoulders' },
-      { name: 'Cable Bicep Curls', warmup: 'light', working: '30lbs×8×3', muscle: 'arms' },
-      { name: 'Cable Triceps', warmup: 'light', working: '30lbs×10×3', muscle: 'arms' },
-      { name: 'Standing Calf Raises', warmup: '40×15', working: '50lbs×15×3', muscle: 'legs' },
-      { name: 'Bar Knee Raises', warmup: '—', working: 'BW×10×3', muscle: 'core' },
-      { name: 'Leg Extension', warmup: '30×10, 60×10', working: '80×10×1', muscle: 'legs' },
-      { name: 'Barbell Squat', warmup: 'BW×10, 20×5, 40×5', working: '50×5×2', muscle: 'legs' },
+      { name: 'Hip Thrust Machine',    muscle: 'legs', sets: 4, reps: '10–12',  rest: '90s', swaps: ['Barbell Hip Thrust', 'Single-Leg Hip Thrust', 'Cable Pull-Through'] },
+      { name: 'Romanian Deadlift',     muscle: 'legs', sets: 3, reps: '10',      rest: '90s', swaps: ['Dumbbell RDL', 'Good Morning', 'Single-Leg RDL'] },
+      { name: 'Bulgarian Split Squat', muscle: 'legs', sets: 3, reps: '8/leg',   rest: '75s', swaps: ['Reverse Lunge', 'Step-Up', 'Walking Lunge'] },
+      { name: 'Leg Press',             muscle: 'legs', sets: 3, reps: '12',      rest: '90s', swaps: ['Hack Squat', 'Goblet Squat', 'Smith Machine Squat'] },
+      { name: 'Cable Glute Kickback',  muscle: 'legs', sets: 2, reps: '15/side', rest: '45s', swaps: ['Machine Kickback', 'Banded Kickback', 'Frog Pump'] },
+      { name: 'Dead Bug',              muscle: 'core', sets: 3, reps: '10/side', rest: '45s', isCore: true, swaps: ['Hanging Knee Raise', 'Reverse Crunch', 'Bird Dog'] },
     ],
   },
   'Day 2': {
-    focus: 'Zercher / Quad / Shoulders',
+    focus: 'Upper Body & Core',
     exercises: [
-      { name: 'Zercher Squat', warmup: 'BW×8, 20×10', working: '40×8×2, 50×5×2', muscle: 'legs' },
-      { name: 'Barbell Squat', warmup: 'BW×5, 50×5, 70×5', working: '90×5×3', muscle: 'legs' },
-      { name: 'Leg Press', warmup: '45×10, 110×10', working: '130×8×3', muscle: 'legs' },
-      { name: 'Leg Extension', warmup: '60×8, 90×8', working: '100×8×2, 110×8×1', muscle: 'legs' },
-      { name: 'Shoulder Press (Bar)', warmup: '40×8, 65×8', working: '80×8×2', muscle: 'shoulders' },
-      { name: 'DB Shoulder Press', warmup: '25×10', working: '30×10×3, 35×10×2', muscle: 'shoulders' },
-      { name: 'Weighted Pull-ups', warmup: 'BW×5', working: '+25lbs×5×6', muscle: 'back' },
-      { name: 'Weighted Push-ups', warmup: 'BW×10', working: '10lbs×12×3', muscle: 'chest' },
-      { name: 'Russian Twists', warmup: '—', working: '15lbs×10×3', muscle: 'core' },
-      { name: 'Hanging Leg Raises', warmup: '—', working: 'BW×10×3', muscle: 'core' },
+      { name: 'Assisted Pull-Up',        muscle: 'back',      sets: 3, reps: '6–8',    rest: '90s', swaps: ['Lat Pulldown', 'Inverted Row', 'Band-Assisted Pull-Up'] },
+      { name: 'Assisted Dip',            muscle: 'chest',     sets: 3, reps: '6–8',    rest: '90s', swaps: ['Push-Up', 'Bench Dip', 'Chest Press Machine'] },
+      { name: 'Seated Cable Row',        muscle: 'back',      sets: 3, reps: '10–12',  rest: '75s', swaps: ['Chest-Supported Row', 'One-Arm DB Row', 'Machine Row'] },
+      { name: 'Dumbbell Shoulder Press', muscle: 'shoulders', sets: 3, reps: '10',     rest: '75s', swaps: ['Machine Shoulder Press', 'Arnold Press', 'Landmine Press'] },
+      { name: 'Face Pull',               muscle: 'shoulders', sets: 2, reps: '15',     rest: '45s', swaps: ['Reverse Pec Deck', 'Band Pull-Apart', 'Rear Delt Fly'] },
+      { name: 'Cable Pallof Press',      muscle: 'core',      sets: 3, reps: '10/side',rest: '45s', isCore: true, swaps: ['Side Plank', 'Suitcase Carry', 'Half-Kneeling Chop'] },
+      { name: 'Hollow Body Hold',        muscle: 'core',      sets: 3, reps: '20–30s', rest: '45s', isCore: true, swaps: ['Plank', 'Ab Wheel from Knees', 'Leg Lowers'] },
     ],
   },
   'Day 3': {
-    focus: 'Posterior / Delts / Forearms / Calves',
+    focus: 'Legs, Deadlift & Glutes',
     exercises: [
-      { name: 'Deadlift', warmup: 'BW×5, 20×5, 50×5, 70×5', working: '90×5×3', muscle: 'legs' },
-      { name: 'Romanian Deadlift', warmup: 'light', working: '50lbs×8×3', muscle: 'legs' },
-      { name: 'DB Shoulder Press', warmup: '25×10', working: '30×10×3, 35×10×2', muscle: 'shoulders' },
-      { name: 'DB Lateral Raises', warmup: '10×10', working: '12×10×3', muscle: 'shoulders' },
-      { name: 'Rear Delt Raises', warmup: 'light', working: '10-12lbs×12×3', muscle: 'shoulders' },
-      { name: 'Weighted Pull-ups', warmup: 'BW×5', working: '+25lbs×5×3', muscle: 'back' },
-      { name: 'Hammer Curls', warmup: '25×10', working: '35lbs×10×3', muscle: 'arms' },
-      { name: 'Standing Calf Raises', warmup: '40×15', working: '50lbs×15×3', muscle: 'legs' },
-      { name: 'Hanging Leg Raises', warmup: '—', working: 'BW×10×3', muscle: 'core' },
+      { name: 'Deadlift',           muscle: 'legs', sets: 4, reps: '5',      rest: '2–3 min', swaps: ['Trap-Bar Deadlift', 'Sumo Deadlift', 'Rack Pull', 'Kettlebell Deadlift'] },
+      { name: 'Barbell Back Squat', muscle: 'legs', sets: 3, reps: '8',      rest: '2 min',   swaps: ['Goblet Squat', 'Hack Squat', 'Front-Foot-Elevated Split Squat'] },
+      { name: 'Hip Thrust Machine', muscle: 'legs', sets: 3, reps: '12',     rest: '90s',     swaps: ['Glute Bridge', 'Cable Pull-Through', 'Single-Leg Hip Thrust'] },
+      { name: 'Walking Lunge',      muscle: 'legs', sets: 2, reps: '10/leg', rest: '75s',     swaps: ['Reverse Lunge', 'Step-Up', 'Curtsy Lunge'] },
+      { name: 'Seated Leg Curl',    muscle: 'legs', sets: 2, reps: '12',     rest: '60s',     swaps: ['Lying Leg Curl', 'Nordic Negative', 'Stability Ball Curl'] },
+      { name: 'Cable Crunch',       muscle: 'core', sets: 3, reps: '12',     rest: '45s',     isCore: true, swaps: ['Reverse Crunch', 'Hanging Knee Raise', 'Ab Wheel'] },
     ],
   },
 }
 
-export type MuscleGroup = 'legs' | 'back' | 'shoulders' | 'arms' | 'chest' | 'core'
-
-export const SWAP_OPTIONS: Record<MuscleGroup, string[]> = {
-  legs: [
-    'Barbell Squat', 'Zercher Squat', 'Leg Press', 'Leg Extension',
-    'Romanian Deadlift', 'Walking Lunges', 'Standing Calf Raises',
-    'Box Step-ups', 'Leg Curl Machine', 'Goblet Squat', 'Bulgarian Split Squat',
-  ],
-  shoulders: [
-    'Barbell Shoulder Press', 'DB Shoulder Press', 'DB Lateral Raises',
-    'Rear Delt Raises', 'Trap Raises', 'Face Pulls', 'Arnold Press',
-    'Machine Shoulder Press', 'Cable Lateral Raises', 'Upright Row',
-  ],
-  back: [
-    'Weighted Pull-ups', 'BW Pull-ups', 'Barbell Row', 'DB Row',
-    'Trap Raises', 'Cable Row', 'Lat Pulldown', 'T-Bar Row',
-    'Chest-Supported Row', 'Meadows Row',
-  ],
-  chest: [
-    'Weighted Push-ups', 'BW Push-ups', 'DB Chest Press',
-    'Cable Fly', 'Barbell Bench Press', 'Incline DB Press',
-    'Cable Crossover', 'Pec Deck',
-  ],
-  arms: [
-    'Barbell Curls', 'DB Hammer Curls', 'Cable Bicep Curls',
-    'Cable Triceps', 'Overhead Tricep Extension', 'Skull Crushers',
-    'Preacher Curls', 'Concentration Curls', 'Dips', 'Close-Grip Bench',
-  ],
-  core: [
-    'Hanging Leg Raises', 'Bar Knee Raises', 'Russian Twists',
-    'Plank', 'Dead Bug', 'Ab Wheel', 'Cable Crunch',
-    'Bicycle Crunches', 'Dragon Flag', 'Pallof Press',
-  ],
+/** A pickable catalog entry — same shape a template exercise carries. */
+export interface LibraryExercise {
+  name: string
+  muscle: MuscleGroup
+  sets: number
+  reps: string
+  rest: string
+  isCore?: boolean
+  swaps: string[]
 }
 
+/**
+ * Deduped exercise library derived from the templates. Every main movement is
+ * included with its full prescription; each swap is folded in as a pickable
+ * entry that inherits its parent's muscle group (with a sensible default
+ * prescription the user can edit). Deduped by name — main prescriptions win, so
+ * e.g. Hip Thrust Machine appears once despite being on Days 1 and 3.
+ */
+function buildLibrary(program: Record<string, ProgramDay>): LibraryExercise[] {
+  const byName = new Map<string, LibraryExercise>()
+  const mains = Object.values(program).flatMap(day => day.exercises)
+
+  for (const ex of mains) {
+    if (!byName.has(ex.name)) {
+      byName.set(ex.name, {
+        name: ex.name, muscle: ex.muscle, sets: ex.sets,
+        reps: ex.reps, rest: ex.rest, isCore: ex.isCore, swaps: ex.swaps,
+      })
+    }
+  }
+  for (const ex of mains) {
+    for (const swapName of ex.swaps) {
+      if (!byName.has(swapName)) {
+        byName.set(swapName, {
+          name: swapName, muscle: ex.muscle, sets: 3, reps: '10',
+          rest: '60s', isCore: ex.isCore, swaps: [],
+        })
+      }
+    }
+  }
+  return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name))
+}
+
+export const EXERCISE_LIBRARY: LibraryExercise[] = buildLibrary(OBZEN_PROGRAM)
+
+/** Library names grouped by muscle — kept for consumers that filter by group. */
+export const SWAP_OPTIONS: Record<MuscleGroup, string[]> = EXERCISE_LIBRARY.reduce(
+  (groups, ex) => {
+    groups[ex.muscle].push(ex.name)
+    return groups
+  },
+  { legs: [], back: [], shoulders: [], arms: [], chest: [], core: [] } as Record<MuscleGroup, string[]>
+)
+
+/** Pull-dominant movements — used to auto-flag pull volume on fatigue days. */
 export const PULL_HEAVY_EXERCISES = [
-  'Weighted Pull-ups', 'BW Pull-ups', 'Lat Pulldown', 'Cable Row',
-  'Barbell Row', 'DB Row', 'T-Bar Row',
+  'Assisted Pull-Up', 'Lat Pulldown', 'Inverted Row', 'Band-Assisted Pull-Up',
+  'Seated Cable Row', 'Chest-Supported Row', 'One-Arm DB Row', 'Machine Row',
 ]
 
+/** Grip/forearm-loading movements — flagged when forearm fatigue is logged. */
 export const FOREARM_LOAD_EXERCISES = [
-  'Hammer Curls', 'Cable Bicep Curls', 'Barbell Curls', 'Wrist Curls',
-  'Reverse Curls', 'Farmer Carries',
+  'Deadlift', 'Romanian Deadlift', 'Dumbbell RDL', 'Assisted Pull-Up',
+  'Seated Cable Row', 'One-Arm DB Row', 'Kettlebell Deadlift',
 ]
