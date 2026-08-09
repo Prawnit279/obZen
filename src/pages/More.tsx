@@ -1,5 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { PersonStanding, Flame, Star, FolderKanban, Users, Settings } from 'lucide-react'
+import { SHOW_VEDIC } from '@/config/features'
 
 const MORE_ITEMS = [
   { path: '/yoga', label: 'Yoga', sub: '30-day progression + sequences', icon: PersonStanding },
@@ -8,7 +9,7 @@ const MORE_ITEMS = [
   { path: '/projects', label: 'Projects', sub: 'Kanban boards', icon: FolderKanban },
   { path: '/meetings', label: 'Meetings', sub: 'Notes + action items', icon: Users },
   { path: '/settings', label: 'Settings', sub: 'Data, export, profile', icon: Settings },
-]
+].filter(item => SHOW_VEDIC || item.path !== '/vedic')
 
 export default function More() {
   const navigate = useNavigate()

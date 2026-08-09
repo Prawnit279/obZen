@@ -13,6 +13,7 @@ import {
   Settings,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { SHOW_NUTRITION, SHOW_VEDIC } from '@/config/features'
 
 const NAV_ITEMS = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
@@ -26,7 +27,10 @@ const NAV_ITEMS = [
   { path: '/ayurveda', label: 'Ayurveda', icon: Flame },
   { path: '/vedic', label: 'Vedic', icon: Star },
   { path: '/settings', label: 'Settings', icon: Settings },
-]
+].filter(item =>
+  (SHOW_NUTRITION || item.path !== '/nutrition') &&
+  (SHOW_VEDIC || item.path !== '/vedic')
+)
 
 export function Sidebar() {
   return (

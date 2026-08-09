@@ -5,6 +5,7 @@ import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher'
 import { StoragePanel } from '@/components/ui/StoragePanel'
 import { exportAllDataAsJSON, importAllDataFromJSON } from '@/lib/export'
 import { importWorkoutData } from '@/utils/importWorkoutData'
+import { SHOW_VEDIC } from '@/config/features'
 
 function formatBytes(b: number) {
   if (b < 1024) return `${b} B`
@@ -128,14 +129,18 @@ export default function Settings() {
             <span className="text-noir-dim">Dosha</span>
             <span className="text-noir-accent">Pitta</span>
           </div>
-          <div className="flex justify-between">
-            <span className="text-noir-dim">Mahadasha</span>
-            <span className="text-noir-accent">Rahu (~2030)</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-noir-dim">Atmakaraka</span>
-            <span className="text-noir-accent">Saturn</span>
-          </div>
+          {SHOW_VEDIC && (
+            <>
+              <div className="flex justify-between">
+                <span className="text-noir-dim">Mahadasha</span>
+                <span className="text-noir-accent">Rahu (~2030)</span>
+              </div>
+              <div className="flex justify-between">
+                <span className="text-noir-dim">Atmakaraka</span>
+                <span className="text-noir-accent">Saturn</span>
+              </div>
+            </>
+          )}
         </div>
       </Card>
 

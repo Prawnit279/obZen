@@ -8,6 +8,7 @@ import {
   MoreHorizontal,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { SHOW_NUTRITION } from '@/config/features'
 
 const PRIMARY_NAV = [
   { path: '/', label: 'Home', icon: LayoutDashboard },
@@ -16,7 +17,7 @@ const PRIMARY_NAV = [
   { path: '/calendar', label: 'Cal', icon: CalendarDays },
   { path: '/nutrition', label: 'Food', icon: UtensilsCrossed },
   { path: '/more', label: 'More', icon: MoreHorizontal },
-]
+].filter(item => SHOW_NUTRITION || item.path !== '/nutrition')
 
 export function BottomNav() {
   const navigate = useNavigate()
