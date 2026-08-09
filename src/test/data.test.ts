@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { RUDIMENTS, getRudimentsByFamily, getRudimentsByDifficulty } from '@/data/rudiments'
-import { OBZEN_PROGRAM, SWAP_OPTIONS } from '@/data/obzen-program'
+import { OBZEN_PROGRAM, SWAP_OPTIONS, EXERCISE_LIBRARY } from '@/data/obzen-program'
 import { EXERCISES, getExercisesByMuscle } from '@/data/exercises'
 import { YOGA_POSES, getPosesBySequence } from '@/data/yoga-poses'
 import { PITTA_REMEDIES, PITTA_DINACHARYA } from '@/data/ayurveda'
@@ -44,12 +44,23 @@ describe('Obzen Program', () => {
       expect(day.focus).toBeTruthy()
     }
   })
-  it('all swap options cover expected muscle groups', () => {
+  it('swap options are defined for every muscle group', () => {
     const groups = ['legs', 'shoulders', 'back', 'chest', 'arms', 'core']
     groups.forEach(g => {
       expect(SWAP_OPTIONS[g as keyof typeof SWAP_OPTIONS]).toBeDefined()
+    })
+  })
+  it('library covers the program muscle groups', () => {
+    // The Phase 1 program uses these groups (no dedicated arm work).
+    const covered = ['legs', 'back', 'shoulders', 'chest', 'core']
+    covered.forEach(g => {
       expect(SWAP_OPTIONS[g as keyof typeof SWAP_OPTIONS].length).toBeGreaterThan(0)
     })
+  })
+  it('exercise library is non-empty and deduped by name', () => {
+    expect(EXERCISE_LIBRARY.length).toBeGreaterThan(0)
+    const names = EXERCISE_LIBRARY.map(e => e.name)
+    expect(new Set(names).size).toBe(names.length)
   })
 })
 
