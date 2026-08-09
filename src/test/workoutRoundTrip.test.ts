@@ -3,6 +3,7 @@ import { db } from '@/db/dexie'
 import type { LoggedSet } from '@/db/dexie'
 import { useWorkoutDayStore } from '@/store/useWorkoutDayStore'
 import { todayISO } from '@/lib/utils'
+import { sessionHasActivity } from '@/lib/workoutSession'
 
 // Regression coverage for the empty-History bug: the live logging flow writes
 // workoutDaySessions, so every read path (History, WeekStrip, SessionDetail)
@@ -28,15 +29,19 @@ describe('workout save → history round-trip', () => {
     const store = useWorkoutDayStore.getState()
     const today = todayISO()
 
-    // 1. A day starts empty (no forced preset).
+    // 1. A day starts empty and is NOT written to the DB until something is
+    //    logged — just opening/tabbing a day must not create a row.
     await store.loadSession('Day 1')
+    const key = `Day 1::${today}`
+    expect(useWorkoutDayStore.getState().sessions[key]?.exercises).toHaveLength(0)
+    expect(
+      await db.workoutDaySessions.where('date').equals(today).filter(s => s.dayLabel === 'Day 1').first()
+    ).toBeUndefined()
+
+    // 2. Loading the template persists the day (first write) and stamps focus.
+    await store.loadTemplate('Day 1')
     let session = (await db.workoutDaySessions.where('date').equals(today).filter(s => s.dayLabel === 'Day 1').first())!
     expect(session).toBeTruthy()
-    expect(session.exercises).toHaveLength(0)
-
-    // 2. Loading the template populates it and stamps the focus.
-    await store.loadTemplate('Day 1')
-    session = (await db.workoutDaySessions.get(session.id!))!
     expect(session.exercises.length).toBe(6)
     expect(session.focus).toBe('Glutes & Hamstrings')
 
@@ -72,6 +77,28 @@ describe('workout save → history round-trip', () => {
     // 8. Regression guard: the OLD table History used to read stays empty —
     //    proving the read path now matches the write path.
     expect(await db.workoutSessions.count()).toBe(0)
+  })
+
+  it('opening/tabbing days without logging creates no session rows', async () => {
+    const store = useWorkoutDayStore.getState()
+
+    // Simulate the user tabbing through all three days without logging.
+    await store.loadSession('Day 1')
+    await store.loadSession('Day 2')
+    await store.loadSession('Day 3')
+
+    // No empty rows written — the DB stays clean until something is logged.
+    expect(await db.workoutDaySessions.count()).toBe(0)
+
+    // Log a single set on Day 3 only.
+    await store.loadTemplate('Day 3')
+    const day3 = (await db.workoutDaySessions.where('dayLabel').equals('Day 3').first())!
+    await store.addLoggedSet('Day 3', day3.exercises[0].exerciseId, makeSet(80))
+
+    // Exactly one row exists, and History surfaces only Day 3 for the date.
+    const rows = await db.workoutDaySessions.toArray()
+    expect(rows).toHaveLength(1)
+    expect(rows.filter(sessionHasActivity).map(s => s.dayLabel)).toEqual(['Day 3'])
   })
 
   it('loadTemplate is non-destructive and idempotent', async () => {

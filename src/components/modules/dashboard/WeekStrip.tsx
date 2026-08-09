@@ -4,6 +4,7 @@ import { ChevronRight } from 'lucide-react'
 import { db } from '@/db/dexie'
 import type { WorkoutDaySession } from '@/db/dexie'
 import { todayISO } from '@/lib/utils'
+import { sessionHasActivity, loggedExercises, totalSets } from '@/lib/workoutSession'
 import { Card, CardHeader } from '@/components/ui/Card'
 
 function isoDate(d: Date): string {
@@ -36,12 +37,14 @@ export function WeekStrip() {
     [isoList.join(',')]
   )
 
-  // One entry per date — the logged session with the most exercises.
+  // One entry per date — the session actually trained that day. Ignore empty
+  // placeholders; prefer a completed session, then the one with the most sets.
+  const rank = (s: WorkoutDaySession) => (s.completedAt ? 1_000_000 : 0) + totalSets(s)
   const byDate = new Map<string, WorkoutDaySession>()
   for (const s of sessions ?? []) {
-    if (s.exercises.length === 0) continue
+    if (!sessionHasActivity(s)) continue
     const cur = byDate.get(s.date)
-    if (!cur || s.exercises.length > cur.exercises.length) byDate.set(s.date, s)
+    if (!cur || rank(s) > rank(cur)) byDate.set(s.date, s)
   }
 
   return (
@@ -53,7 +56,7 @@ export function WeekStrip() {
           const session = byDate.get(iso)
           const isToday = iso === today
           const weekday = d.toLocaleDateString('en-US', { weekday: 'short' })
-          const complete = session ? session.exercises.filter(e => e.status === 'complete').length : 0
+          const doneCount = session ? loggedExercises(session).length : 0
 
           const dayCol = (
             <div className="flex items-center gap-3 shrink-0 w-20">
@@ -95,7 +98,7 @@ export function WeekStrip() {
                   {session.dayLabel}{session.focus ? ` · ${session.focus}` : ''}
                 </div>
                 <div className="text-[11px] uppercase tracking-widest" style={{ color: '#6f6f6f' }}>
-                  {complete}/{session.exercises.length} done
+                  {doneCount} exercise{doneCount === 1 ? '' : 's'}
                   {session.completedAt && <span style={{ color: '#86efac' }}> · complete</span>}
                 </div>
               </div>

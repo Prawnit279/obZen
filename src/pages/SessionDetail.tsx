@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react'
 import { db } from '@/db/dexie'
 import type { ExerciseSessionState } from '@/db/dexie'
 import { formatDateFull } from '@/lib/utils'
+import { isExerciseLogged } from '@/lib/workoutSession'
 
 const STATUS_LABEL: Record<ExerciseSessionState['status'], { text: string; color: string }> = {
   complete: { text: 'Complete', color: '#86efac' },
@@ -56,8 +57,11 @@ export default function SessionDetail() {
 
   const map = Object.fromEntries(session.exercises.map(e => [e.exerciseId, e]))
   const ordered = session.order.map(eid => map[eid]).filter(Boolean) as ExerciseSessionState[]
-  const exercises = ordered.length > 0 ? ordered : session.exercises
-  const completeCount = exercises.filter(e => e.status === 'complete').length
+  const allOrdered = ordered.length > 0 ? ordered : session.exercises
+  // Only what was actually done — completed or with logged sets. Skipped and
+  // untouched exercises are noise in a past session's detail.
+  const exercises = allOrdered.filter(isExerciseLogged)
+  const setCount = exercises.reduce((n, e) => n + e.sets.length, 0)
 
   return (
     <div className="page-container space-y-4">
@@ -73,7 +77,7 @@ export default function SessionDetail() {
         </div>
         <div className="flex items-center gap-3 mt-1">
           <span className="text-[12px]" style={{ color: '#6f6f6f' }}>
-            {completeCount}/{exercises.length} exercises complete
+            {exercises.length} exercise{exercises.length === 1 ? '' : 's'} · {setCount} set{setCount === 1 ? '' : 's'}
           </span>
           {session.completedAt && (
             <span

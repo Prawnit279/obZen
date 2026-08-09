@@ -49,179 +49,190 @@ interface WorkoutDayState {
 // Store
 // ---------------------------------------------------------------------------
 
-export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => ({
-  sessions: {},
-  loading: false,
+export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => {
+  // Guards the first insert per key so a brand-new day is created exactly once,
+  // even if several mutations fire before the add resolves.
+  const pendingCreate: Record<string, Promise<number>> = {}
 
-  loadSession: async (dayLabel, date = todayISO()) => {
-    const key = `${dayLabel}::${date}`
-    if (get().sessions[key]) return // already loaded
+  /**
+   * Persist the current in-memory session for `key`. On the first write it
+   * inserts the row (guarded) and patches the store with the new id; afterwards
+   * it upserts the full session. Placeholder sessions never call this, so simply
+   * opening or tabbing a day no longer writes anything.
+   */
+  async function persist(key: string): Promise<void> {
+    const session = get().sessions[key]
+    if (!session) return
 
-    set({ loading: true })
-    try {
-      const existing = await db.workoutDaySessions
-        .where('date').equals(date)
-        .filter(s => s.dayLabel === dayLabel)
-        .first()
-
-      if (existing) {
-        set(s => ({ sessions: { ...s.sessions, [key]: existing }, loading: false }))
-      } else {
-        // Days start empty — the user loads a template or adds from the library.
-        const newSession: WorkoutDaySession = {
-          date,
-          dayLabel,
-          exercises: [],
-          order: [],
-        }
-        const id = await db.workoutDaySessions.add(newSession) as number
-        const withId = { ...newSession, id }
-        set(s => ({ sessions: { ...s.sessions, [key]: withId }, loading: false }))
-      }
-    } catch {
-      set({ loading: false })
+    if (session.id != null) {
+      await db.workoutDaySessions.put(session)
+      return
     }
-  },
 
-  // Load a day template as a starting point. Non-destructive: appends any
-  // template exercise not already present and stamps the focus label.
-  loadTemplate: async (dayLabel, date = todayISO()) => {
-    const key = `${dayLabel}::${date}`
+    if (!pendingCreate[key]) {
+      pendingCreate[key] = db.workoutDaySessions
+        .add(session)
+        .then(newId => {
+          set(s => {
+            const cur = s.sessions[key]
+            return cur ? { sessions: { ...s.sessions, [key]: { ...cur, id: newId as number } } } : {}
+          })
+          return newId as number
+        })
+        .catch(err => {
+          delete pendingCreate[key] // allow a later write to retry the insert
+          throw err
+        })
+    }
+
+    const id = await pendingCreate[key]
+    // Write the freshest state (any mutations that landed during the insert).
+    const latest = get().sessions[key]
+    if (latest) await db.workoutDaySessions.put({ ...latest, id })
+  }
+
+  /** Apply an immutable update to a session and persist it. */
+  async function mutate(
+    key: string,
+    updater: (session: WorkoutDaySession) => WorkoutDaySession
+  ): Promise<void> {
     const session = get().sessions[key]
     if (!session) return
+    set(s => ({ sessions: { ...s.sessions, [key]: updater(session) } }))
+    await persist(key)
+  }
 
-    const existingIds = new Set(session.exercises.map(e => e.exerciseId))
-    const additions = buildTemplateExercises(dayLabel).filter(e => !existingIds.has(e.exerciseId))
-    if (additions.length === 0 && session.focus) return
+  return {
+    sessions: {},
+    loading: false,
 
-    const exercises = [...session.exercises, ...additions]
-    const order = [...session.order, ...additions.map(e => e.exerciseId)]
-    const focus = session.focus ?? OBZEN_PROGRAM[dayLabel]?.focus
-    const updated = { ...session, exercises, order, focus }
-    set(s => ({ sessions: { ...s.sessions, [key]: updated } }))
-    if (session.id != null) await db.workoutDaySessions.update(session.id, { exercises, order, focus })
-  },
+    loadSession: async (dayLabel, date = todayISO()) => {
+      const key = `${dayLabel}::${date}`
+      if (get().sessions[key]) return // already loaded
 
-  // Mark the day's workout complete (stamps completedAt for history/streaks).
-  completeSession: async (dayLabel, date = todayISO()) => {
-    const key = `${dayLabel}::${date}`
-    const session = get().sessions[key]
-    if (!session) return
+      set({ loading: true })
+      try {
+        const existing = await db.workoutDaySessions
+          .where('date').equals(date)
+          .filter(s => s.dayLabel === dayLabel)
+          .first()
 
-    const completedAt = new Date().toISOString()
-    const focus = session.focus ?? OBZEN_PROGRAM[dayLabel]?.focus
-    const updated = { ...session, completedAt, focus }
-    set(s => ({ sessions: { ...s.sessions, [key]: updated } }))
-    if (session.id != null) await db.workoutDaySessions.update(session.id, { completedAt, focus })
-  },
+        if (existing) {
+          set(s => ({ sessions: { ...s.sessions, [key]: existing }, loading: false }))
+        } else {
+          // In-memory only — nothing is written until the user logs something.
+          const newSession: WorkoutDaySession = { date, dayLabel, exercises: [], order: [] }
+          set(s => ({ sessions: { ...s.sessions, [key]: newSession }, loading: false }))
+        }
+      } catch {
+        set({ loading: false })
+      }
+    },
 
-  updateExerciseStatus: async (dayLabel, exerciseId, status, date = todayISO()) => {
-    const key = `${dayLabel}::${date}`
-    const session = get().sessions[key]
-    if (!session) return
+    // Load a day template as a starting point. Non-destructive: appends any
+    // template exercise not already present and stamps the focus label.
+    loadTemplate: async (dayLabel, date = todayISO()) => {
+      const key = `${dayLabel}::${date}`
+      const session = get().sessions[key]
+      if (!session) return
 
-    const exercises = session.exercises.map(e =>
-      e.exerciseId === exerciseId ? { ...e, status } : e
-    )
-    const updated = { ...session, exercises }
-    set(s => ({ sessions: { ...s.sessions, [key]: updated } }))
-    if (session.id != null) await db.workoutDaySessions.update(session.id, { exercises })
-  },
+      const existingIds = new Set(session.exercises.map(e => e.exerciseId))
+      const additions = buildTemplateExercises(dayLabel).filter(e => !existingIds.has(e.exerciseId))
+      if (additions.length === 0 && session.focus) return
 
-  addLoggedSet: async (dayLabel, exerciseId, loggedSet, date = todayISO()) => {
-    const key = `${dayLabel}::${date}`
-    const session = get().sessions[key]
-    if (!session) return
+      await mutate(key, s => ({
+        ...s,
+        exercises: [...s.exercises, ...additions],
+        order: [...s.order, ...additions.map(e => e.exerciseId)],
+        focus: s.focus ?? OBZEN_PROGRAM[dayLabel]?.focus,
+      }))
+    },
 
-    const exercises = session.exercises.map(e => {
-      if (e.exerciseId !== exerciseId) return e
-      return { ...e, sets: [...e.sets, loggedSet] }
-    })
-    const updated = { ...session, exercises }
-    set(s => ({ sessions: { ...s.sessions, [key]: updated } }))
-    if (session.id != null) await db.workoutDaySessions.update(session.id, { exercises })
-  },
+    // Mark the day's workout complete (stamps completedAt for history/streaks).
+    completeSession: async (dayLabel, date = todayISO()) => {
+      const key = `${dayLabel}::${date}`
+      await mutate(key, s => ({
+        ...s,
+        completedAt: new Date().toISOString(),
+        focus: s.focus ?? OBZEN_PROGRAM[dayLabel]?.focus,
+      }))
+    },
 
-  updateLoggedSet: async (dayLabel, exerciseId, setIndex, loggedSet, date = todayISO()) => {
-    const key = `${dayLabel}::${date}`
-    const session = get().sessions[key]
-    if (!session) return
+    updateExerciseStatus: async (dayLabel, exerciseId, status, date = todayISO()) => {
+      const key = `${dayLabel}::${date}`
+      await mutate(key, s => ({
+        ...s,
+        exercises: s.exercises.map(e => e.exerciseId === exerciseId ? { ...e, status } : e),
+      }))
+    },
 
-    const exercises = session.exercises.map(e => {
-      if (e.exerciseId !== exerciseId) return e
-      const sets = e.sets.map((s, i) => i === setIndex ? loggedSet : s)
-      return { ...e, sets }
-    })
-    const updated = { ...session, exercises }
-    set(s => ({ sessions: { ...s.sessions, [key]: updated } }))
-    if (session.id != null) await db.workoutDaySessions.update(session.id, { exercises })
-  },
+    addLoggedSet: async (dayLabel, exerciseId, loggedSet, date = todayISO()) => {
+      const key = `${dayLabel}::${date}`
+      await mutate(key, s => ({
+        ...s,
+        exercises: s.exercises.map(e =>
+          e.exerciseId === exerciseId ? { ...e, sets: [...e.sets, loggedSet] } : e
+        ),
+      }))
+    },
 
-  removeLoggedSet: async (dayLabel, exerciseId, setIndex, date = todayISO()) => {
-    const key = `${dayLabel}::${date}`
-    const session = get().sessions[key]
-    if (!session) return
+    updateLoggedSet: async (dayLabel, exerciseId, setIndex, loggedSet, date = todayISO()) => {
+      const key = `${dayLabel}::${date}`
+      await mutate(key, s => ({
+        ...s,
+        exercises: s.exercises.map(e => {
+          if (e.exerciseId !== exerciseId) return e
+          return { ...e, sets: e.sets.map((set, i) => i === setIndex ? loggedSet : set) }
+        }),
+      }))
+    },
 
-    const exercises = session.exercises.map(e => {
-      if (e.exerciseId !== exerciseId) return e
-      const sets = e.sets.filter((_, i) => i !== setIndex).map((s, i) => ({ ...s, setNumber: i + 1 }))
-      return { ...e, sets }
-    })
-    const updated = { ...session, exercises }
-    set(s => ({ sessions: { ...s.sessions, [key]: updated } }))
-    if (session.id != null) await db.workoutDaySessions.update(session.id, { exercises })
-  },
+    removeLoggedSet: async (dayLabel, exerciseId, setIndex, date = todayISO()) => {
+      const key = `${dayLabel}::${date}`
+      await mutate(key, s => ({
+        ...s,
+        exercises: s.exercises.map(e => {
+          if (e.exerciseId !== exerciseId) return e
+          const sets = e.sets.filter((_, i) => i !== setIndex).map((set, i) => ({ ...set, setNumber: i + 1 }))
+          return { ...e, sets }
+        }),
+      }))
+    },
 
-  reorderExercises: async (dayLabel, newOrder, date = todayISO()) => {
-    const key = `${dayLabel}::${date}`
-    const session = get().sessions[key]
-    if (!session) return
+    reorderExercises: async (dayLabel, newOrder, date = todayISO()) => {
+      const key = `${dayLabel}::${date}`
+      await mutate(key, s => ({ ...s, order: newOrder }))
+    },
 
-    const updated = { ...session, order: newOrder }
-    set(s => ({ sessions: { ...s.sessions, [key]: updated } }))
-    if (session.id != null) await db.workoutDaySessions.update(session.id, { order: newOrder })
-  },
+    addExercise: async (dayLabel, exercise, date = todayISO()) => {
+      const key = `${dayLabel}::${date}`
+      await mutate(key, s => ({
+        ...s,
+        exercises: [...s.exercises, exercise],
+        order: [...s.order, exercise.exerciseId],
+      }))
+    },
 
-  addExercise: async (dayLabel, exercise, date = todayISO()) => {
-    const key = `${dayLabel}::${date}`
-    const session = get().sessions[key]
-    if (!session) return
+    setExerciseNote: async (dayLabel, exerciseId, note, date = todayISO()) => {
+      const key = `${dayLabel}::${date}`
+      await mutate(key, s => ({
+        ...s,
+        exercises: s.exercises.map(e => e.exerciseId === exerciseId ? { ...e, note } : e),
+      }))
+    },
 
-    const exercises = [...session.exercises, exercise]
-    const order = [...session.order, exercise.exerciseId]
-    const updated = { ...session, exercises, order }
-    set(s => ({ sessions: { ...s.sessions, [key]: updated } }))
-    if (session.id != null) await db.workoutDaySessions.update(session.id, { exercises, order })
-  },
-
-  setExerciseNote: async (dayLabel, exerciseId, note, date = todayISO()) => {
-    const key = `${dayLabel}::${date}`
-    const session = get().sessions[key]
-    if (!session) return
-
-    const exercises = session.exercises.map(e =>
-      e.exerciseId === exerciseId ? { ...e, note } : e
-    )
-    const updated = { ...session, exercises }
-    set(s => ({ sessions: { ...s.sessions, [key]: updated } }))
-    if (session.id != null) await db.workoutDaySessions.update(session.id, { exercises })
-  },
-
-  updateExerciseUnit: async (dayLabel, exerciseId, unit, date = todayISO()) => {
-    const key = `${dayLabel}::${date}`
-    const session = get().sessions[key]
-    if (!session) return
-
-    const exercises = session.exercises.map(e => {
-      if (e.exerciseId !== exerciseId) return e
-      const sets = e.sets.map(s => ({ ...s, unit }))
-      return { ...e, sets }
-    })
-    const updated = { ...session, exercises }
-    set(s => ({ sessions: { ...s.sessions, [key]: updated } }))
-    if (session.id != null) await db.workoutDaySessions.update(session.id, { exercises })
-  },
-}))
+    updateExerciseUnit: async (dayLabel, exerciseId, unit, date = todayISO()) => {
+      const key = `${dayLabel}::${date}`
+      await mutate(key, s => ({
+        ...s,
+        exercises: s.exercises.map(e => {
+          if (e.exerciseId !== exerciseId) return e
+          return { ...e, sets: e.sets.map(set => ({ ...set, unit })) }
+        }),
+      }))
+    },
+  }
+})
 
 // ---------------------------------------------------------------------------
 // Selector helpers

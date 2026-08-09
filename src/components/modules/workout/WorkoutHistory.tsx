@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import { db } from '@/db/dexie'
 import { formatDateFull } from '@/lib/utils'
+import { sessionHasActivity, loggedExercises, totalSets } from '@/lib/workoutSession'
 
 export function WorkoutHistory() {
   const navigate = useNavigate()
@@ -18,8 +19,9 @@ export function WorkoutHistory() {
     return <div className="text-center py-8 text-[13px] text-noir-muted">Loading…</div>
   }
 
-  // Only surface days that actually have exercises logged.
-  const logged = sessions.filter(s => s.exercises.length > 0)
+  // Only surface days with real training — completed, or with logged sets.
+  // Empty/placeholder days (opened but never logged) are hidden.
+  const logged = sessions.filter(sessionHasActivity)
 
   if (logged.length === 0) {
     return (
@@ -32,9 +34,8 @@ export function WorkoutHistory() {
   return (
     <div className="space-y-2.5">
       {logged.map(session => {
-        const total = session.exercises.length
-        const complete = session.exercises.filter(e => e.status === 'complete').length
-        const setCount = session.exercises.reduce((n, e) => n + e.sets.length, 0)
+        const doneCount = loggedExercises(session).length
+        const setCount = totalSets(session)
         return (
           <button
             key={session.id}
@@ -48,7 +49,7 @@ export function WorkoutHistory() {
                 {session.dayLabel}{session.focus ? ` · ${session.focus}` : ''}
               </div>
               <div className="text-[11px] uppercase tracking-widest mt-1.5" style={{ color: '#6f6f6f' }}>
-                {complete}/{total} done · {setCount} sets
+                {doneCount} exercise{doneCount === 1 ? '' : 's'} · {setCount} set{setCount === 1 ? '' : 's'}
                 {session.completedAt && <span style={{ color: '#86efac' }}> · complete</span>}
               </div>
             </div>

@@ -6,11 +6,12 @@ interface Props {
   exerciseName: string
 }
 
-const DAY_ABBR = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-
 function formatSessionDate(dateISO: string): string {
   const d = new Date(dateISO + 'T12:00:00')
-  return `${DAY_ABBR[d.getDay()]} ${d.getDate()}`
+  // Full date so recency is unambiguous, e.g. "Wed, 10 Aug 2026".
+  return d.toLocaleDateString('en-GB', {
+    weekday: 'short', day: 'numeric', month: 'short', year: 'numeric',
+  })
 }
 
 export function ExerciseHistory({ exerciseId, exerciseName }: Props) {
@@ -52,17 +53,17 @@ export function ExerciseHistory({ exerciseId, exerciseName }: Props) {
           No previous logs
         </p>
       ) : (
-        <div className="space-y-1">
+        <div className="space-y-1.5">
           {history.map((entry, i) => (
-            <div key={i} className="flex gap-3 items-baseline text-[11px]">
-              <span className="shrink-0 tabular-nums w-12" style={{ color: '#555555' }}>
+            <div key={i} className="space-y-0.5">
+              <div className="text-[10px] uppercase tracking-widest" style={{ color: '#6f6f6f' }}>
                 {formatSessionDate(entry.date)}
-              </span>
-              <span className="text-[10px]" style={{ color: '#888888' }}>
+              </div>
+              <div className="text-[11px]" style={{ color: '#a6a6a6' }}>
                 {entry.sets.map(s => (
                   `Set ${s.setNumber}: ${s.weight > 0 ? s.weight : '—'}×${s.reps}`
                 )).join('  ')}
-              </span>
+              </div>
             </div>
           ))}
         </div>
