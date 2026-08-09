@@ -6,11 +6,23 @@ import { StoragePanel } from '@/components/ui/StoragePanel'
 import { exportAllDataAsJSON, importAllDataFromJSON } from '@/lib/export'
 import { importWorkoutData } from '@/utils/importWorkoutData'
 import { SHOW_VEDIC } from '@/config/features'
+import { PROFILES, PROFILE_IDS } from '@/config/profiles'
+import { useProfileStore } from '@/store/useProfileStore'
+import { cn } from '@/lib/utils'
 
 function formatBytes(b: number) {
   if (b < 1024) return `${b} B`
   if (b < 1024 * 1024) return `${(b / 1024).toFixed(1)} KB`
   return `${(b / (1024 * 1024)).toFixed(1)} MB`
+}
+
+function ProfileRow({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex justify-between gap-4">
+      <span className="text-noir-dim shrink-0">{label}</span>
+      <span className="text-noir-accent text-right">{value}</span>
+    </div>
+  )
 }
 
 function useStorageEstimate() {
@@ -31,6 +43,8 @@ function useStorageEstimate() {
 
 export default function Settings() {
   const { used, quota, persisted } = useStorageEstimate()
+  const { activeId, setActive } = useProfileStore()
+  const profile = PROFILES[activeId]
 
   const [exporting, setExporting]   = useState(false)
   const [exportDone, setExportDone] = useState(false)
@@ -115,31 +129,44 @@ export default function Settings() {
       </Card>
 
       <Card>
-        <CardHeader label="User Profile" />
-        <div className="space-y-2 text-[12px]">
-          <div className="flex justify-between">
-            <span className="text-noir-dim">Name</span>
-            <span className="text-noir-accent">Pronit</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-noir-dim">Bodyweight</span>
-            <span className="text-noir-accent">75 kg</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-noir-dim">Dosha</span>
-            <span className="text-noir-accent">Pitta</span>
-          </div>
-          {SHOW_VEDIC && (
-            <>
-              <div className="flex justify-between">
-                <span className="text-noir-dim">Mahadasha</span>
-                <span className="text-noir-accent">Rahu (~2030)</span>
-              </div>
-              <div className="flex justify-between">
-                <span className="text-noir-dim">Atmakaraka</span>
-                <span className="text-noir-accent">Saturn</span>
-              </div>
-            </>
+        <CardHeader label="Profile" />
+
+        {/* Profile switcher */}
+        <div className="flex gap-2 mb-3">
+          {PROFILE_IDS.map(id => (
+            <button
+              key={id}
+              onClick={() => setActive(id)}
+              className={cn(
+                'flex-1 py-2 rounded-[2px] text-[11px] uppercase tracking-widest transition-colors border',
+                id === activeId
+                  ? 'border-noir-accent text-noir-white bg-noir-elevated'
+                  : 'border-noir-border text-noir-dim hover:border-noir-strong hover:text-noir-muted'
+              )}
+              aria-pressed={id === activeId}
+            >
+              {PROFILES[id].name}
+            </button>
+          ))}
+        </div>
+
+        {/* Active profile details */}
+        <div className="space-y-2 text-[13px]">
+          <ProfileRow label="Name" value={profile.name} />
+          <ProfileRow label="Bodyweight" value={profile.body.bodyweight} />
+          {profile.program && <ProfileRow label="Program" value={profile.program} />}
+          {profile.body.bodyFat && <ProfileRow label="Body Fat" value={profile.body.bodyFat} />}
+          {profile.body.fatMass && <ProfileRow label="Fat Mass" value={profile.body.fatMass} />}
+          {profile.body.leanMass && <ProfileRow label="Lean Mass" value={profile.body.leanMass} />}
+          <ProfileRow label="Protein" value={`${profile.targets.proteinG} g/day`} />
+          {profile.targets.steps && <ProfileRow label="Steps" value={profile.targets.steps} />}
+          {profile.dosha && <ProfileRow label="Dosha" value={profile.dosha} />}
+          {SHOW_VEDIC && profile.mahadasha && <ProfileRow label="Mahadasha" value={profile.mahadasha} />}
+          {SHOW_VEDIC && profile.atmakaraka && <ProfileRow label="Atmakaraka" value={profile.atmakaraka} />}
+          {profile.body.goal && (
+            <p className="text-[12px] leading-relaxed pt-1" style={{ color: '#888888' }}>
+              {profile.body.goal}
+            </p>
           )}
         </div>
       </Card>

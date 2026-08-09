@@ -14,6 +14,8 @@ import { DAILY_AYURVEDA_TIPS } from '@/data/ayurveda'
 import { VEDIC_REMEDIES } from '@/data/vedic-remedies'
 import { OBZEN_PROGRAM } from '@/data/obzen-program'
 import { SHOW_NUTRITION, SHOW_VEDIC } from '@/config/features'
+import { PROFILES, PROFILE_IDS } from '@/config/profiles'
+import { useProfileStore } from '@/store/useProfileStore'
 import { Card, CardHeader } from '@/components/ui/Card'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { Badge } from '@/components/ui/Badge'
@@ -54,6 +56,7 @@ export default function Dashboard() {
   const { isTrainingDay } = useNutritionStore()
   const [checkInOpen, setCheckInOpen] = useState(false)
   const [dashTab, setDashTab] = useState<DashTab>('today')
+  const { activeId, setActive } = useProfileStore()
 
   useEffect(() => { checkAndReset(today) }, [checkAndReset, today])
 
@@ -107,9 +110,32 @@ export default function Dashboard() {
     <div className="page-container space-y-4">
       {/* Header */}
       <div className="pt-2">
-        <div className="text-[11px] uppercase tracking-widest text-noir-muted">{dayOfWeek()}</div>
-        <div className="text-[18px] uppercase tracking-wide text-noir-white leading-tight">
+        <div className="flex items-center justify-between gap-2">
+          <span className="text-[11px] uppercase tracking-widest text-noir-muted">{dayOfWeek()}</span>
+          {/* Profile switcher */}
+          <div className="flex gap-1">
+            {PROFILE_IDS.map(id => (
+              <button
+                key={id}
+                onClick={() => setActive(id)}
+                className={cn(
+                  'px-2.5 py-1 rounded-[2px] text-[10px] uppercase tracking-widest transition-colors border',
+                  id === activeId
+                    ? 'border-noir-accent text-noir-white bg-noir-elevated'
+                    : 'border-noir-border text-noir-dim hover:text-noir-muted'
+                )}
+                aria-pressed={id === activeId}
+              >
+                {PROFILES[id].name}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="text-[18px] uppercase tracking-wide text-noir-white leading-tight mt-1">
           {formatDateLong(new Date())}
+        </div>
+        <div className="text-[13px] text-noir-muted mt-0.5">
+          {PROFILES[activeId].name}'s day
         </div>
         <div className="flex items-center gap-3 mt-1 flex-wrap">
           <span className="text-[10px] uppercase tracking-widest text-noir-dim">
