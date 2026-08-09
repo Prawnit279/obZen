@@ -28,12 +28,12 @@ export default {
         sans: ['Inter', 'system-ui', 'sans-serif'],
       },
       fontSize: {
-        label: ['10px', { letterSpacing: '0.08em', lineHeight: '1.4' }],
-        'label-sm': ['11px', { letterSpacing: '0.08em', lineHeight: '1.4' }],
-        body: ['13px', { lineHeight: '1.6' }],
-        'body-md': ['14px', { lineHeight: '1.6' }],
-        heading: ['16px', { lineHeight: '1.3' }],
-        'heading-lg': ['18px', { lineHeight: '1.3' }],
+        label: ['11px', { letterSpacing: '0.08em', lineHeight: '1.4' }],
+        'label-sm': ['12px', { letterSpacing: '0.08em', lineHeight: '1.4' }],
+        body: ['15px', { lineHeight: '1.65' }],
+        'body-md': ['16px', { lineHeight: '1.6' }],
+        heading: ['18px', { lineHeight: '1.3' }],
+        'heading-lg': ['20px', { lineHeight: '1.3' }],
       },
       borderRadius: {
         DEFAULT: '2px',
