@@ -12,7 +12,7 @@ import {
 } from '@/lib/utils'
 import { DAILY_AYURVEDA_TIPS } from '@/data/ayurveda'
 import { VEDIC_REMEDIES } from '@/data/vedic-remedies'
-import { getProgram } from '@/data/obzen-program'
+import { getProgram, getScheduledDay } from '@/data/obzen-program'
 import { SHOW_NUTRITION, SHOW_VEDIC } from '@/config/features'
 import { PROFILES, PROFILE_IDS } from '@/config/profiles'
 import { useProfileStore } from '@/store/useProfileStore'
@@ -42,10 +42,10 @@ function getDailyRemedy() {
 }
 
 function getProgramDay(profileId: string): { label: string; isRest: boolean } {
-  const dayIdx = new Date().getDay()
-  if (dayIdx === 0 || dayIdx === 4) return { label: 'Rest Day', isRest: true }
-  const days = Object.keys(getProgram(profileId))
-  return { label: days[dayIdx % days.length], isRest: false }
+  const scheduled = getScheduledDay(profileId)
+  return scheduled.kind === 'train'
+    ? { label: scheduled.dayLabel, isRest: false }
+    : { label: scheduled.label, isRest: true }
 }
 
 export default function Dashboard() {
@@ -267,7 +267,7 @@ export default function Dashboard() {
             </div>
           </>
         ) : (
-          <div className="text-[13px] text-noir-muted">Rest Day — yoga or recovery only</div>
+          <div className="text-[15px] text-noir-accent">{programDayLabel}</div>
         )}
       </Card>
 

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { RUDIMENTS, getRudimentsByFamily, getRudimentsByDifficulty } from '@/data/rudiments'
-import { PRONIT_PROGRAM, AISHWARYA_PROGRAM, SWAP_OPTIONS, EXERCISE_LIBRARY } from '@/data/obzen-program'
+import { PRONIT_PROGRAM, AISHWARYA_PROGRAM, SWAP_OPTIONS, EXERCISE_LIBRARY, getScheduledDay } from '@/data/obzen-program'
 import type { ProgramDay } from '@/data/obzen-program'
 import { EXERCISES, getExercisesByMuscle } from '@/data/exercises'
 import { YOGA_POSES, getPosesBySequence } from '@/data/yoga-poses'
@@ -52,6 +52,31 @@ describe('Obzen Program', () => {
   })
   it('keeps the two profiles on different programs', () => {
     expect(PRONIT_PROGRAM['Day 1'].focus).not.toBe(AISHWARYA_PROGRAM['Day 1'].focus)
+  })
+
+  it('schedules Aishwarya Mon/Wed/Fri with walks between', () => {
+    // 2026-08-10 is a Monday; step through that week.
+    const monday = new Date(2026, 7, 10)
+    const at = (offset: number) => {
+      const d = new Date(monday)
+      d.setDate(monday.getDate() + offset)
+      return getScheduledDay('aishwarya', d)
+    }
+    expect(at(0)).toEqual({ kind: 'train', dayLabel: 'Day 1' })   // Mon
+    expect(at(1).kind).toBe('off')                                 // Tue — walk
+    expect(at(2)).toEqual({ kind: 'train', dayLabel: 'Day 2' })   // Wed
+    expect(at(3).kind).toBe('off')                                 // Thu — walk
+    expect(at(4)).toEqual({ kind: 'train', dayLabel: 'Day 3' })   // Fri
+    expect(at(5).kind).toBe('off')                                 // Sat
+    expect(at(6).kind).toBe('off')                                 // Sun
+  })
+
+  it('gives every Aishwarya exercise a coaching cue', () => {
+    for (const day of Object.values(AISHWARYA_PROGRAM)) {
+      for (const ex of day.exercises) {
+        expect(ex.cue, `${ex.name} is missing a cue`).toBeTruthy()
+      }
+    }
   })
   it('swap options are defined for every muscle group', () => {
     const groups = ['legs', 'shoulders', 'back', 'chest', 'arms', 'core']

@@ -57,6 +57,8 @@ export function ExerciseCard({
     ?? exerciseState.exerciseId.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())
   const muscle = exerciseState.muscle ?? programExercise?.muscle ?? ''
   const target = exerciseState.target ?? ''
+  const cue = exerciseState.cue ?? programExercise?.cue
+  const coached = exerciseState.coached ?? programExercise?.coached
 
   const isPullHeavy = PULL_HEAVY_EXERCISES.includes(displayName)
   const isForearmLoad = FOREARM_LOAD_EXERCISES.includes(displayName)
@@ -108,6 +110,14 @@ export function ExerciseCard({
                     +{exerciseState.addedFrom}
                   </span>
                 )}
+                {coached && (
+                  <span
+                    className="text-[9px] uppercase tracking-widest border rounded-[2px] px-1.5 py-0.5"
+                    style={{ color: '#a6a6a6', borderColor: '#454545' }}
+                  >
+                    Pronit coaches
+                  </span>
+                )}
                 {hasWarning && (
                   <span
                     className="flex items-center gap-0.5 text-[9px] uppercase tracking-widest border rounded-[2px] px-1.5 py-0.5"
@@ -125,6 +135,16 @@ export function ExerciseCard({
                   {target}
                   {muscle && <span className="ml-2 normal-case capitalize">{muscle}</span>}
                 </div>
+              )}
+
+              {/* Coaching cue from the plan */}
+              {cue && status !== 'skipped' && (
+                <p
+                  className="text-[13px] leading-snug mt-1.5 pl-2.5"
+                  style={{ color: '#a6a6a6', borderLeft: '1px solid #454545' }}
+                >
+                  {cue}
+                </p>
               )}
             </div>
 

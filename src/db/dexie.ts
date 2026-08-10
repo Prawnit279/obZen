@@ -190,6 +190,10 @@ export interface ExerciseSessionState {
   muscle?: string
   /** Prescription summary as written on the plan, e.g. '4 × 10–12 · 90s'. */
   target?: string
+  /** Coaching cue from the plan, shown on the exercise card. */
+  cue?: string
+  /** Lift the plan marks as coached by Pronit. */
+  coached?: boolean
   status: 'pending' | 'complete' | 'skipped'
   sets: LoggedSet[]
   note?: string

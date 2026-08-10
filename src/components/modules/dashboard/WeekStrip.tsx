@@ -4,6 +4,7 @@ import { ChevronRight } from 'lucide-react'
 import { db } from '@/db/dexie'
 import type { WorkoutDaySession } from '@/db/dexie'
 import { todayISO } from '@/lib/utils'
+import { getScheduledDay, getProgram } from '@/data/obzen-program'
 import { sessionHasActivity, loggedExercises, totalSets, belongsToProfile } from '@/lib/workoutSession'
 import { useProfileStore } from '@/store/useProfileStore'
 import { Card, CardHeader } from '@/components/ui/Card'
@@ -75,14 +76,24 @@ export function WeekStrip() {
           )
 
           if (!session) {
+            // Nothing logged — show what the plan calls for on this weekday.
+            const planned = getScheduledDay(activeId, d)
+            const plannedLabel = planned.kind === 'train'
+              ? `${planned.dayLabel} · ${getProgram(activeId)[planned.dayLabel]?.focus ?? ''}`
+              : planned.label
             return (
               <div
                 key={iso}
-                className="flex items-center justify-between py-2 px-2 rounded-[2px]"
+                className="flex items-center justify-between gap-2 py-2 px-2 rounded-[2px]"
                 style={{ background: isToday ? '#1e1e1e' : 'transparent' }}
               >
                 {dayCol}
-                <span className="text-[12px]" style={{ color: '#555555' }}>—</span>
+                <span
+                  className="text-[12px] truncate text-right"
+                  style={{ color: planned.kind === 'train' ? '#8a8a8a' : '#5a5a5a' }}
+                >
+                  {plannedLabel}
+                </span>
               </div>
             )
           }

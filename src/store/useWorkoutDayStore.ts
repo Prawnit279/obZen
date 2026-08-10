@@ -27,6 +27,8 @@ function buildTemplateExercises(
     name: ex.name,
     muscle: ex.muscle,
     target: formatTarget(ex),
+    cue: ex.cue,
+    coached: ex.coached,
     status: 'pending' as const,
     sets: [],
     addedFrom: dayLabel,

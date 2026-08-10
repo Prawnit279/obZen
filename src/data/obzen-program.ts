@@ -15,9 +15,18 @@ export interface ProgramExercise {
   working?: string
   /** Core/ab movement — surfaced with a CORE tag in the UI. */
   isCore?: boolean
+  /** Coaching cue for this movement, as written on the plan. */
+  cue?: string
+  /** Lifts the plan marks "Pronit coaches this". */
+  coached?: boolean
   /** Suggested alternatives for this movement. */
   swaps?: string[]
 }
+
+/** One weekday in a profile's training week. */
+export type ScheduleEntry =
+  | { kind: 'train'; dayLabel: string }
+  | { kind: 'off'; label: string }
 
 export interface ProgramDay {
   focus: string
@@ -48,35 +57,35 @@ export const AISHWARYA_PROGRAM: Record<string, ProgramDay> = {
   'Day 1': {
     focus: 'Glutes & Hamstrings',
     exercises: [
-      { name: 'Hip Thrust Machine',    muscle: 'legs', sets: 4, reps: '10–12',  rest: '90s', swaps: ['Barbell Hip Thrust', 'Single-Leg Hip Thrust', 'Cable Pull-Through'] },
-      { name: 'Romanian Deadlift',     muscle: 'legs', sets: 3, reps: '10',      rest: '90s', swaps: ['Dumbbell RDL', 'Good Morning', 'Single-Leg RDL'] },
-      { name: 'Bulgarian Split Squat', muscle: 'legs', sets: 3, reps: '8/leg',   rest: '75s', swaps: ['Reverse Lunge', 'Step-Up', 'Walking Lunge'] },
-      { name: 'Leg Press',             muscle: 'legs', sets: 3, reps: '12',      rest: '90s', swaps: ['Hack Squat', 'Goblet Squat', 'Smith Machine Squat'] },
-      { name: 'Cable Glute Kickback',  muscle: 'legs', sets: 2, reps: '15/side', rest: '45s', swaps: ['Machine Kickback', 'Banded Kickback', 'Frog Pump'] },
-      { name: 'Dead Bug',              muscle: 'core', sets: 3, reps: '10/side', rest: '45s', isCore: true, swaps: ['Hanging Knee Raise', 'Reverse Crunch', 'Bird Dog'] },
+      { name: 'Hip Thrust Machine',    muscle: 'legs', sets: 4, reps: '10–12',  rest: '90s', cue: 'Chin tucked, ribs down. Hold the squeeze at the top for a full second before lowering.', swaps: ['Barbell Hip Thrust', 'Single-Leg Hip Thrust', 'Cable Pull-Through'] },
+      { name: 'Romanian Deadlift',     muscle: 'legs', sets: 3, reps: '10',      rest: '90s', cue: 'Push the hips back with soft knees. Stop the moment you feel the hamstring stretch, not lower.', swaps: ['Dumbbell RDL', 'Good Morning', 'Single-Leg RDL'] },
+      { name: 'Bulgarian Split Squat', muscle: 'legs', sets: 3, reps: '8/leg',   rest: '75s', cue: 'Lean the torso slightly forward. That is what shifts the work out of the quad and into the glute.', swaps: ['Reverse Lunge', 'Step-Up', 'Walking Lunge'] },
+      { name: 'Leg Press',             muscle: 'legs', sets: 3, reps: '12',      rest: '90s', cue: 'Feet high and wide. High foot placement loads glutes and hamstrings. Never lock the knees out at the top.', swaps: ['Hack Squat', 'Goblet Squat', 'Smith Machine Squat'] },
+      { name: 'Cable Glute Kickback',  muscle: 'legs', sets: 2, reps: '15/side', rest: '45s', cue: 'Slow on the way back. This is a finisher for blood flow, not a max effort lift.', swaps: ['Machine Kickback', 'Banded Kickback', 'Frog Pump'] },
+      { name: 'Dead Bug',              muscle: 'core', sets: 3, reps: '10/side', rest: '45s', isCore: true, cue: 'Lower back stays glued to the floor for the entire set. If it lifts, shorten the reach.', swaps: ['Hanging Knee Raise', 'Reverse Crunch', 'Bird Dog'] },
     ],
   },
   'Day 2': {
     focus: 'Upper Body & Core',
     exercises: [
-      { name: 'Assisted Pull-Up',        muscle: 'back',      sets: 3, reps: '6–8',    rest: '90s', swaps: ['Lat Pulldown', 'Inverted Row', 'Band-Assisted Pull-Up'] },
-      { name: 'Assisted Dip',            muscle: 'chest',     sets: 3, reps: '6–8',    rest: '90s', swaps: ['Push-Up', 'Bench Dip', 'Chest Press Machine'] },
-      { name: 'Seated Cable Row',        muscle: 'back',      sets: 3, reps: '10–12',  rest: '75s', swaps: ['Chest-Supported Row', 'One-Arm DB Row', 'Machine Row'] },
-      { name: 'Dumbbell Shoulder Press', muscle: 'shoulders', sets: 3, reps: '10',     rest: '75s', swaps: ['Machine Shoulder Press', 'Arnold Press', 'Landmine Press'] },
-      { name: 'Face Pull',               muscle: 'shoulders', sets: 2, reps: '15',     rest: '45s', swaps: ['Reverse Pec Deck', 'Band Pull-Apart', 'Rear Delt Fly'] },
-      { name: 'Cable Pallof Press',      muscle: 'core',      sets: 3, reps: '10/side',rest: '45s', isCore: true, swaps: ['Side Plank', 'Suitcase Carry', 'Half-Kneeling Chop'] },
-      { name: 'Hollow Body Hold',        muscle: 'core',      sets: 3, reps: '20–30s', rest: '45s', isCore: true, swaps: ['Plank', 'Ab Wheel from Knees', 'Leg Lowers'] },
+      { name: 'Assisted Pull-Up',        muscle: 'back',      sets: 3, reps: '6–8',    rest: '90s', coached: true, cue: 'Start with the most assistance available. Full hang at the bottom, chest toward the bar.', swaps: ['Lat Pulldown', 'Inverted Row', 'Band-Assisted Pull-Up'] },
+      { name: 'Assisted Dip',            muscle: 'chest',     sets: 3, reps: '6–8',    rest: '90s', coached: true, cue: 'Lean forward slightly. Stop at the depth where the shoulder feels stretched, never below it.', swaps: ['Push-Up', 'Bench Dip', 'Chest Press Machine'] },
+      { name: 'Seated Cable Row',        muscle: 'back',      sets: 3, reps: '10–12',  rest: '75s', cue: 'Pull to the belly button and drive the shoulder blades back. No rocking the torso.', swaps: ['Chest-Supported Row', 'One-Arm DB Row', 'Machine Row'] },
+      { name: 'Dumbbell Shoulder Press', muscle: 'shoulders', sets: 3, reps: '10',     rest: '75s', cue: 'Ribs down, glutes tight. Press up and slightly back rather than forward.', swaps: ['Machine Shoulder Press', 'Arnold Press', 'Landmine Press'] },
+      { name: 'Face Pull',               muscle: 'shoulders', sets: 2, reps: '15',     rest: '45s', cue: 'Pull toward the forehead with elbows high. This is the antidote to a desk job.', swaps: ['Reverse Pec Deck', 'Band Pull-Apart', 'Rear Delt Fly'] },
+      { name: 'Cable Pallof Press',      muscle: 'core',      sets: 3, reps: '10/side',rest: '45s', isCore: true, cue: 'Resist the twist. Nothing moves except your arms. This is the waist exercise that works.', swaps: ['Side Plank', 'Suitcase Carry', 'Half-Kneeling Chop'] },
+      { name: 'Hollow Body Hold',        muscle: 'core',      sets: 3, reps: '20–30s', rest: '45s', isCore: true, cue: 'Lower back pressed flat into the floor. Drop the legs closer to the ground to make it harder.', swaps: ['Plank', 'Ab Wheel from Knees', 'Leg Lowers'] },
     ],
   },
   'Day 3': {
     focus: 'Legs, Deadlift & Glutes',
     exercises: [
-      { name: 'Deadlift',           muscle: 'legs', sets: 4, reps: '5',      rest: '2–3 min', swaps: ['Trap-Bar Deadlift', 'Sumo Deadlift', 'Rack Pull', 'Kettlebell Deadlift'] },
-      { name: 'Barbell Back Squat', muscle: 'legs', sets: 3, reps: '8',      rest: '2 min',   swaps: ['Goblet Squat', 'Hack Squat', 'Front-Foot-Elevated Split Squat'] },
-      { name: 'Hip Thrust Machine', muscle: 'legs', sets: 3, reps: '12',     rest: '90s',     swaps: ['Glute Bridge', 'Cable Pull-Through', 'Single-Leg Hip Thrust'] },
-      { name: 'Walking Lunge',      muscle: 'legs', sets: 2, reps: '10/leg', rest: '75s',     swaps: ['Reverse Lunge', 'Step-Up', 'Curtsy Lunge'] },
-      { name: 'Seated Leg Curl',    muscle: 'legs', sets: 2, reps: '12',     rest: '60s',     swaps: ['Lying Leg Curl', 'Nordic Negative', 'Stability Ball Curl'] },
-      { name: 'Cable Crunch',       muscle: 'core', sets: 3, reps: '12',     rest: '45s',     isCore: true, swaps: ['Reverse Crunch', 'Hanging Knee Raise', 'Ab Wheel'] },
+      { name: 'Deadlift',           muscle: 'legs', sets: 4, reps: '5',      rest: '2–3 min', coached: true, cue: 'Weeks 1 to 4 are technique only. Bar stays against the shins. End the set the moment the back rounds.', swaps: ['Trap-Bar Deadlift', 'Sumo Deadlift', 'Rack Pull', 'Kettlebell Deadlift'] },
+      { name: 'Barbell Back Squat', muscle: 'legs', sets: 3, reps: '8',      rest: '2 min',   cue: 'Sit down between the hips, knees tracking over the toes. Earn depth before you add weight.', swaps: ['Goblet Squat', 'Hack Squat', 'Front-Foot-Elevated Split Squat'] },
+      { name: 'Hip Thrust Machine', muscle: 'legs', sets: 3, reps: '12',     rest: '90s',     cue: 'Second glute session of the week. Go lighter than Day 1 and chase the squeeze instead of the load.', swaps: ['Glute Bridge', 'Cable Pull-Through', 'Single-Leg Hip Thrust'] },
+      { name: 'Walking Lunge',      muscle: 'legs', sets: 2, reps: '10/leg', rest: '75s',     cue: 'A long stride hits the glutes, a short stride hits the quads. Take the long one.', swaps: ['Reverse Lunge', 'Step-Up', 'Curtsy Lunge'] },
+      { name: 'Seated Leg Curl',    muscle: 'legs', sets: 2, reps: '12',     rest: '60s',     cue: 'Slow on the way back. The hamstrings finish what the Romanian deadlift started on Day 1.', swaps: ['Lying Leg Curl', 'Nordic Negative', 'Stability Ball Curl'] },
+      { name: 'Cable Crunch',       muscle: 'core', sets: 3, reps: '12',     rest: '45s',     isCore: true, cue: 'Curl the ribs toward the hips. The hips themselves stay completely still.', swaps: ['Reverse Crunch', 'Hanging Knee Raise', 'Ab Wheel'] },
     ],
   },
 }
@@ -140,6 +149,36 @@ export const PROGRAMS_BY_PROFILE: Record<string, Record<string, ProgramDay>> = {
 
 export function getProgram(profileId: string): Record<string, ProgramDay> {
   return PROGRAMS_BY_PROFILE[profileId] ?? PRONIT_PROGRAM
+}
+
+/**
+ * Fixed weekly schedules, indexed by JS getDay() (0 = Sunday). Aishwarya's
+ * follows "THE WEEK" from her Phase 1 plan: train Mon/Wed/Fri with walks on
+ * the days between. Profiles without a schedule fall back to the rolling
+ * pattern below.
+ */
+export const SCHEDULES: Record<string, ScheduleEntry[]> = {
+  aishwarya: [
+    { kind: 'off',   label: 'Rest' },                 // Sun
+    { kind: 'train', dayLabel: 'Day 1' },             // Mon
+    { kind: 'off',   label: 'Walk 25–30 min' },       // Tue
+    { kind: 'train', dayLabel: 'Day 2' },             // Wed
+    { kind: 'off',   label: 'Walk 25–30 min' },       // Thu
+    { kind: 'train', dayLabel: 'Day 3' },             // Fri
+    { kind: 'off',   label: 'Rest or easy walk' },    // Sat
+  ],
+}
+
+/** What the given profile is scheduled to do on `date`. */
+export function getScheduledDay(profileId: string, date = new Date()): ScheduleEntry {
+  const weekday = date.getDay()
+  const schedule = SCHEDULES[profileId]
+  if (schedule) return schedule[weekday]
+
+  // Default (Pronit): rest Sunday and Thursday, otherwise rotate the days.
+  if (weekday === 0 || weekday === 4) return { kind: 'off', label: 'Rest Day' }
+  const days = Object.keys(getProgram(profileId))
+  return { kind: 'train', dayLabel: days[weekday % days.length] }
 }
 
 /** A pickable catalog entry — same shape a template exercise carries. */
