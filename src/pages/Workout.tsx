@@ -176,6 +176,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
           onAddSet={(exerciseId, set) => store.addLoggedSet(dayLabel, exerciseId, set)}
           onUpdateSet={(exerciseId, index, set) => store.updateLoggedSet(dayLabel, exerciseId, index, set)}
           onRemoveSet={(exerciseId, index) => store.removeLoggedSet(dayLabel, exerciseId, index)}
+          onRemoveExercise={exerciseId => store.removeExercise(dayLabel, exerciseId)}
         />
       )}
 

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { ChevronDown, ChevronUp, GripVertical, Zap } from 'lucide-react'
+import { ChevronDown, ChevronUp, GripVertical, Zap, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { ExerciseSessionState, LoggedSet } from '@/db/dexie'
 import type { ProgramExercise } from '@/data/obzen-program'
@@ -30,6 +30,8 @@ interface Props {
   onAddSet: (set: LoggedSet) => void
   onUpdateSet: (index: number, set: LoggedSet) => void
   onRemoveSet: (index: number) => void
+  /** Drop this exercise from the day entirely. */
+  onRemoveExercise: () => void
 }
 
 export function ExerciseCard({
@@ -41,8 +43,10 @@ export function ExerciseCard({
   onAddSet,
   onUpdateSet,
   onRemoveSet,
+  onRemoveExercise,
 }: Props) {
   const [showHistory, setShowHistory] = useState(false)
+  const [confirmRemove, setConfirmRemove] = useState(false)
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: exerciseState.exerciseId,
@@ -124,16 +128,61 @@ export function ExerciseCard({
               )}
             </div>
 
-            {/* Right: chevron toggle */}
-            <button
-              onClick={() => setShowHistory(h => !h)}
-              className="shrink-0 p-1 transition-opacity hover:opacity-70"
-              style={{ color: '#555555' }}
-              aria-label={showHistory ? 'Hide history' : 'Show history'}
-            >
-              {showHistory ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
-            </button>
+            {/* Right: history toggle + remove */}
+            <div className="shrink-0 flex items-center gap-1">
+              <button
+                onClick={() => setShowHistory(h => !h)}
+                className="p-1 transition-opacity hover:opacity-70"
+                style={{ color: '#8a8a8a' }}
+                aria-label={showHistory ? 'Hide history' : 'Show history'}
+              >
+                {showHistory ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+              </button>
+              <button
+                onClick={() => setConfirmRemove(true)}
+                className="p-1 transition-opacity hover:opacity-70"
+                style={{ color: '#8a8a8a' }}
+                aria-label={`Remove ${displayName} from this day`}
+              >
+                <Trash2 size={15} />
+              </button>
+            </div>
           </div>
+
+          {/* Remove confirmation */}
+          {confirmRemove && (
+            <div
+              className="mt-2.5 p-2.5 rounded-[2px] space-y-2"
+              style={{ border: '1px solid #7f1d1d', background: 'rgba(127,29,29,0.08)' }}
+            >
+              <p className="text-[13px]" style={{ color: '#e2e2e2' }}>
+                Remove {displayName} from this day?
+                {exerciseState.sets.length > 0 && (
+                  <span style={{ color: '#fca5a5' }}>
+                    {' '}{exerciseState.sets.length} logged{' '}
+                    {exerciseState.sets.length === 1 ? 'set' : 'sets'} will be lost.
+                  </span>
+                )}
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setConfirmRemove(false)}
+                  className="px-3 py-1.5 text-[12px] uppercase tracking-widest rounded-[2px] transition-opacity hover:opacity-70"
+                  style={{ border: '1px solid #454545', color: '#a6a6a6' }}
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={onRemoveExercise}
+                  className="px-3 py-1.5 text-[12px] uppercase tracking-widest rounded-[2px] transition-opacity hover:opacity-70"
+                  style={{ border: '1px solid #7f1d1d', color: '#fca5a5' }}
+                  aria-label={`Confirm remove ${displayName}`}
+                >
+                  Remove
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* Status action buttons */}
           <div className="flex gap-2 mt-2.5">

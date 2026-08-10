@@ -51,6 +51,7 @@ interface WorkoutDayState {
   removeLoggedSet: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, setIndex: number, date?: string) => Promise<void>
   reorderExercises: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', newOrder: string[], date?: string) => Promise<void>
   addExercise: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exercise: ExerciseSessionState, date?: string) => Promise<void>
+  removeExercise: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, date?: string) => Promise<void>
   setExerciseNote: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, note: string, date?: string) => Promise<void>
   updateExerciseUnit: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, unit: 'lbs' | 'kg', date?: string) => Promise<void>
 }
@@ -78,6 +79,10 @@ export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => {
       await db.workoutDaySessions.put(session)
       return
     }
+
+    // Never create a row for a day that holds nothing (e.g. the user added an
+    // exercise then removed it before anything was persisted).
+    if (session.exercises.length === 0 && !session.completedAt) return
 
     // Guard only concurrent inserts for the *current* in-flight session. The
     // entry is always cleared once settled, so a later session for the same key
@@ -224,6 +229,17 @@ export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => {
         ...s,
         exercises: [...s.exercises, exercise],
         order: [...s.order, exercise.exerciseId],
+      }))
+    },
+
+    // Drop an exercise from the day entirely (added by mistake). Any sets
+    // logged against it go with it — the UI confirms before calling this.
+    removeExercise: async (dayLabel, exerciseId, date = todayISO()) => {
+      const key = `${activeProfile()}::${dayLabel}::${date}`
+      await mutate(key, s => ({
+        ...s,
+        exercises: s.exercises.filter(e => e.exerciseId !== exerciseId),
+        order: s.order.filter(id => id !== exerciseId),
       }))
     },
 

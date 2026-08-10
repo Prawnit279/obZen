@@ -27,6 +27,7 @@ interface Props {
   onAddSet: (exerciseId: string, set: LoggedSet) => void
   onUpdateSet: (exerciseId: string, index: number, set: LoggedSet) => void
   onRemoveSet: (exerciseId: string, index: number) => void
+  onRemoveExercise: (exerciseId: string) => void
 }
 
 export function SortableExerciseList({
@@ -39,6 +40,7 @@ export function SortableExerciseList({
   onAddSet,
   onUpdateSet,
   onRemoveSet,
+  onRemoveExercise,
 }: Props) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -94,6 +96,7 @@ export function SortableExerciseList({
               onAddSet={set => onAddSet(ex.exerciseId, set)}
               onUpdateSet={(i, set) => onUpdateSet(ex.exerciseId, i, set)}
               onRemoveSet={i => onRemoveSet(ex.exerciseId, i)}
+              onRemoveExercise={() => onRemoveExercise(ex.exerciseId)}
             />
           ))}
         </div>

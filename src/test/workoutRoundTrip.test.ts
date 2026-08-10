@@ -151,6 +151,40 @@ describe('workout save → history round-trip', () => {
     expect(rows.filter(r => belongsToProfile(r, 'aishwarya'))).toHaveLength(1)
   })
 
+  it('removes an exercise from the day, with its logged sets', async () => {
+    const store = () => useWorkoutDayStore.getState()
+
+    await store().loadSession('Day 1')
+    await store().loadTemplate('Day 1')
+    let row = (await db.workoutDaySessions.where('dayLabel').equals('Day 1').first())!
+    const before = row.exercises.length
+    const victim = row.exercises[1]
+
+    // Log a set on it, then remove the whole exercise.
+    await store().addLoggedSet('Day 1', victim.exerciseId, makeSet(40))
+    await store().removeExercise('Day 1', victim.exerciseId)
+
+    row = (await db.workoutDaySessions.get(row.id!))!
+    expect(row.exercises).toHaveLength(before - 1)
+    expect(row.exercises.some(e => e.exerciseId === victim.exerciseId)).toBe(false)
+    expect(row.order).not.toContain(victim.exerciseId)   // ordering stays consistent
+    expect(row.exercises.map(e => e.exerciseId)).toEqual(row.order)
+  })
+
+  it('does not create a row when an exercise is added then removed', async () => {
+    const store = () => useWorkoutDayStore.getState()
+
+    await store().loadSession('Day 2')
+    await store().addExercise('Day 2', {
+      exerciseId: 'oops', name: 'Oops', status: 'pending', sets: [], addedFrom: 'library',
+    })
+    await store().removeExercise('Day 2', 'oops')
+
+    // The day is empty again, so nothing should be persisted for it.
+    const rows = await db.workoutDaySessions.where('dayLabel').equals('Day 2').toArray()
+    expect(rows.every(r => r.exercises.length === 0)).toBe(true)
+  })
+
   it('attributes pre-profile sessions to Aishwarya', async () => {
     // A row saved before profiles existed carries no profileId.
     await db.workoutDaySessions.add({
