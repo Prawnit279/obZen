@@ -1,13 +1,11 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/db/dexie'
-import { OBZEN_PROGRAM } from '@/data/obzen-program'
+import { EXERCISE_LIBRARY } from '@/data/obzen-program'
 import type { MuscleGroup } from '@/data/obzen-program'
 
 const EXERCISE_MUSCLE: Record<string, MuscleGroup> = {}
-for (const day of Object.values(OBZEN_PROGRAM)) {
-  for (const ex of day.exercises) {
-    EXERCISE_MUSCLE[ex.name] = ex.muscle
-  }
+for (const ex of EXERCISE_LIBRARY) {
+  EXERCISE_MUSCLE[ex.name] = ex.muscle
 }
 
 function parseWeight(w: string): number {

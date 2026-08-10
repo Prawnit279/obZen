@@ -12,7 +12,7 @@ import {
 } from '@/lib/utils'
 import { DAILY_AYURVEDA_TIPS } from '@/data/ayurveda'
 import { VEDIC_REMEDIES } from '@/data/vedic-remedies'
-import { OBZEN_PROGRAM } from '@/data/obzen-program'
+import { getProgram } from '@/data/obzen-program'
 import { SHOW_NUTRITION, SHOW_VEDIC } from '@/config/features'
 import { PROFILES, PROFILE_IDS } from '@/config/profiles'
 import { useProfileStore } from '@/store/useProfileStore'
@@ -41,10 +41,10 @@ function getDailyRemedy() {
   return VEDIC_REMEDIES[day % VEDIC_REMEDIES.length]
 }
 
-function getProgramDay(): { label: string; isRest: boolean } {
+function getProgramDay(profileId: string): { label: string; isRest: boolean } {
   const dayIdx = new Date().getDay()
   if (dayIdx === 0 || dayIdx === 4) return { label: 'Rest Day', isRest: true }
-  const days = Object.keys(OBZEN_PROGRAM)
+  const days = Object.keys(getProgram(profileId))
   return { label: days[dayIdx % days.length], isRest: false }
 }
 
@@ -96,8 +96,8 @@ export default function Dashboard() {
   const planetaryDay = getPlanetaryDay()
   const dailyTip = getDailyTip()
   const dailyRemedy = getDailyRemedy()
-  const { label: programDayLabel, isRest } = getProgramDay()
-  const program = isRest ? null : OBZEN_PROGRAM[programDayLabel]
+  const { label: programDayLabel, isRest } = getProgramDay(activeId)
+  const program = isRest ? null : getProgram(activeId)[programDayLabel]
 
   const targets = isTrainingDay
     ? { protein: 150, carbs: 270, fat: 59, calories: 2550 }

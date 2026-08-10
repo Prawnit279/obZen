@@ -2,21 +2,31 @@ import { create } from 'zustand'
 import { db } from '@/db/dexie'
 import type { WorkoutDaySession, ExerciseSessionState, LoggedSet } from '@/db/dexie'
 import { todayISO } from '@/lib/utils'
-import { OBZEN_PROGRAM, formatTarget, toExerciseId } from '@/data/obzen-program'
+import { getProgram, formatTarget, toExerciseId } from '@/data/obzen-program'
+import { useProfileStore } from '@/store/useProfileStore'
+import { sessionProfile } from '@/lib/workoutSession'
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
+/** The profile whose program/history is currently active. */
+function activeProfile(): string {
+  return useProfileStore.getState().activeId
+}
+
 /** Build session-state rows from a day template (name/muscle/target persisted). */
-function buildTemplateExercises(dayLabel: 'Day 1' | 'Day 2' | 'Day 3'): ExerciseSessionState[] {
-  const program = OBZEN_PROGRAM[dayLabel]
+function buildTemplateExercises(
+  dayLabel: 'Day 1' | 'Day 2' | 'Day 3',
+  profileId: string
+): ExerciseSessionState[] {
+  const program = getProgram(profileId)[dayLabel]
   if (!program) return []
   return program.exercises.map(ex => ({
     exerciseId: toExerciseId(ex.name),
     name: ex.name,
     muscle: ex.muscle,
-    target: formatTarget(ex.sets, ex.reps, ex.rest),
+    target: formatTarget(ex),
     status: 'pending' as const,
     sets: [],
     addedFrom: dayLabel,
@@ -69,6 +79,10 @@ export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => {
       return
     }
 
+    // Guard only concurrent inserts for the *current* in-flight session. The
+    // entry is always cleared once settled, so a later session for the same key
+    // (new day, profile switch, or after a DB reset) inserts its own row rather
+    // than reusing — and overwriting — an earlier row's id.
     if (!pendingCreate[key]) {
       pendingCreate[key] = db.workoutDaySessions
         .add(session)
@@ -79,10 +93,7 @@ export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => {
           })
           return newId as number
         })
-        .catch(err => {
-          delete pendingCreate[key] // allow a later write to retry the insert
-          throw err
-        })
+        .finally(() => { delete pendingCreate[key] })
     }
 
     const id = await pendingCreate[key]
@@ -107,21 +118,22 @@ export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => {
     loading: false,
 
     loadSession: async (dayLabel, date = todayISO()) => {
-      const key = `${dayLabel}::${date}`
+      const profileId = activeProfile()
+      const key = `${profileId}::${dayLabel}::${date}`
       if (get().sessions[key]) return // already loaded
 
       set({ loading: true })
       try {
         const existing = await db.workoutDaySessions
           .where('date').equals(date)
-          .filter(s => s.dayLabel === dayLabel)
+          .filter(s => s.dayLabel === dayLabel && sessionProfile(s) === profileId)
           .first()
 
         if (existing) {
           set(s => ({ sessions: { ...s.sessions, [key]: existing }, loading: false }))
         } else {
           // In-memory only — nothing is written until the user logs something.
-          const newSession: WorkoutDaySession = { date, dayLabel, exercises: [], order: [] }
+          const newSession: WorkoutDaySession = { date, dayLabel, profileId, exercises: [], order: [] }
           set(s => ({ sessions: { ...s.sessions, [key]: newSession }, loading: false }))
         }
       } catch {
@@ -132,34 +144,36 @@ export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => {
     // Load a day template as a starting point. Non-destructive: appends any
     // template exercise not already present and stamps the focus label.
     loadTemplate: async (dayLabel, date = todayISO()) => {
-      const key = `${dayLabel}::${date}`
+      const key = `${activeProfile()}::${dayLabel}::${date}`
       const session = get().sessions[key]
       if (!session) return
 
+      const profileId = activeProfile()
       const existingIds = new Set(session.exercises.map(e => e.exerciseId))
-      const additions = buildTemplateExercises(dayLabel).filter(e => !existingIds.has(e.exerciseId))
+      const additions = buildTemplateExercises(dayLabel, profileId).filter(e => !existingIds.has(e.exerciseId))
       if (additions.length === 0 && session.focus) return
 
       await mutate(key, s => ({
         ...s,
         exercises: [...s.exercises, ...additions],
         order: [...s.order, ...additions.map(e => e.exerciseId)],
-        focus: s.focus ?? OBZEN_PROGRAM[dayLabel]?.focus,
+        focus: s.focus ?? getProgram(profileId)[dayLabel]?.focus,
       }))
     },
 
     // Mark the day's workout complete (stamps completedAt for history/streaks).
     completeSession: async (dayLabel, date = todayISO()) => {
-      const key = `${dayLabel}::${date}`
+      const profileId = activeProfile()
+      const key = `${profileId}::${dayLabel}::${date}`
       await mutate(key, s => ({
         ...s,
         completedAt: new Date().toISOString(),
-        focus: s.focus ?? OBZEN_PROGRAM[dayLabel]?.focus,
+        focus: s.focus ?? getProgram(profileId)[dayLabel]?.focus,
       }))
     },
 
     updateExerciseStatus: async (dayLabel, exerciseId, status, date = todayISO()) => {
-      const key = `${dayLabel}::${date}`
+      const key = `${activeProfile()}::${dayLabel}::${date}`
       await mutate(key, s => ({
         ...s,
         exercises: s.exercises.map(e => e.exerciseId === exerciseId ? { ...e, status } : e),
@@ -167,7 +181,7 @@ export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => {
     },
 
     addLoggedSet: async (dayLabel, exerciseId, loggedSet, date = todayISO()) => {
-      const key = `${dayLabel}::${date}`
+      const key = `${activeProfile()}::${dayLabel}::${date}`
       await mutate(key, s => ({
         ...s,
         exercises: s.exercises.map(e =>
@@ -177,7 +191,7 @@ export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => {
     },
 
     updateLoggedSet: async (dayLabel, exerciseId, setIndex, loggedSet, date = todayISO()) => {
-      const key = `${dayLabel}::${date}`
+      const key = `${activeProfile()}::${dayLabel}::${date}`
       await mutate(key, s => ({
         ...s,
         exercises: s.exercises.map(e => {
@@ -188,7 +202,7 @@ export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => {
     },
 
     removeLoggedSet: async (dayLabel, exerciseId, setIndex, date = todayISO()) => {
-      const key = `${dayLabel}::${date}`
+      const key = `${activeProfile()}::${dayLabel}::${date}`
       await mutate(key, s => ({
         ...s,
         exercises: s.exercises.map(e => {
@@ -200,12 +214,12 @@ export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => {
     },
 
     reorderExercises: async (dayLabel, newOrder, date = todayISO()) => {
-      const key = `${dayLabel}::${date}`
+      const key = `${activeProfile()}::${dayLabel}::${date}`
       await mutate(key, s => ({ ...s, order: newOrder }))
     },
 
     addExercise: async (dayLabel, exercise, date = todayISO()) => {
-      const key = `${dayLabel}::${date}`
+      const key = `${activeProfile()}::${dayLabel}::${date}`
       await mutate(key, s => ({
         ...s,
         exercises: [...s.exercises, exercise],
@@ -214,7 +228,7 @@ export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => {
     },
 
     setExerciseNote: async (dayLabel, exerciseId, note, date = todayISO()) => {
-      const key = `${dayLabel}::${date}`
+      const key = `${activeProfile()}::${dayLabel}::${date}`
       await mutate(key, s => ({
         ...s,
         exercises: s.exercises.map(e => e.exerciseId === exerciseId ? { ...e, note } : e),
@@ -222,7 +236,7 @@ export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => {
     },
 
     updateExerciseUnit: async (dayLabel, exerciseId, unit, date = todayISO()) => {
-      const key = `${dayLabel}::${date}`
+      const key = `${activeProfile()}::${dayLabel}::${date}`
       await mutate(key, s => ({
         ...s,
         exercises: s.exercises.map(e => {
@@ -241,9 +255,10 @@ export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => {
 export function selectDaySession(
   sessions: Record<string, WorkoutDaySession>,
   dayLabel: 'Day 1' | 'Day 2' | 'Day 3',
-  date = todayISO()
+  date = todayISO(),
+  profileId = useProfileStore.getState().activeId
 ): WorkoutDaySession | undefined {
-  return sessions[`${dayLabel}::${date}`]
+  return sessions[`${profileId}::${dayLabel}::${date}`]
 }
 
 export function selectOrderedExercises(session: WorkoutDaySession): ExerciseSessionState[] {

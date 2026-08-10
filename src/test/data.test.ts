@@ -1,6 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { RUDIMENTS, getRudimentsByFamily, getRudimentsByDifficulty } from '@/data/rudiments'
-import { OBZEN_PROGRAM, SWAP_OPTIONS, EXERCISE_LIBRARY } from '@/data/obzen-program'
+import { PRONIT_PROGRAM, AISHWARYA_PROGRAM, SWAP_OPTIONS, EXERCISE_LIBRARY } from '@/data/obzen-program'
+import type { ProgramDay } from '@/data/obzen-program'
 import { EXERCISES, getExercisesByMuscle } from '@/data/exercises'
 import { YOGA_POSES, getPosesBySequence } from '@/data/yoga-poses'
 import { PITTA_REMEDIES, PITTA_DINACHARYA } from '@/data/ayurveda'
@@ -35,14 +36,22 @@ describe('Rudiments', () => {
 })
 
 describe('Obzen Program', () => {
-  it('has 3 training days', () => {
-    expect(Object.keys(OBZEN_PROGRAM)).toHaveLength(3)
+  it('each profile has 3 training days', () => {
+    expect(Object.keys(PRONIT_PROGRAM)).toHaveLength(3)
+    expect(Object.keys(AISHWARYA_PROGRAM)).toHaveLength(3)
   })
   it('each day has exercises', () => {
-    for (const day of Object.values(OBZEN_PROGRAM)) {
+    const days: ProgramDay[] = [
+      ...Object.values(PRONIT_PROGRAM),
+      ...Object.values(AISHWARYA_PROGRAM),
+    ]
+    for (const day of days) {
       expect(day.exercises.length).toBeGreaterThan(0)
       expect(day.focus).toBeTruthy()
     }
+  })
+  it('keeps the two profiles on different programs', () => {
+    expect(PRONIT_PROGRAM['Day 1'].focus).not.toBe(AISHWARYA_PROGRAM['Day 1'].focus)
   })
   it('swap options are defined for every muscle group', () => {
     const groups = ['legs', 'shoulders', 'back', 'chest', 'arms', 'core']

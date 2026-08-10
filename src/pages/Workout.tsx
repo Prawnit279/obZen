@@ -1,8 +1,9 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { Plus, AlertTriangle, Zap } from 'lucide-react'
-import { OBZEN_PROGRAM, PULL_HEAVY_EXERCISES, FOREARM_LOAD_EXERCISES } from '@/data/obzen-program'
+import { getProgram, EXERCISE_LIBRARY, toExerciseId, PULL_HEAVY_EXERCISES, FOREARM_LOAD_EXERCISES } from '@/data/obzen-program'
 import type { ProgramExercise } from '@/data/obzen-program'
+import { useProfileStore } from '@/store/useProfileStore'
 import { db } from '@/db/dexie'
 import { todayISO } from '@/lib/utils'
 import { cn } from '@/lib/utils'
@@ -23,20 +24,24 @@ type Tab = 'program' | 'history'
 const DAYS: DayLabel[] = ['Day 1', 'Day 2', 'Day 3']
 const TODAY = todayISO()
 
-// Build a map of exerciseId → ProgramExercise for all days
-function buildProgramMap(): Record<string, ProgramExercise> {
+/**
+ * exerciseId → ProgramExercise for the active profile's days, with the shared
+ * library as a fallback so exercises added from the library or the other
+ * profile's program still resolve a name/prescription.
+ */
+function buildProgramMap(profileId: string): Record<string, ProgramExercise> {
   const map: Record<string, ProgramExercise> = {}
+  for (const ex of EXERCISE_LIBRARY) {
+    map[toExerciseId(ex.name)] = ex
+  }
+  const program = getProgram(profileId)
   for (const day of DAYS) {
-    const program = OBZEN_PROGRAM[day]
-    for (const ex of program.exercises) {
-      const id = ex.name.toLowerCase().replace(/\s+/g, '-')
-      map[id] = ex
+    for (const ex of program[day]?.exercises ?? []) {
+      map[toExerciseId(ex.name)] = ex
     }
   }
   return map
 }
-
-const PROGRAM_MAP = buildProgramMap()
 
 // ---------------------------------------------------------------------------
 // Rest day card
@@ -73,15 +78,17 @@ interface DayViewProps {
 
 function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
   const store = useWorkoutDayStore()
-  const session = selectDaySession(store.sessions, dayLabel)
+  const activeId = useProfileStore(s => s.activeId)
+  const session = selectDaySession(store.sessions, dayLabel, undefined, activeId)
   const [showAddSheet, setShowAddSheet] = useState(false)
 
-  // Load session on mount
+  // Load the active profile's session for this day (reloads when either changes)
   useEffect(() => {
     store.loadSession(dayLabel)
-  }, [dayLabel]) // eslint-disable-line react-hooks/exhaustive-deps
+  }, [dayLabel, activeId]) // eslint-disable-line react-hooks/exhaustive-deps
 
-  const program = OBZEN_PROGRAM[dayLabel]
+  const program = getProgram(activeId)[dayLabel]
+  const programMap = useMemo(() => buildProgramMap(activeId), [activeId])
 
   // Derive ordered exercises
   const orderedExercises = useMemo(() => {
@@ -91,7 +98,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
 
   // Forearm/pull warning for the day
   const hasFlaggedExercises = forearmFatigue && orderedExercises.some(ex => {
-    const prog = PROGRAM_MAP[ex.exerciseId]
+    const prog = programMap[ex.exerciseId]
     return prog && (PULL_HEAVY_EXERCISES.includes(prog.name) || FOREARM_LOAD_EXERCISES.includes(prog.name))
   })
 
@@ -161,7 +168,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
       {orderedExercises.length > 0 && (
         <SortableExerciseList
           exercises={orderedExercises}
-          programMap={PROGRAM_MAP}
+          programMap={programMap}
           forearmFatigue={forearmFatigue}
           dayLabel={dayLabel}
           onReorder={newOrder => store.reorderExercises(dayLabel, newOrder)}

@@ -3,16 +3,20 @@ export type MuscleGroup = 'legs' | 'back' | 'shoulders' | 'arms' | 'chest' | 'co
 export interface ProgramExercise {
   name: string
   muscle: MuscleGroup
-  /** Prescribed working sets. */
-  sets: number
+  /** Prescribed working sets (sets/reps/rest style plans). */
+  sets?: number
   /** Rep target as written on the plan, e.g. '10–12', '8/leg', '20–30s'. */
-  reps: string
+  reps?: string
   /** Rest between sets as written on the plan, e.g. '90s', '2–3 min'. */
-  rest: string
+  rest?: string
+  /** Warm-up prescription as written, e.g. '45×10, 110×10' (load-based plans). */
+  warmup?: string
+  /** Working-set prescription as written, e.g. '140×8×2' (load-based plans). */
+  working?: string
   /** Core/ab movement — surfaced with a CORE tag in the UI. */
   isCore?: boolean
   /** Suggested alternatives for this movement. */
-  swaps: string[]
+  swaps?: string[]
 }
 
 export interface ProgramDay {
@@ -20,9 +24,15 @@ export interface ProgramDay {
   exercises: ProgramExercise[]
 }
 
-/** Human-readable prescription summary, e.g. '4 × 10–12 · 90s'. */
-export function formatTarget(sets: number, reps: string, rest: string): string {
-  return `${sets} × ${reps} · rest ${rest}`
+/**
+ * Human-readable prescription summary. Supports both plan styles: sets/reps/rest
+ * (e.g. '4 × 10–12 · rest 90s') and load-based working sets (e.g. '140×8×2').
+ */
+export function formatTarget(ex: ProgramExercise): string {
+  if (ex.sets != null && ex.reps) {
+    return `${ex.sets} × ${ex.reps}${ex.rest ? ` · rest ${ex.rest}` : ''}`
+  }
+  return ex.working ?? ''
 }
 
 /** Slug used as the stable exerciseId for a movement name. */
@@ -31,11 +41,10 @@ export function toExerciseId(name: string): string {
 }
 
 /**
- * The three loadable day templates. A day is no longer auto-loaded — the user
- * either loads one of these as a starting point or builds a day from the
- * exercise library, then edits freely. (Phase 1 glute/hamstring program.)
+ * Aishwarya — Phase 1 (Weeks 1–4): Glutes, Core & Strength.
+ * Sets/reps/rest style with swap options per movement.
  */
-export const OBZEN_PROGRAM: Record<string, ProgramDay> = {
+export const AISHWARYA_PROGRAM: Record<string, ProgramDay> = {
   'Day 1': {
     focus: 'Glutes & Hamstrings',
     exercises: [
@@ -72,13 +81,76 @@ export const OBZEN_PROGRAM: Record<string, ProgramDay> = {
   },
 }
 
+/**
+ * Pronit — 3-day split. Load-based prescriptions (warm-up + working sets) as
+ * originally programmed.
+ */
+export const PRONIT_PROGRAM: Record<string, ProgramDay> = {
+  'Day 1': {
+    focus: 'Pull / Legs / Arms',
+    exercises: [
+      { name: 'Leg Press',            muscle: 'legs',      warmup: '45×10, 110×10',    working: '140×8×2' },
+      { name: 'Weighted Pull-ups',    muscle: 'back',      warmup: 'BW×5',             working: '+25lbs×5×6' },
+      { name: 'Barbell Row',          muscle: 'back',      warmup: 'light',            working: '20×10×3' },
+      { name: 'DB Lateral Raises',    muscle: 'shoulders', warmup: '10×10',            working: '12×10×3' },
+      { name: 'Cable Bicep Curls',    muscle: 'arms',      warmup: 'light',            working: '30lbs×8×3' },
+      { name: 'Cable Triceps',        muscle: 'arms',      warmup: 'light',            working: '30lbs×10×3' },
+      { name: 'Standing Calf Raises', muscle: 'legs',      warmup: '40×15',            working: '50lbs×15×3' },
+      { name: 'Bar Knee Raises',      muscle: 'core',      warmup: '—',                working: 'BW×10×3', isCore: true },
+      { name: 'Leg Extension',        muscle: 'legs',      warmup: '30×10, 60×10',     working: '80×10×1' },
+      { name: 'Barbell Squat',        muscle: 'legs',      warmup: 'BW×10, 20×5, 40×5', working: '50×5×2' },
+    ],
+  },
+  'Day 2': {
+    focus: 'Zercher / Quad / Shoulders',
+    exercises: [
+      { name: 'Zercher Squat',        muscle: 'legs',      warmup: 'BW×8, 20×10',       working: '40×8×2, 50×5×2' },
+      { name: 'Barbell Squat',        muscle: 'legs',      warmup: 'BW×5, 50×5, 70×5',  working: '90×5×3' },
+      { name: 'Leg Press',            muscle: 'legs',      warmup: '45×10, 110×10',     working: '130×8×3' },
+      { name: 'Leg Extension',        muscle: 'legs',      warmup: '60×8, 90×8',        working: '100×8×2, 110×8×1' },
+      { name: 'Shoulder Press (Bar)', muscle: 'shoulders', warmup: '40×8, 65×8',        working: '80×8×2' },
+      { name: 'DB Shoulder Press',    muscle: 'shoulders', warmup: '25×10',             working: '30×10×3, 35×10×2' },
+      { name: 'Weighted Pull-ups',    muscle: 'back',      warmup: 'BW×5',              working: '+25lbs×5×6' },
+      { name: 'Weighted Push-ups',    muscle: 'chest',     warmup: 'BW×10',             working: '10lbs×12×3' },
+      { name: 'Russian Twists',       muscle: 'core',      warmup: '—',                 working: '15lbs×10×3', isCore: true },
+      { name: 'Hanging Leg Raises',   muscle: 'core',      warmup: '—',                 working: 'BW×10×3', isCore: true },
+    ],
+  },
+  'Day 3': {
+    focus: 'Posterior / Delts / Forearms / Calves',
+    exercises: [
+      { name: 'Deadlift',             muscle: 'legs',      warmup: 'BW×5, 20×5, 50×5, 70×5', working: '90×5×3' },
+      { name: 'Romanian Deadlift',    muscle: 'legs',      warmup: 'light',             working: '50lbs×8×3' },
+      { name: 'DB Shoulder Press',    muscle: 'shoulders', warmup: '25×10',             working: '30×10×3, 35×10×2' },
+      { name: 'DB Lateral Raises',    muscle: 'shoulders', warmup: '10×10',             working: '12×10×3' },
+      { name: 'Rear Delt Raises',     muscle: 'shoulders', warmup: 'light',             working: '10-12lbs×12×3' },
+      { name: 'Weighted Pull-ups',    muscle: 'back',      warmup: 'BW×5',              working: '+25lbs×5×3' },
+      { name: 'Hammer Curls',         muscle: 'arms',      warmup: '25×10',             working: '35lbs×10×3' },
+      { name: 'Standing Calf Raises', muscle: 'legs',      warmup: '40×15',             working: '50lbs×15×3' },
+      { name: 'Hanging Leg Raises',   muscle: 'core',      warmup: '—',                 working: 'BW×10×3', isCore: true },
+    ],
+  },
+}
+
+/** Day templates per profile — the Home switcher selects which set is active. */
+export const PROGRAMS_BY_PROFILE: Record<string, Record<string, ProgramDay>> = {
+  pronit: PRONIT_PROGRAM,
+  aishwarya: AISHWARYA_PROGRAM,
+}
+
+export function getProgram(profileId: string): Record<string, ProgramDay> {
+  return PROGRAMS_BY_PROFILE[profileId] ?? PRONIT_PROGRAM
+}
+
 /** A pickable catalog entry — same shape a template exercise carries. */
 export interface LibraryExercise {
   name: string
   muscle: MuscleGroup
-  sets: number
-  reps: string
-  rest: string
+  sets?: number
+  reps?: string
+  rest?: string
+  warmup?: string
+  working?: string
   isCore?: boolean
   swaps: string[]
 }
@@ -90,20 +162,20 @@ export interface LibraryExercise {
  * prescription the user can edit). Deduped by name — main prescriptions win, so
  * e.g. Hip Thrust Machine appears once despite being on Days 1 and 3.
  */
-function buildLibrary(program: Record<string, ProgramDay>): LibraryExercise[] {
+function buildLibrary(programs: Record<string, ProgramDay>[]): LibraryExercise[] {
   const byName = new Map<string, LibraryExercise>()
-  const mains = Object.values(program).flatMap(day => day.exercises)
+  const mains = programs.flatMap(p => Object.values(p).flatMap(day => day.exercises))
 
   for (const ex of mains) {
     if (!byName.has(ex.name)) {
       byName.set(ex.name, {
-        name: ex.name, muscle: ex.muscle, sets: ex.sets,
-        reps: ex.reps, rest: ex.rest, isCore: ex.isCore, swaps: ex.swaps,
+        name: ex.name, muscle: ex.muscle, sets: ex.sets, reps: ex.reps, rest: ex.rest,
+        warmup: ex.warmup, working: ex.working, isCore: ex.isCore, swaps: ex.swaps ?? [],
       })
     }
   }
   for (const ex of mains) {
-    for (const swapName of ex.swaps) {
+    for (const swapName of ex.swaps ?? []) {
       if (!byName.has(swapName)) {
         byName.set(swapName, {
           name: swapName, muscle: ex.muscle, sets: 3, reps: '10',
@@ -115,7 +187,8 @@ function buildLibrary(program: Record<string, ProgramDay>): LibraryExercise[] {
   return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name))
 }
 
-export const EXERCISE_LIBRARY: LibraryExercise[] = buildLibrary(OBZEN_PROGRAM)
+/** Combined catalog — every movement from both programs is pickable. */
+export const EXERCISE_LIBRARY: LibraryExercise[] = buildLibrary([PRONIT_PROGRAM, AISHWARYA_PROGRAM])
 
 /** Library names grouped by muscle — kept for consumers that filter by group. */
 export const SWAP_OPTIONS: Record<MuscleGroup, string[]> = EXERCISE_LIBRARY.reduce(

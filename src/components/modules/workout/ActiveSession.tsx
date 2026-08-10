@@ -33,7 +33,7 @@ export function ActiveSession({ sessionId, dayLabel, program, forearmFatigue, on
       exerciseId: ex.name.toLowerCase().replace(/\s+/g, '-'),
       exerciseName: ex.name,
       date: today,
-      sets: buildInitialSets(ex.reps, ''),
+      sets: buildInitialSets(ex.reps ?? '', ''),
       injuryFlag: false,
       skipped: false,
     }))

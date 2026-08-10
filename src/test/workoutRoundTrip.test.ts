@@ -2,8 +2,9 @@ import { describe, it, expect, beforeEach } from 'vitest'
 import { db } from '@/db/dexie'
 import type { LoggedSet } from '@/db/dexie'
 import { useWorkoutDayStore } from '@/store/useWorkoutDayStore'
+import { useProfileStore } from '@/store/useProfileStore'
 import { todayISO } from '@/lib/utils'
-import { sessionHasActivity } from '@/lib/workoutSession'
+import { sessionHasActivity, belongsToProfile } from '@/lib/workoutSession'
 
 // Regression coverage for the empty-History bug: the live logging flow writes
 // workoutDaySessions, so every read path (History, WeekStrip, SessionDetail)
@@ -16,8 +17,9 @@ async function resetDb() {
 
 beforeEach(async () => {
   await resetDb()
-  // Reset the zustand singleton so cached sessions don't leak across tests.
+  // Reset the zustand singletons so cached sessions/profile don't leak.
   useWorkoutDayStore.setState({ sessions: {}, loading: false })
+  useProfileStore.setState({ activeId: 'aishwarya' })
 })
 
 function makeSet(weight: number): LoggedSet {
@@ -32,7 +34,7 @@ describe('workout save → history round-trip', () => {
     // 1. A day starts empty and is NOT written to the DB until something is
     //    logged — just opening/tabbing a day must not create a row.
     await store.loadSession('Day 1')
-    const key = `Day 1::${today}`
+    const key = `aishwarya::Day 1::${today}`
     expect(useWorkoutDayStore.getState().sessions[key]?.exercises).toHaveLength(0)
     expect(
       await db.workoutDaySessions.where('date').equals(today).filter(s => s.dayLabel === 'Day 1').first()
@@ -118,5 +120,44 @@ describe('workout save → history round-trip', () => {
     const s2 = (await db.workoutDaySessions.get(s1.id!))!
     expect(s2.exercises.length).toBe(count1)          // no duplicate exercises
     expect(s2.exercises[0].sets[0].weight).toBe(20)   // logged data preserved
+  })
+
+  it('keeps each profile on its own program and history', async () => {
+    // Read fresh state per call — the store object is a snapshot.
+    const store = () => useWorkoutDayStore.getState()
+
+    // Pronit's Day 1 is his own split, not Aishwarya's.
+    useProfileStore.setState({ activeId: 'pronit' })
+    await store().loadSession('Day 1')
+    await store().loadTemplate('Day 1')
+    const pronitDay = (await db.workoutDaySessions.where('dayLabel').equals('Day 1').first())!
+    expect(pronitDay.focus).toBe('Pull / Legs / Arms')
+    expect(pronitDay.exercises.some(e => e.name === 'Weighted Pull-ups')).toBe(true)
+    expect(pronitDay.profileId).toBe('pronit')
+
+    // Aishwarya's Day 1 on the same date is a separate row with her program.
+    useProfileStore.setState({ activeId: 'aishwarya' })
+    await store().loadSession('Day 1')
+    await store().loadTemplate('Day 1')
+    const rows = await db.workoutDaySessions.where('dayLabel').equals('Day 1').toArray()
+    expect(rows).toHaveLength(2)
+
+    const hers = rows.find(r => r.profileId === 'aishwarya')!
+    expect(hers.focus).toBe('Glutes & Hamstrings')
+    expect(hers.exercises.some(e => e.name === 'Hip Thrust Machine')).toBe(true)
+
+    // Each profile's history shows only their own session.
+    expect(rows.filter(r => belongsToProfile(r, 'pronit'))).toHaveLength(1)
+    expect(rows.filter(r => belongsToProfile(r, 'aishwarya'))).toHaveLength(1)
+  })
+
+  it('attributes pre-profile sessions to Aishwarya', async () => {
+    // A row saved before profiles existed carries no profileId.
+    await db.workoutDaySessions.add({
+      date: todayISO(), dayLabel: 'Day 2', exercises: [], order: [],
+    })
+    const legacy = (await db.workoutDaySessions.toArray())[0]
+    expect(belongsToProfile(legacy, 'aishwarya')).toBe(true)
+    expect(belongsToProfile(legacy, 'pronit')).toBe(false)
   })
 })

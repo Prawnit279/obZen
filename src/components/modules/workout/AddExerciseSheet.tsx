@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { X, Search, Plus } from 'lucide-react'
-import { OBZEN_PROGRAM, EXERCISE_LIBRARY, formatTarget, toExerciseId } from '@/data/obzen-program'
+import { getProgram, EXERCISE_LIBRARY, formatTarget, toExerciseId } from '@/data/obzen-program'
+import { useProfileStore } from '@/store/useProfileStore'
 import type { MuscleGroup } from '@/data/obzen-program'
 import type { ExerciseSessionState } from '@/db/dexie'
 import { cn } from '@/lib/utils'
@@ -41,12 +42,13 @@ function OtherDaysTab({
   existingIds,
   onAdd,
 }: { currentDay: 'Day 1' | 'Day 2' | 'Day 3'; existingIds: string[]; onAdd: (ex: ExerciseSessionState) => void }) {
+  const activeId = useProfileStore(s => s.activeId)
   const otherDays = (['Day 1', 'Day 2', 'Day 3'] as const).filter(d => d !== currentDay)
 
   return (
     <div className="space-y-4">
       {otherDays.map(day => {
-        const program = OBZEN_PROGRAM[day]
+        const program = getProgram(activeId)[day]
         const available = program.exercises.filter(ex => !existingIds.includes(toExerciseId(ex.name)))
         return (
           <div key={day}>
@@ -62,7 +64,7 @@ function OtherDaysTab({
                     key={ex.name}
                     onClick={() => onAdd(makeExerciseState(ex.name, day, {
                       muscle: ex.muscle,
-                      target: formatTarget(ex.sets, ex.reps, ex.rest),
+                      target: formatTarget(ex),
                     }))}
                     className="w-full flex items-center justify-between px-3 py-2.5 rounded-[2px] text-left transition-opacity hover:opacity-70"
                     style={{ background: '#1e1e1e', border: '1px solid #323232' }}
@@ -148,7 +150,7 @@ function LibraryTab({
               key={ex.name}
               onClick={() => onAdd(makeExerciseState(ex.name, 'library', {
                 muscle: ex.muscle,
-                target: formatTarget(ex.sets, ex.reps, ex.rest),
+                target: formatTarget(ex),
               }))}
               className="w-full flex items-center justify-between px-3 py-2.5 rounded-[2px] text-left transition-opacity hover:opacity-70"
               style={{ background: '#1e1e1e', border: '1px solid #323232' }}

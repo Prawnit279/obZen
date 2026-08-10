@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom'
 import { ChevronRight } from 'lucide-react'
 import { db } from '@/db/dexie'
 import { formatDateFull } from '@/lib/utils'
-import { sessionHasActivity, loggedExercises, totalSets } from '@/lib/workoutSession'
+import { sessionHasActivity, loggedExercises, totalSets, belongsToProfile } from '@/lib/workoutSession'
+import { useProfileStore } from '@/store/useProfileStore'
 
 export function WorkoutHistory() {
   const navigate = useNavigate()
+  const activeId = useProfileStore(s => s.activeId)
 
   // Read the table the live logging flow writes to (workoutDaySessions),
   // most-recent first.
@@ -19,9 +21,9 @@ export function WorkoutHistory() {
     return <div className="text-center py-8 text-[13px] text-noir-muted">Loading…</div>
   }
 
-  // Only surface days with real training — completed, or with logged sets.
-  // Empty/placeholder days (opened but never logged) are hidden.
-  const logged = sessions.filter(sessionHasActivity)
+  // Only the active profile's days, and only ones with real training —
+  // completed or with logged sets. Empty placeholder days stay hidden.
+  const logged = sessions.filter(s => belongsToProfile(s, activeId) && sessionHasActivity(s))
 
   if (logged.length === 0) {
     return (

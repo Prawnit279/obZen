@@ -1,5 +1,19 @@
 import type { WorkoutDaySession, ExerciseSessionState } from '@/db/dexie'
 
+/**
+ * Sessions logged before profiles existed carry no profileId. They were all
+ * Aishwarya's Phase 1 workouts, so they're attributed to her.
+ */
+export const LEGACY_PROFILE_ID = 'aishwarya'
+
+export function sessionProfile(s: WorkoutDaySession): string {
+  return s.profileId ?? LEGACY_PROFILE_ID
+}
+
+export function belongsToProfile(s: WorkoutDaySession, profileId: string): boolean {
+  return sessionProfile(s) === profileId
+}
+
 /** An exercise counts as "done" if it was marked complete or has any logged set. */
 export function isExerciseLogged(e: ExerciseSessionState): boolean {
   return e.status === 'complete' || e.sets.length > 0

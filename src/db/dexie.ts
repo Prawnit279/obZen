@@ -200,6 +200,9 @@ export interface WorkoutDaySession {
   id?: number
   date: string
   dayLabel: 'Day 1' | 'Day 2' | 'Day 3'
+  /** Whose workout this is ('pronit' | 'aishwarya'). Rows saved before profiles
+   *  existed have no value and are treated as Aishwarya's. */
+  profileId?: string
   /** Muscle-focus label, e.g. 'Glutes & Hamstrings' — persisted for history/detail. */
   focus?: string
   exercises: ExerciseSessionState[]

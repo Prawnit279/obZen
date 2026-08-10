@@ -4,7 +4,8 @@ import { ChevronRight } from 'lucide-react'
 import { db } from '@/db/dexie'
 import type { WorkoutDaySession } from '@/db/dexie'
 import { todayISO } from '@/lib/utils'
-import { sessionHasActivity, loggedExercises, totalSets } from '@/lib/workoutSession'
+import { sessionHasActivity, loggedExercises, totalSets, belongsToProfile } from '@/lib/workoutSession'
+import { useProfileStore } from '@/store/useProfileStore'
 import { Card, CardHeader } from '@/components/ui/Card'
 
 function isoDate(d: Date): string {
@@ -22,6 +23,7 @@ function startOfWeekMonday(base = new Date()): Date {
 
 export function WeekStrip() {
   const navigate = useNavigate()
+  const activeId = useProfileStore(s => s.activeId)
 
   const monday = startOfWeekMonday()
   const weekDates = Array.from({ length: 7 }, (_, i) => {
@@ -42,7 +44,7 @@ export function WeekStrip() {
   const rank = (s: WorkoutDaySession) => (s.completedAt ? 1_000_000 : 0) + totalSets(s)
   const byDate = new Map<string, WorkoutDaySession>()
   for (const s of sessions ?? []) {
-    if (!sessionHasActivity(s)) continue
+    if (!belongsToProfile(s, activeId) || !sessionHasActivity(s)) continue
     const cur = byDate.get(s.date)
     if (!cur || rank(s) > rank(cur)) byDate.set(s.date, s)
   }

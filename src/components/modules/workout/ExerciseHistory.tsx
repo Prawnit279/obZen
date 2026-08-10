@@ -1,5 +1,7 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/db/dexie'
+import { belongsToProfile } from '@/lib/workoutSession'
+import { useProfileStore } from '@/store/useProfileStore'
 
 interface Props {
   exerciseId: string
@@ -15,13 +17,15 @@ function formatSessionDate(dateISO: string): string {
 }
 
 export function ExerciseHistory({ exerciseId, exerciseName }: Props) {
-  // Query last 5 sessions where this exercise was complete
+  const activeId = useProfileStore(s => s.activeId)
+
+  // Last 5 of the active profile's sessions where this exercise was completed
   const history = useLiveQuery(async () => {
-    // Try new-style WorkoutDaySession first
     const daySessions = await db.workoutDaySessions
       .orderBy('date')
       .reverse()
       .filter(session =>
+        belongsToProfile(session, activeId) &&
         session.exercises.some(
           e => (e.exerciseId === exerciseId || e.exerciseId === exerciseName.toLowerCase().replace(/\s+/g, '-'))
             && e.status === 'complete'
@@ -37,7 +41,7 @@ export function ExerciseHistory({ exerciseId, exerciseName }: Props) {
       )!
       return { date: session.date, sets: ex.sets }
     })
-  }, [exerciseId, exerciseName])
+  }, [exerciseId, exerciseName, activeId])
 
   return (
     <div
