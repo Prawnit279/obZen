@@ -185,13 +185,14 @@ describe('workout save → history round-trip', () => {
     expect(rows.every(r => r.exercises.length === 0)).toBe(true)
   })
 
-  it('attributes pre-profile sessions to Aishwarya', async () => {
-    // A row saved before profiles existed carries no profileId.
+  it('attributes pre-profile sessions to Pronit', async () => {
+    // A row saved before profiles existed carries no profileId. All of that
+    // history predates the second profile, so it belongs to Pronit.
     await db.workoutDaySessions.add({
       date: todayISO(), dayLabel: 'Day 2', exercises: [], order: [],
     })
     const legacy = (await db.workoutDaySessions.toArray())[0]
-    expect(belongsToProfile(legacy, 'aishwarya')).toBe(true)
-    expect(belongsToProfile(legacy, 'pronit')).toBe(false)
+    expect(belongsToProfile(legacy, 'pronit')).toBe(true)
+    expect(belongsToProfile(legacy, 'aishwarya')).toBe(false)
   })
 })
