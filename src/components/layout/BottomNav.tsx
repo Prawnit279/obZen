@@ -14,9 +14,9 @@ const PRIMARY_NAV = [
   { path: '/', label: 'Home', icon: LayoutDashboard },
   { path: '/workout', label: 'Train', icon: Dumbbell },
   { path: '/drum', label: 'Drum', icon: Music2 },
-  { path: '/calendar', label: 'Cal', icon: CalendarDays },
   { path: '/nutrition', label: 'Food', icon: UtensilsCrossed },
   { path: '/more', label: 'More', icon: MoreHorizontal },
+  { path: '/calendar', label: 'Cal', icon: CalendarDays },
 ].filter(item => SHOW_NUTRITION || item.path !== '/nutrition')
 
 export function BottomNav() {

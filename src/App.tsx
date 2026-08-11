@@ -13,6 +13,9 @@ import VedicRemedies from '@/pages/VedicRemedies'
 import Settings from '@/pages/Settings'
 import More from '@/pages/More'
 import SessionDetail from '@/pages/SessionDetail'
+import Progress from '@/pages/Progress'
+import Tools from '@/pages/Tools'
+import FiveThreeOneGuide from '@/pages/FiveThreeOneGuide'
 import { SHOW_NUTRITION, SHOW_VEDIC } from '@/config/features'
 
 export default function App() {
@@ -21,6 +24,9 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/workout" element={<Workout />} />
+        <Route path="/workout/progress" element={<Progress />} />
+        <Route path="/workout/tools" element={<Tools />} />
+        <Route path="/workout/tools/guide" element={<FiveThreeOneGuide />} />
         <Route path="/workout/session/:id" element={<SessionDetail />} />
         <Route path="/drum" element={<DrumStudio />} />
         <Route path="/yoga" element={<Yoga />} />

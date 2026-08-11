@@ -13,13 +13,15 @@ import { DaySummaryBar } from '@/components/modules/workout/DaySummaryBar'
 import { SortableExerciseList } from '@/components/modules/workout/SortableExerciseList'
 import { AddExerciseSheet } from '@/components/modules/workout/AddExerciseSheet'
 import { WorkoutHistory } from '@/components/modules/workout/WorkoutHistory'
+import { WorkoutProgress } from '@/components/modules/workout/progress/WorkoutProgress'
+import { StrengthTools } from '@/components/modules/workout/tools/StrengthTools'
 
 // ---------------------------------------------------------------------------
 // Constants
 // ---------------------------------------------------------------------------
 
 type DayLabel = 'Day 1' | 'Day 2' | 'Day 3'
-type Tab = 'program' | 'history'
+type Tab = 'program' | 'history' | 'progress' | 'tools'
 
 const DAYS: DayLabel[] = ['Day 1', 'Day 2', 'Day 3']
 const TODAY = todayISO()
@@ -269,7 +271,7 @@ export default function Workout() {
 
       {/* Tabs */}
       <div className="flex border border-noir-border rounded-[2px] overflow-hidden">
-        {(['program', 'history'] as Tab[]).map(t => (
+        {(['program', 'history', 'progress', 'tools'] as Tab[]).map(t => (
           <button
             key={t}
             onClick={() => setTab(t)}
@@ -286,6 +288,10 @@ export default function Workout() {
       </div>
 
       {tab === 'history' && <WorkoutHistory />}
+
+      {tab === 'progress' && <WorkoutProgress />}
+
+      {tab === 'tools' && <StrengthTools />}
 
       {tab === 'program' && (
         <>

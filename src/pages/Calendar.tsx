@@ -1,11 +1,14 @@
 import { useState } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { useNavigate } from 'react-router-dom'
 import { useCalendarStore } from '@/store/useCalendarStore'
+import { useProfileStore } from '@/store/useProfileStore'
+import { belongsToProfile, sessionHasActivity } from '@/lib/workoutSession'
 import { Card } from '@/components/ui/Card'
 import { cn, getMoonPhaseName } from '@/lib/utils'
 import { ChevronLeft, ChevronRight, Plus, X, Trash2 } from 'lucide-react'
 import { db } from '@/db/dexie'
-import type { CalendarEvent } from '@/db/dexie'
+import type { CalendarEvent, WorkoutDaySession } from '@/db/dexie'
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
 const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December']
@@ -382,6 +385,8 @@ function DayView({ selectedDate, setSelectedDate, onAdd }: DayViewProps) {
 
 // ── Calendar Page ─────────────────────────────────────────────────────────────
 export default function Calendar() {
+  const navigate = useNavigate()
+  const { activeId } = useProfileStore()
   const { view, setView, selectedDate, setSelectedDate } = useCalendarStore()
   const [currentMonth, setCurrentMonth] = useState(new Date())
   const [showAdd, setShowAdd]   = useState(false)
@@ -412,6 +417,20 @@ export default function Calendar() {
   const dayEvents = monthEvents.filter(e => e.date === selectedDate)
   const datesWithEvents = new Set(monthEvents.map(e => e.date))
   const isSaturday = (day: number) => new Date(year, month, day).getDay() === 6
+
+  // Workout days for the active profile, marked on the month grid.
+  const monthWorkouts = useLiveQuery(
+    () => db.workoutDaySessions.where('date').between(monthStart, monthEnd, true, true).toArray(),
+    [monthStart, monthEnd]
+  ) ?? []
+  const workoutByDate = new Map<string, WorkoutDaySession>()
+  for (const s of monthWorkouts) {
+    if (!belongsToProfile(s, activeId) || !sessionHasActivity(s)) continue
+    // A date can (rarely) carry two day-labels for one profile — keep the
+    // more complete session so the marker links somewhere meaningful.
+    const existing = workoutByDate.get(s.date)
+    if (!existing || s.exercises.length > existing.exercises.length) workoutByDate.set(s.date, s)
+  }
 
   const openAdd = (date: string) => { setAddDate(date); setShowAdd(true) }
 
@@ -469,17 +488,31 @@ export default function Calendar() {
                 const isSel   = dateStr === selectedDate
                 const isSat   = isSaturday(day)
                 const hasEvt  = datesWithEvents.has(dateStr)
+                const workout = workoutByDate.get(dateStr)
                 return (
-                  <button key={day} onClick={() => { setSelectedDate(dateStr); setShowDay(true) }}
+                  <button
+                    key={day}
+                    onClick={() => {
+                      if (workout) { navigate(`/workout/session/${workout.id}`); return }
+                      setSelectedDate(dateStr)
+                      setShowDay(true)
+                    }}
                     className={cn(
                       'aspect-square flex flex-col items-center justify-center text-[12px] transition-colors border border-transparent gap-0.5',
                       isToday && 'border-noir-accent',
                       isSel && !isToday && 'bg-noir-elevated',
                       isSat ? 'text-noir-muted' : 'text-noir-accent',
                       !isToday && !isSel && 'hover:bg-noir-elevated/50'
-                    )}>
+                    )}
+                    aria-label={workout ? `${day}, workout logged — open session` : String(day)}
+                  >
                     <span>{day}</span>
-                    {hasEvt && <span className="w-1 h-1 rounded-full" style={{ background: '#888888' }} />}
+                    {(hasEvt || workout) && (
+                      <span className="flex gap-0.5">
+                        {hasEvt && <span className="w-1 h-1 rounded-full" style={{ background: '#888888' }} />}
+                        {workout && <span className="w-1 h-1 rounded-full" style={{ background: '#34d399' }} />}
+                      </span>
+                    )}
                   </button>
                 )
               })}
