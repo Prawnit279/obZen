@@ -181,6 +181,36 @@ export function getScheduledDay(profileId: string, date = new Date()): ScheduleE
   return { kind: 'train', dayLabel: days[weekday % days.length] }
 }
 
+/**
+ * How progress is measured for a movement.
+ *  - `load`            heavier weight is better (default)
+ *  - `assisted`        less assistance is better — trends down toward bodyweight
+ *  - `bodyweight-reps` more reps in a set is better
+ *  - `timed`           a longer hold is better
+ */
+export type TrackingMode = 'load' | 'assisted' | 'bodyweight-reps' | 'timed'
+
+/** Rungs a bodyweight movement climbs on the way to being unassisted. */
+export const DEFAULT_PROGRESSION_PATH = [
+  'Negatives', 'Band-assisted', 'Machine-assisted', 'Bodyweight', 'Weighted',
+]
+
+/** Movements whose tracking mode differs from the `load` default. */
+const TRACKING_MODES: Record<string, TrackingMode> = {
+  'Assisted Pull-Up': 'assisted',
+  'Assisted Dip': 'assisted',
+  'Band-Assisted Pull-Up': 'assisted',
+  'Hollow Body Hold': 'timed',
+  'Plank': 'timed',
+  'Side Plank': 'timed',
+  'Suitcase Carry': 'timed',
+  'Dead Bug': 'timed',
+  'Push-Up': 'bodyweight-reps',
+}
+
+/** The three powerlifting competition lifts (Pronit's SBD total). */
+const COMPETITION_LIFTS = new Set(['Barbell Squat', 'Bench Press', 'Deadlift'])
+
 /** A pickable catalog entry — same shape a template exercise carries. */
 export interface LibraryExercise {
   name: string
@@ -192,6 +222,12 @@ export interface LibraryExercise {
   working?: string
   isCore?: boolean
   swaps: string[]
+  /** How progress is measured for this movement. */
+  trackingMode: TrackingMode
+  /** Part of the squat/bench/deadlift total. */
+  isCompetitionLift: boolean
+  /** Ladder rungs, for movements worked up to unassisted. */
+  progressionPath?: string[]
 }
 
 /**
@@ -205,29 +241,60 @@ function buildLibrary(programs: Record<string, ProgramDay>[]): LibraryExercise[]
   const byName = new Map<string, LibraryExercise>()
   const mains = programs.flatMap(p => Object.values(p).flatMap(day => day.exercises))
 
+  /** Attach the progress-tracking metadata every catalog entry carries. */
+  const withTracking = (entry: Omit<LibraryExercise, 'trackingMode' | 'isCompetitionLift'>): LibraryExercise => {
+    const trackingMode = TRACKING_MODES[entry.name] ?? 'load'
+    return {
+      ...entry,
+      trackingMode,
+      isCompetitionLift: COMPETITION_LIFTS.has(entry.name),
+      progressionPath: trackingMode === 'assisted' || trackingMode === 'bodyweight-reps'
+        ? DEFAULT_PROGRESSION_PATH
+        : undefined,
+    }
+  }
+
   for (const ex of mains) {
     if (!byName.has(ex.name)) {
-      byName.set(ex.name, {
+      byName.set(ex.name, withTracking({
         name: ex.name, muscle: ex.muscle, sets: ex.sets, reps: ex.reps, rest: ex.rest,
         warmup: ex.warmup, working: ex.working, isCore: ex.isCore, swaps: ex.swaps ?? [],
-      })
+      }))
     }
   }
   for (const ex of mains) {
     for (const swapName of ex.swaps ?? []) {
       if (!byName.has(swapName)) {
-        byName.set(swapName, {
+        byName.set(swapName, withTracking({
           name: swapName, muscle: ex.muscle, sets: 3, reps: '10',
           rest: '60s', isCore: ex.isCore, swaps: [],
-        })
+        }))
       }
     }
+  }
+  // Bench Press completes the SBD total but appears in neither program, so it
+  // is added here as a pickable catalog entry.
+  if (!byName.has('Bench Press')) {
+    byName.set('Bench Press', withTracking({
+      name: 'Bench Press', muscle: 'chest', sets: 3, reps: '5', rest: '2–3 min',
+      swaps: ['Dumbbell Bench Press', 'Close-Grip Bench Press', 'Chest Press Machine'],
+    }))
   }
   return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name))
 }
 
 /** Combined catalog — every movement from both programs is pickable. */
 export const EXERCISE_LIBRARY: LibraryExercise[] = buildLibrary([PRONIT_PROGRAM, AISHWARYA_PROGRAM])
+
+/** Catalog entry for an exercise id, for consumers that only persist the id. */
+export const LIBRARY_BY_ID: Record<string, LibraryExercise> = Object.fromEntries(
+  EXERCISE_LIBRARY.map(ex => [toExerciseId(ex.name), ex])
+)
+
+/** Tracking mode for a logged exercise id (defaults to `load` for custom adds). */
+export function trackingModeFor(exerciseId: string): TrackingMode {
+  return LIBRARY_BY_ID[exerciseId]?.trackingMode ?? 'load'
+}
 
 /** Library names grouped by muscle — kept for consumers that filter by group. */
 export const SWAP_OPTIONS: Record<MuscleGroup, string[]> = EXERCISE_LIBRARY.reduce(
