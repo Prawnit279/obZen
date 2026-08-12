@@ -522,9 +522,9 @@ export function DrumLibrary() {
   const [syncing, setSyncing] = useState(false)
   const [syncMsg, setSyncMsg] = useState<string | null>(null)
 
+  // Persistent storage is requested once at app startup (see lib/storage.ts).
   useEffect(() => {
     seedIndexedBooks()
-    navigator.storage?.persist?.()
   }, [])
 
   const handleSync = async () => {
