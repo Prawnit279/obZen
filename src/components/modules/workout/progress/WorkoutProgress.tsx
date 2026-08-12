@@ -8,8 +8,9 @@ import { PROFILES } from '@/config/profiles'
 import { LIBRARY_BY_ID, EXERCISE_LIBRARY, toExerciseId } from '@/data/obzen-program'
 import {
   e1rmSeries, bestCurrentE1RM, sbdTotal, weeklyVolume, recentPRs,
-  dotsScore, strengthStandard, trackingSeries, weeklyRepVolume, delta,
+  dotsScore, strengthStandard, trackingSeries, weeklyRepVolume, delta, isoWeekKey,
 } from '@/lib/progress'
+import { todayISO } from '@/lib/utils'
 import { LineChart, BarChart, ChartEmpty } from './Charts'
 import { ProgressionLadder } from './ProgressionLadder'
 import { BodyweightPanel } from './BodyweightPanel'
@@ -86,6 +87,11 @@ export function WorkoutProgress() {
     : 0
 
   const volume = weeklyVolume(mine)
+  // Look the current week up by key — `volume` only contains weeks that were
+  // trained, so its last entry is the most recent *trained* week, which is not
+  // the current one after any week off.
+  const thisWeekKey = isoWeekKey(todayISO())
+  const thisWeekVolume = volume.find(v => v.week === thisWeekKey)?.tonnageKg ?? 0
   const prs = recentPRs(mine, bodyweightKg).slice(0, 6)
 
   // ── Bodyweight-mode movements this profile has actually logged ─────────────
@@ -121,7 +127,7 @@ export function WorkoutProgress() {
         )}
         <Stat value={String(mine.length)} label="Sessions" />
         <Stat
-          value={volume.length > 0 ? kg(volume[volume.length - 1].tonnageKg / 1000) : '0'}
+          value={kg(thisWeekVolume / 1000)}
           unit="t" label="Volume" sub="this week"
         />
       </div>

@@ -211,6 +211,28 @@ const TRACKING_MODES: Record<string, TrackingMode> = {
 /** The three powerlifting competition lifts (Pronit's SBD total). */
 const COMPETITION_LIFTS = new Set(['Barbell Squat', 'Bench Press', 'Deadlift'])
 
+/**
+ * Fraction of bodyweight a movement actually loads, for movements where the
+ * body is the resistance. Used to compute effective load: a weighted pull-up
+ * at +25 lb moves bodyweight *plus* the plates, so scoring it on the plates
+ * alone badly understates it.
+ *
+ * Deliberately not derived from `trackingMode` — "weighted pull-up" is a
+ * `load` movement that is still bodyweight-driven, which is exactly the case
+ * a mode-based rule missed. Anything absent here is pure external load
+ * (barbells, machines) and needs no adjustment.
+ */
+const BODYWEIGHT_FACTORS: Record<string, number> = {
+  'Weighted Pull-ups': 1,
+  'Assisted Pull-Up': 1,
+  'Band-Assisted Pull-Up': 1,
+  'Assisted Dip': 1,
+  'Weighted Push-ups': 0.65,
+  'Push-Up': 0.65,
+  'Inverted Row': 0.5,
+  'Bench Dip': 0.4,
+}
+
 /** A pickable catalog entry — same shape a template exercise carries. */
 export interface LibraryExercise {
   name: string
@@ -228,6 +250,8 @@ export interface LibraryExercise {
   isCompetitionLift: boolean
   /** Ladder rungs, for movements worked up to unassisted. */
   progressionPath?: string[]
+  /** Fraction of bodyweight this movement loads (absent = external load only). */
+  bodyweightFactor?: number
 }
 
 /**
@@ -251,6 +275,7 @@ function buildLibrary(programs: Record<string, ProgramDay>[]): LibraryExercise[]
       progressionPath: trackingMode === 'assisted' || trackingMode === 'bodyweight-reps'
         ? DEFAULT_PROGRESSION_PATH
         : undefined,
+      bodyweightFactor: BODYWEIGHT_FACTORS[entry.name],
     }
   }
 
@@ -294,6 +319,11 @@ export const LIBRARY_BY_ID: Record<string, LibraryExercise> = Object.fromEntries
 /** Tracking mode for a logged exercise id (defaults to `load` for custom adds). */
 export function trackingModeFor(exerciseId: string): TrackingMode {
   return LIBRARY_BY_ID[exerciseId]?.trackingMode ?? 'load'
+}
+
+/** Fraction of bodyweight a logged exercise loads (0 = external load only). */
+export function bodyweightFactorFor(exerciseId: string): number {
+  return LIBRARY_BY_ID[exerciseId]?.bodyweightFactor ?? 0
 }
 
 /** Library names grouped by muscle — kept for consumers that filter by group. */

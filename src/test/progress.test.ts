@@ -86,6 +86,40 @@ describe('bestE1RM', () => {
     }
     expect(bestE1RM(ex)).toBeCloseTo(140, 2)
   })
+
+  it('ignores bodyweight for pure external-load lifts', () => {
+    const ex = { exerciseId: 'deadlift', status: 'complete' as const, sets: [set(140, 1)] }
+    expect(bestE1RM(ex, 75)).toBeCloseTo(140, 2)
+  })
+
+  it('adds full bodyweight to a weighted pull-up', () => {
+    // +20 kg on the belt at 75 kg bodyweight = 95 kg moved for a single.
+    const ex = { exerciseId: 'weighted-pull-ups', status: 'complete' as const, sets: [set(20, 1)] }
+    expect(bestE1RM(ex, 75)).toBeCloseTo(95, 2)
+  })
+
+  it('adds only the loaded fraction for a push-up variant', () => {
+    // Push-ups move ~65% of bodyweight: 10 + (75 × 0.65) = 58.75.
+    const ex = { exerciseId: 'weighted-push-ups', status: 'complete' as const, sets: [set(10, 1)] }
+    expect(bestE1RM(ex, 75)).toBeCloseTo(58.75, 2)
+  })
+
+  it('subtracts assistance from bodyweight on assisted work', () => {
+    // 30 kg of machine assistance at 75 kg bodyweight = 45 kg actually moved.
+    const ex = { exerciseId: 'assisted-pull-up', status: 'complete' as const, sets: [set(30, 1)] }
+    expect(bestE1RM(ex, 75)).toBeCloseTo(45, 2)
+  })
+
+  it('never goes negative when assistance exceeds bodyweight', () => {
+    const ex = { exerciseId: 'assisted-pull-up', status: 'complete' as const, sets: [set(200, 1)] }
+    expect(bestE1RM(ex, 75)).toBe(0)
+  })
+
+  it('scores a weighted pull-up above a bodyweight-only one', () => {
+    const weighted = { exerciseId: 'weighted-pull-ups', status: 'complete' as const, sets: [set(25, 3)] }
+    const bare = { exerciseId: 'weighted-pull-ups', status: 'complete' as const, sets: [set(0, 3)] }
+    expect(bestE1RM(weighted, 75)).toBeGreaterThan(bestE1RM(bare, 75))
+  })
 })
 
 describe('e1rmSeries + bestCurrentE1RM', () => {
@@ -157,6 +191,18 @@ describe('weeklyVolume', () => {
     ])
     expect(weeks).toHaveLength(2)
     expect(weeks[0].week < weeks[1].week).toBe(true)
+  })
+
+  it('omits untrained weeks entirely, so the last entry is not necessarily now', () => {
+    // The "this week" stat must look the current week up by key rather than
+    // taking the last entry — after a week off the last entry is stale.
+    const weeks = weeklyVolume([session('2026-08-10', 'deadlift', [set(100, 5)])])
+    const trainedWeek = isoWeekKey('2026-08-10')
+    const weekOff = isoWeekKey('2026-08-24')
+
+    expect(weeks).toHaveLength(1)
+    expect(weeks[weeks.length - 1].week).toBe(trainedWeek)   // last entry = stale week
+    expect(weeks.find(v => v.week === weekOff)).toBeUndefined() // lookup = correctly absent
   })
 })
 

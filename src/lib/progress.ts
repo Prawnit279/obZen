@@ -13,7 +13,7 @@
  */
 
 import type { WorkoutDaySession, ExerciseSessionState, LoggedSet } from '@/db/dexie'
-import { trackingModeFor, LIBRARY_BY_ID } from '@/data/obzen-program'
+import { trackingModeFor, bodyweightFactorFor, LIBRARY_BY_ID } from '@/data/obzen-program'
 import type { TrackingMode } from '@/data/obzen-program'
 
 const LB_PER_KG = 2.2046226218
@@ -51,9 +51,19 @@ export function epley1RM(weightKg: number, reps: number, addedBodyweightKg = 0):
  * taking the max means warmups can never beat a true working set anyway.
  */
 export function bestE1RM(ex: ExerciseSessionState, bodyweightKg = 0): number {
-  const isWeightedBodyweight = trackingModeFor(ex.exerciseId) === 'bodyweight-reps'
+  const mode = trackingModeFor(ex.exerciseId)
+  // Portion of bodyweight this movement actually moves — 0 for barbell/machine
+  // work, ~1 for a pull-up, ~0.65 for a push-up.
+  const bodyweightLoad = bodyweightKg * bodyweightFactorFor(ex.exerciseId)
+
   return realSets(ex).reduce((best, s) => {
-    const e1rm = epley1RM(toKg(s.weight, s.unit), s.reps, isWeightedBodyweight ? bodyweightKg : 0)
+    const logged = toKg(s.weight, s.unit)
+    // Assistance is subtracted from the bodyweight being moved; every other
+    // movement adds its external load on top.
+    const load = mode === 'assisted'
+      ? Math.max(0, bodyweightLoad - logged)
+      : logged + bodyweightLoad
+    const e1rm = epley1RM(load, s.reps)
     return e1rm > best ? e1rm : best
   }, 0)
 }
@@ -371,7 +381,8 @@ export interface TrackPoint {
 export function trackingSeries(
   sessions: WorkoutDaySession[],
   exerciseId: string,
-  mode: TrackingMode = trackingModeFor(exerciseId)
+  mode: TrackingMode = trackingModeFor(exerciseId),
+  bodyweightKg = 0
 ): TrackPoint[] {
   return sessions
     .flatMap(session => {
@@ -392,7 +403,7 @@ export function trackingSeries(
           value = Math.max(...sets.map(s => s.reps)) // reps field holds seconds
           break
         default:
-          value = bestE1RM(ex)
+          value = bestE1RM(ex, bodyweightKg)
       }
       return [{ date: session.date, value }]
     })
