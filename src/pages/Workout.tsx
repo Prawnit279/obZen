@@ -4,6 +4,8 @@ import { Plus, AlertTriangle, Zap } from 'lucide-react'
 import { getProgram, EXERCISE_LIBRARY, toExerciseId, PULL_HEAVY_EXERCISES, FOREARM_LOAD_EXERCISES } from '@/data/obzen-program'
 import type { ProgramExercise } from '@/data/obzen-program'
 import { useProfileStore } from '@/store/useProfileStore'
+import { PROFILES, PROFILE_IDS } from '@/config/profiles'
+import { belongsToProfile } from '@/lib/workoutSession'
 import { db } from '@/db/dexie'
 import { todayISO } from '@/lib/utils'
 import { cn } from '@/lib/utils'
@@ -232,6 +234,8 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
 export default function Workout() {
   const [tab, setTab] = useState<Tab>('program')
   const [selectedDay, setSelectedDay] = useState<DayLabel | 'Rest'>('Day 1')
+  const activeProfileId = useProfileStore(s => s.activeId)
+  const setActiveProfile = useProfileStore(s => s.setActive)
 
   const todayCheckIn = useLiveQuery(
     () => db.checkIns.where('date').equals(TODAY).first(),
@@ -247,25 +251,48 @@ export default function Workout() {
       const cutoff = new Date()
       cutoff.setDate(cutoff.getDate() - 7)
       const cutoffISO = cutoff.toISOString().split('T')[0]
-      // Read the table the live logging flow actually writes to.
+      // Read the table the live logging flow actually writes to, counting only
+      // the active profile's sessions.
       return db.workoutDaySessions
         .where('date').aboveOrEqual(cutoffISO)
-        .filter(s => !!s.completedAt)
+        .filter(s => !!s.completedAt && belongsToProfile(s, activeProfileId))
         .count()
     },
-    []
+    [activeProfileId]
   )
 
   return (
     <div className="page-container space-y-4">
       {/* Header */}
-      <div className="flex items-center justify-between pt-2">
-        <div>
+      <div className="flex items-center justify-between pt-2 gap-2">
+        <div className="min-w-0">
           <div className="text-[11px] uppercase tracking-widest text-noir-muted">Obzen Program</div>
           <div className="text-[18px] uppercase tracking-wide text-noir-white">Workout</div>
         </div>
-        <div className="text-[11px] uppercase tracking-widest text-noir-dim">
-          {weekSessions ?? 0}/3 this week
+        {/* Whose session this is. Switchable here so a workout can't be logged
+            under the wrong profile without it being visible. */}
+        <div className="flex flex-col items-end gap-1 shrink-0">
+          <div className="flex gap-1">
+            {PROFILE_IDS.map(id => (
+              <button
+                key={id}
+                onClick={() => setActiveProfile(id)}
+                className={cn(
+                  'px-2.5 py-1 rounded-[2px] text-[10px] uppercase tracking-widest transition-colors border',
+                  id === activeProfileId
+                    ? 'border-noir-accent text-noir-white bg-noir-elevated'
+                    : 'border-noir-border text-noir-dim hover:text-noir-muted'
+                )}
+                aria-pressed={id === activeProfileId}
+                aria-label={`Log as ${PROFILES[id].name}`}
+              >
+                {PROFILES[id].name}
+              </button>
+            ))}
+          </div>
+          <div className="text-[11px] uppercase tracking-widest text-noir-dim">
+            {weekSessions ?? 0}/3 this week
+          </div>
         </div>
       </div>
 

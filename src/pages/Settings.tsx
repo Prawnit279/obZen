@@ -7,6 +7,8 @@ import { exportAllDataAsJSON, importAllDataFromJSON } from '@/lib/export'
 import { importWorkoutData } from '@/utils/importWorkoutData'
 import { SHOW_VEDIC } from '@/config/features'
 import { PROFILES, PROFILE_IDS } from '@/config/profiles'
+import type { ProfileId } from '@/config/profiles'
+import { previewReassign, reassignSessions } from '@/utils/reassignSessions'
 import { useProfileStore } from '@/store/useProfileStore'
 import { cn } from '@/lib/utils'
 
@@ -55,6 +57,43 @@ export default function Settings() {
 
   const [migrating, setMigrating]   = useState(false)
   const [migrateMsg, setMigrateMsg] = useState<{ ok: boolean; text: string } | null>(null)
+
+  // Reassigning workouts between profiles on this device.
+  const [reassignFrom, setReassignFrom]   = useState<ProfileId>(PROFILE_IDS[0])
+  const [reassignCount, setReassignCount] = useState<number | null>(null)
+  const [reassigning, setReassigning]     = useState(false)
+  const [reassignMsg, setReassignMsg]     = useState<{ ok: boolean; text: string } | null>(null)
+  const reassignTo = PROFILE_IDS.find(id => id !== reassignFrom) ?? PROFILE_IDS[0]
+
+  const handlePreviewReassign = async () => {
+    setReassignMsg(null)
+    try {
+      const { count } = await previewReassign(reassignFrom)
+      setReassignCount(count)
+    } catch (err: unknown) {
+      setReassignMsg({ ok: false, text: err instanceof Error ? err.message : 'Check failed.' })
+    }
+  }
+
+  const handleReassign = async () => {
+    setReassigning(true)
+    setReassignMsg(null)
+    try {
+      const moved = await reassignSessions(reassignFrom, reassignTo)
+      setReassignCount(0)
+      setReassignMsg({
+        ok: true,
+        text: moved === 0
+          ? 'Nothing to move.'
+          : `✓ Moved ${moved} workout${moved === 1 ? '' : 's'} to ${PROFILES[reassignTo].name}.`,
+      })
+    } catch (err: unknown) {
+      setReassignMsg({ ok: false, text: err instanceof Error ? err.message : 'Move failed.' })
+    } finally {
+      setReassigning(false)
+      setTimeout(() => setReassignMsg(null), 8000)
+    }
+  }
 
   const handleExport = async () => {
     setExporting(true)
@@ -221,6 +260,73 @@ export default function Settings() {
               {persisted === null ? '—' : persisted ? 'Yes' : 'No'}
             </span>
           </div>
+        </div>
+      </Card>
+
+      {/* ── Reassign workouts between profiles on this device ── */}
+      <Card>
+        <CardHeader label="Reassign Workouts" />
+        <div className="space-y-2">
+          <p className="text-[12px] leading-relaxed" style={{ color: '#8a8a8a' }}>
+            Moves every workout on <em>this device</em> from one profile to the other.
+            Use it if sessions were logged under the wrong name — the app starts on{' '}
+            {PROFILES[PROFILE_IDS[0]].name} until you switch.
+          </p>
+
+          <div className="flex items-center gap-2 pt-1">
+            <span className="text-[11px] uppercase tracking-widest" style={{ color: '#6f6f6f' }}>From</span>
+            <div className="flex gap-1">
+              {PROFILE_IDS.map(id => (
+                <button
+                  key={id}
+                  onClick={() => setReassignFrom(id)}
+                  className={cn(
+                    'px-2.5 py-1 rounded-[2px] text-[11px] uppercase tracking-widest transition-colors border',
+                    id === reassignFrom
+                      ? 'border-noir-accent text-noir-white bg-noir-elevated'
+                      : 'border-noir-border text-noir-dim hover:text-noir-muted'
+                  )}
+                  aria-pressed={id === reassignFrom}
+                >
+                  {PROFILES[id].name}
+                </button>
+              ))}
+            </div>
+            <span className="text-[11px] uppercase tracking-widest" style={{ color: '#6f6f6f' }}>
+              → {PROFILES[reassignTo].name}
+            </span>
+          </div>
+
+          {reassignCount !== null && (
+            <p className="text-[12px]" style={{ color: '#a6a6a6' }}>
+              {reassignCount === 0
+                ? `No workouts are filed under ${PROFILES[reassignFrom].name}.`
+                : `${reassignCount} workout${reassignCount === 1 ? '' : 's'} would move to ${PROFILES[reassignTo].name}.`}
+            </p>
+          )}
+
+          <div className="flex gap-2">
+            <Button variant="ghost" fullWidth onClick={handlePreviewReassign} disabled={reassigning}>
+              Check
+            </Button>
+            <Button
+              variant="default"
+              fullWidth
+              onClick={handleReassign}
+              disabled={reassigning || !reassignCount}
+            >
+              {reassigning ? 'Moving…' : `Move to ${PROFILES[reassignTo].name}`}
+            </Button>
+          </div>
+
+          {reassignMsg && (
+            <p
+              className="text-[12px] text-center pt-1"
+              style={{ color: reassignMsg.ok ? '#34d399' : '#fb7185' }}
+            >
+              {reassignMsg.text}
+            </p>
+          )}
         </div>
       </Card>
 
