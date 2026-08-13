@@ -79,16 +79,16 @@ export function WeeklyVolumeChart() {
           const y = mt + ch * (1 - t)
           return (
             <g key={t}>
-              <line x1={ml} y1={y} x2={W - mr} y2={y} stroke="#2a2a2a" strokeWidth="1" />
+              <line x1={ml} y1={y} x2={W - mr} y2={y} stroke="var(--dim)" strokeWidth="1" />
               {t > 0 && (
-                <text x={ml - 3} y={y + 3} fontSize="7" fill="#555555" textAnchor="end">
+                <text x={ml - 3} y={y + 3} fontSize="7" fill="var(--dim)" textAnchor="end">
                   {fmtVol(maxVol * t)}
                 </text>
               )}
             </g>
           )
         })}
-        <line x1={ml} y1={mt} x2={ml} y2={mt + ch} stroke="#2a2a2a" strokeWidth="1" />
+        <line x1={ml} y1={mt} x2={ml} y2={mt + ch} stroke="var(--dim)" strokeWidth="1" />
 
         {days.map((d, i) => {
           const x = ml + i * colW + Math.floor((colW - barW) / 2)
@@ -112,11 +112,11 @@ export function WeeklyVolumeChart() {
               ))}
               {total > 0 && (
                 <text x={x + barW / 2} y={mt + ch - totalH - 3}
-                  fontSize="6" fill="#888888" textAnchor="middle">
+                  fontSize="6" fill="var(--muted)" textAnchor="middle">
                   {fmtVol(total)}
                 </text>
               )}
-              <text x={x + barW / 2} y={H - mb + 13} fontSize="7" fill="#555555" textAnchor="middle">
+              <text x={x + barW / 2} y={H - mb + 13} fontSize="7" fill="var(--dim)" textAnchor="middle">
                 {dayLabel}
               </text>
             </g>

@@ -14,16 +14,16 @@ export default function Progress() {
       <button
         onClick={() => navigate('/workout')}
         className="flex items-center gap-1.5 text-[12px] uppercase tracking-widest transition-opacity hover:opacity-70"
-        style={{ color: '#a6a6a6' }}
+        style={{ color: 'var(--muted)' }}
       >
         <ArrowLeft size={14} /> Train
       </button>
 
       <div className="pt-1">
-        <div className="text-[11px] uppercase tracking-widest" style={{ color: '#a6a6a6' }}>
+        <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--muted)' }}>
           {PROFILES[activeId].name}
         </div>
-        <h1 className="text-[20px] uppercase tracking-wide" style={{ color: '#e2e2e2' }}>
+        <h1 className="text-[20px] uppercase tracking-wide" style={{ color: 'var(--accent)' }}>
           Progress
         </h1>
       </div>

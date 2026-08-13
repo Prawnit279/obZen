@@ -203,7 +203,7 @@ export default function Settings() {
           {SHOW_VEDIC && profile.mahadasha && <ProfileRow label="Mahadasha" value={profile.mahadasha} />}
           {SHOW_VEDIC && profile.atmakaraka && <ProfileRow label="Atmakaraka" value={profile.atmakaraka} />}
           {profile.body.goal && (
-            <p className="text-[12px] leading-relaxed pt-1" style={{ color: '#888888' }}>
+            <p className="text-[12px] leading-relaxed pt-1" style={{ color: 'var(--muted)' }}>
               {profile.body.goal}
             </p>
           )}
@@ -230,7 +230,7 @@ export default function Settings() {
           {importMsg && (
             <p
               className="text-[11px] text-center pt-1"
-              style={{ color: importMsg.ok ? '#34d399' : '#fb7185' }}
+              style={{ color: importMsg.ok ? 'var(--complete-text)' : 'var(--skip-text)' }}
             >
               {importMsg.text}
             </p>
@@ -267,14 +267,14 @@ export default function Settings() {
       <Card>
         <CardHeader label="Reassign Workouts" />
         <div className="space-y-2">
-          <p className="text-[12px] leading-relaxed" style={{ color: '#8a8a8a' }}>
+          <p className="text-[12px] leading-relaxed" style={{ color: 'var(--muted)' }}>
             Moves every workout on <em>this device</em> from one profile to the other.
             Use it if sessions were logged under the wrong name — the app starts on{' '}
             {PROFILES[PROFILE_IDS[0]].name} until you switch.
           </p>
 
           <div className="flex items-center gap-2 pt-1">
-            <span className="text-[11px] uppercase tracking-widest" style={{ color: '#6f6f6f' }}>From</span>
+            <span className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>From</span>
             <div className="flex gap-1">
               {PROFILE_IDS.map(id => (
                 <button
@@ -292,13 +292,13 @@ export default function Settings() {
                 </button>
               ))}
             </div>
-            <span className="text-[11px] uppercase tracking-widest" style={{ color: '#6f6f6f' }}>
+            <span className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
               → {PROFILES[reassignTo].name}
             </span>
           </div>
 
           {reassignCount !== null && (
-            <p className="text-[12px]" style={{ color: '#a6a6a6' }}>
+            <p className="text-[12px]" style={{ color: 'var(--muted)' }}>
               {reassignCount === 0
                 ? `No workouts are filed under ${PROFILES[reassignFrom].name}.`
                 : `${reassignCount} workout${reassignCount === 1 ? '' : 's'} would move to ${PROFILES[reassignTo].name}.`}
@@ -322,7 +322,7 @@ export default function Settings() {
           {reassignMsg && (
             <p
               className="text-[12px] text-center pt-1"
-              style={{ color: reassignMsg.ok ? '#34d399' : '#fb7185' }}
+              style={{ color: reassignMsg.ok ? 'var(--complete-text)' : 'var(--skip-text)' }}
             >
               {reassignMsg.text}
             </p>
@@ -334,10 +334,10 @@ export default function Settings() {
       <Card>
         <CardHeader label="Migration" />
         <div className="space-y-2">
-          <p className="text-[10px] leading-relaxed" style={{ color: '#555555' }}>
+          <p className="text-[10px] leading-relaxed" style={{ color: 'var(--dim)' }}>
             Import historical workout data from{' '}
-            <span style={{ color: '#888888' }}>obZen_workout_import.json</span>.
-            Place the file in the <span style={{ color: '#888888' }}>/public</span> folder
+            <span style={{ color: 'var(--muted)' }}>obZen_workout_import.json</span>.
+            Place the file in the <span style={{ color: 'var(--muted)' }}>/public</span> folder
             before clicking. Safe to re-run — duplicate records are skipped.
           </p>
           <Button variant="ghost" fullWidth onClick={handleWorkoutMigration} disabled={migrating}>
@@ -346,7 +346,7 @@ export default function Settings() {
           {migrateMsg && (
             <p
               className="text-[11px] text-center pt-1"
-              style={{ color: migrateMsg.ok ? '#34d399' : '#fb7185' }}
+              style={{ color: migrateMsg.ok ? 'var(--complete-text)' : 'var(--skip-text)' }}
             >
               {migrateMsg.text}
             </p>

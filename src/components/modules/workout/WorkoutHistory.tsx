@@ -43,19 +43,19 @@ export function WorkoutHistory() {
             key={session.id}
             onClick={() => navigate(`/workout/session/${session.id}`)}
             className="w-full text-left rounded-[2px] p-4 flex items-center justify-between gap-3 transition-opacity hover:opacity-80"
-            style={{ background: '#161616', border: '1px solid #323232' }}
+            style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
           >
             <div className="min-w-0">
-              <div className="text-[15px]" style={{ color: '#e2e2e2' }}>{formatDateFull(session.date)}</div>
-              <div className="text-[13px] mt-1" style={{ color: '#a6a6a6' }}>
+              <div className="text-[15px]" style={{ color: 'var(--accent)' }}>{formatDateFull(session.date)}</div>
+              <div className="text-[13px] mt-1" style={{ color: 'var(--muted)' }}>
                 {session.dayLabel}{session.focus ? ` · ${session.focus}` : ''}
               </div>
-              <div className="text-[11px] uppercase tracking-widest mt-1.5" style={{ color: '#6f6f6f' }}>
+              <div className="text-[11px] uppercase tracking-widest mt-1.5" style={{ color: 'var(--dim)' }}>
                 {doneCount} exercise{doneCount === 1 ? '' : 's'} · {setCount} set{setCount === 1 ? '' : 's'}
-                {session.completedAt && <span style={{ color: '#86efac' }}> · complete</span>}
+                {session.completedAt && <span style={{ color: 'var(--complete-text)' }}> · complete</span>}
               </div>
             </div>
-            <ChevronRight size={16} style={{ color: '#6f6f6f' }} className="shrink-0" />
+            <ChevronRight size={16} style={{ color: 'var(--dim)' }} className="shrink-0" />
           </button>
         )
       })}

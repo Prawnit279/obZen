@@ -15,12 +15,12 @@ import { LineChart, BarChart, ChartEmpty } from './Charts'
 import { ProgressionLadder } from './ProgressionLadder'
 import { BodyweightPanel } from './BodyweightPanel'
 
-const CARD = { background: '#161616', border: '1px solid #323232' } as const
+const CARD = { background: 'var(--surface)', border: '1px solid var(--border)' } as const
 
 function Card({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <section className="rounded-[2px] p-4" style={CARD}>
-      <h3 className="text-[11px] uppercase tracking-widest mb-3" style={{ color: '#a6a6a6' }}>
+      <h3 className="text-[11px] uppercase tracking-widest mb-3" style={{ color: 'var(--muted)' }}>
         {label}
       </h3>
       {children}
@@ -32,11 +32,11 @@ function Stat({ value, unit, label, sub }: { value: string; unit?: string; label
   return (
     <div className="rounded-[2px] p-3 flex-1 min-w-[100px]" style={CARD}>
       <div className="flex items-baseline gap-1">
-        <span className="text-[22px] tabular-nums leading-none" style={{ color: '#e2e2e2' }}>{value}</span>
-        {unit && <span className="text-[12px]" style={{ color: '#8a8a8a' }}>{unit}</span>}
+        <span className="text-[22px] tabular-nums leading-none" style={{ color: 'var(--accent)' }}>{value}</span>
+        {unit && <span className="text-[12px]" style={{ color: 'var(--muted)' }}>{unit}</span>}
       </div>
-      <div className="text-[11px] uppercase tracking-widest mt-1.5" style={{ color: '#8a8a8a' }}>{label}</div>
-      {sub && <div className="text-[11px] mt-0.5" style={{ color: '#6f6f6f' }}>{sub}</div>}
+      <div className="text-[11px] uppercase tracking-widest mt-1.5" style={{ color: 'var(--muted)' }}>{label}</div>
+      {sub && <div className="text-[11px] mt-0.5" style={{ color: 'var(--dim)' }}>{sub}</div>}
     </div>
   )
 }
@@ -56,7 +56,7 @@ export function WorkoutProgress() {
   )
 
   if (!sessions) {
-    return <div className="py-10 text-center text-[13px]" style={{ color: '#6f6f6f' }}>Loading…</div>
+    return <div className="py-10 text-center text-[13px]" style={{ color: 'var(--dim)' }}>Loading…</div>
   }
 
   // Everything below is computed from this profile's real training only.
@@ -65,8 +65,8 @@ export function WorkoutProgress() {
   if (mine.length === 0) {
     return (
       <div className="rounded-[2px] p-6 text-center space-y-2" style={CARD}>
-        <p className="text-[15px]" style={{ color: '#e2e2e2' }}>No training logged yet</p>
-        <p className="text-[13px]" style={{ color: '#8a8a8a' }}>
+        <p className="text-[15px]" style={{ color: 'var(--accent)' }}>No training logged yet</p>
+        <p className="text-[13px]" style={{ color: 'var(--muted)' }}>
           Log a few sessions and your strength trends, volume and PRs will appear here.
         </p>
       </div>
@@ -154,19 +154,19 @@ export function WorkoutProgress() {
               return (
                 <div key={row.key}>
                   <div className="flex items-baseline justify-between text-[13px]">
-                    <span style={{ color: '#e2e2e2' }}>{row.name}</span>
-                    <span style={{ color: '#a6a6a6' }}>
+                    <span style={{ color: 'var(--accent)' }}>{row.name}</span>
+                    <span style={{ color: 'var(--muted)' }}>
                       {std.band}
-                      <span className="ml-2 tabular-nums" style={{ color: '#6f6f6f' }}>
+                      <span className="ml-2 tabular-nums" style={{ color: 'var(--dim)' }}>
                         {Math.round(std.ratio * 100) / 100}×BW
                       </span>
                     </span>
                   </div>
-                  <div className="h-[3px] mt-1.5 rounded-full" style={{ background: '#252525' }}>
+                  <div className="h-[3px] mt-1.5 rounded-full" style={{ background: 'var(--elevated)' }}>
                     <div className="h-full rounded-full" style={{ width: `${pct}%`, background: '#a6a6a6' }} />
                   </div>
                   {std.toNextKg !== null && std.nextBand && (
-                    <div className="text-[11px] mt-1" style={{ color: '#6f6f6f' }}>
+                    <div className="text-[11px] mt-1" style={{ color: 'var(--dim)' }}>
                       {kg(std.toNextKg)} kg to {std.nextBand}
                     </div>
                   )}
@@ -174,7 +174,7 @@ export function WorkoutProgress() {
               )
             })}
           </div>
-          <p className="text-[11px] mt-3 pt-3" style={{ color: '#6f6f6f', borderTop: '1px solid #252525' }}>
+          <p className="text-[11px] mt-3 pt-3" style={{ color: 'var(--dim)', borderTop: '1px solid var(--border)' }}>
             Bands and the DOTS score are reference estimates — worth checking against a
             source you trust before treating them as authoritative.
           </p>
@@ -198,10 +198,10 @@ export function WorkoutProgress() {
           <ul className="space-y-2">
             {prs.map(pr => (
               <li key={pr.exerciseId} className="flex items-baseline justify-between gap-3">
-                <span className="text-[15px] truncate" style={{ color: '#e2e2e2' }}>{pr.name}</span>
-                <span className="text-[13px] tabular-nums shrink-0" style={{ color: '#a6a6a6' }}>
+                <span className="text-[15px] truncate" style={{ color: 'var(--accent)' }}>{pr.name}</span>
+                <span className="text-[13px] tabular-nums shrink-0" style={{ color: 'var(--muted)' }}>
                   {kg(pr.e1rm)} kg
-                  <span className="ml-2 text-[11px]" style={{ color: '#6f6f6f' }}>{pr.date}</span>
+                  <span className="ml-2 text-[11px]" style={{ color: 'var(--dim)' }}>{pr.date}</span>
                 </span>
               </li>
             ))}
@@ -221,12 +221,12 @@ export function WorkoutProgress() {
         return (
           <Card key={id} label={entry.name}>
             <div className="flex items-baseline gap-3 mb-3">
-              <span className="text-[22px] tabular-nums" style={{ color: '#e2e2e2' }}>
+              <span className="text-[22px] tabular-nums" style={{ color: 'var(--accent)' }}>
                 {Math.round(latest * 10) / 10}
               </span>
-              <span className="text-[12px]" style={{ color: '#8a8a8a' }}>{unit}</span>
+              <span className="text-[12px]" style={{ color: 'var(--muted)' }}>{unit}</span>
               {series.length > 1 && (
-                <span className="text-[12px]" style={{ color: improving ? '#86efac' : '#8a8a8a' }}>
+                <span className="text-[12px]" style={{ color: improving ? 'var(--complete-text)' : 'var(--muted)' }}>
                   {change > 0 ? '+' : ''}{Math.round(change * 10) / 10} {unit}
                   {entry.trackingMode === 'assisted' && ' assist'}
                 </span>
@@ -238,7 +238,7 @@ export function WorkoutProgress() {
             />
             {entry.trackingMode === 'bodyweight-reps' && (
               <div className="mt-3">
-                <div className="text-[11px] uppercase tracking-widest mb-1" style={{ color: '#8a8a8a' }}>
+                <div className="text-[11px] uppercase tracking-widest mb-1" style={{ color: 'var(--muted)' }}>
                   Weekly rep volume
                 </div>
                 <BarChart

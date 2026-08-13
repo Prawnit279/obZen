@@ -89,7 +89,7 @@ export function DrumPieChart() {
             fill={s.color}
           />
         ))}
-        <text x={cx} y={cy + 4} fontSize="9" fill="#888888" textAnchor="middle">
+        <text x={cx} y={cy + 4} fontSize="9" fill="var(--muted)" textAnchor="middle">
           {sessions.length} sess.
         </text>
 
@@ -101,8 +101,8 @@ export function DrumPieChart() {
           return (
             <g key={cat} transform={`translate(128, ${16 + i * 26})`}>
               <rect width="8" height="8" rx="1" fill={SLICE_COLORS[i]} />
-              <text x="12" y="8" fontSize="8" fill="#d4d4d4">{cat}</text>
-              <text x="12" y="18" fontSize="7" fill="#555555">{pct}% · {fmtMin(min)}</text>
+              <text x="12" y="8" fontSize="8" fill="var(--accent)">{cat}</text>
+              <text x="12" y="18" fontSize="7" fill="var(--dim)">{pct}% · {fmtMin(min)}</text>
             </g>
           )
         })}

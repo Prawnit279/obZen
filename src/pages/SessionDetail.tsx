@@ -7,9 +7,9 @@ import { formatDateFull } from '@/lib/utils'
 import { isExerciseLogged } from '@/lib/workoutSession'
 
 const STATUS_LABEL: Record<ExerciseSessionState['status'], { text: string; color: string }> = {
-  complete: { text: 'Complete', color: '#86efac' },
-  skipped:  { text: 'Skipped',  color: '#fca5a5' },
-  pending:  { text: 'Pending',  color: '#6f6f6f' },
+  complete: { text: 'Complete', color: 'var(--complete-text)' },
+  skipped:  { text: 'Skipped',  color: 'var(--skip-text)' },
+  pending:  { text: 'Pending',  color: 'var(--dim)' },
 }
 
 function displayName(ex: ExerciseSessionState): string {
@@ -30,7 +30,7 @@ export default function SessionDetail() {
     <button
       onClick={() => navigate(-1)}
       className="flex items-center gap-1.5 text-[12px] uppercase tracking-widest transition-opacity hover:opacity-70"
-      style={{ color: '#a6a6a6' }}
+      style={{ color: 'var(--muted)' }}
     >
       <ArrowLeft size={14} /> Back
     </button>
@@ -42,7 +42,7 @@ export default function SessionDetail() {
     return (
       <div className="page-container space-y-4">
         {back}
-        <div className="text-center py-10 text-[13px]" style={{ color: '#6f6f6f' }}>Loading session…</div>
+        <div className="text-center py-10 text-[13px]" style={{ color: 'var(--dim)' }}>Loading session…</div>
       </div>
     )
   }
@@ -50,7 +50,7 @@ export default function SessionDetail() {
     return (
       <div className="page-container space-y-4">
         {back}
-        <div className="text-center py-10 text-[13px]" style={{ color: '#6f6f6f' }}>Session not found.</div>
+        <div className="text-center py-10 text-[13px]" style={{ color: 'var(--dim)' }}>Session not found.</div>
       </div>
     )
   }
@@ -69,20 +69,20 @@ export default function SessionDetail() {
 
       {/* Header */}
       <div className="pt-1">
-        <div className="text-[11px] uppercase tracking-widest" style={{ color: '#a6a6a6' }}>
+        <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--muted)' }}>
           {session.dayLabel}{session.focus ? ` · ${session.focus}` : ''}
         </div>
-        <div className="text-[18px] leading-tight" style={{ color: '#e2e2e2' }}>
+        <div className="text-[18px] leading-tight" style={{ color: 'var(--accent)' }}>
           {formatDateFull(session.date)}
         </div>
         <div className="flex items-center gap-3 mt-1">
-          <span className="text-[12px]" style={{ color: '#6f6f6f' }}>
+          <span className="text-[12px]" style={{ color: 'var(--dim)' }}>
             {exercises.length} exercise{exercises.length === 1 ? '' : 's'} · {setCount} set{setCount === 1 ? '' : 's'}
           </span>
           {session.completedAt && (
             <span
               className="text-[10px] uppercase tracking-widest px-2 py-0.5 rounded-[2px]"
-              style={{ color: '#86efac', border: '1px solid #166534' }}
+              style={{ color: 'var(--complete-text)', border: '1px solid var(--complete-border)' }}
             >
               Workout Complete
             </span>
@@ -92,7 +92,7 @@ export default function SessionDetail() {
 
       {/* Exercises */}
       {exercises.length === 0 ? (
-        <div className="text-center py-10 text-[13px]" style={{ color: '#6f6f6f' }}>
+        <div className="text-center py-10 text-[13px]" style={{ color: 'var(--dim)' }}>
           No exercises were logged for this day.
         </div>
       ) : (
@@ -103,13 +103,13 @@ export default function SessionDetail() {
               <div
                 key={ex.exerciseId}
                 className="rounded-[2px] p-3.5"
-                style={{ background: '#161616', border: '1px solid #323232' }}
+                style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="text-[15px]" style={{ color: '#e2e2e2' }}>{displayName(ex)}</div>
+                    <div className="text-[15px]" style={{ color: 'var(--accent)' }}>{displayName(ex)}</div>
                     {(ex.target || ex.muscle) && (
-                      <div className="text-[11px] uppercase tracking-widest mt-0.5" style={{ color: '#8a8a8a' }}>
+                      <div className="text-[11px] uppercase tracking-widest mt-0.5" style={{ color: 'var(--muted)' }}>
                         {ex.target}
                         {ex.muscle && <span className="ml-2 normal-case capitalize">{ex.muscle}</span>}
                       </div>
@@ -127,12 +127,12 @@ export default function SessionDetail() {
                       <div
                         key={i}
                         className="flex items-center justify-between text-[13px] py-1.5 px-2 rounded-[2px]"
-                        style={{ background: '#1e1e1e' }}
+                        style={{ background: 'var(--elevated)' }}
                       >
-                        <span style={{ color: '#6f6f6f' }} className="uppercase tracking-widest text-[11px]">
+                        <span style={{ color: 'var(--dim)' }} className="uppercase tracking-widest text-[11px]">
                           Set {s.setNumber}
                         </span>
-                        <span className="font-mono tabular-nums" style={{ color: '#e2e2e2' }}>
+                        <span className="font-mono tabular-nums" style={{ color: 'var(--accent)' }}>
                           {s.weight}{s.unit} × {s.reps}
                         </span>
                       </div>
@@ -140,12 +140,12 @@ export default function SessionDetail() {
                   </div>
                 ) : (
                   ex.status !== 'skipped' && (
-                    <div className="mt-2 text-[12px]" style={{ color: '#555555' }}>No sets logged.</div>
+                    <div className="mt-2 text-[12px]" style={{ color: 'var(--dim)' }}>No sets logged.</div>
                   )
                 )}
 
                 {ex.note && (
-                  <div className="mt-2 text-[12px] italic" style={{ color: '#8a8a8a' }}>{ex.note}</div>
+                  <div className="mt-2 text-[12px] italic" style={{ color: 'var(--muted)' }}>{ex.note}</div>
                 )}
               </div>
             )

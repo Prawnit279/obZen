@@ -30,18 +30,18 @@ export function BodyweightPanel({ profileId }: { profileId: ProfileId }) {
   }
 
   return (
-    <section className="rounded-[2px] p-4" style={{ background: '#161616', border: '1px solid #323232' }}>
-      <h3 className="text-[11px] uppercase tracking-widest mb-3" style={{ color: '#a6a6a6' }}>
+    <section className="rounded-[2px] p-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+      <h3 className="text-[11px] uppercase tracking-widest mb-3" style={{ color: 'var(--muted)' }}>
         Bodyweight
       </h3>
 
       <div className="flex items-baseline gap-3 mb-3">
-        <span className="text-[22px] tabular-nums" style={{ color: '#e2e2e2' }}>
+        <span className="text-[22px] tabular-nums" style={{ color: 'var(--accent)' }}>
           {latest !== undefined ? Math.round(latest * 10) / 10 : '—'}
         </span>
-        <span className="text-[12px]" style={{ color: '#8a8a8a' }}>kg</span>
+        <span className="text-[12px]" style={{ color: 'var(--muted)' }}>kg</span>
         {entries.length > 1 && (
-          <span className="text-[12px]" style={{ color: change < 0 ? '#86efac' : '#8a8a8a' }}>
+          <span className="text-[12px]" style={{ color: change < 0 ? 'var(--complete-text)' : 'var(--muted)' }}>
             {change > 0 ? '+' : ''}{Math.round(change * 10) / 10} kg
           </span>
         )}
@@ -53,7 +53,7 @@ export function BodyweightPanel({ profileId }: { profileId: ProfileId }) {
           yLabel="Bodyweight in kilograms"
         />
       ) : (
-        <p className="text-[13px] py-2" style={{ color: '#6f6f6f' }}>
+        <p className="text-[13px] py-2" style={{ color: 'var(--dim)' }}>
           Log twice to see a trend.
         </p>
       )}
@@ -69,13 +69,13 @@ export function BodyweightPanel({ profileId }: { profileId: ProfileId }) {
           placeholder="Today's weight (kg)"
           aria-label="Today's bodyweight in kilograms"
           className="flex-1 rounded-[2px] px-3 py-2 text-[15px] bg-transparent focus:outline-none"
-          style={{ border: '1px solid #323232', color: '#e2e2e2' }}
+          style={{ border: '1px solid var(--border)', color: 'var(--accent)' }}
         />
         <button
           onClick={submit}
           disabled={!value.trim()}
           className="px-4 rounded-[2px] text-[12px] uppercase tracking-widest transition-opacity disabled:opacity-30"
-          style={{ border: '1px solid #a6a6a6', color: '#e2e2e2' }}
+          style={{ border: '1px solid #a6a6a6', color: 'var(--accent)' }}
         >
           Log
         </button>

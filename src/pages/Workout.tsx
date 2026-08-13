@@ -55,13 +55,13 @@ function RestDayCard() {
   return (
     <div
       className="rounded-[2px] p-6 text-center space-y-2"
-      style={{ background: '#111111', border: '1px solid #2a2a2a' }}
+      style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
     >
-      <div className="text-[14px]" style={{ color: '#d4d4d4' }}>Rest Day</div>
-      <div className="text-[12px]" style={{ color: '#888888' }}>Yoga or light recovery only.</div>
+      <div className="text-[14px]" style={{ color: 'var(--accent)' }}>Rest Day</div>
+      <div className="text-[12px]" style={{ color: 'var(--muted)' }}>Yoga or light recovery only.</div>
       <div
         className="text-[11px] pl-3 text-left max-w-xs mx-auto mt-3"
-        style={{ color: '#555555', borderLeft: '1px solid #3a3a3a' }}
+        style={{ color: 'var(--dim)', borderLeft: '1px solid var(--border-strong)' }}
       >
         Pitta: recovery is productive. Avoid overtraining urge.
         Cool yoga session favored.
@@ -109,7 +109,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
   if (!session) {
     return (
       <div className="flex items-center justify-center py-12">
-        <span className="text-[11px] uppercase tracking-widest" style={{ color: '#555555' }}>
+        <span className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
           Loading...
         </span>
       </div>
@@ -131,8 +131,8 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
           className="flex items-start gap-2 p-3 rounded-[2px]"
           style={{ border: '1px solid rgba(127,29,29,0.4)' }}
         >
-          <AlertTriangle size={13} style={{ color: '#cc3333', marginTop: 1 }} className="shrink-0" />
-          <span className="text-[11px]" style={{ color: '#888888' }}>
+          <AlertTriangle size={13} style={{ color: 'var(--red)', marginTop: 1 }} className="shrink-0" />
+          <span className="text-[11px]" style={{ color: 'var(--muted)' }}>
             Low readiness — consider reducing volume or choosing a rest day.
           </span>
         </div>
@@ -143,7 +143,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
           style={{ border: '1px solid rgba(161,98,7,0.4)' }}
         >
           <Zap size={13} style={{ color: '#ca8a04', marginTop: 1 }} className="shrink-0" />
-          <span className="text-[11px]" style={{ color: '#888888' }}>
+          <span className="text-[11px]" style={{ color: 'var(--muted)' }}>
             Forearm fatigue active — pull-heavy exercises flagged.
           </span>
         </div>
@@ -153,15 +153,15 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
       {orderedExercises.length === 0 && (
         <div
           className="rounded-[2px] p-5 text-center space-y-3"
-          style={{ background: '#161616', border: '1px dashed #323232' }}
+          style={{ background: 'var(--surface)', border: '1px dashed var(--border)' }}
         >
-          <p className="text-[14px]" style={{ color: '#a6a6a6' }}>
+          <p className="text-[14px]" style={{ color: 'var(--muted)' }}>
             No exercises yet — load the {dayLabel} template as a starting point, or add your own below.
           </p>
           <button
             onClick={() => store.loadTemplate(dayLabel)}
             className="w-full py-3 rounded-[2px] text-[13px] uppercase tracking-widest transition-opacity hover:opacity-80"
-            style={{ border: '1px solid #e2e2e2', color: '#e2e2e2' }}
+            style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}
           >
             Load {dayLabel} · {program.focus}
           </button>
@@ -188,7 +188,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
       <button
         onClick={() => setShowAddSheet(true)}
         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[2px] text-[12px] uppercase tracking-widest transition-opacity hover:opacity-70"
-        style={{ border: '1px dashed #323232', color: '#a6a6a6' }}
+        style={{ border: '1px dashed var(--border)', color: 'var(--muted)' }}
       >
         <Plus size={13} />
         Add Exercise
@@ -199,7 +199,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
         session.completedAt ? (
           <div
             className="text-center text-[13px] uppercase tracking-widest py-2.5 rounded-[2px]"
-            style={{ color: '#86efac', border: '1px solid #166534', background: 'rgba(22,101,52,0.08)' }}
+            style={{ color: 'var(--complete-text)', border: '1px solid var(--complete-border)', background: 'rgba(22,101,52,0.08)' }}
           >
             ✓ Workout Complete
           </div>
@@ -207,7 +207,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
           <button
             onClick={() => store.completeSession(dayLabel)}
             className="w-full py-3 rounded-[2px] text-[13px] uppercase tracking-widest transition-opacity hover:opacity-80"
-            style={{ border: '1px solid #166534', color: '#86efac' }}
+            style={{ border: '1px solid var(--complete-border)', color: 'var(--complete-text)' }}
           >
             Complete Workout
           </button>

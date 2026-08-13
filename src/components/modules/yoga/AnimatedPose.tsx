@@ -49,11 +49,11 @@ export function AnimatedPose({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: '#111111',
+          background: 'var(--surface)',
           borderRadius: 2,
         }}
       >
-        <span style={{ fontSize: 10, color: '#3a3a3a', textTransform: 'uppercase', letterSpacing: 2 }}>
+        <span style={{ fontSize: 10, color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: 2 }}>
           —
         </span>
       </div>

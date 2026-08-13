@@ -74,14 +74,14 @@ function ListView({ sequences, onNew, onPlay, onDelete }: ListViewProps) {
       <div className="flex items-center justify-between">
         <span
           className="text-[10px] uppercase tracking-widest"
-          style={{ color: '#555555' }}
+          style={{ color: 'var(--dim)' }}
         >
           Custom Sequences
         </span>
         <button
           onClick={onNew}
           className="flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] text-[10px] uppercase tracking-widest transition-opacity hover:opacity-80"
-          style={{ border: '1px solid #d4d4d4', color: '#d4d4d4' }}
+          style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}
         >
           <Plus size={11} />
           New Sequence
@@ -94,10 +94,10 @@ function ListView({ sequences, onNew, onPlay, onDelete }: ListViewProps) {
           className="py-10 text-center rounded-[2px]"
           style={{ border: '1px solid #1a1a1a' }}
         >
-          <p className="text-[12px]" style={{ color: '#555555' }}>
+          <p className="text-[12px]" style={{ color: 'var(--dim)' }}>
             No custom sequences yet.
           </p>
-          <p className="text-[11px] mt-1" style={{ color: '#3a3a3a' }}>
+          <p className="text-[11px] mt-1" style={{ color: 'var(--dim)' }}>
             Build your first.
           </p>
         </div>
@@ -108,13 +108,13 @@ function ListView({ sequences, onNew, onPlay, onDelete }: ListViewProps) {
         <div
           key={seq.id}
           className="p-3 rounded-[2px] flex items-center justify-between gap-3"
-          style={{ background: '#111111', border: '1px solid #2a2a2a' }}
+          style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
         >
           <div className="min-w-0">
-            <div className="text-[13px] truncate" style={{ color: '#d4d4d4' }}>
+            <div className="text-[13px] truncate" style={{ color: 'var(--accent)' }}>
               {seq.name}
             </div>
-            <div className="text-[10px] mt-0.5" style={{ color: '#555555' }}>
+            <div className="text-[10px] mt-0.5" style={{ color: 'var(--dim)' }}>
               {seq.poses.length} pose{seq.poses.length !== 1 ? 's' : ''}
             </div>
           </div>
@@ -123,7 +123,7 @@ function ListView({ sequences, onNew, onPlay, onDelete }: ListViewProps) {
             <button
               onClick={() => onPlay(seq)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] text-[10px] uppercase tracking-widest transition-opacity hover:opacity-80"
-              style={{ border: '1px solid #888888', color: '#888888' }}
+              style={{ border: '1px solid #888888', color: 'var(--muted)' }}
               aria-label={`Play ${seq.name}`}
             >
               <Play size={10} />
@@ -132,7 +132,7 @@ function ListView({ sequences, onNew, onPlay, onDelete }: ListViewProps) {
             <button
               onClick={() => onDelete(seq.id)}
               className="flex items-center justify-center w-7 h-7 rounded-[2px] transition-opacity hover:opacity-60"
-              style={{ border: '1px solid #2a2a2a', color: '#555555' }}
+              style={{ border: '1px solid var(--border)', color: 'var(--dim)' }}
               aria-label={`Delete ${seq.name}`}
             >
               <Trash2 size={12} />
@@ -168,22 +168,22 @@ function PosePickerRow({ pose, alreadyAdded, onAdd }: PosePickerRowProps) {
       disabled={alreadyAdded}
     >
       <div className="min-w-0">
-        <div className="text-[12px] truncate" style={{ color: '#d4d4d4' }}>
+        <div className="text-[12px] truncate" style={{ color: 'var(--accent)' }}>
           {pose.name}
         </div>
         {pose.sanskritName && (
-          <div className="text-[10px] italic truncate" style={{ color: '#555555' }}>
+          <div className="text-[10px] italic truncate" style={{ color: 'var(--dim)' }}>
             {pose.sanskritName}
           </div>
         )}
-        <div className="text-[10px] capitalize mt-0.5" style={{ color: '#3a3a3a' }}>
+        <div className="text-[10px] capitalize mt-0.5" style={{ color: 'var(--dim)' }}>
           {pose.category} · {pose.duration}
         </div>
       </div>
       {alreadyAdded ? (
-        <Check size={12} style={{ color: '#555555' }} className="shrink-0" />
+        <Check size={12} style={{ color: 'var(--dim)' }} className="shrink-0" />
       ) : (
-        <Plus size={12} style={{ color: '#555555' }} className="shrink-0" />
+        <Plus size={12} style={{ color: 'var(--dim)' }} className="shrink-0" />
       )}
     </button>
   )
@@ -218,7 +218,7 @@ function BuiltPoseRow({
   return (
     <div
       className="flex items-center gap-2 p-2 rounded-[2px]"
-      style={{ background: '#111111', border: '1px solid #2a2a2a' }}
+      style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
     >
       {/* Reorder */}
       <div className="flex flex-col gap-0.5">
@@ -228,7 +228,7 @@ function BuiltPoseRow({
           className="transition-opacity hover:opacity-70 disabled:opacity-20"
           aria-label="Move up"
         >
-          <ChevronUp size={12} style={{ color: '#555555' }} />
+          <ChevronUp size={12} style={{ color: 'var(--dim)' }} />
         </button>
         <button
           onClick={() => onMoveDown(index)}
@@ -236,16 +236,16 @@ function BuiltPoseRow({
           className="transition-opacity hover:opacity-70 disabled:opacity-20"
           aria-label="Move down"
         >
-          <ChevronDown size={12} style={{ color: '#555555' }} />
+          <ChevronDown size={12} style={{ color: 'var(--dim)' }} />
         </button>
       </div>
 
       {/* Pose name */}
       <div className="flex-1 min-w-0">
-        <div className="text-[12px] truncate" style={{ color: '#d4d4d4' }}>
+        <div className="text-[12px] truncate" style={{ color: 'var(--accent)' }}>
           {pose.name}
         </div>
-        <div className="text-[10px] capitalize" style={{ color: '#555555' }}>
+        <div className="text-[10px] capitalize" style={{ color: 'var(--dim)' }}>
           {pose.category}
         </div>
       </div>
@@ -259,10 +259,10 @@ function BuiltPoseRow({
           value={entry.duration}
           onChange={e => onDurationChange(index, Math.max(5, parseInt(e.target.value) || 5))}
           className="w-12 text-right text-[12px] bg-transparent outline-none tabular-nums"
-          style={{ color: '#888888', border: '1px solid #2a2a2a', borderRadius: '2px', padding: '2px 4px' }}
+          style={{ color: 'var(--muted)', border: '1px solid var(--border)', borderRadius: '2px', padding: '2px 4px' }}
           aria-label={`Duration for ${pose.name}`}
         />
-        <span className="text-[10px]" style={{ color: '#3a3a3a' }}>s</span>
+        <span className="text-[10px]" style={{ color: 'var(--dim)' }}>s</span>
       </div>
 
       {/* Remove */}
@@ -271,7 +271,7 @@ function BuiltPoseRow({
         className="shrink-0 transition-opacity hover:opacity-60"
         aria-label={`Remove ${pose.name}`}
       >
-        <X size={13} style={{ color: '#555555' }} />
+        <X size={13} style={{ color: 'var(--dim)' }} />
       </button>
     </div>
   )
@@ -358,14 +358,14 @@ function BuildView({ onSave, onCancel }: BuildViewProps) {
       <div className="flex items-center justify-between">
         <span
           className="text-[10px] uppercase tracking-widest"
-          style={{ color: '#555555' }}
+          style={{ color: 'var(--dim)' }}
         >
           Build Sequence
         </span>
         <button
           onClick={onCancel}
           className="text-[10px] uppercase tracking-widest transition-opacity hover:opacity-60"
-          style={{ color: '#3a3a3a' }}
+          style={{ color: 'var(--dim)' }}
         >
           Cancel
         </button>
@@ -379,8 +379,8 @@ function BuildView({ onSave, onCancel }: BuildViewProps) {
         onChange={e => setBuildName(e.target.value)}
         className="w-full px-3 py-2 rounded-[2px] text-[13px] bg-transparent outline-none placeholder:text-[#3a3a3a]"
         style={{
-          border: '1px solid #2a2a2a',
-          color: '#d4d4d4',
+          border: '1px solid var(--border)',
+          color: 'var(--accent)',
         }}
       />
 
@@ -389,7 +389,7 @@ function BuildView({ onSave, onCancel }: BuildViewProps) {
         <div className="space-y-1.5">
           <div
             className="text-[9px] uppercase tracking-widest"
-            style={{ color: '#3a3a3a' }}
+            style={{ color: 'var(--dim)' }}
           >
             Sequence ({buildPoses.length} pose{buildPoses.length !== 1 ? 's' : ''})
           </div>
@@ -410,7 +410,7 @@ function BuildView({ onSave, onCancel }: BuildViewProps) {
 
       {/* Error */}
       {error && (
-        <p className="text-[11px]" style={{ color: '#cc3333' }}>
+        <p className="text-[11px]" style={{ color: 'var(--red)' }}>
           {error}
         </p>
       )}
@@ -419,7 +419,7 @@ function BuildView({ onSave, onCancel }: BuildViewProps) {
       <button
         onClick={handleSave}
         className="w-full py-2.5 rounded-[2px] text-[11px] uppercase tracking-widest transition-opacity hover:opacity-80"
-        style={{ border: '1px solid #d4d4d4', color: '#d4d4d4' }}
+        style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}
       >
         Save Sequence
       </button>
@@ -428,7 +428,7 @@ function BuildView({ onSave, onCancel }: BuildViewProps) {
       <div className="space-y-2">
         <div
           className="text-[9px] uppercase tracking-widest"
-          style={{ color: '#3a3a3a' }}
+          style={{ color: 'var(--dim)' }}
         >
           Add Poses
         </div>
@@ -438,7 +438,7 @@ function BuildView({ onSave, onCancel }: BuildViewProps) {
           value={search}
           onChange={e => setSearch(e.target.value)}
           className="w-full px-3 py-2 rounded-[2px] text-[12px] bg-transparent outline-none placeholder:text-[#3a3a3a]"
-          style={{ border: '1px solid #1a1a1a', color: '#888888' }}
+          style={{ border: '1px solid #1a1a1a', color: 'var(--muted)' }}
         />
         <div className="space-y-1 max-h-60 overflow-y-auto">
           {filteredPoses.map(pose => (
@@ -450,7 +450,7 @@ function BuildView({ onSave, onCancel }: BuildViewProps) {
             />
           ))}
           {filteredPoses.length === 0 && (
-            <p className="text-[11px] px-3 py-2" style={{ color: '#3a3a3a' }}>
+            <p className="text-[11px] px-3 py-2" style={{ color: 'var(--dim)' }}>
               No poses match "{search}"
             </p>
           )}

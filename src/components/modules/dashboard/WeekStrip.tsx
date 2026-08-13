@@ -65,11 +65,11 @@ export function WeekStrip() {
             <div className="flex items-center gap-3 shrink-0 w-20">
               <span
                 className="text-[11px] uppercase tracking-widest"
-                style={{ color: isToday ? '#e2e2e2' : '#8a8a8a' }}
+                style={{ color: isToday ? 'var(--accent)' : 'var(--muted)' }}
               >
                 {weekday}
               </span>
-              <span className="text-[13px] tabular-nums" style={{ color: isToday ? '#e2e2e2' : '#6f6f6f' }}>
+              <span className="text-[13px] tabular-nums" style={{ color: isToday ? 'var(--accent)' : 'var(--dim)' }}>
                 {d.getDate()}
               </span>
             </div>
@@ -85,12 +85,12 @@ export function WeekStrip() {
               <div
                 key={iso}
                 className="flex items-center justify-between gap-2 py-2 px-2 rounded-[2px]"
-                style={{ background: isToday ? '#1e1e1e' : 'transparent' }}
+                style={{ background: isToday ? 'var(--elevated)' : 'transparent' }}
               >
                 {dayCol}
                 <span
                   className="text-[12px] truncate text-right"
-                  style={{ color: planned.kind === 'train' ? '#8a8a8a' : '#5a5a5a' }}
+                  style={{ color: planned.kind === 'train' ? 'var(--muted)' : 'var(--dim)' }}
                 >
                   {plannedLabel}
                 </span>
@@ -103,19 +103,19 @@ export function WeekStrip() {
               key={iso}
               onClick={() => navigate(`/workout/session/${session.id}`)}
               className="w-full flex items-center justify-between py-2 px-2 rounded-[2px] text-left transition-opacity hover:opacity-80"
-              style={{ background: isToday ? '#1e1e1e' : 'transparent', border: '1px solid #323232' }}
+              style={{ background: isToday ? 'var(--elevated)' : 'transparent', border: '1px solid var(--border)' }}
             >
               {dayCol}
               <div className="flex-1 min-w-0 px-2">
-                <div className="text-[13px] truncate" style={{ color: '#e2e2e2' }}>
+                <div className="text-[13px] truncate" style={{ color: 'var(--accent)' }}>
                   {session.dayLabel}{session.focus ? ` · ${session.focus}` : ''}
                 </div>
-                <div className="text-[11px] uppercase tracking-widest" style={{ color: '#6f6f6f' }}>
+                <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
                   {doneCount} exercise{doneCount === 1 ? '' : 's'}
-                  {session.completedAt && <span style={{ color: '#86efac' }}> · complete</span>}
+                  {session.completedAt && <span style={{ color: 'var(--complete-text)' }}> · complete</span>}
                 </div>
               </div>
-              <ChevronRight size={15} style={{ color: '#6f6f6f' }} className="shrink-0" />
+              <ChevronRight size={15} style={{ color: 'var(--dim)' }} className="shrink-0" />
             </button>
           )
         })}

@@ -14,16 +14,18 @@ const MR = 8
 const MT = 10
 const MB = 22
 
-const AXIS = '#454545'
+const AXIS = 'var(--border-strong)'
 const TICK = '#8a8a8a'
 
 /** Dash patterns cycle so overlaid series stay distinguishable without colour. */
 export const SERIES_DASHES = ['none', '5 3', '2 3', '8 3 2 3']
-export const SERIES_COLORS = ['#e2e2e2', '#a6a6a6', '#8a8a8a', '#6f6f6f']
+/** Theme-aware so lines stay visible on both a dark and a light surface.
+ *  Paired with SERIES_DASHES, so series are never distinguished by colour alone. */
+export const SERIES_COLORS = ['var(--series-1)', 'var(--series-2)', 'var(--series-3)', 'var(--series-4)']
 
 export function ChartEmpty({ text }: { text: string }) {
   return (
-    <div className="py-8 text-center text-[13px]" style={{ color: '#6f6f6f' }}>
+    <div className="py-8 text-center text-[13px]" style={{ color: 'var(--dim)' }}>
       {text}
     </div>
   )
@@ -86,9 +88,9 @@ export function LineChart({ series, goal, yLabel }: LineChartProps) {
           <g>
             <line
               x1={ML} y1={y(goal.value)} x2={W - MR} y2={y(goal.value)}
-              stroke="#86efac" strokeWidth="1" strokeDasharray="3 2"
+              stroke="var(--complete-text)" strokeWidth="1" strokeDasharray="3 2"
             />
-            <text x={W - MR} y={y(goal.value) - 3} textAnchor="end" fontSize="8" fill="#86efac">
+            <text x={W - MR} y={y(goal.value) - 3} textAnchor="end" fontSize="8" fill="var(--complete-text)">
               {goal.label}
             </text>
           </g>
@@ -130,7 +132,7 @@ export function LineChart({ series, goal, yLabel }: LineChartProps) {
       {withData.length > 1 && (
         <div className="flex flex-wrap gap-3 mt-1">
           {withData.map((s, i) => (
-            <span key={s.label} className="flex items-center gap-1.5 text-[11px]" style={{ color: '#a6a6a6' }}>
+            <span key={s.label} className="flex items-center gap-1.5 text-[11px]" style={{ color: 'var(--muted)' }}>
               <svg width="18" height="6" aria-hidden="true">
                 <line
                   x1="0" y1="3" x2="18" y2="3"
@@ -188,7 +190,7 @@ export function BarChart({ data, unit = '' }: { data: BarDatum[]; unit?: string 
             <rect
               x={cx - barW / 2} y={MT + (H - MT - MB) - h}
               width={barW} height={Math.max(h, d.value > 0 ? 1 : 0)}
-              fill="#a6a6a6"
+              fill="var(--muted)"
             />
             <text x={cx} y={H - 6} textAnchor="middle" fontSize="8" fill={TICK}>
               {d.label}

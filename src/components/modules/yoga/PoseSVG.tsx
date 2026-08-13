@@ -4,11 +4,11 @@ interface PoseSVGProps {
   drummerRecovery?: boolean
 }
 
-const B = { stroke: '#d4d4d4', strokeWidth: 12, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, fill: 'none' }
-const H = { fill: '#d4d4d4' }
-const GND = { x1: 5, y1: 165, x2: 155, y2: 165, stroke: '#2a2a2a', strokeWidth: 1.5 }
-const A = { stroke: '#555555', strokeWidth: 2, strokeDasharray: '4,3', fill: 'none' }
-const AP = { fill: '#555555' }
+const B = { stroke: 'var(--accent)', strokeWidth: 12, strokeLinecap: 'round' as const, strokeLinejoin: 'round' as const, fill: 'none' }
+const H = { fill: 'var(--accent)' }
+const GND = { x1: 5, y1: 165, x2: 155, y2: 165, stroke: 'var(--dim)', strokeWidth: 1.5 }
+const A = { stroke: 'var(--dim)', strokeWidth: 2, strokeDasharray: '4,3', fill: 'none' }
+const AP = { fill: 'var(--dim)' }
 
 function Arrow({ x1, y1, x2, y2 }: { x1: number; y1: number; x2: number; y2: number }) {
   const dx = x2 - x1; const dy = y2 - y1
@@ -92,7 +92,7 @@ function ChildsPose() {
     <>
       <line {...GND} />
       {/* Hips/glutes on heels */}
-      <ellipse cx={105} cy={150} rx={18} ry={12} fill="#d4d4d4" />
+      <ellipse cx={105} cy={150} rx={18} ry={12} fill="var(--accent)" />
       {/* Torso folded forward, low */}
       <line x1={92} y1={146} x2={45} y2={146} {...B} />
       {/* Arms extended forward along ground */}
@@ -134,7 +134,7 @@ function PigeonPose() {
       {/* Front shin horizontal across */}
       <line x1={28} y1={145} x2={82} y2={130} {...B} />
       {/* Front knee */}
-      <ellipse cx={28} cy={145} rx={8} ry={8} fill="#d4d4d4" />
+      <ellipse cx={28} cy={145} rx={8} ry={8} fill="var(--accent)" />
       {/* Back leg extended behind */}
       <line x1={72} y1={128} x2={140} y2={158} {...B} />
       {/* Torso upright */}
@@ -162,13 +162,13 @@ function CatCow() {
       {/* Thighs */}
       <line x1={118} y1={148} x2={100} y2={130} {...B} />
       {/* COW: spine arched (concave, solid) */}
-      <path d="M 42 132 Q 70 148 100 130" stroke="#d4d4d4" strokeWidth={12} strokeLinecap="round" fill="none" />
+      <path d="M 42 132 Q 70 148 100 130" stroke="var(--accent)" strokeWidth={12} strokeLinecap="round" fill="none" />
       {/* CAT: spine rounded (convex, dashed) */}
-      <path d="M 42 132 Q 70 105 100 130" stroke="#d4d4d4" strokeWidth={8} strokeLinecap="round" strokeDasharray="6,4" fill="none" />
+      <path d="M 42 132 Q 70 105 100 130" stroke="var(--accent)" strokeWidth={8} strokeLinecap="round" strokeDasharray="6,4" fill="none" />
       {/* Cow head (up) */}
       <circle cx={28} cy={118} r={10} {...H} />
       {/* Cat head ghost (down, dim) */}
-      <circle cx={28} cy={138} r={8} fill="#555555" />
+      <circle cx={28} cy={138} r={8} fill="var(--dim)" />
       {/* Cue: alternate with breath */}
       <Arrow x1={70} y1={100} x2={70} y2={82} />
     </>
@@ -180,7 +180,7 @@ function LegsUpTheWall() {
     <>
       <line {...GND} />
       {/* Wall on right */}
-      <rect x={140} y={10} width={16} height={155} fill="#2a2a2a" />
+      <rect x={140} y={10} width={16} height={155} fill="var(--border)" />
       {/* Head on ground */}
       <circle cx={18} cy={145} r={10} {...H} />
       {/* Torso horizontal */}
@@ -331,7 +331,7 @@ function TrianglePose() {
 function BoatPose() {
   return (
     <>
-      <circle cx={80} cy={148} r={5} fill="#2a2a2a" />
+      <circle cx={80} cy={148} r={5} fill="var(--border)" />
       <line x1={80} y1={145} x2={60} y2={85} {...B} />
       <line x1={80} y1={145} x2={140} y2={100} {...B} />
       <line x1={66} y1={112} x2={128} y2={110} {...B} />
@@ -346,7 +346,7 @@ function SupermanPose() {
   return (
     <>
       <line {...GND} />
-      <ellipse cx={80} cy={157} rx={20} ry={7} fill="#181818" />
+      <ellipse cx={80} cy={157} rx={20} ry={7} fill="var(--elevated)" />
       <line x1={62} y1={148} x2={100} y2={148} {...B} />
       <line x1={62} y1={148} x2={24} y2={136} {...B} />
       <line x1={100} y1={148} x2={142} y2={136} {...B} />

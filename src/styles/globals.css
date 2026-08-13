@@ -34,9 +34,58 @@
     --skip-text:       #fca5a5;
     --skip-bg:         rgba(127, 29, 29, 0.06);
 
+    /* Chart series — light greys for a dark surface. */
+    --series-1: #e2e2e2;
+    --series-2: #a6a6a6;
+    --series-3: #8a8a8a;
+    --series-4: #6f6f6f;
+
     --duration-fast:   150ms;
     --duration-normal: 300ms;
     --ease-out-expo:   cubic-bezier(0.16, 1, 0.3, 1);
+
+    /* Native controls (date/time pickers, scrollbars) follow the theme. */
+    color-scheme: dark;
+  }
+
+  /* ── Theme: Daylight (the one light theme) ──────────────────────────────
+     Token *roles* are unchanged, only their values invert: --accent stays
+     "primary text" and --white stays "strongest text", so both become dark
+     here. The names read oddly in isolation but keep every component that
+     uses them correct without edits. Semantic greens/reds are darkened —
+     the dark theme's pale mint/rose are unreadable on a light surface. */
+  [data-theme="light"] {
+    --bg:            #f4f4f5;
+    --surface:       #ffffff;
+    --elevated:      #ebebed;
+    --border:        #dcdce0;
+    --border-strong: #b6b6bd;
+    --dim:           #86868f;
+    --muted:         #5a5a64;
+    --accent:        #1c1c21;
+    --white:         #0a0a0d;
+    --red:           #c62828;
+
+    --theme-primary:       #1c1c21;
+    --theme-secondary:     #5a5a64;
+    --theme-glow:          rgba(0,0,0,0.04);
+    --theme-border-active: #1c1c21;
+    --theme-text-active:   #0a0a0d;
+
+    --complete-border: #2e7d32;
+    --complete-text:   #1b5e20;
+    --complete-bg:     rgba(46, 125, 50, 0.10);
+    --skip-border:     #c62828;
+    --skip-text:       #b71c1c;
+    --skip-bg:         rgba(198, 40, 40, 0.08);
+
+    /* Chart series — darkened so lines read on a light surface. */
+    --series-1: #1c1c21;
+    --series-2: #55555f;
+    --series-3: #80808a;
+    --series-4: #a0a0aa;
+
+    color-scheme: light;
   }
 
   /* ── Theme: Noircut (default — same as :root) ──────────────────────── */

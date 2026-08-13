@@ -14,9 +14,9 @@ import { SetLogger } from './SetLogger'
 // ---------------------------------------------------------------------------
 
 const STATUS_CARD_STYLE: Record<ExerciseSessionState['status'], React.CSSProperties> = {
-  pending: { borderColor: '#2a2a2a', background: '#111111' },
-  complete: { borderColor: '#166534', background: 'rgba(22, 101, 52, 0.08)', borderLeftWidth: 2, borderLeftColor: '#166534' },
-  skipped: { borderColor: '#7f1d1d', background: 'rgba(127, 29, 29, 0.06)', borderLeftWidth: 2, borderLeftColor: '#7f1d1d', opacity: 0.7 },
+  pending: { borderColor: 'var(--border)', background: 'var(--surface)' },
+  complete: { borderColor: 'var(--complete-border)', background: 'rgba(22, 101, 52, 0.08)', borderLeftWidth: 2, borderLeftColor: 'var(--complete-border)' },
+  skipped: { borderColor: 'var(--skip-border)', background: 'rgba(127, 29, 29, 0.06)', borderLeftWidth: 2, borderLeftColor: 'var(--skip-border)', opacity: 0.7 },
 }
 
 // ---------------------------------------------------------------------------
@@ -83,7 +83,7 @@ export function ExerciseCard({
         {/* Drag handle — 6px left strip */}
         <div
           className="shrink-0 w-[6px] cursor-grab active:cursor-grabbing hover:opacity-60 transition-opacity"
-          style={{ background: '#2a2a2a' }}
+          style={{ background: 'var(--border)' }}
           {...attributes}
           {...listeners}
           aria-label={`Drag to reorder ${displayName}`}
@@ -101,19 +101,19 @@ export function ExerciseCard({
                     status === 'skipped' && 'opacity-50',
                     status === 'complete' && 'line-through opacity-60'
                   )}
-                  style={{ color: status === 'skipped' ? '#5a5a5a' : '#e2e2e2' }}
+                  style={{ color: status === 'skipped' ? 'var(--dim)' : 'var(--accent)' }}
                 >
                   {displayName}
                 </span>
                 {exerciseState.addedFrom && (
-                  <span className="text-[9px] uppercase tracking-widest" style={{ color: '#555555' }}>
+                  <span className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
                     +{exerciseState.addedFrom}
                   </span>
                 )}
                 {coached && (
                   <span
                     className="text-[9px] uppercase tracking-widest border rounded-[2px] px-1.5 py-0.5"
-                    style={{ color: '#a6a6a6', borderColor: '#454545' }}
+                    style={{ color: 'var(--muted)', borderColor: 'var(--border-strong)' }}
                   >
                     Pronit coaches
                   </span>
@@ -131,7 +131,7 @@ export function ExerciseCard({
 
               {/* Prescription / muscle label */}
               {(target || muscle) && (
-                <div className="text-[11px] mt-0.5 uppercase tracking-widest" style={{ color: '#8a8a8a' }}>
+                <div className="text-[11px] mt-0.5 uppercase tracking-widest" style={{ color: 'var(--muted)' }}>
                   {target}
                   {muscle && <span className="ml-2 normal-case capitalize">{muscle}</span>}
                 </div>
@@ -141,7 +141,7 @@ export function ExerciseCard({
               {cue && status !== 'skipped' && (
                 <p
                   className="text-[13px] leading-snug mt-1.5 pl-2.5"
-                  style={{ color: '#a6a6a6', borderLeft: '1px solid #454545' }}
+                  style={{ color: 'var(--muted)', borderLeft: '1px solid var(--border-strong)' }}
                 >
                   {cue}
                 </p>
@@ -153,7 +153,7 @@ export function ExerciseCard({
               <button
                 onClick={() => setShowHistory(h => !h)}
                 className="p-1 transition-opacity hover:opacity-70"
-                style={{ color: '#8a8a8a' }}
+                style={{ color: 'var(--muted)' }}
                 aria-label={showHistory ? 'Hide history' : 'Show history'}
               >
                 {showHistory ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
@@ -161,7 +161,7 @@ export function ExerciseCard({
               <button
                 onClick={() => setConfirmRemove(true)}
                 className="p-1 transition-opacity hover:opacity-70"
-                style={{ color: '#8a8a8a' }}
+                style={{ color: 'var(--muted)' }}
                 aria-label={`Remove ${displayName} from this day`}
               >
                 <Trash2 size={15} />
@@ -173,12 +173,12 @@ export function ExerciseCard({
           {confirmRemove && (
             <div
               className="mt-2.5 p-2.5 rounded-[2px] space-y-2"
-              style={{ border: '1px solid #7f1d1d', background: 'rgba(127,29,29,0.08)' }}
+              style={{ border: '1px solid var(--skip-border)', background: 'rgba(127,29,29,0.08)' }}
             >
-              <p className="text-[13px]" style={{ color: '#e2e2e2' }}>
+              <p className="text-[13px]" style={{ color: 'var(--accent)' }}>
                 Remove {displayName} from this day?
                 {exerciseState.sets.length > 0 && (
-                  <span style={{ color: '#fca5a5' }}>
+                  <span style={{ color: 'var(--skip-text)' }}>
                     {' '}{exerciseState.sets.length} logged{' '}
                     {exerciseState.sets.length === 1 ? 'set' : 'sets'} will be lost.
                   </span>
@@ -188,14 +188,14 @@ export function ExerciseCard({
                 <button
                   onClick={() => setConfirmRemove(false)}
                   className="px-3 py-1.5 text-[12px] uppercase tracking-widest rounded-[2px] transition-opacity hover:opacity-70"
-                  style={{ border: '1px solid #454545', color: '#a6a6a6' }}
+                  style={{ border: '1px solid var(--border-strong)', color: 'var(--muted)' }}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={onRemoveExercise}
                   className="px-3 py-1.5 text-[12px] uppercase tracking-widest rounded-[2px] transition-opacity hover:opacity-70"
-                  style={{ border: '1px solid #7f1d1d', color: '#fca5a5' }}
+                  style={{ border: '1px solid var(--skip-border)', color: 'var(--skip-text)' }}
                   aria-label={`Confirm remove ${displayName}`}
                 >
                   Remove
@@ -211,7 +211,7 @@ export function ExerciseCard({
                 <button
                   onClick={() => onStatusChange('complete')}
                   className="px-3 py-1 text-[10px] uppercase tracking-widest rounded-[2px] transition-opacity hover:opacity-70"
-                  style={{ border: '1px solid #166534', color: '#86efac' }}
+                  style={{ border: '1px solid var(--complete-border)', color: 'var(--complete-text)' }}
                   aria-label={`Complete ${displayName}`}
                 >
                   Complete
@@ -219,7 +219,7 @@ export function ExerciseCard({
                 <button
                   onClick={() => onStatusChange('skipped')}
                   className="px-3 py-1 text-[10px] uppercase tracking-widest rounded-[2px] transition-opacity hover:opacity-70"
-                  style={{ border: '1px solid #7f1d1d', color: '#fca5a5' }}
+                  style={{ border: '1px solid var(--skip-border)', color: 'var(--skip-text)' }}
                   aria-label={`Skip ${displayName}`}
                 >
                   Skip
@@ -230,7 +230,7 @@ export function ExerciseCard({
               <button
                 onClick={() => onStatusChange('pending')}
                 className="px-3 py-1 text-[10px] uppercase tracking-widest rounded-[2px] transition-opacity hover:opacity-70"
-                style={{ border: '1px solid #3a3a3a', color: '#888888' }}
+                style={{ border: '1px solid var(--border-strong)', color: 'var(--muted)' }}
                 aria-label={`Undo ${displayName}`}
               >
                 Undo
@@ -240,7 +240,7 @@ export function ExerciseCard({
         </div>
 
         {/* Drag handle icon on right for visual cue */}
-        <div className="shrink-0 flex items-center pr-2" style={{ color: '#2a2a2a' }}>
+        <div className="shrink-0 flex items-center pr-2" style={{ color: 'var(--dim)' }}>
           <GripVertical size={14} />
         </div>
       </div>

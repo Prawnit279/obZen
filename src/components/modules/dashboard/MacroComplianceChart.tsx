@@ -64,18 +64,18 @@ export function MacroComplianceChart() {
           return (
             <g key={t}>
               <line x1={ml} y1={y} x2={W - mr} y2={y}
-                stroke={t === 1 ? '#555555' : '#2a2a2a'}
+                stroke={t === 1 ? 'var(--dim)' : 'var(--dim)'}
                 strokeWidth="1"
                 strokeDasharray={t === 1 ? '4,3' : undefined}
               />
-              <text x={ml - 3} y={y + 3} fontSize="7" fill="#555555" textAnchor="end">
+              <text x={ml - 3} y={y + 3} fontSize="7" fill="var(--dim)" textAnchor="end">
                 {t * 100}%
               </text>
             </g>
           )
         })}
-        <line x1={ml} y1={mt} x2={ml} y2={mt + ch} stroke="#2a2a2a" strokeWidth="1" />
-        <line x1={ml} y1={mt + ch} x2={W - mr} y2={mt + ch} stroke="#2a2a2a" strokeWidth="1" />
+        <line x1={ml} y1={mt} x2={ml} y2={mt + ch} stroke="var(--dim)" strokeWidth="1" />
+        <line x1={ml} y1={mt + ch} x2={W - mr} y2={mt + ch} stroke="var(--dim)" strokeWidth="1" />
 
         {days.map((d, i) => {
           const cx = ml + i * colW + barGap
@@ -98,7 +98,7 @@ export function MacroComplianceChart() {
                 )
               })}
               <text x={ml + i * colW + colW / 2} y={H - mb + 13}
-                fontSize="7" fill="#555555" textAnchor="middle">
+                fontSize="7" fill="var(--dim)" textAnchor="middle">
                 {dayLabel}
               </text>
             </g>

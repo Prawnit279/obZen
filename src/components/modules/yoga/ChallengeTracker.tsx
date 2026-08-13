@@ -91,25 +91,25 @@ function WeekBar({ weekNum, days, completedDays, currentDay }: WeekBarProps) {
     <div className="flex items-center gap-3">
       <span
         className="text-[10px] uppercase tracking-widest shrink-0 w-14"
-        style={{ color: '#555555' }}
+        style={{ color: 'var(--dim)' }}
       >
         Week {weekNum}
       </span>
       <div
         className="flex-1 h-[3px] rounded-full"
-        style={{ background: '#1a1a1a' }}
+        style={{ background: 'var(--elevated)' }}
       >
         <div
           className="h-full rounded-full transition-all duration-300"
           style={{
             width: `${pct}%`,
-            background: days.some(d => d <= currentDay) ? '#555555' : '#2a2a2a',
+            background: days.some(d => d <= currentDay) ? '#555555' : 'var(--border)',
           }}
         />
       </div>
       <span
         className="text-[10px] tabular-nums shrink-0 w-8 text-right"
-        style={{ color: '#3a3a3a' }}
+        style={{ color: 'var(--dim)' }}
       >
         {done}/{total}
       </span>
@@ -162,7 +162,7 @@ function DayCell({ day, completed, isToday, isFuture, selected, onSelect }: DayC
     >
       <span
         className="absolute top-0.5 left-1 text-[8px] leading-none tabular-nums"
-        style={{ color: '#555555' }}
+        style={{ color: 'var(--dim)' }}
       >
         {day}
       </span>
@@ -172,7 +172,7 @@ function DayCell({ day, completed, isToday, isFuture, selected, onSelect }: DayC
       {completed && (
         <span
           className="absolute bottom-0.5 right-0.5"
-          style={{ color: '#555555' }}
+          style={{ color: 'var(--dim)' }}
           aria-hidden="true"
         >
           <CheckCircle size={8} strokeWidth={2} />
@@ -209,7 +209,7 @@ function SelectedDayPanel({
   return (
     <div
       className="rounded-[2px] p-4 relative"
-      style={{ background: '#111111', border: '1px solid #2a2a2a' }}
+      style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
     >
       {/* Close */}
       <button
@@ -217,24 +217,24 @@ function SelectedDayPanel({
         className="absolute top-3 right-3 transition-opacity hover:opacity-60"
         aria-label="Close panel"
       >
-        <X size={14} style={{ color: '#555555' }} />
+        <X size={14} style={{ color: 'var(--dim)' }} />
       </button>
 
       {/* Header */}
       <div className="mb-3 pr-6">
         <div
           className="text-[10px] uppercase tracking-widest mb-1"
-          style={{ color: '#555555' }}
+          style={{ color: 'var(--dim)' }}
         >
           Day {day}
         </div>
-        <div className="text-[16px] leading-snug" style={{ color: '#d4d4d4' }}>
+        <div className="text-[16px] leading-snug" style={{ color: 'var(--accent)' }}>
           {pose.name}
         </div>
         {pose.sanskritName && (
           <div
             className="text-[11px] italic mt-0.5"
-            style={{ color: '#555555' }}
+            style={{ color: 'var(--dim)' }}
           >
             {pose.sanskritName}
           </div>
@@ -251,7 +251,7 @@ function SelectedDayPanel({
       {/* Duration */}
       <div
         className="text-[10px] uppercase tracking-widest mb-3"
-        style={{ color: '#555555' }}
+        style={{ color: 'var(--dim)' }}
       >
         {pose.duration}
       </div>
@@ -260,7 +260,7 @@ function SelectedDayPanel({
       <div className="mb-3">
         <div
           className="text-[9px] uppercase tracking-widest mb-1.5"
-          style={{ color: '#3a3a3a' }}
+          style={{ color: 'var(--dim)' }}
         >
           Steps
         </div>
@@ -269,16 +269,16 @@ function SelectedDayPanel({
             <li
               key={i}
               className="text-[12px] flex gap-2 leading-snug"
-              style={{ color: '#888888' }}
+              style={{ color: 'var(--muted)' }}
             >
-              <span style={{ color: '#555555' }} className="shrink-0">
+              <span style={{ color: 'var(--dim)' }} className="shrink-0">
                 {i + 1}.
               </span>
               {step}
             </li>
           ))}
           {pose.steps.length > 3 && (
-            <li className="text-[11px]" style={{ color: '#3a3a3a' }}>
+            <li className="text-[11px]" style={{ color: 'var(--dim)' }}>
               ...
             </li>
           )}
@@ -289,15 +289,15 @@ function SelectedDayPanel({
       {pose.pittaNote && (
         <div
           className="mb-3 pl-3"
-          style={{ borderLeft: '2px solid #2a2a2a' }}
+          style={{ borderLeft: '2px solid var(--border)' }}
         >
           <div
             className="text-[9px] uppercase tracking-widest mb-0.5"
-            style={{ color: '#3a3a3a' }}
+            style={{ color: 'var(--dim)' }}
           >
             Pitta Note
           </div>
-          <p className="text-[11px] leading-snug" style={{ color: '#555555' }}>
+          <p className="text-[11px] leading-snug" style={{ color: 'var(--dim)' }}>
             {pose.pittaNote}
           </p>
         </div>
@@ -312,8 +312,8 @@ function SelectedDayPanel({
           canMark ? 'hover:opacity-80' : 'opacity-30 cursor-not-allowed',
         )}
         style={{
-          border: `1px solid ${completed ? '#555555' : '#d4d4d4'}`,
-          color: completed ? '#555555' : '#d4d4d4',
+          border: `1px solid ${completed ? '#555555' : 'var(--accent)'}`,
+          color: completed ? 'var(--dim)' : 'var(--accent)',
         }}
       >
         {completed ? `Day ${day} Complete` : `Mark Day ${day} Complete`}
@@ -369,18 +369,18 @@ export function ChallengeTracker() {
         <div>
           <h2
             className="text-[18px] uppercase tracking-wide mb-1"
-            style={{ color: '#d4d4d4' }}
+            style={{ color: 'var(--accent)' }}
           >
             30-Day Yoga Challenge
           </h2>
-          <p className="text-[12px]" style={{ color: '#555555' }}>
+          <p className="text-[12px]" style={{ color: 'var(--dim)' }}>
             Build a daily practice, one pose at a time.
           </p>
         </div>
         <button
           onClick={startChallenge}
           className="px-6 py-2.5 rounded-[2px] text-[12px] uppercase tracking-widest transition-opacity hover:opacity-80"
-          style={{ border: '1px solid #d4d4d4', color: '#d4d4d4' }}
+          style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}
         >
           Start Challenge
         </button>
@@ -408,13 +408,13 @@ export function ChallengeTracker() {
       {/* Header row */}
       <div className="flex items-start justify-between">
         <div className="space-y-0.5">
-          <div className="text-[13px]" style={{ color: '#d4d4d4' }}>
+          <div className="text-[13px]" style={{ color: 'var(--accent)' }}>
             Day {currentDay} of 30
           </div>
-          <div className="text-[11px]" style={{ color: '#555555' }}>
+          <div className="text-[11px]" style={{ color: 'var(--dim)' }}>
             {completed} completed
             {streak > 0 && (
-              <span className="ml-2" style={{ color: '#3a3a3a' }}>
+              <span className="ml-2" style={{ color: 'var(--dim)' }}>
                 · {streak}-day streak
               </span>
             )}
@@ -423,7 +423,7 @@ export function ChallengeTracker() {
         <button
           onClick={resetChallenge}
           className="text-[10px] uppercase tracking-widest transition-opacity hover:opacity-60"
-          style={{ color: '#3a3a3a' }}
+          style={{ color: 'var(--dim)' }}
         >
           Reset
         </button>

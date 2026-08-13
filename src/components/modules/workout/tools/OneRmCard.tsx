@@ -40,32 +40,32 @@ export function OneRmCard() {
         <div className="mt-4 space-y-3">
           <div className="flex gap-4">
             <div>
-              <div className="text-[22px] tabular-nums" style={{ color: '#e2e2e2' }}>{Math.round(est.epley)}</div>
-              <div className="text-[11px] uppercase tracking-widest" style={{ color: '#8a8a8a' }}>Epley e1RM</div>
+              <div className="text-[22px] tabular-nums" style={{ color: 'var(--accent)' }}>{Math.round(est.epley)}</div>
+              <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Epley e1RM</div>
             </div>
             <div>
-              <div className="text-[22px] tabular-nums" style={{ color: '#e2e2e2' }}>
+              <div className="text-[22px] tabular-nums" style={{ color: 'var(--accent)' }}>
                 {est.brzycki > 0 ? Math.round(est.brzycki) : '—'}
               </div>
-              <div className="text-[11px] uppercase tracking-widest" style={{ color: '#8a8a8a' }}>Brzycki e1RM</div>
+              <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Brzycki e1RM</div>
             </div>
           </div>
 
           {repsDelta !== null && (
-            <p className="text-[13px]" style={{ color: repsDelta >= 0 ? '#86efac' : '#fca5a5' }}>
+            <p className="text-[13px]" style={{ color: repsDelta >= 0 ? 'var(--complete-text)' : 'var(--skip-text)' }}>
               {repsDelta >= 0 ? `+${repsDelta} rep${repsDelta === 1 ? '' : 's'} over target` : `${repsDelta} reps under target`}
             </p>
           )}
 
           <div>
-            <div className="text-[11px] uppercase tracking-widest mb-1.5" style={{ color: '#8a8a8a' }}>
+            <div className="text-[11px] uppercase tracking-widest mb-1.5" style={{ color: 'var(--muted)' }}>
               Working weights (% of Epley e1RM)
             </div>
             <div className="grid grid-cols-5 gap-1.5">
               {table.map(row => (
-                <div key={row.pct} className="text-center rounded-[2px] py-1.5" style={{ background: '#1e1e1e' }}>
-                  <div className="text-[13px] tabular-nums" style={{ color: '#e2e2e2' }}>{row.weight}</div>
-                  <div className="text-[10px]" style={{ color: '#6f6f6f' }}>{row.pct}%</div>
+                <div key={row.pct} className="text-center rounded-[2px] py-1.5" style={{ background: 'var(--elevated)' }}>
+                  <div className="text-[13px] tabular-nums" style={{ color: 'var(--accent)' }}>{row.weight}</div>
+                  <div className="text-[10px]" style={{ color: 'var(--dim)' }}>{row.pct}%</div>
                 </div>
               ))}
             </div>

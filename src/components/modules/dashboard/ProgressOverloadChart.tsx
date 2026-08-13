@@ -79,14 +79,14 @@ export function ProgressOverloadChart() {
           const val = minW + wRange * t
           return (
             <g key={t}>
-              <line x1={ml} y1={y} x2={W - mr} y2={y} stroke="#2a2a2a" strokeWidth="1" />
-              <text x={ml - 3} y={y + 3} fontSize="7" fill="#555555" textAnchor="end">
+              <line x1={ml} y1={y} x2={W - mr} y2={y} stroke="var(--dim)" strokeWidth="1" />
+              <text x={ml - 3} y={y + 3} fontSize="7" fill="var(--dim)" textAnchor="end">
                 {Math.round(val)}
               </text>
             </g>
           )
         })}
-        <line x1={ml} y1={mt} x2={ml} y2={mt + ch} stroke="#2a2a2a" strokeWidth="1" />
+        <line x1={ml} y1={mt} x2={ml} y2={mt + ch} stroke="var(--dim)" strokeWidth="1" />
 
         {/* Lines + dots */}
         {KEY_EXERCISES.map((ex, li) => {
@@ -110,11 +110,11 @@ export function ProgressOverloadChart() {
         {/* X axis date labels */}
         {allDates.length >= 2 && (
           <>
-            <text x={toX(allDates[0])} y={H - mb + 12} fontSize="7" fill="#555555" textAnchor="start">
+            <text x={toX(allDates[0])} y={H - mb + 12} fontSize="7" fill="var(--dim)" textAnchor="start">
               {new Date(allDates[0] + 'T12:00:00').toLocaleDateString('en', { month: 'short', day: 'numeric' })}
             </text>
             <text x={toX(allDates[allDates.length - 1])} y={H - mb + 12}
-              fontSize="7" fill="#555555" textAnchor="end">
+              fontSize="7" fill="var(--dim)" textAnchor="end">
               {new Date(allDates[allDates.length - 1] + 'T12:00:00').toLocaleDateString('en', { month: 'short', day: 'numeric' })}
             </text>
           </>

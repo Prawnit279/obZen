@@ -163,25 +163,25 @@ export function BreathingTimer({ technique, onClose }: BreathingTimerProps) {
     return (
       <div
         className="fixed inset-0 z-50 flex flex-col items-center justify-center gap-8"
-        style={{ backgroundColor: '#0a0a0a' }}
+        style={{ backgroundColor: 'var(--bg)' }}
       >
-        <CheckCircle size={64} style={{ color: '#d4d4d4' }} strokeWidth={1} />
+        <CheckCircle size={64} style={{ color: 'var(--accent)' }} strokeWidth={1} />
         <div className="flex flex-col items-center gap-3">
           <p
             className="text-xs tracking-widest uppercase"
-            style={{ color: '#888888' }}
+            style={{ color: 'var(--muted)' }}
           >
             SESSION COMPLETE
           </p>
           <p
             className="text-4xl font-light tracking-widest uppercase"
-            style={{ color: '#ffffff' }}
+            style={{ color: 'var(--white)' }}
           >
             {technique.name}
           </p>
           <p
             className="text-sm tracking-widest uppercase"
-            style={{ color: '#555555' }}
+            style={{ color: 'var(--dim)' }}
           >
             {totalRounds} ROUNDS COMPLETED
           </p>
@@ -190,9 +190,9 @@ export function BreathingTimer({ technique, onClose }: BreathingTimerProps) {
           onClick={onClose}
           className="mt-4 px-10 py-3 tracking-widest uppercase text-xs"
           style={{
-            backgroundColor: '#181818',
-            color: '#d4d4d4',
-            border: '1px solid #2a2a2a',
+            backgroundColor: 'var(--elevated)',
+            color: 'var(--accent)',
+            border: '1px solid var(--border)',
           }}
         >
           CLOSE
@@ -204,30 +204,30 @@ export function BreathingTimer({ technique, onClose }: BreathingTimerProps) {
   return (
     <div
       className="fixed inset-0 z-50 flex flex-col"
-      style={{ backgroundColor: '#0a0a0a' }}
+      style={{ backgroundColor: 'var(--bg)' }}
     >
       {/* Header */}
       <header
         className="flex items-center justify-between px-6 py-4"
-        style={{ borderBottom: '1px solid #2a2a2a' }}
+        style={{ borderBottom: '1px solid var(--border)' }}
       >
         <button
           onClick={handleEnd}
           aria-label="Close breathing session"
-          style={{ color: '#555555' }}
+          style={{ color: 'var(--dim)' }}
           className="hover:opacity-70 transition-opacity"
         >
           <X size={20} />
         </button>
         <p
           className="text-xs tracking-widest uppercase"
-          style={{ color: '#888888' }}
+          style={{ color: 'var(--muted)' }}
         >
           {technique.name}
         </p>
         <p
           className="text-xs tracking-widest uppercase"
-          style={{ color: '#555555' }}
+          style={{ color: 'var(--dim)' }}
         >
           {isKapalbhati(technique.id)
             ? `ROUND ${Math.min(roundsDone + 1, totalRounds)}/${totalRounds}`
@@ -255,14 +255,14 @@ export function BreathingTimer({ technique, onClose }: BreathingTimerProps) {
           {isKapalbhati(technique.id) ? (
             <p
               className="text-lg tracking-widest uppercase"
-              style={{ color: '#555555' }}
+              style={{ color: 'var(--dim)' }}
             >
               {pumpCount + 1}/{PUMPS_PER_ROUND}
             </p>
           ) : shouldShowCount && displayCount !== null ? (
             <p
               className="text-xl tracking-widest"
-              style={{ color: '#555555' }}
+              style={{ color: 'var(--dim)' }}
             >
               {displayCount}
             </p>
@@ -273,7 +273,7 @@ export function BreathingTimer({ technique, onClose }: BreathingTimerProps) {
         {technique.pittaNote && (
           <p
             className="text-xs tracking-widest uppercase text-center max-w-xs"
-            style={{ color: '#555555' }}
+            style={{ color: 'var(--dim)' }}
           >
             {technique.pittaNote}
           </p>
@@ -283,15 +283,15 @@ export function BreathingTimer({ technique, onClose }: BreathingTimerProps) {
       {/* Footer */}
       <footer
         className="flex items-center justify-center gap-4 px-6 py-5"
-        style={{ borderTop: '1px solid #2a2a2a' }}
+        style={{ borderTop: '1px solid var(--border)' }}
       >
         <button
           onClick={handleEnd}
           className="px-6 py-2 text-xs tracking-widest uppercase"
           style={{
             backgroundColor: 'transparent',
-            color: '#555555',
-            border: '1px solid #2a2a2a',
+            color: 'var(--dim)',
+            border: '1px solid var(--border)',
           }}
         >
           END SESSION
@@ -300,9 +300,9 @@ export function BreathingTimer({ technique, onClose }: BreathingTimerProps) {
           onClick={handlePauseResume}
           className="px-6 py-2 text-xs tracking-widest uppercase"
           style={{
-            backgroundColor: '#181818',
-            color: '#d4d4d4',
-            border: '1px solid #2a2a2a',
+            backgroundColor: 'var(--elevated)',
+            color: 'var(--accent)',
+            border: '1px solid var(--border)',
           }}
         >
           {running ? 'PAUSE' : 'RESUME'}

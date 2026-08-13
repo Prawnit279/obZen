@@ -29,10 +29,10 @@ const CATEGORY_COLOR: Record<Category, string> = {
   personal:  '#888888',
   work:      '#d4d4d4',
   meeting:   '#fbbf24',
-  workout:   '#34d399',
+  workout:   'var(--complete-text)',
   drum:      '#f97316',
   yoga:      '#a78bfa',
-  jam:       '#fb7185',
+  jam:       'var(--skip-text)',
   ayurveda:  '#6ee7b7',
 }
 
@@ -83,15 +83,15 @@ function AddEventSheet({ initialDate, onClose }: AddEventSheetProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end" style={{ background: 'rgba(0,0,0,0.7)' }}>
-      <div className="rounded-t-[4px] flex flex-col max-h-[90vh]" style={{ background: '#111111', border: '1px solid #2a2a2a' }}>
-        <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ borderBottom: '1px solid #2a2a2a' }}>
-          <span className="text-[12px] uppercase tracking-widest" style={{ color: '#d4d4d4' }}>New Event</span>
-          <button onClick={onClose} aria-label="Close"><X size={16} style={{ color: '#555555' }} /></button>
+      <div className="rounded-t-[4px] flex flex-col max-h-[90vh]" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+        <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
+          <span className="text-[12px] uppercase tracking-widest" style={{ color: 'var(--accent)' }}>New Event</span>
+          <button onClick={onClose} aria-label="Close"><X size={16} style={{ color: 'var(--dim)' }} /></button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           <div>
-            <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: '#555555' }}>Title *</label>
+            <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Title *</label>
             <input
               className="input w-full"
               value={title}
@@ -102,23 +102,23 @@ function AddEventSheet({ initialDate, onClose }: AddEventSheetProps) {
           </div>
 
           <div>
-            <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: '#555555' }}>Date</label>
+            <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Date</label>
             <input type="date" className="input w-full" value={date} onChange={e => setDate(e.target.value)} />
           </div>
 
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: '#555555' }}>Start</label>
+              <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Start</label>
               <input type="time" className="input w-full" value={startTime} onChange={e => setStartTime(e.target.value)} />
             </div>
             <div>
-              <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: '#555555' }}>End</label>
+              <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>End</label>
               <input type="time" className="input w-full" value={endTime} onChange={e => setEndTime(e.target.value)} />
             </div>
           </div>
 
           <div>
-            <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: '#555555' }}>Category</label>
+            <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Category</label>
             <div className="flex flex-wrap gap-1.5">
               {CATEGORIES.map(c => (
                 <button
@@ -126,9 +126,9 @@ function AddEventSheet({ initialDate, onClose }: AddEventSheetProps) {
                   onClick={() => setCategory(c.value)}
                   className="px-2.5 py-1 rounded-[2px] text-[9px] uppercase tracking-widest transition-colors"
                   style={{
-                    border: `1px solid ${category === c.value ? CATEGORY_COLOR[c.value] : '#2a2a2a'}`,
-                    color: category === c.value ? CATEGORY_COLOR[c.value] : '#555555',
-                    background: category === c.value ? '#181818' : 'transparent',
+                    border: `1px solid ${category === c.value ? CATEGORY_COLOR[c.value] : 'var(--border)'}`,
+                    color: category === c.value ? CATEGORY_COLOR[c.value] : 'var(--dim)',
+                    background: category === c.value ? 'var(--elevated)' : 'transparent',
                   }}
                 >{c.label}</button>
               ))}
@@ -136,7 +136,7 @@ function AddEventSheet({ initialDate, onClose }: AddEventSheetProps) {
           </div>
 
           <div>
-            <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: '#555555' }}>Notes</label>
+            <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Notes</label>
             <textarea
               className="input w-full resize-none"
               rows={2}
@@ -150,7 +150,7 @@ function AddEventSheet({ initialDate, onClose }: AddEventSheetProps) {
             onClick={handleSave}
             disabled={!title.trim() || saving}
             className="w-full py-2.5 rounded-[2px] text-[11px] uppercase tracking-widest disabled:opacity-30 transition-opacity"
-            style={{ border: '1px solid #d4d4d4', color: '#d4d4d4' }}
+            style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}
           >
             {saving ? 'Saving...' : 'Add Event'}
           </button>
@@ -178,40 +178,40 @@ function DaySheet({ date, events, onClose, onAdd }: DaySheetProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end" style={{ background: 'rgba(0,0,0,0.7)' }}>
-      <div className="rounded-t-[4px] flex flex-col max-h-[70vh]" style={{ background: '#111111', border: '1px solid #2a2a2a' }}>
-        <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ borderBottom: '1px solid #2a2a2a' }}>
-          <span className="text-[12px] uppercase tracking-widest" style={{ color: '#d4d4d4' }}>{label}</span>
+      <div className="rounded-t-[4px] flex flex-col max-h-[70vh]" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+        <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
+          <span className="text-[12px] uppercase tracking-widest" style={{ color: 'var(--accent)' }}>{label}</span>
           <div className="flex items-center gap-2">
-            <button onClick={onAdd} aria-label="Add event"><Plus size={16} style={{ color: '#888888' }} /></button>
-            <button onClick={onClose} aria-label="Close"><X size={16} style={{ color: '#555555' }} /></button>
+            <button onClick={onAdd} aria-label="Add event"><Plus size={16} style={{ color: 'var(--muted)' }} /></button>
+            <button onClick={onClose} aria-label="Close"><X size={16} style={{ color: 'var(--dim)' }} /></button>
           </div>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-2">
           {events.length === 0 && (
-            <p className="text-[12px] text-center py-6" style={{ color: '#555555' }}>No events. Tap + to add one.</p>
+            <p className="text-[12px] text-center py-6" style={{ color: 'var(--dim)' }}>No events. Tap + to add one.</p>
           )}
           {events.map(ev => (
             <div
               key={ev.id}
               className="flex items-start justify-between gap-3 p-3 rounded-[2px]"
-              style={{ background: '#0d0d0d', border: '1px solid #2a2a2a' }}
+              style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}
             >
               <div className="flex items-start gap-2.5 flex-1 min-w-0">
                 <div className="w-2 h-2 rounded-full mt-1.5 shrink-0" style={{ background: CATEGORY_COLOR[ev.category] }} />
                 <div className="min-w-0">
-                  <p className="text-[13px] truncate" style={{ color: '#d4d4d4' }}>{ev.title}</p>
+                  <p className="text-[13px] truncate" style={{ color: 'var(--accent)' }}>{ev.title}</p>
                   {(ev.startTime || ev.endTime) && (
-                    <p className="text-[10px]" style={{ color: '#888888' }}>
+                    <p className="text-[10px]" style={{ color: 'var(--muted)' }}>
                       {ev.startTime}{ev.endTime ? ` – ${ev.endTime}` : ''}
                     </p>
                   )}
-                  {ev.notes && <p className="text-[10px] mt-0.5" style={{ color: '#555555' }}>{ev.notes}</p>}
-                  <p className="text-[9px] uppercase tracking-widest mt-0.5" style={{ color: '#3a3a3a' }}>{ev.category}</p>
+                  {ev.notes && <p className="text-[10px] mt-0.5" style={{ color: 'var(--dim)' }}>{ev.notes}</p>}
+                  <p className="text-[9px] uppercase tracking-widest mt-0.5" style={{ color: 'var(--dim)' }}>{ev.category}</p>
                 </div>
               </div>
               <button onClick={() => handleDelete(ev.id!)} aria-label="Delete event" className="shrink-0 mt-0.5">
-                <Trash2 size={13} style={{ color: '#3a3a3a' }} className="hover:text-red-400 transition-colors" />
+                <Trash2 size={13} style={{ color: 'var(--dim)' }} className="hover:text-red-400 transition-colors" />
               </button>
             </div>
           ))}
@@ -274,8 +274,8 @@ function WeekView({ selectedDate, setSelectedDate, onAdd }: WeekViewProps) {
                   isSel && !isToday && 'bg-noir-elevated',
                   !isToday && !isSel && 'hover:bg-noir-elevated/50'
                 )}>
-                <span className="text-[9px] uppercase tracking-widest" style={{ color: isSel ? '#d4d4d4' : '#555555' }}>{label}</span>
-                <span className="text-[13px]" style={{ color: isToday ? '#d4d4d4' : isSel ? '#d4d4d4' : '#888888' }}>{num}</span>
+                <span className="text-[9px] uppercase tracking-widest" style={{ color: isSel ? 'var(--accent)' : 'var(--dim)' }}>{label}</span>
+                <span className="text-[13px]" style={{ color: isToday ? 'var(--accent)' : isSel ? 'var(--accent)' : 'var(--muted)' }}>{num}</span>
                 {dayEvts.length > 0 && (
                   <div className="flex gap-0.5 flex-wrap justify-center px-1">
                     {dayEvts.slice(0, 3).map((ev, i) => (
@@ -292,22 +292,22 @@ function WeekView({ selectedDate, setSelectedDate, onAdd }: WeekViewProps) {
       {/* Selected day events */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <p className="text-[9px] uppercase tracking-widest" style={{ color: '#3a3a3a' }}>
+          <p className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
             {new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
           </p>
           <button onClick={() => onAdd(selectedDate)} aria-label="Add event">
-            <Plus size={14} style={{ color: '#555555' }} />
+            <Plus size={14} style={{ color: 'var(--dim)' }} />
           </button>
         </div>
         {dayEvents.length === 0
-          ? <p className="text-[12px] text-center py-6" style={{ color: '#555555' }}>No events. Tap + to add.</p>
+          ? <p className="text-[12px] text-center py-6" style={{ color: 'var(--dim)' }}>No events. Tap + to add.</p>
           : dayEvents.map(ev => (
-            <div key={ev.id} className="flex items-center gap-2.5 px-3 py-2 rounded-[2px]" style={{ background: '#111111', border: '1px solid #2a2a2a' }}>
+            <div key={ev.id} className="flex items-center gap-2.5 px-3 py-2 rounded-[2px]" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
               <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: CATEGORY_COLOR[ev.category] }} />
-              <span className="flex-1 text-[12px] truncate" style={{ color: '#d4d4d4' }}>{ev.title}</span>
-              {ev.startTime && <span className="text-[10px] shrink-0" style={{ color: '#555555' }}>{ev.startTime}</span>}
+              <span className="flex-1 text-[12px] truncate" style={{ color: 'var(--accent)' }}>{ev.title}</span>
+              {ev.startTime && <span className="text-[10px] shrink-0" style={{ color: 'var(--dim)' }}>{ev.startTime}</span>}
               <button onClick={() => db.calendarEvents.delete(ev.id!)} aria-label="Delete">
-                <Trash2 size={12} style={{ color: '#3a3a3a' }} />
+                <Trash2 size={12} style={{ color: 'var(--dim)' }} />
               </button>
             </div>
           ))
@@ -354,26 +354,26 @@ function DayView({ selectedDate, setSelectedDate, onAdd }: DayViewProps) {
       {/* Events */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <p className="text-[9px] uppercase tracking-widest" style={{ color: '#3a3a3a' }}>Events</p>
+          <p className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>Events</p>
           <button onClick={() => onAdd(selectedDate)} aria-label="Add event">
-            <Plus size={14} style={{ color: '#555555' }} />
+            <Plus size={14} style={{ color: 'var(--dim)' }} />
           </button>
         </div>
         {sorted.length === 0
-          ? <p className="text-[12px] text-center py-8" style={{ color: '#555555' }}>No events. Tap + to add.</p>
+          ? <p className="text-[12px] text-center py-8" style={{ color: 'var(--dim)' }}>No events. Tap + to add.</p>
           : sorted.map(ev => (
-            <div key={ev.id} className="flex items-start gap-2.5 px-3 py-2.5 rounded-[2px]" style={{ background: '#111111', border: '1px solid #2a2a2a' }}>
+            <div key={ev.id} className="flex items-start gap-2.5 px-3 py-2.5 rounded-[2px]" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
               <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{ background: CATEGORY_COLOR[ev.category] }} />
               <div className="flex-1 min-w-0">
-                <p className="text-[13px]" style={{ color: '#d4d4d4' }}>{ev.title}</p>
+                <p className="text-[13px]" style={{ color: 'var(--accent)' }}>{ev.title}</p>
                 {(ev.startTime || ev.endTime) && (
-                  <p className="text-[10px] mt-0.5" style={{ color: '#888888' }}>{ev.startTime}{ev.endTime ? ` – ${ev.endTime}` : ''}</p>
+                  <p className="text-[10px] mt-0.5" style={{ color: 'var(--muted)' }}>{ev.startTime}{ev.endTime ? ` – ${ev.endTime}` : ''}</p>
                 )}
-                {ev.notes && <p className="text-[10px] mt-0.5" style={{ color: '#555555' }}>{ev.notes}</p>}
-                <p className="text-[9px] uppercase tracking-widest mt-0.5" style={{ color: '#3a3a3a' }}>{ev.category}</p>
+                {ev.notes && <p className="text-[10px] mt-0.5" style={{ color: 'var(--dim)' }}>{ev.notes}</p>}
+                <p className="text-[9px] uppercase tracking-widest mt-0.5" style={{ color: 'var(--dim)' }}>{ev.category}</p>
               </div>
               <button onClick={() => db.calendarEvents.delete(ev.id!)} aria-label="Delete event" className="shrink-0 mt-0.5">
-                <Trash2 size={13} style={{ color: '#3a3a3a' }} />
+                <Trash2 size={13} style={{ color: 'var(--dim)' }} />
               </button>
             </div>
           ))
@@ -510,7 +510,7 @@ export default function Calendar() {
                     {(hasEvt || workout) && (
                       <span className="flex gap-0.5">
                         {hasEvt && <span className="w-1 h-1 rounded-full" style={{ background: '#888888' }} />}
-                        {workout && <span className="w-1 h-1 rounded-full" style={{ background: '#34d399' }} />}
+                        {workout && <span className="w-1 h-1 rounded-full" style={{ background: 'var(--complete-text)' }} />}
                       </span>
                     )}
                   </button>
@@ -527,16 +527,16 @@ export default function Calendar() {
 
           {monthEvents.length > 0 && (
             <div className="space-y-1.5">
-              <p className="text-[9px] uppercase tracking-widest" style={{ color: '#3a3a3a' }}>This Month ({monthEvents.length})</p>
+              <p className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>This Month ({monthEvents.length})</p>
               {[...monthEvents].sort((a, b) => a.date.localeCompare(b.date)).slice(0, 5).map(ev => (
-                <div key={ev.id} className="flex items-center gap-2.5 px-3 py-2 rounded-[2px]" style={{ background: '#111111', border: '1px solid #2a2a2a' }}>
+                <div key={ev.id} className="flex items-center gap-2.5 px-3 py-2 rounded-[2px]" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
                   <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: CATEGORY_COLOR[ev.category] }} />
-                  <span className="text-[11px] flex-1 truncate" style={{ color: '#d4d4d4' }}>{ev.title}</span>
-                  <span className="text-[10px] shrink-0" style={{ color: '#555555' }}>{ev.date.slice(5)}</span>
+                  <span className="text-[11px] flex-1 truncate" style={{ color: 'var(--accent)' }}>{ev.title}</span>
+                  <span className="text-[10px] shrink-0" style={{ color: 'var(--dim)' }}>{ev.date.slice(5)}</span>
                 </div>
               ))}
               {monthEvents.length > 5 && (
-                <p className="text-[10px] text-center" style={{ color: '#555555' }}>+{monthEvents.length - 5} more</p>
+                <p className="text-[10px] text-center" style={{ color: 'var(--dim)' }}>+{monthEvents.length - 5} more</p>
               )}
             </div>
           )}

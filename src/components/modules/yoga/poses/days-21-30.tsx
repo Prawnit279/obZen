@@ -28,36 +28,36 @@ export function WideLegsForwardFoldAnim({ paused = false }: PoseAnimProps) {
         }
       `}</style>
       {/* ground */}
-      <line x1="10" y1="170" x2="150" y2="170" stroke="#2a2a2a" strokeWidth="1.5"/>
+      <line x1="10" y1="170" x2="150" y2="170" stroke="var(--dim)" strokeWidth="1.5"/>
       {/* left leg */}
-      <line x1="80" y1="118" x2="32" y2="145" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
-      <line x1="32" y1="145" x2="25" y2="168" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+      <line x1="80" y1="118" x2="32" y2="145" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
+      <line x1="32" y1="145" x2="25" y2="168" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
       {/* right leg */}
-      <line x1="80" y1="118" x2="128" y2="145" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
-      <line x1="128" y1="145" x2="135" y2="168" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+      <line x1="80" y1="118" x2="128" y2="145" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
+      <line x1="128" y1="145" x2="135" y2="168" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
       {/* hip joint */}
-      <circle cx="80" cy="118" r="4" fill="#d4d4d4"/>
+      <circle cx="80" cy="118" r="4" fill="var(--accent)"/>
       {/* left knee joint */}
-      <circle cx="32" cy="145" r="4" fill="#d4d4d4"/>
+      <circle cx="32" cy="145" r="4" fill="var(--accent)"/>
       {/* right knee joint */}
-      <circle cx="128" cy="145" r="4" fill="#d4d4d4"/>
+      <circle cx="128" cy="145" r="4" fill="var(--accent)"/>
       {/* torso + arms + head group — rotates forward */}
       <g className="wlf-torso">
         {/* torso */}
-        <line x1="80" y1="118" x2="80" y2="65" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round"/>
+        <line x1="80" y1="118" x2="80" y2="65" stroke="var(--accent)" strokeWidth="6" strokeLinecap="round"/>
         {/* shoulder joints */}
-        <circle cx="80" cy="80" r="4" fill="#d4d4d4"/>
+        <circle cx="80" cy="80" r="4" fill="var(--accent)"/>
         {/* left arm down to floor */}
-        <line x1="80" y1="80" x2="60" y2="108" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
-        <line x1="60" y1="108" x2="58" y2="130" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="80" y1="80" x2="60" y2="108" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="60" y1="108" x2="58" y2="130" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
         {/* right arm down to floor */}
-        <line x1="80" y1="80" x2="100" y2="108" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
-        <line x1="100" y1="108" x2="102" y2="130" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="80" y1="80" x2="100" y2="108" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="100" y1="108" x2="102" y2="130" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
         {/* elbow joints */}
-        <circle cx="60" cy="108" r="4" fill="#d4d4d4"/>
-        <circle cx="100" cy="108" r="4" fill="#d4d4d4"/>
+        <circle cx="60" cy="108" r="4" fill="var(--accent)"/>
+        <circle cx="100" cy="108" r="4" fill="var(--accent)"/>
         {/* head */}
-        <circle cx="80" cy="52" r="13" fill="#d4d4d4"/>
+        <circle cx="80" cy="52" r="13" fill="var(--accent)"/>
       </g>
     </svg>
   )
@@ -96,41 +96,41 @@ export function EaglePoseAnim({ paused = false }: PoseAnimProps) {
         }
       `}</style>
       {/* ground */}
-      <line x1="10" y1="170" x2="150" y2="170" stroke="#2a2a2a" strokeWidth="1.5"/>
+      <line x1="10" y1="170" x2="150" y2="170" stroke="var(--dim)" strokeWidth="1.5"/>
       {/* head */}
-      <circle cx="80" cy="22" r="13" fill="#d4d4d4"/>
+      <circle cx="80" cy="22" r="13" fill="var(--accent)"/>
       {/* torso */}
-      <line x1="80" y1="35" x2="80" y2="128" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round"/>
+      <line x1="80" y1="35" x2="80" y2="128" stroke="var(--accent)" strokeWidth="6" strokeLinecap="round"/>
       {/* shoulder joints */}
-      <circle cx="80" cy="68" r="4" fill="#d4d4d4"/>
+      <circle cx="80" cy="68" r="4" fill="var(--accent)"/>
       {/* hip joint */}
-      <circle cx="80" cy="128" r="4" fill="#d4d4d4"/>
+      <circle cx="80" cy="128" r="4" fill="var(--accent)"/>
       {/* support leg — right, bent */}
-      <line x1="80" y1="128" x2="80" y2="148" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
-      <line x1="80" y1="148" x2="82" y2="168" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+      <line x1="80" y1="128" x2="80" y2="148" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
+      <line x1="80" y1="148" x2="82" y2="168" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
       {/* support knee joint */}
-      <circle cx="80" cy="148" r="4" fill="#d4d4d4"/>
+      <circle cx="80" cy="148" r="4" fill="var(--accent)"/>
       {/* crossed legs group */}
       <g className="eg-legs">
         {/* left thigh over right */}
-        <line x1="80" y1="128" x2="74" y2="148" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+        <line x1="80" y1="128" x2="74" y2="148" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
         {/* left knee joint */}
-        <circle cx="74" cy="148" r="4" fill="#d4d4d4"/>
+        <circle cx="74" cy="148" r="4" fill="var(--accent)"/>
         {/* left foot hooks behind right calf */}
-        <line x1="74" y1="148" x2="78" y2="158" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+        <line x1="74" y1="148" x2="78" y2="158" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
       </g>
       {/* arms wrapped group */}
       <g className="eg-arms">
         {/* left arm under right, elbows lifted */}
-        <line x1="80" y1="68" x2="68" y2="75" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
-        <line x1="68" y1="75" x2="75" y2="55" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="80" y1="68" x2="68" y2="75" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="68" y1="75" x2="75" y2="55" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
         {/* elbow joint */}
-        <circle cx="68" cy="75" r="4" fill="#d4d4d4"/>
+        <circle cx="68" cy="75" r="4" fill="var(--accent)"/>
         {/* right arm over left */}
-        <line x1="80" y1="68" x2="92" y2="75" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
-        <line x1="92" y1="75" x2="75" y2="55" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="80" y1="68" x2="92" y2="75" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="92" y1="75" x2="75" y2="55" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
         {/* elbow joint */}
-        <circle cx="92" cy="75" r="4" fill="#d4d4d4"/>
+        <circle cx="92" cy="75" r="4" fill="var(--accent)"/>
       </g>
     </svg>
   )
@@ -165,38 +165,38 @@ export function KneelingQuadStretchAnim({ paused = false }: PoseAnimProps) {
         }
       `}</style>
       {/* ground */}
-      <line x1="10" y1="170" x2="150" y2="170" stroke="#2a2a2a" strokeWidth="1.5"/>
+      <line x1="10" y1="170" x2="150" y2="170" stroke="var(--dim)" strokeWidth="1.5"/>
       {/* head */}
-      <circle cx="80" cy="22" r="13" fill="#d4d4d4"/>
+      <circle cx="80" cy="22" r="13" fill="var(--accent)"/>
       {/* torso upright */}
-      <line x1="80" y1="35" x2="80" y2="118" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round"/>
+      <line x1="80" y1="35" x2="80" y2="118" stroke="var(--accent)" strokeWidth="6" strokeLinecap="round"/>
       {/* shoulder joints */}
-      <circle cx="80" cy="75" r="4" fill="#d4d4d4"/>
+      <circle cx="80" cy="75" r="4" fill="var(--accent)"/>
       {/* hip joint */}
-      <circle cx="80" cy="118" r="4" fill="#d4d4d4"/>
+      <circle cx="80" cy="118" r="4" fill="var(--accent)"/>
       {/* front right leg — lunge */}
-      <line x1="80" y1="118" x2="55" y2="132" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
-      <line x1="55" y1="132" x2="55" y2="168" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+      <line x1="80" y1="118" x2="55" y2="132" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
+      <line x1="55" y1="132" x2="55" y2="168" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
       {/* front knee joint */}
-      <circle cx="55" cy="132" r="4" fill="#d4d4d4"/>
+      <circle cx="55" cy="132" r="4" fill="var(--accent)"/>
       {/* left arm on front thigh */}
-      <line x1="80" y1="75" x2="62" y2="115" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
+      <line x1="80" y1="75" x2="62" y2="115" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
       {/* left elbow joint */}
-      <circle cx="71" cy="95" r="4" fill="#d4d4d4"/>
+      <circle cx="71" cy="95" r="4" fill="var(--accent)"/>
       {/* back leg + right arm group — lifts together */}
       <g className="kqs-backleg">
         {/* back thigh from hip */}
-        <line x1="80" y1="118" x2="112" y2="152" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+        <line x1="80" y1="118" x2="112" y2="152" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
         {/* back knee joint */}
-        <circle cx="112" cy="152" r="4" fill="#d4d4d4"/>
+        <circle cx="112" cy="152" r="4" fill="var(--accent)"/>
         {/* back foot pulled up */}
-        <line x1="112" y1="152" x2="105" y2="128" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+        <line x1="112" y1="152" x2="105" y2="128" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
       </g>
       <g className="kqs-rarm">
         {/* right arm reaching back to hold foot */}
-        <line x1="80" y1="75" x2="105" y2="115" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="80" y1="75" x2="105" y2="115" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
         {/* right elbow joint */}
-        <circle cx="93" cy="95" r="4" fill="#d4d4d4"/>
+        <circle cx="93" cy="95" r="4" fill="var(--accent)"/>
       </g>
     </svg>
   )
@@ -224,32 +224,32 @@ export function ChildsPoseAnim({ paused = false }: PoseAnimProps) {
         }
       `}</style>
       {/* ground */}
-      <line x1="10" y1="170" x2="150" y2="170" stroke="#2a2a2a" strokeWidth="1.5"/>
+      <line x1="10" y1="170" x2="150" y2="170" stroke="var(--dim)" strokeWidth="1.5"/>
       {/* hips/seat */}
-      <line x1="65" y1="155" x2="95" y2="155" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+      <line x1="65" y1="155" x2="95" y2="155" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
       {/* left knee */}
-      <line x1="65" y1="155" x2="55" y2="148" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+      <line x1="65" y1="155" x2="55" y2="148" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
       {/* right knee */}
-      <line x1="95" y1="155" x2="105" y2="148" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+      <line x1="95" y1="155" x2="105" y2="148" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
       {/* left shin back */}
-      <line x1="55" y1="148" x2="57" y2="168" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+      <line x1="55" y1="148" x2="57" y2="168" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
       {/* right shin back */}
-      <line x1="105" y1="148" x2="107" y2="168" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+      <line x1="105" y1="148" x2="107" y2="168" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
       {/* left knee joint */}
-      <circle cx="55" cy="148" r="4" fill="#d4d4d4"/>
+      <circle cx="55" cy="148" r="4" fill="var(--accent)"/>
       {/* right knee joint */}
-      <circle cx="105" cy="148" r="4" fill="#d4d4d4"/>
+      <circle cx="105" cy="148" r="4" fill="var(--accent)"/>
       {/* folded torso + head + arms group — pivots at hip/knee junction */}
       <g className="cp-upper">
         {/* torso forward and flat */}
-        <line x1="78" y1="148" x2="30" y2="132" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round"/>
+        <line x1="78" y1="148" x2="30" y2="132" stroke="var(--accent)" strokeWidth="6" strokeLinecap="round"/>
         {/* head — forehead near floor */}
-        <circle cx="20" cy="132" r="13" fill="#d4d4d4"/>
+        <circle cx="20" cy="132" r="13" fill="var(--accent)"/>
         {/* shoulder area */}
-        <circle cx="45" cy="138" r="4" fill="#d4d4d4"/>
+        <circle cx="45" cy="138" r="4" fill="var(--accent)"/>
         {/* arms extended forward */}
-        <line x1="45" y1="138" x2="12" y2="128" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
-        <line x1="45" y1="138" x2="38" y2="120" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="45" y1="138" x2="12" y2="128" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="45" y1="138" x2="38" y2="120" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
       </g>
     </svg>
   )
@@ -288,27 +288,27 @@ export function BoatPoseAnim({ paused = false }: PoseAnimProps) {
         }
       `}</style>
       {/* ground */}
-      <line x1="10" y1="170" x2="150" y2="170" stroke="#2a2a2a" strokeWidth="1.5"/>
+      <line x1="10" y1="170" x2="150" y2="170" stroke="var(--dim)" strokeWidth="1.5"/>
       {/* sit bones */}
-      <circle cx="80" cy="148" r="4" fill="#d4d4d4"/>
+      <circle cx="80" cy="148" r="4" fill="var(--accent)"/>
       {/* head */}
-      <circle cx="80" cy="82" r="13" fill="#d4d4d4"/>
+      <circle cx="80" cy="82" r="13" fill="var(--accent)"/>
       {/* torso leaning back */}
       <g className="bt-torso">
-        <line x1="80" y1="148" x2="80" y2="95" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round"/>
+        <line x1="80" y1="148" x2="80" y2="95" stroke="var(--accent)" strokeWidth="6" strokeLinecap="round"/>
         {/* shoulder joints */}
-        <circle cx="80" cy="115" r="4" fill="#d4d4d4"/>
+        <circle cx="80" cy="115" r="4" fill="var(--accent)"/>
         {/* arms parallel forward */}
-        <line x1="80" y1="115" x2="40" y2="120" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
-        <line x1="80" y1="115" x2="120" y2="120" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="80" y1="115" x2="40" y2="120" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="80" y1="115" x2="120" y2="120" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
       </g>
       {/* legs lifting to diagonal V */}
       <g className="bt-legs">
-        <line x1="80" y1="148" x2="48" y2="115" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
-        <line x1="80" y1="148" x2="112" y2="115" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+        <line x1="80" y1="148" x2="48" y2="115" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
+        <line x1="80" y1="148" x2="112" y2="115" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
         {/* knee joints */}
-        <circle cx="60" cy="130" r="4" fill="#d4d4d4"/>
-        <circle cx="100" cy="130" r="4" fill="#d4d4d4"/>
+        <circle cx="60" cy="130" r="4" fill="var(--accent)"/>
+        <circle cx="100" cy="130" r="4" fill="var(--accent)"/>
       </g>
     </svg>
   )
@@ -349,32 +349,32 @@ export function SupermanPoseAnim({ paused = false }: PoseAnimProps) {
         }
       `}</style>
       {/* ground */}
-      <line x1="10" y1="170" x2="150" y2="170" stroke="#2a2a2a" strokeWidth="1.5"/>
+      <line x1="10" y1="170" x2="150" y2="170" stroke="var(--dim)" strokeWidth="1.5"/>
       {/* pelvis/belly center — stays on floor */}
-      <line x1="65" y1="148" x2="95" y2="148" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round"/>
+      <line x1="65" y1="148" x2="95" y2="148" stroke="var(--accent)" strokeWidth="6" strokeLinecap="round"/>
       {/* shoulder anchor */}
-      <circle cx="65" cy="144" r="4" fill="#d4d4d4"/>
+      <circle cx="65" cy="144" r="4" fill="var(--accent)"/>
       {/* hip anchor */}
-      <circle cx="95" cy="144" r="4" fill="#d4d4d4"/>
+      <circle cx="95" cy="144" r="4" fill="var(--accent)"/>
       {/* arms group — extends forward and lifts */}
       <g className="sm-arms">
-        <line x1="65" y1="140" x2="30" y2="126" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
-        <line x1="65" y1="146" x2="30" y2="134" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="65" y1="140" x2="30" y2="126" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="65" y1="146" x2="30" y2="134" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
         {/* elbow joints */}
-        <circle cx="47" cy="133" r="4" fill="#d4d4d4"/>
-        <circle cx="47" cy="140" r="4" fill="#d4d4d4"/>
+        <circle cx="47" cy="133" r="4" fill="var(--accent)"/>
+        <circle cx="47" cy="140" r="4" fill="var(--accent)"/>
       </g>
       {/* legs group — extends back and lifts */}
       <g className="sm-legs">
-        <line x1="95" y1="140" x2="135" y2="126" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
-        <line x1="95" y1="146" x2="135" y2="134" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+        <line x1="95" y1="140" x2="135" y2="126" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
+        <line x1="95" y1="146" x2="135" y2="134" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
         {/* knee joints */}
-        <circle cx="115" cy="133" r="4" fill="#d4d4d4"/>
-        <circle cx="115" cy="140" r="4" fill="#d4d4d4"/>
+        <circle cx="115" cy="133" r="4" fill="var(--accent)"/>
+        <circle cx="115" cy="140" r="4" fill="var(--accent)"/>
       </g>
       {/* head group — lifts */}
       <g className="sm-head">
-        <circle cx="22" cy="132" r="13" fill="#d4d4d4"/>
+        <circle cx="22" cy="132" r="13" fill="var(--accent)"/>
       </g>
     </svg>
   )
@@ -403,31 +403,31 @@ export function BridgePoseAnim({ paused = false }: PoseAnimProps) {
         }
       `}</style>
       {/* ground */}
-      <line x1="10" y1="170" x2="150" y2="170" stroke="#2a2a2a" strokeWidth="1.5"/>
+      <line x1="10" y1="170" x2="150" y2="170" stroke="var(--dim)" strokeWidth="1.5"/>
       {/* head on floor */}
-      <circle cx="30" cy="152" r="13" fill="#d4d4d4"/>
+      <circle cx="30" cy="152" r="13" fill="var(--accent)"/>
       {/* shoulders on floor */}
-      <line x1="43" y1="148" x2="78" y2="148" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round"/>
+      <line x1="43" y1="148" x2="78" y2="148" stroke="var(--accent)" strokeWidth="6" strokeLinecap="round"/>
       {/* shoulder joints */}
-      <circle cx="55" cy="148" r="4" fill="#d4d4d4"/>
-      <circle cx="78" cy="148" r="4" fill="#d4d4d4"/>
+      <circle cx="55" cy="148" r="4" fill="var(--accent)"/>
+      <circle cx="78" cy="148" r="4" fill="var(--accent)"/>
       {/* arms clasped under back */}
-      <line x1="55" y1="148" x2="68" y2="160" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
-      <line x1="85" y1="148" x2="68" y2="160" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
+      <line x1="55" y1="148" x2="68" y2="160" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
+      <line x1="85" y1="148" x2="68" y2="160" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
       {/* feet on floor, knees bent */}
-      <line x1="58" y1="130" x2="58" y2="168" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
-      <line x1="102" y1="130" x2="102" y2="168" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+      <line x1="58" y1="130" x2="58" y2="168" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
+      <line x1="102" y1="130" x2="102" y2="168" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
       {/* knee joints */}
-      <circle cx="58" cy="148" r="4" fill="#d4d4d4"/>
-      <circle cx="102" cy="148" r="4" fill="#d4d4d4"/>
+      <circle cx="58" cy="148" r="4" fill="var(--accent)"/>
+      <circle cx="102" cy="148" r="4" fill="var(--accent)"/>
       {/* hips peeling up — the arc */}
       <g className="br-hips">
-        <line x1="58" y1="130" x2="80" y2="100" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
-        <line x1="102" y1="130" x2="80" y2="100" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+        <line x1="58" y1="130" x2="80" y2="100" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
+        <line x1="102" y1="130" x2="80" y2="100" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
         {/* hip connector to shoulders */}
-        <line x1="78" y1="148" x2="80" y2="100" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round"/>
+        <line x1="78" y1="148" x2="80" y2="100" stroke="var(--accent)" strokeWidth="6" strokeLinecap="round"/>
         {/* hip joint at apex */}
-        <circle cx="80" cy="100" r="4" fill="#d4d4d4"/>
+        <circle cx="80" cy="100" r="4" fill="var(--accent)"/>
       </g>
     </svg>
   )
@@ -466,35 +466,35 @@ export function BowPoseAnim({ paused = false }: PoseAnimProps) {
         }
       `}</style>
       {/* ground */}
-      <line x1="10" y1="170" x2="150" y2="170" stroke="#2a2a2a" strokeWidth="1.5"/>
+      <line x1="10" y1="170" x2="150" y2="170" stroke="var(--dim)" strokeWidth="1.5"/>
       {/* belly on floor */}
-      <line x1="60" y1="148" x2="100" y2="148" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round"/>
+      <line x1="60" y1="148" x2="100" y2="148" stroke="var(--accent)" strokeWidth="6" strokeLinecap="round"/>
       {/* hip joints */}
-      <circle cx="65" cy="148" r="4" fill="#d4d4d4"/>
-      <circle cx="95" cy="148" r="4" fill="#d4d4d4"/>
+      <circle cx="65" cy="148" r="4" fill="var(--accent)"/>
+      <circle cx="95" cy="148" r="4" fill="var(--accent)"/>
       {/* chest + head lifting group */}
       <g className="bw-chest">
-        <line x1="70" y1="148" x2="80" y2="115" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round"/>
-        <circle cx="80" cy="105" r="13" fill="#d4d4d4"/>
+        <line x1="70" y1="148" x2="80" y2="115" stroke="var(--accent)" strokeWidth="6" strokeLinecap="round"/>
+        <circle cx="80" cy="105" r="13" fill="var(--accent)"/>
         {/* shoulder joints */}
-        <circle cx="80" cy="128" r="4" fill="#d4d4d4"/>
+        <circle cx="80" cy="128" r="4" fill="var(--accent)"/>
         {/* hands reaching back to hold ankles */}
-        <line x1="80" y1="128" x2="52" y2="110" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
-        <line x1="80" y1="128" x2="108" y2="110" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="80" y1="128" x2="52" y2="110" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="80" y1="128" x2="108" y2="110" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
         {/* elbow joints */}
-        <circle cx="60" cy="119" r="4" fill="#d4d4d4"/>
-        <circle cx="100" cy="119" r="4" fill="#d4d4d4"/>
+        <circle cx="60" cy="119" r="4" fill="var(--accent)"/>
+        <circle cx="100" cy="119" r="4" fill="var(--accent)"/>
       </g>
       {/* legs bending up — knees and feet rise */}
       <g className="bw-legs">
-        <line x1="65" y1="148" x2="55" y2="122" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
-        <line x1="55" y1="122" x2="50" y2="98" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+        <line x1="65" y1="148" x2="55" y2="122" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
+        <line x1="55" y1="122" x2="50" y2="98" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
         {/* left knee joint */}
-        <circle cx="55" cy="122" r="4" fill="#d4d4d4"/>
-        <line x1="95" y1="148" x2="105" y2="122" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
-        <line x1="105" y1="122" x2="110" y2="98" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+        <circle cx="55" cy="122" r="4" fill="var(--accent)"/>
+        <line x1="95" y1="148" x2="105" y2="122" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
+        <line x1="105" y1="122" x2="110" y2="98" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
         {/* right knee joint */}
-        <circle cx="105" cy="122" r="4" fill="#d4d4d4"/>
+        <circle cx="105" cy="122" r="4" fill="var(--accent)"/>
       </g>
     </svg>
   )
@@ -523,28 +523,28 @@ export function HeroPoseAnim({ paused = false }: PoseAnimProps) {
         }
       `}</style>
       {/* ground */}
-      <line x1="10" y1="170" x2="150" y2="170" stroke="#2a2a2a" strokeWidth="1.5"/>
+      <line x1="10" y1="170" x2="150" y2="170" stroke="var(--dim)" strokeWidth="1.5"/>
       {/* feet splayed to sides */}
-      <line x1="80" y1="148" x2="58" y2="164" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
-      <line x1="80" y1="148" x2="102" y2="164" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+      <line x1="80" y1="148" x2="58" y2="164" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
+      <line x1="80" y1="148" x2="102" y2="164" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
       {/* hip anchor */}
-      <circle cx="80" cy="148" r="4" fill="#d4d4d4"/>
+      <circle cx="80" cy="148" r="4" fill="var(--accent)"/>
       {/* knee joints */}
-      <circle cx="65" cy="156" r="4" fill="#d4d4d4"/>
-      <circle cx="95" cy="156" r="4" fill="#d4d4d4"/>
+      <circle cx="65" cy="156" r="4" fill="var(--accent)"/>
+      <circle cx="95" cy="156" r="4" fill="var(--accent)"/>
       {/* torso lengthening group */}
       <g className="hr-torso">
-        <line x1="80" y1="148" x2="80" y2="85" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round"/>
+        <line x1="80" y1="148" x2="80" y2="85" stroke="var(--accent)" strokeWidth="6" strokeLinecap="round"/>
         {/* shoulder joints */}
-        <circle cx="80" cy="110" r="4" fill="#d4d4d4"/>
+        <circle cx="80" cy="110" r="4" fill="var(--accent)"/>
         {/* arms on thighs */}
-        <line x1="80" y1="110" x2="62" y2="122" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
-        <line x1="80" y1="110" x2="98" y2="122" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="80" y1="110" x2="62" y2="122" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
+        <line x1="80" y1="110" x2="98" y2="122" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
         {/* elbow joints */}
-        <circle cx="68" cy="116" r="4" fill="#d4d4d4"/>
-        <circle cx="92" cy="116" r="4" fill="#d4d4d4"/>
+        <circle cx="68" cy="116" r="4" fill="var(--accent)"/>
+        <circle cx="92" cy="116" r="4" fill="var(--accent)"/>
         {/* head */}
-        <circle cx="80" cy="72" r="13" fill="#d4d4d4"/>
+        <circle cx="80" cy="72" r="13" fill="var(--accent)"/>
       </g>
     </svg>
   )
@@ -572,40 +572,40 @@ export function ReclineBigToeAnim({ paused = false }: PoseAnimProps) {
         }
       `}</style>
       {/* ground */}
-      <line x1="10" y1="170" x2="150" y2="170" stroke="#2a2a2a" strokeWidth="1.5"/>
+      <line x1="10" y1="170" x2="150" y2="170" stroke="var(--dim)" strokeWidth="1.5"/>
       {/* head on floor */}
-      <circle cx="80" cy="18" r="13" fill="#d4d4d4"/>
+      <circle cx="80" cy="18" r="13" fill="var(--accent)"/>
       {/* torso along center */}
-      <line x1="80" y1="31" x2="80" y2="108" stroke="#d4d4d4" strokeWidth="6" strokeLinecap="round"/>
+      <line x1="80" y1="31" x2="80" y2="108" stroke="var(--accent)" strokeWidth="6" strokeLinecap="round"/>
       {/* shoulders */}
-      <line x1="62" y1="40" x2="98" y2="40" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
+      <line x1="62" y1="40" x2="98" y2="40" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
       {/* shoulder joints */}
-      <circle cx="65" cy="40" r="4" fill="#d4d4d4"/>
-      <circle cx="95" cy="40" r="4" fill="#d4d4d4"/>
+      <circle cx="65" cy="40" r="4" fill="var(--accent)"/>
+      <circle cx="95" cy="40" r="4" fill="var(--accent)"/>
       {/* hip joint */}
-      <circle cx="80" cy="108" r="4" fill="#d4d4d4"/>
+      <circle cx="80" cy="108" r="4" fill="var(--accent)"/>
       {/* left leg flat on floor */}
-      <line x1="80" y1="108" x2="80" y2="168" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+      <line x1="80" y1="108" x2="80" y2="168" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
       {/* left knee joint */}
-      <circle cx="80" cy="138" r="4" fill="#d4d4d4"/>
+      <circle cx="80" cy="138" r="4" fill="var(--accent)"/>
       {/* left arm at side */}
-      <line x1="65" y1="40" x2="55" y2="90" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
+      <line x1="65" y1="40" x2="55" y2="90" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
       {/* left elbow joint */}
-      <circle cx="58" cy="65" r="4" fill="#d4d4d4"/>
+      <circle cx="58" cy="65" r="4" fill="var(--accent)"/>
       {/* right leg group — lifts to vertical */}
       <g className="rbt-rightleg">
-        <line x1="80" y1="108" x2="80" y2="32" stroke="#d4d4d4" strokeWidth="5" strokeLinecap="round"/>
+        <line x1="80" y1="108" x2="80" y2="32" stroke="var(--accent)" strokeWidth="5" strokeLinecap="round"/>
         {/* right knee joint */}
-        <circle cx="80" cy="70" r="4" fill="#d4d4d4"/>
+        <circle cx="80" cy="70" r="4" fill="var(--accent)"/>
         {/* right foot at top */}
-        <circle cx="80" cy="24" r="4" fill="none" stroke="#d4d4d4" strokeWidth="3"/>
+        <circle cx="80" cy="24" r="4" fill="none" stroke="var(--accent)" strokeWidth="3"/>
         {/* strap — dashed line from hand to foot */}
-        <line x1="80" y1="24" x2="80" y2="34" stroke="#d4d4d4" strokeWidth="2" strokeDasharray="3,3" strokeLinecap="round"/>
+        <line x1="80" y1="24" x2="80" y2="34" stroke="var(--accent)" strokeWidth="2" strokeDasharray="3,3" strokeLinecap="round"/>
       </g>
       {/* right arm holds strap — reaches up */}
-      <line x1="95" y1="40" x2="80" y2="34" stroke="#d4d4d4" strokeWidth="4" strokeLinecap="round"/>
+      <line x1="95" y1="40" x2="80" y2="34" stroke="var(--accent)" strokeWidth="4" strokeLinecap="round"/>
       {/* right elbow joint */}
-      <circle cx="89" cy="37" r="4" fill="#d4d4d4"/>
+      <circle cx="89" cy="37" r="4" fill="var(--accent)"/>
     </svg>
   )
 }

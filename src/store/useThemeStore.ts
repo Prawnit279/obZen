@@ -1,7 +1,7 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
-export type ThemeId = 'noircut' | 'crimson' | 'void' | 'steel' | 'ember'
+export type ThemeId = 'noircut' | 'light' | 'crimson' | 'void' | 'steel' | 'ember'
 
 export interface ThemeMeta {
   id: ThemeId
@@ -13,6 +13,7 @@ export interface ThemeMeta {
 
 export const THEMES: ThemeMeta[] = [
   { id: 'noircut', name: 'Noircut',      dot: '#2a2a2a', borderActive: '#d4d4d4', textActive: '#ffffff' },
+  { id: 'light',   name: 'Daylight',     dot: '#f0f0f2', borderActive: '#1c1c21', textActive: '#0a0a0d' },
   { id: 'crimson', name: 'Crimson',      dot: '#2d1515', borderActive: '#dc2626', textActive: '#fca5a5' },
   { id: 'void',    name: 'Void Purple',  dot: '#2a1f3d', borderActive: '#9333ea', textActive: '#d8b4fe' },
   { id: 'steel',   name: 'Steel Blue',   dot: '#1a2236', borderActive: '#3b82f6', textActive: '#93c5fd' },

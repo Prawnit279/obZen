@@ -46,24 +46,24 @@ export function ExerciseHistory({ exerciseId, exerciseName }: Props) {
   return (
     <div
       className="px-4 pb-3 pt-2 space-y-2"
-      style={{ background: '#0d0d0d', borderTop: '1px solid #2a2a2a' }}
+      style={{ background: 'var(--bg)', borderTop: '1px solid var(--border)' }}
     >
-      <div className="text-[9px] uppercase tracking-widest" style={{ color: '#3a3a3a' }}>
+      <div className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
         Previous Sessions
       </div>
 
       {!history || history.length === 0 ? (
-        <p className="text-[11px]" style={{ color: '#555555' }}>
+        <p className="text-[11px]" style={{ color: 'var(--dim)' }}>
           No previous logs
         </p>
       ) : (
         <div className="space-y-1.5">
           {history.map((entry, i) => (
             <div key={i} className="space-y-0.5">
-              <div className="text-[10px] uppercase tracking-widest" style={{ color: '#6f6f6f' }}>
+              <div className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
                 {formatSessionDate(entry.date)}
               </div>
-              <div className="text-[11px]" style={{ color: '#a6a6a6' }}>
+              <div className="text-[11px]" style={{ color: 'var(--muted)' }}>
                 {entry.sets.map(s => (
                   `Set ${s.setNumber}: ${s.weight > 0 ? s.weight : '—'}×${s.reps}`
                 )).join('  ')}

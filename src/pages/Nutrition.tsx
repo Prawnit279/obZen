@@ -12,7 +12,7 @@ type MealType = 'breakfast' | 'lunch' | 'dinner' | 'snack'
 type TypedEntry = MealEntry & { mealType: MealType }
 
 const MEAL_TYPES: MealType[] = ['breakfast', 'lunch', 'dinner', 'snack']
-const MACRO_CLR = { protein: '#34d399', carbs: '#fbbf24', fat: '#a78bfa' }
+const MACRO_CLR = { protein: 'var(--complete-text)', carbs: '#fbbf24', fat: '#a78bfa' }
 
 function shiftDate(dateStr: string, n: number): string {
   const d = new Date(dateStr + 'T00:00:00')
@@ -67,12 +67,12 @@ function MacroBar({ label, value, max, color, unit = 'g' }: MacroBarProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <span className="text-[10px] uppercase tracking-widest" style={{ color: '#555555' }}>{label}</span>
-        <span className="text-[11px]" style={{ color: '#d4d4d4' }}>
-          {value}{unit} <span style={{ color: '#3a3a3a' }}>/ {max}{unit}</span>
+        <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>{label}</span>
+        <span className="text-[11px]" style={{ color: 'var(--accent)' }}>
+          {value}{unit} <span style={{ color: 'var(--dim)' }}>/ {max}{unit}</span>
         </span>
       </div>
-      <div className="h-1 rounded-[1px]" style={{ background: '#1a1a1a' }}>
+      <div className="h-1 rounded-[1px]" style={{ background: 'var(--elevated)' }}>
         <div
           className="h-full rounded-[1px] transition-all"
           style={{ width: `${pct}%`, background: color }}
@@ -153,10 +153,10 @@ function AddMealSheet({ date, isTrainingDay, savedMeals, initialMealType, onClos
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end" style={{ background: 'rgba(0,0,0,0.75)' }}>
-      <div className="rounded-t-[4px] p-4 space-y-3 max-h-[85vh] overflow-y-auto" style={{ background: '#111111', border: '1px solid #2a2a2a' }}>
+      <div className="rounded-t-[4px] p-4 space-y-3 max-h-[85vh] overflow-y-auto" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
         <div className="flex items-center justify-between">
-          <p className="text-[11px] uppercase tracking-widest" style={{ color: '#d4d4d4' }}>Add Meal</p>
-          <button onClick={onClose}><X size={14} style={{ color: '#555555' }} /></button>
+          <p className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--accent)' }}>Add Meal</p>
+          <button onClick={onClose}><X size={14} style={{ color: 'var(--dim)' }} /></button>
         </div>
 
         {/* Meal type selector */}
@@ -167,8 +167,8 @@ function AddMealSheet({ date, isTrainingDay, savedMeals, initialMealType, onClos
               onClick={() => setMealType(mt)}
               className="flex-1 py-1.5 rounded-[2px] text-[9px] uppercase tracking-widest transition-colors"
               style={mealType === mt
-                ? { background: '#2a2a2a', color: '#d4d4d4', border: '1px solid #3a3a3a' }
-                : { background: 'transparent', color: '#3a3a3a', border: '1px solid #1a1a1a' }
+                ? { background: 'var(--border)', color: 'var(--accent)', border: '1px solid var(--border-strong)' }
+                : { background: 'transparent', color: 'var(--dim)', border: '1px solid #1a1a1a' }
               }
             >
               {mt}
@@ -184,8 +184,8 @@ function AddMealSheet({ date, isTrainingDay, savedMeals, initialMealType, onClos
               onClick={() => setTab(t)}
               className="pb-2 text-[10px] uppercase tracking-widest transition-colors"
               style={tab === t
-                ? { color: '#d4d4d4', borderBottom: '1px solid #d4d4d4' }
-                : { color: '#3a3a3a' }
+                ? { color: 'var(--accent)', borderBottom: '1px solid var(--accent)' }
+                : { color: 'var(--dim)' }
               }
             >
               {t}
@@ -196,7 +196,7 @@ function AddMealSheet({ date, isTrainingDay, savedMeals, initialMealType, onClos
         {tab === 'custom' && (
           <div className="space-y-2.5">
             <div>
-              <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: '#3a3a3a' }}>Food / Meal *</label>
+              <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Food / Meal *</label>
               <input
                 className="input w-full"
                 value={name}
@@ -207,11 +207,11 @@ function AddMealSheet({ date, isTrainingDay, savedMeals, initialMealType, onClos
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: '#3a3a3a' }}>Calories (kcal)</label>
+                <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Calories (kcal)</label>
                 <input type="number" className="input w-full" value={calories} onChange={e => setCalories(e.target.value)} placeholder="450" min="0" />
               </div>
               <div>
-                <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: '#3a3a3a' }}>Time</label>
+                <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Time</label>
                 <input type="time" className="input w-full" value={time} onChange={e => setTime(e.target.value)} />
               </div>
             </div>
@@ -231,14 +231,14 @@ function AddMealSheet({ date, isTrainingDay, savedMeals, initialMealType, onClos
             </div>
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={pitta} onChange={e => setPitta(e.target.checked)} className="rounded-[2px]" />
-              <span className="text-[10px] uppercase tracking-widest" style={{ color: '#555555' }}>Pitta-friendly</span>
+              <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>Pitta-friendly</span>
             </label>
             <div className="flex gap-2">
               <button
                 onClick={handleLog}
                 disabled={!canSave || saving}
                 className="flex-1 py-2 rounded-[2px] text-[10px] uppercase tracking-widest disabled:opacity-30"
-                style={{ border: '1px solid #d4d4d4', color: '#d4d4d4' }}
+                style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}
               >
                 {saving ? 'Logging…' : 'Log Meal'}
               </button>
@@ -247,7 +247,7 @@ function AddMealSheet({ date, isTrainingDay, savedMeals, initialMealType, onClos
                 disabled={!name.trim()}
                 title="Save as template"
                 className="px-3 py-2 rounded-[2px] disabled:opacity-30"
-                style={{ border: '1px solid #2a2a2a', color: '#555555' }}
+                style={{ border: '1px solid var(--border)', color: 'var(--dim)' }}
               >
                 <Star size={12} />
               </button>
@@ -258,15 +258,15 @@ function AddMealSheet({ date, isTrainingDay, savedMeals, initialMealType, onClos
         {tab === 'saved' && (
           <div className="space-y-1.5">
             {savedMeals.length === 0 && (
-              <p className="text-[11px] text-center py-4" style={{ color: '#333333' }}>
+              <p className="text-[11px] text-center py-4" style={{ color: 'var(--dim)' }}>
                 No saved meals. Log a meal and tap ★ to save it.
               </p>
             )}
             {savedMeals.map(meal => (
-              <div key={meal.id} className="flex items-center gap-2 px-3 py-2.5 rounded-[2px]" style={{ background: '#0d0d0d', border: '1px solid #1a1a1a' }}>
+              <div key={meal.id} className="flex items-center gap-2 px-3 py-2.5 rounded-[2px]" style={{ background: 'var(--bg)', border: '1px solid #1a1a1a' }}>
                 <div className="flex-1 min-w-0">
-                  <div className="text-[12px]" style={{ color: '#d4d4d4' }}>{meal.name}</div>
-                  <div className="text-[10px] mt-0.5" style={{ color: '#555555' }}>
+                  <div className="text-[12px]" style={{ color: 'var(--accent)' }}>{meal.name}</div>
+                  <div className="text-[10px] mt-0.5" style={{ color: 'var(--dim)' }}>
                     {meal.calories}kcal · <span style={{ color: MACRO_CLR.protein }}>{meal.protein}p</span> · <span style={{ color: MACRO_CLR.carbs }}>{meal.carbs}c</span> · <span style={{ color: MACRO_CLR.fat }}>{meal.fat}f</span>
                   </div>
                 </div>
@@ -274,12 +274,12 @@ function AddMealSheet({ date, isTrainingDay, savedMeals, initialMealType, onClos
                   <button
                     onClick={() => handleQuickAdd(meal)}
                     className="px-2 py-1 rounded-[2px] text-[9px] uppercase tracking-widest"
-                    style={{ border: '1px solid #2a2a2a', color: '#d4d4d4' }}
+                    style={{ border: '1px solid var(--border)', color: 'var(--accent)' }}
                   >
                     Add
                   </button>
                   <button onClick={() => db.savedMeals.delete(meal.id!)} aria-label="Delete saved meal">
-                    <Trash2 size={11} style={{ color: '#3a3a3a' }} />
+                    <Trash2 size={11} style={{ color: 'var(--dim)' }} />
                   </button>
                 </div>
               </div>
@@ -308,38 +308,38 @@ function MealSection({ type, entries, logId, allEntries, onAdd }: MealSectionPro
     <div>
       <div className="flex items-center justify-between mb-1.5">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] uppercase tracking-widest" style={{ color: '#3a3a3a' }}>{type}</span>
+          <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>{type}</span>
           {sectionCals > 0 && (
-            <span className="text-[10px]" style={{ color: '#555555' }}>{sectionCals} kcal</span>
+            <span className="text-[10px]" style={{ color: 'var(--dim)' }}>{sectionCals} kcal</span>
           )}
         </div>
         <button
           onClick={() => onAdd(type)}
           className="flex items-center gap-1 text-[9px] uppercase tracking-widest px-2 py-1 rounded-[2px]"
-          style={{ border: '1px solid #1a1a1a', color: '#555555' }}
+          style={{ border: '1px solid #1a1a1a', color: 'var(--dim)' }}
         >
           <Plus size={9} /> Add
         </button>
       </div>
       {entries.length === 0 ? (
-        <div className="py-1.5 text-[10px]" style={{ color: '#2a2a2a' }}>—</div>
+        <div className="py-1.5 text-[10px]" style={{ color: 'var(--dim)' }}>—</div>
       ) : (
         <div className="space-y-1">
           {entries.map(entry => (
-            <div key={entry.id} className="flex items-center gap-2 px-2.5 py-2 rounded-[2px]" style={{ background: '#0d0d0d', border: '1px solid #1a1a1a' }}>
+            <div key={entry.id} className="flex items-center gap-2 px-2.5 py-2 rounded-[2px]" style={{ background: 'var(--bg)', border: '1px solid #1a1a1a' }}>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[12px]" style={{ color: '#d4d4d4' }}>{entry.name}</span>
+                  <span className="text-[12px]" style={{ color: 'var(--accent)' }}>{entry.name}</span>
                   {entry.isPittaFriendly && (
-                    <span className="text-[9px] px-1 rounded-[2px]" style={{ background: '#0d2a1a', color: '#34d399' }}>pitta</span>
+                    <span className="text-[9px] px-1 rounded-[2px]" style={{ background: '#0d2a1a', color: 'var(--complete-text)' }}>pitta</span>
                   )}
                 </div>
-                <div className="text-[10px] mt-0.5 flex flex-wrap gap-1" style={{ color: '#555555' }}>
+                <div className="text-[10px] mt-0.5 flex flex-wrap gap-1" style={{ color: 'var(--dim)' }}>
                   <span>{entry.calories}kcal</span>
                   {(entry.protein ?? 0) > 0 && <span style={{ color: MACRO_CLR.protein }}>{entry.protein}p</span>}
                   {(entry.carbs ?? 0) > 0 && <span style={{ color: MACRO_CLR.carbs }}>{entry.carbs}c</span>}
                   {(entry.fat ?? 0) > 0 && <span style={{ color: MACRO_CLR.fat }}>{entry.fat}f</span>}
-                  {entry.time && <span style={{ color: '#3a3a3a' }}>{entry.time}</span>}
+                  {entry.time && <span style={{ color: 'var(--dim)' }}>{entry.time}</span>}
                 </div>
               </div>
               {logId !== undefined && (
@@ -348,7 +348,7 @@ function MealSection({ type, entries, logId, allEntries, onAdd }: MealSectionPro
                   aria-label="Remove entry"
                   className="shrink-0"
                 >
-                  <Trash2 size={11} style={{ color: '#3a3a3a' }} />
+                  <Trash2 size={11} style={{ color: 'var(--dim)' }} />
                 </button>
               )}
             </div>
@@ -413,9 +413,9 @@ export default function Nutrition() {
           className="p-1.5 rounded-[2px]"
           style={{ border: '1px solid #1a1a1a' }}
         >
-          <ChevronLeft size={14} style={{ color: '#555555' }} />
+          <ChevronLeft size={14} style={{ color: 'var(--dim)' }} />
         </button>
-        <span className="text-[12px]" style={{ color: isToday ? '#d4d4d4' : '#888888' }}>
+        <span className="text-[12px]" style={{ color: isToday ? 'var(--accent)' : 'var(--muted)' }}>
           {isToday ? 'Today' : date}
         </span>
         <button
@@ -424,7 +424,7 @@ export default function Nutrition() {
           className="p-1.5 rounded-[2px] disabled:opacity-30"
           style={{ border: '1px solid #1a1a1a' }}
         >
-          <ChevronRight size={14} style={{ color: '#555555' }} />
+          <ChevronRight size={14} style={{ color: 'var(--dim)' }} />
         </button>
       </div>
 
@@ -432,8 +432,8 @@ export default function Nutrition() {
       <Card>
         <div className="flex items-center justify-between mb-3">
           <CardHeader label="Macros" />
-          <span className="text-[16px]" style={{ color: totalCalories > 0 ? '#d4d4d4' : '#2a2a2a' }}>
-            {totalCalories} <span className="text-[10px] uppercase tracking-widest" style={{ color: '#3a3a3a' }}>kcal</span>
+          <span className="text-[16px]" style={{ color: totalCalories > 0 ? 'var(--accent)' : 'var(--dim)' }}>
+            {totalCalories} <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>kcal</span>
           </span>
         </div>
         <div className="space-y-3">
@@ -441,7 +441,7 @@ export default function Nutrition() {
           <MacroBar label="Carbs" value={totalCarbs} max={targets.carbs.max} color={MACRO_CLR.carbs} />
           <MacroBar label="Fat" value={totalFat} max={targets.fat.max} color={MACRO_CLR.fat} />
         </div>
-        <div className="mt-3 text-[10px] border-l pl-3" style={{ color: '#3a3a3a', borderColor: '#2a2a2a' }}>
+        <div className="mt-3 text-[10px] border-l pl-3" style={{ color: 'var(--dim)', borderColor: 'var(--border)' }}>
           {targets.ayurvedicNote}
         </div>
       </Card>

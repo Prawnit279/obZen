@@ -33,44 +33,44 @@ function AddLogForm({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="p-3 rounded-[2px] space-y-2.5" style={{ background: '#0d0d0d', border: '1px solid #2a2a2a' }}>
+    <div className="p-3 rounded-[2px] space-y-2.5" style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}>
       <div className="flex items-center justify-between">
-        <p className="text-[9px] uppercase tracking-widest" style={{ color: '#555555' }}>New Log</p>
-        <button onClick={onClose} aria-label="Close"><X size={12} style={{ color: '#555555' }} /></button>
+        <p className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>New Log</p>
+        <button onClick={onClose} aria-label="Close"><X size={12} style={{ color: 'var(--dim)' }} /></button>
       </div>
       <div>
-        <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: '#3a3a3a' }}>Planet</label>
+        <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Planet</label>
         <select className="input w-full text-[11px]" value={planet} onChange={e => setPlanet(e.target.value)}>
           {PLANETS.map(p => <option key={p} value={p}>{p}</option>)}
         </select>
       </div>
       <div>
-        <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: '#3a3a3a' }}>Practice *</label>
+        <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Practice *</label>
         <input className="input w-full" value={practice} onChange={e => setPractice(e.target.value)} placeholder="e.g. Mantra recitation, fasting..." autoFocus />
       </div>
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: '#3a3a3a' }}>Mantra</label>
+          <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Mantra</label>
           <input className="input w-full" value={mantra} onChange={e => setMantra(e.target.value)} placeholder="Om Shani Namaha..." />
         </div>
         <div>
-          <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: '#3a3a3a' }}>Count</label>
+          <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Count</label>
           <input type="number" className="input w-full" value={count} onChange={e => setCount(e.target.value)} placeholder="108" min="1" />
         </div>
       </div>
       <div className="grid grid-cols-2 gap-2">
         <div>
-          <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: '#3a3a3a' }}>Date</label>
+          <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Date</label>
           <input type="date" className="input w-full" value={date} onChange={e => setDate(e.target.value)} />
         </div>
         <div>
-          <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: '#3a3a3a' }}>Notes</label>
+          <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Notes</label>
           <input className="input w-full" value={notes} onChange={e => setNotes(e.target.value)} placeholder="Optional..." />
         </div>
       </div>
       <button onClick={handleSave} disabled={!practice.trim() || saving}
         className="w-full py-2 rounded-[2px] text-[10px] uppercase tracking-widest disabled:opacity-30"
-        style={{ border: '1px solid #d4d4d4', color: '#d4d4d4' }}>
+        style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}>
         {saving ? 'Saving…' : 'Log Practice'}
       </button>
     </div>
@@ -87,32 +87,32 @@ function PracticeLog() {
         <CardHeader label="Practice Log" />
         <button onClick={() => setShowForm(s => !s)}
           className="flex items-center gap-1 px-2.5 py-1 rounded-[2px] text-[9px] uppercase tracking-widest"
-          style={{ border: '1px solid #2a2a2a', color: '#555555' }}>
+          style={{ border: '1px solid var(--border)', color: 'var(--dim)' }}>
           <Plus size={9} /> Add
         </button>
       </div>
       {showForm && <AddLogForm onClose={() => setShowForm(false)} />}
       {logs.length === 0 && !showForm && (
-        <p className="text-[11px] text-center py-4" style={{ color: '#333333' }}>No logs yet. Tap + to record a practice.</p>
+        <p className="text-[11px] text-center py-4" style={{ color: 'var(--dim)' }}>No logs yet. Tap + to record a practice.</p>
       )}
       {logs.length > 0 && (
         <div className="space-y-1.5 mt-2">
           {logs.map((log: VedicLog) => (
-            <div key={log.id} className="flex items-start gap-2 px-3 py-2.5 rounded-[2px]" style={{ background: '#0d0d0d', border: '1px solid #1a1a1a' }}>
+            <div key={log.id} className="flex items-start gap-2 px-3 py-2.5 rounded-[2px]" style={{ background: 'var(--bg)', border: '1px solid #1a1a1a' }}>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[12px]" style={{ color: '#d4d4d4' }}>{log.practice}</span>
-                  {log.mantraCount && <span className="text-[10px] px-1.5 py-0.5 rounded-[2px]" style={{ background: '#1a1a1a', color: '#888888' }}>×{log.mantraCount}</span>}
+                  <span className="text-[12px]" style={{ color: 'var(--accent)' }}>{log.practice}</span>
+                  {log.mantraCount && <span className="text-[10px] px-1.5 py-0.5 rounded-[2px]" style={{ background: 'var(--elevated)', color: 'var(--muted)' }}>×{log.mantraCount}</span>}
                 </div>
                 <div className="flex items-center gap-2 mt-0.5 flex-wrap">
-                  <span className="text-[10px]" style={{ color: '#555555' }}>{log.date}</span>
-                  <span className="text-[9px] uppercase tracking-widest" style={{ color: '#3a3a3a' }}>{log.planet.split(' ')[0]}</span>
-                  {log.mantra && <span className="text-[10px] italic" style={{ color: '#555555' }}>{log.mantra}</span>}
+                  <span className="text-[10px]" style={{ color: 'var(--dim)' }}>{log.date}</span>
+                  <span className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>{log.planet.split(' ')[0]}</span>
+                  {log.mantra && <span className="text-[10px] italic" style={{ color: 'var(--dim)' }}>{log.mantra}</span>}
                 </div>
-                {log.notes && <p className="text-[10px] mt-0.5" style={{ color: '#444444' }}>{log.notes}</p>}
+                {log.notes && <p className="text-[10px] mt-0.5" style={{ color: 'var(--dim)' }}>{log.notes}</p>}
               </div>
               <button onClick={() => db.vedicLogs.delete(log.id!)} aria-label="Delete log" className="shrink-0 mt-0.5">
-                <Trash2 size={12} style={{ color: '#3a3a3a' }} />
+                <Trash2 size={12} style={{ color: 'var(--dim)' }} />
               </button>
             </div>
           ))}
