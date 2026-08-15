@@ -22,6 +22,34 @@ export function toKg(weight: number, unit: LoggedSet['unit']): number {
   return unit === 'kg' ? weight : weight / LB_PER_KG
 }
 
+/**
+ * kg → lb. The app displays pounds throughout (the gym's plates are in
+ * pounds), but calculations stay in kg internally: logged sets can mix units,
+ * and DOTS/Wilks coefficients are calibrated for kilograms. Conversion happens
+ * at the display boundary only.
+ */
+export function kgToLb(kg: number): number {
+  return kg * LB_PER_KG
+}
+
+export function lbToKg(lb: number): number {
+  return lb / LB_PER_KG
+}
+
+/** Display a kg value as rounded pounds, e.g. 110 -> '243'. */
+export function displayLb(kg: number, decimals = 0): string {
+  const lb = kgToLb(kg)
+  return decimals > 0 ? lb.toFixed(decimals) : String(Math.round(lb))
+}
+
+/**
+ * A logged set's weight in pounds, whichever unit it was recorded in. Older
+ * sets may be in kg; those are converted so history reads consistently.
+ */
+export function setWeightLb(s: LoggedSet): number {
+  return s.unit === 'lbs' ? s.weight : kgToLb(s.weight)
+}
+
 /** A set actually performed — placeholder rows from the logger are excluded. */
 export function isRealSet(s: LoggedSet): boolean {
   return s.reps > 0 && s.timestamp !== ''

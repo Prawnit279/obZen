@@ -1,15 +1,19 @@
 import { useState, useMemo } from 'react'
-import { dotsScore, wilksScore } from '@/lib/progress'
+import { dotsScore, wilksScore, kgToLb, lbToKg } from '@/lib/progress'
 import { PROFILES } from '@/config/profiles'
 import { useProfileStore } from '@/store/useProfileStore'
-import { ToolCard, NumberField, SegmentedToggle } from './ToolCard'
+import { ToolCard, NumberField, SegmentedToggle, AwaitingInput } from './ToolCard'
 
 /** Bodyweight + sex + total → Wilks and DOTS side by side, both "(est.)". */
 export function WilksDotsCard() {
   const { activeId } = useProfileStore()
   const profile = PROFILES[activeId]
 
-  const [bodyweight, setBodyweight] = useState(profile.body.bodyweightKg ? String(profile.body.bodyweightKg) : '')
+  // Entered in pounds; the coefficients are kg-calibrated, so convert to kg
+  // before scoring rather than displaying kg to the user.
+  const [bodyweight, setBodyweight] = useState(
+    profile.body.bodyweightKg ? String(Math.round(kgToLb(profile.body.bodyweightKg))) : ''
+  )
   const [total, setTotal] = useState('')
   const [sex, setSex] = useState<'male' | 'female'>(profile.sex ?? 'male')
 
@@ -17,13 +21,15 @@ export function WilksDotsCard() {
   const t = Number(total)
   const valid = bw > 0 && t > 0
 
-  const scores = useMemo(
-    () => (valid ? { wilks: wilksScore(t, bw, sex), dots: dotsScore(t, bw, sex) } : null),
-    [valid, t, bw, sex]
-  )
+  const scores = useMemo(() => {
+    if (!valid) return null
+    const bwKg = lbToKg(bw)
+    const totalKg = lbToKg(t)
+    return { wilks: wilksScore(totalKg, bwKg, sex), dots: dotsScore(totalKg, bwKg, sex) }
+  }, [valid, t, bw, sex])
 
   return (
-    <ToolCard label="Wilks & DOTS" sub="Bodyweight-adjusted score for a total or a single lift, in kilograms.">
+    <ToolCard label="Wilks & DOTS" sub="Bodyweight-adjusted score for a total or a single lift.">
       <div className="space-y-3">
         <SegmentedToggle
           value={sex}
@@ -31,10 +37,14 @@ export function WilksDotsCard() {
           options={[{ value: 'male', label: 'Male coefficients' }, { value: 'female', label: 'Female coefficients' }]}
         />
         <div className="grid grid-cols-2 gap-3">
-          <NumberField label="Bodyweight" value={bodyweight} onChange={setBodyweight} placeholder="75" suffix="kg" />
-          <NumberField label="Total (or single lift)" value={total} onChange={setTotal} placeholder="400" suffix="kg" />
+          <NumberField label="Bodyweight" value={bodyweight} onChange={setBodyweight} placeholder="165" suffix="lb" />
+          <NumberField label="Total (or single lift)" value={total} onChange={setTotal} placeholder="900" suffix="lb" />
         </div>
       </div>
+
+      {!valid && (
+        <AwaitingInput need={bw > 0 ? 'a total (or single lift)' : 'a bodyweight and total'} />
+      )}
 
       {scores && (
         <div className="flex gap-6 mt-4">

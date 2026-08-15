@@ -4,6 +4,7 @@ import { ArrowLeft } from 'lucide-react'
 import { db } from '@/db/dexie'
 import type { ExerciseSessionState } from '@/db/dexie'
 import { formatDateFull } from '@/lib/utils'
+import { setWeightLb } from '@/lib/progress'
 import { isExerciseLogged } from '@/lib/workoutSession'
 
 const STATUS_LABEL: Record<ExerciseSessionState['status'], { text: string; color: string }> = {
@@ -133,7 +134,7 @@ export default function SessionDetail() {
                           Set {s.setNumber}
                         </span>
                         <span className="font-mono tabular-nums" style={{ color: 'var(--accent)' }}>
-                          {s.weight}{s.unit} × {s.reps}
+                          {Math.round(setWeightLb(s) * 10) / 10} lb × {s.reps}
                         </span>
                       </div>
                     ))}

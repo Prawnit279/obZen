@@ -8,7 +8,7 @@ import { PROFILES } from '@/config/profiles'
 import { LIBRARY_BY_ID, EXERCISE_LIBRARY, toExerciseId } from '@/data/obzen-program'
 import {
   e1rmSeries, bestCurrentE1RM, sbdTotal, weeklyVolume, recentPRs,
-  dotsScore, strengthStandard, trackingSeries, weeklyRepVolume, delta, isoWeekKey,
+  dotsScore, strengthStandard, trackingSeries, weeklyRepVolume, delta, isoWeekKey, displayLb, kgToLb,
 } from '@/lib/progress'
 import { todayISO } from '@/lib/utils'
 import { LineChart, BarChart, ChartEmpty } from './Charts'
@@ -41,7 +41,10 @@ function Stat({ value, unit, label, sub }: { value: string; unit?: string; label
   )
 }
 
-const kg = (n: number) => `${Math.round(n * 10) / 10}`
+/** Internal maths is kg; the gym is in pounds, so display converts at the edge. */
+const lb = (kgValue: number) => displayLb(kgValue)
+/** Scores (DOTS/Wilks) are unitless — never convert them. */
+const score = (n: number) => `${Math.round(n * 10) / 10}`
 
 export function WorkoutProgress() {
   const { activeId } = useProfileStore()
@@ -113,22 +116,22 @@ export function WorkoutProgress() {
         {cfg.showPowerlifting ? (
           <>
             <Stat
-              value={kg(total.totalKg)} unit="kg" label="SBD Total"
+              value={lb(total.totalKg)} unit="lb" label="SBD Total"
               sub={total.loggedCount < total.lifts.length
                 ? `${total.loggedCount} of ${total.lifts.length} lifts logged`
                 : 'all three logged'}
             />
-            {dots > 0 && <Stat value={kg(dots)} label="DOTS (est.)" sub={`at ${kg(bodyweightKg)} kg`} />}
+            {dots > 0 && <Stat value={score(dots)} label="DOTS (est.)" sub={`at ${lb(bodyweightKg)} lb`} />}
           </>
         ) : (
           keyLifts.slice(0, 2).map(l => (
-            <Stat key={l.id} value={l.best > 0 ? kg(l.best) : '—'} unit={l.best > 0 ? 'kg' : ''} label={l.name} sub="best e1RM" />
+            <Stat key={l.id} value={l.best > 0 ? lb(l.best) : '—'} unit={l.best > 0 ? 'lb' : ''} label={l.name} sub="best e1RM" />
           ))
         )}
         <Stat value={String(mine.length)} label="Sessions" />
         <Stat
-          value={kg(thisWeekVolume / 1000)}
-          unit="t" label="Volume" sub="this week"
+          value={Math.round(kgToLb(thisWeekVolume)).toLocaleString()}
+          unit="lb" label="Volume" sub="this week"
         />
       </div>
 
@@ -137,8 +140,8 @@ export function WorkoutProgress() {
         <LineChart
           series={keyLifts
             .filter(l => l.series.length > 0)
-            .map(l => ({ label: l.name, points: l.series.map(p => ({ date: p.date, value: p.e1rm })) }))}
-          yLabel="Estimated 1RM in kilograms"
+            .map(l => ({ label: l.name, points: l.series.map(p => ({ date: p.date, value: kgToLb(p.e1rm) })) }))}
+          yLabel="Estimated 1RM in pounds"
         />
       </Card>
 
@@ -167,7 +170,7 @@ export function WorkoutProgress() {
                   </div>
                   {std.toNextKg !== null && std.nextBand && (
                     <div className="text-[11px] mt-1" style={{ color: 'var(--dim)' }}>
-                      {kg(std.toNextKg)} kg to {std.nextBand}
+                      {lb(std.toNextKg)} lb to {std.nextBand}
                     </div>
                   )}
                 </div>
@@ -186,8 +189,8 @@ export function WorkoutProgress() {
       {/* ── Weekly volume + PRs ────────────────────────────────────────── */}
       <Card label="Weekly volume (tonnage)">
         <BarChart
-          data={volume.slice(-8).map(v => ({ label: v.week.slice(-3), value: v.tonnageKg }))}
-          unit="kg"
+          data={volume.slice(-8).map(v => ({ label: v.week.slice(-3), value: kgToLb(v.tonnageKg) }))}
+          unit="lb"
         />
       </Card>
 
@@ -200,7 +203,7 @@ export function WorkoutProgress() {
               <li key={pr.exerciseId} className="flex items-baseline justify-between gap-3">
                 <span className="text-[15px] truncate" style={{ color: 'var(--accent)' }}>{pr.name}</span>
                 <span className="text-[13px] tabular-nums shrink-0" style={{ color: 'var(--muted)' }}>
-                  {kg(pr.e1rm)} kg
+                  {lb(pr.e1rm)} lb
                   <span className="ml-2 text-[11px]" style={{ color: 'var(--dim)' }}>{pr.date}</span>
                 </span>
               </li>
@@ -211,10 +214,15 @@ export function WorkoutProgress() {
 
       {/* ── Bodyweight-mode cards ──────────────────────────────────────── */}
       {bodyweightMovements.map(({ id, entry }) => {
-        const series = trackingSeries(mine, id, entry.trackingMode)
+        // Assistance is a weight, so convert it for display; seconds and reps
+        // are unit-free and pass through unchanged.
+        const rawSeries = trackingSeries(mine, id, entry.trackingMode)
+        const series = entry.trackingMode === 'assisted'
+          ? rawSeries.map(p => ({ ...p, value: kgToLb(p.value) }))
+          : rawSeries
         const change = delta(series)
         const latest = series.length > 0 ? series[series.length - 1].value : 0
-        const unit = entry.trackingMode === 'timed' ? 's' : entry.trackingMode === 'assisted' ? 'kg' : 'reps'
+        const unit = entry.trackingMode === 'timed' ? 's' : entry.trackingMode === 'assisted' ? 'lb' : 'reps'
         // For assistance, down is progress — so a negative delta is good.
         const improving = entry.trackingMode === 'assisted' ? change < 0 : change > 0
 

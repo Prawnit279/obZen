@@ -4,6 +4,7 @@ import { PROFILES } from '@/config/profiles'
 import { useProgressStore } from '@/store/useProgressStore'
 import { todayISO } from '@/lib/utils'
 import { LineChart } from './Charts'
+import { kgToLb, lbToKg } from '@/lib/progress'
 
 /** Stable fallback reference — `?? []` inline in a zustand selector would
  *  construct a new array every call, breaking snapshot equality and looping. */
@@ -18,14 +19,18 @@ export function BodyweightPanel({ profileId }: { profileId: ProfileId }) {
   const logBodyweight = useProgressStore(s => s.logBodyweight)
   const [value, setValue] = useState('')
 
+  // Stored in kg (so existing entries keep working); shown and entered in lb.
   const starting = PROFILES[profileId].body.bodyweightKg
-  const latest = entries.length > 0 ? entries[entries.length - 1].kg : starting
-  const change = entries.length > 1 ? entries[entries.length - 1].kg - entries[0].kg : 0
+  const latestKg = entries.length > 0 ? entries[entries.length - 1].kg : starting
+  const latest = latestKg !== undefined ? kgToLb(latestKg) : undefined
+  const change = entries.length > 1
+    ? kgToLb(entries[entries.length - 1].kg - entries[0].kg)
+    : 0
 
   const submit = () => {
-    const kg = Number(value)
-    if (!Number.isFinite(kg) || kg <= 0) return
-    logBodyweight(profileId, todayISO(), kg)
+    const lb = Number(value)
+    if (!Number.isFinite(lb) || lb <= 0) return
+    logBodyweight(profileId, todayISO(), lbToKg(lb))
     setValue('')
   }
 
@@ -39,18 +44,18 @@ export function BodyweightPanel({ profileId }: { profileId: ProfileId }) {
         <span className="text-[22px] tabular-nums" style={{ color: 'var(--accent)' }}>
           {latest !== undefined ? Math.round(latest * 10) / 10 : '—'}
         </span>
-        <span className="text-[12px]" style={{ color: 'var(--muted)' }}>kg</span>
+        <span className="text-[12px]" style={{ color: 'var(--muted)' }}>lb</span>
         {entries.length > 1 && (
           <span className="text-[12px]" style={{ color: change < 0 ? 'var(--complete-text)' : 'var(--muted)' }}>
-            {change > 0 ? '+' : ''}{Math.round(change * 10) / 10} kg
+            {change > 0 ? '+' : ''}{Math.round(change * 10) / 10} lb
           </span>
         )}
       </div>
 
       {entries.length > 1 ? (
         <LineChart
-          series={[{ label: 'Bodyweight', points: entries.map(e => ({ date: e.date, value: e.kg })) }]}
-          yLabel="Bodyweight in kilograms"
+          series={[{ label: 'Bodyweight', points: entries.map(e => ({ date: e.date, value: kgToLb(e.kg) })) }]}
+          yLabel="Bodyweight in pounds"
         />
       ) : (
         <p className="text-[13px] py-2" style={{ color: 'var(--dim)' }}>
@@ -66,8 +71,8 @@ export function BodyweightPanel({ profileId }: { profileId: ProfileId }) {
           value={value}
           onChange={e => setValue(e.target.value)}
           onKeyDown={e => { if (e.key === 'Enter') submit() }}
-          placeholder="Today's weight (kg)"
-          aria-label="Today's bodyweight in kilograms"
+          placeholder="Today's weight (lb)"
+          aria-label="Today's bodyweight in pounds"
           className="flex-1 rounded-[2px] px-3 py-2 text-[15px] bg-transparent focus:outline-none"
           style={{ border: '1px solid var(--border)', color: 'var(--accent)' }}
         />

@@ -56,21 +56,6 @@ function getCurrentDay(startDate: string): number {
   return Math.min(30, Math.max(1, Math.floor((now - start) / 86400000) + 1))
 }
 
-function calcStreak(completedDays: number[], currentDay: number): number {
-  // Count consecutive completed days ending at currentDay or currentDay-1
-  const anchor = completedDays.includes(currentDay) ? currentDay : currentDay - 1
-  if (anchor < 1) return 0
-  let streak = 0
-  for (let d = anchor; d >= 1; d--) {
-    if (completedDays.includes(d)) {
-      streak++
-    } else {
-      break
-    }
-  }
-  return streak
-}
-
 // ---------------------------------------------------------------------------
 // Sub-components
 // ---------------------------------------------------------------------------
@@ -394,7 +379,6 @@ export function ChallengeTracker() {
 
   const currentDay = getCurrentDay(challenge.startDate)
   const completed = challenge.completedDays.length
-  const streak = calcStreak(challenge.completedDays, currentDay)
 
   const WEEKS: { num: number; days: number[] }[] = [
     { num: 1, days: [1, 2, 3, 4, 5, 6, 7] },
@@ -413,11 +397,6 @@ export function ChallengeTracker() {
           </div>
           <div className="text-[11px]" style={{ color: 'var(--dim)' }}>
             {completed} completed
-            {streak > 0 && (
-              <span className="ml-2" style={{ color: 'var(--dim)' }}>
-                · {streak}-day streak
-              </span>
-            )}
           </div>
         </div>
         <button

@@ -78,18 +78,20 @@ interface DayViewProps {
   dayLabel: DayLabel
   forearmFatigue: boolean
   lowReadiness: boolean
+  /** The date being logged — today unless the user picked a past one. */
+  sessionDate: string
 }
 
-function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
+function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayViewProps) {
   const store = useWorkoutDayStore()
   const activeId = useProfileStore(s => s.activeId)
-  const session = selectDaySession(store.sessions, dayLabel, undefined, activeId)
+  const session = selectDaySession(store.sessions, dayLabel, sessionDate, activeId)
   const [showAddSheet, setShowAddSheet] = useState(false)
 
-  // Load the active profile's session for this day (reloads when either changes)
+  // Load this profile's session for this day+date (reloads when any changes)
   useEffect(() => {
-    store.loadSession(dayLabel)
-  }, [dayLabel, activeId]) // eslint-disable-line react-hooks/exhaustive-deps
+    store.loadSession(dayLabel, sessionDate)
+  }, [dayLabel, activeId, sessionDate]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const program = getProgram(activeId)[dayLabel]
   const programMap = useMemo(() => buildProgramMap(activeId), [activeId])
@@ -159,7 +161,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
             No exercises yet — load the {dayLabel} template as a starting point, or add your own below.
           </p>
           <button
-            onClick={() => store.loadTemplate(dayLabel)}
+            onClick={() => store.loadTemplate(dayLabel, sessionDate)}
             className="w-full py-3 rounded-[2px] text-[13px] uppercase tracking-widest transition-opacity hover:opacity-80"
             style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}
           >
@@ -175,12 +177,12 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
           programMap={programMap}
           forearmFatigue={forearmFatigue}
           dayLabel={dayLabel}
-          onReorder={newOrder => store.reorderExercises(dayLabel, newOrder)}
-          onStatusChange={(exerciseId, status) => store.updateExerciseStatus(dayLabel, exerciseId, status)}
-          onAddSet={(exerciseId, set) => store.addLoggedSet(dayLabel, exerciseId, set)}
-          onUpdateSet={(exerciseId, index, set) => store.updateLoggedSet(dayLabel, exerciseId, index, set)}
-          onRemoveSet={(exerciseId, index) => store.removeLoggedSet(dayLabel, exerciseId, index)}
-          onRemoveExercise={exerciseId => store.removeExercise(dayLabel, exerciseId)}
+          onReorder={newOrder => store.reorderExercises(dayLabel, newOrder, sessionDate)}
+          onStatusChange={(exerciseId, status) => store.updateExerciseStatus(dayLabel, exerciseId, status, sessionDate)}
+          onAddSet={(exerciseId, set) => store.addLoggedSet(dayLabel, exerciseId, set, sessionDate)}
+          onUpdateSet={(exerciseId, index, set) => store.updateLoggedSet(dayLabel, exerciseId, index, set, sessionDate)}
+          onRemoveSet={(exerciseId, index) => store.removeLoggedSet(dayLabel, exerciseId, index, sessionDate)}
+          onRemoveExercise={exerciseId => store.removeExercise(dayLabel, exerciseId, sessionDate)}
         />
       )}
 
@@ -205,7 +207,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
           </div>
         ) : (
           <button
-            onClick={() => store.completeSession(dayLabel)}
+            onClick={() => store.completeSession(dayLabel, sessionDate)}
             className="w-full py-3 rounded-[2px] text-[13px] uppercase tracking-widest transition-opacity hover:opacity-80"
             style={{ border: '1px solid var(--complete-border)', color: 'var(--complete-text)' }}
           >
@@ -219,7 +221,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
         <AddExerciseSheet
           currentDay={dayLabel}
           existingIds={session.exercises.map(e => e.exerciseId)}
-          onAdd={(ex: ExerciseSessionState) => store.addExercise(dayLabel, ex)}
+          onAdd={(ex: ExerciseSessionState) => store.addExercise(dayLabel, ex, sessionDate)}
           onClose={() => setShowAddSheet(false)}
         />
       )}
@@ -234,6 +236,8 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness }: DayViewProps) {
 export default function Workout() {
   const [tab, setTab] = useState<Tab>('program')
   const [selectedDay, setSelectedDay] = useState<DayLabel | 'Rest'>('Day 1')
+  // Which date is being logged — today unless the user backdates a session.
+  const [sessionDate, setSessionDate] = useState<string>(TODAY)
   const activeProfileId = useProfileStore(s => s.activeId)
   const setActiveProfile = useProfileStore(s => s.setActive)
 
@@ -351,6 +355,46 @@ export default function Workout() {
             </button>
           </div>
 
+          {/* Session date — defaults to today; pick a past date to log a
+              workout you forgot to enter at the gym. */}
+          {selectedDay !== 'Rest' && (
+            <div
+              className="flex items-center justify-between gap-3 px-3 py-2 rounded-[2px]"
+              style={{
+                background: 'var(--surface)',
+                border: `1px solid ${sessionDate === TODAY ? 'var(--border)' : 'var(--accent)'}`,
+              }}
+            >
+              <label
+                htmlFor="session-date"
+                className="text-[11px] uppercase tracking-widest shrink-0"
+                style={{ color: 'var(--muted)' }}
+              >
+                {sessionDate === TODAY ? 'Logging today' : 'Logging past date'}
+              </label>
+              <div className="flex items-center gap-2">
+                {sessionDate !== TODAY && (
+                  <button
+                    onClick={() => setSessionDate(TODAY)}
+                    className="text-[11px] uppercase tracking-widest transition-opacity hover:opacity-70"
+                    style={{ color: 'var(--muted)' }}
+                  >
+                    Today
+                  </button>
+                )}
+                <input
+                  id="session-date"
+                  type="date"
+                  value={sessionDate}
+                  max={TODAY}
+                  onChange={e => setSessionDate(e.target.value || TODAY)}
+                  className="rounded-[2px] px-2 py-1 text-[13px] bg-transparent focus:outline-none"
+                  style={{ border: '1px solid var(--border)', color: 'var(--accent)' }}
+                />
+              </div>
+            </div>
+          )}
+
           {/* Day content */}
           {selectedDay === 'Rest' ? (
             <RestDayCard />
@@ -359,6 +403,7 @@ export default function Workout() {
               dayLabel={selectedDay}
               forearmFatigue={forearmFatigue}
               lowReadiness={lowReadiness}
+              sessionDate={sessionDate}
             />
           )}
         </>

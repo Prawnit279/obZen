@@ -3,14 +3,19 @@
  * DrumPDF binary data (ArrayBuffer) is omitted — it's not JSON-serialisable and
  * would bloat the file. All other tables are exported in full.
  *
- * importAllDataFromJSON — reads an obZen backup JSON file and bulkPuts every record
- * back into IndexedDB. Strategy is merge-by-ID: existing records with the same
- * primary key are overwritten; records absent from the backup are left untouched.
+ * importAllDataFromJSON — reads an obZen backup JSON file back into IndexedDB.
+ * Most tables merge by primary key (existing rows with the same id are
+ * overwritten; rows absent from the backup are left untouched). Workout day
+ * sessions are the exception: they merge on profile + date + day, because two
+ * devices assign ids independently and matching on id would clobber unrelated
+ * sessions when swapping backups between phones.
  * drumPDFs and cachedImages are skipped (binary / hollow metadata).
  */
 
 import { type Table } from 'dexie'
 import { db } from '@/db/dexie'
+import type { WorkoutDaySession } from '@/db/dexie'
+import { sessionProfile, sessionHasActivity } from '@/lib/workoutSession'
 
 function getDeviceId(): string {
   const key = 'obzen-device-id'
@@ -321,6 +326,41 @@ export async function importAllDataFromJSON(file: File): Promise<ImportResult> {
     total += rows.length
   }
 
+  /**
+   * Workout sessions are merged by their natural key (profile + date + day)
+   * rather than by primary key.
+   *
+   * Two devices assign auto-increment ids independently, so an incoming id=1
+   * is almost never the same workout as the local id=1 — a plain bulkPut would
+   * silently overwrite unrelated sessions. Incoming rows are therefore matched
+   * on what actually identifies a session, and inserted without their id when
+   * they are new so Dexie assigns a fresh one. A local session that already
+   * has logged work is never replaced.
+   */
+  async function mergeDaySessions(rows: unknown[] | undefined): Promise<void> {
+    if (!rows || rows.length === 0) return
+    const incoming = rows as WorkoutDaySession[]
+    const local = await db.workoutDaySessions.toArray()
+
+    const keyOf = (s: WorkoutDaySession) => `${sessionProfile(s)}::${s.date}::${s.dayLabel}`
+    const localByKey = new Map(local.map(s => [keyOf(s), s]))
+
+    for (const row of incoming) {
+      const existing = localByKey.get(keyOf(row))
+      if (!existing) {
+        // New to this device — drop the foreign id so Dexie assigns its own.
+        const { id: _ignored, ...withoutId } = row
+        await db.workoutDaySessions.add(withoutId as WorkoutDaySession)
+        total++
+      } else if (!sessionHasActivity(existing) && sessionHasActivity(row)) {
+        // Local placeholder, incoming has real work — take the incoming one.
+        await db.workoutDaySessions.put({ ...row, id: existing.id })
+        total++
+      }
+      // Otherwise the local session already has logged work: leave it alone.
+    }
+  }
+
   // ── Write all tables inside a single transaction ────────────────────────────
   await db.transaction('rw', [
     db.workoutSessions,
@@ -347,7 +387,7 @@ export async function importAllDataFromJSON(file: File): Promise<ImportResult> {
     db.meta,
   ], async () => {
     await put(db.workoutSessions,    data.workout?.sessions)
-    await put(db.workoutDaySessions, data.workout?.daySessions)
+    await mergeDaySessions(data.workout?.daySessions)
     await put(db.exerciseLogs,       data.workout?.exerciseLogs)
     await put(db.drumSessions,       data.drums?.sessions)
     await put(db.rudimentLogs,       data.drums?.rudiments)

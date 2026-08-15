@@ -34,11 +34,12 @@
     --skip-text:       #fca5a5;
     --skip-bg:         rgba(127, 29, 29, 0.06);
 
-    /* Chart series — light greys for a dark surface. */
-    --series-1: #e2e2e2;
-    --series-2: #a6a6a6;
-    --series-3: #8a8a8a;
-    --series-4: #6f6f6f;
+    /* Chart series — distinct hues, tuned for a dark surface. Dash patterns
+       still differ per series, so colour is reinforcement, not the only cue. */
+    --series-1: #6ea8fe;
+    --series-2: #7ee2a8;
+    --series-3: #f2b366;
+    --series-4: #d99ae8;
 
     --duration-fast:   150ms;
     --duration-normal: 300ms;
@@ -79,11 +80,11 @@
     --skip-text:       #b71c1c;
     --skip-bg:         rgba(198, 40, 40, 0.08);
 
-    /* Chart series — darkened so lines read on a light surface. */
-    --series-1: #1c1c21;
-    --series-2: #55555f;
-    --series-3: #80808a;
-    --series-4: #a0a0aa;
+    /* Chart series — same hues, darkened so they read on a light surface. */
+    --series-1: #1f5fbf;
+    --series-2: #1d7a4f;
+    --series-3: #a35c10;
+    --series-4: #7b3f9e;
 
     color-scheme: light;
   }

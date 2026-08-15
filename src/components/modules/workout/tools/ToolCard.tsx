@@ -40,6 +40,39 @@ export function NumberField({
   )
 }
 
+/** Free-text field — for labels like a lift name, which is not a number. */
+export function TextField({
+  label, value, onChange, placeholder,
+}: {
+  label: string
+  value: string
+  onChange: (v: string) => void
+  placeholder?: string
+}) {
+  return (
+    <div>
+      <label className="text-[11px] uppercase tracking-widest block mb-1" style={{ color: 'var(--muted)' }}>{label}</label>
+      <input
+        type="text"
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        placeholder={placeholder}
+        className="w-full rounded-[2px] px-3 py-2 text-[15px] bg-transparent focus:outline-none"
+        style={INPUT}
+      />
+    </div>
+  )
+}
+
+/** Tells the user what still needs filling in, instead of rendering nothing. */
+export function AwaitingInput({ need }: { need: string }) {
+  return (
+    <p className="text-[13px] mt-3" style={{ color: 'var(--dim)' }}>
+      Enter {need} to see results.
+    </p>
+  )
+}
+
 export function SegmentedToggle<T extends string | number>({
   options, value, onChange,
 }: {

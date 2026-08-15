@@ -297,24 +297,6 @@ export default function Dashboard() {
         </Card>
       )}
 
-      {/* Streaks */}
-      <Card>
-        <CardHeader label="Streaks" />
-        <div className="grid grid-cols-4 gap-2">
-          {([
-            ['Workout', streaks.workout],
-            ['Drum', streaks.drum],
-            ['Nutrition', streaks.nutrition],
-            ['Ayurveda', streaks.ayurveda],
-          ] as [string, number][]).map(([label, count]) => (
-            <div key={label} className="text-center">
-              <div className="text-[20px] text-noir-white leading-none">{count}</div>
-              <div className="text-[9px] uppercase tracking-widest text-noir-dim mt-1">{label}</div>
-            </div>
-          ))}
-        </div>
-      </Card>
-
       {/* Ayurveda tip */}
       <Card>
         <CardHeader label="Ayurveda · Today" />

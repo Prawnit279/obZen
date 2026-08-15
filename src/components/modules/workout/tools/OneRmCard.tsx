@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react'
 import { estimate1RM, percentageTable, roundTo5 } from '@/lib/strengthTools'
-import { ToolCard, NumberField } from './ToolCard'
+import { ToolCard, NumberField, AwaitingInput } from './ToolCard'
 
 /**
  * Covers both the 1RM calculator and the AMRAP estimator — they take the same
@@ -35,6 +35,10 @@ export function OneRmCard() {
         onChange={setExpectedReps}
         placeholder="e.g. 5"
       />
+
+      {!valid && (
+        <AwaitingInput need={w > 0 ? 'the reps you did' : r > 0 ? 'the weight lifted' : 'a weight and reps'} />
+      )}
 
       {est && (
         <div className="mt-4 space-y-3">

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { HelpCircle } from 'lucide-react'
 import { trainingMax, fiveThreeOneWave, jokerSets, bbbSet } from '@/lib/strengthTools'
 import type { WaveWeek, BBBPercent } from '@/lib/strengthTools'
-import { ToolCard, NumberField, SegmentedToggle } from './ToolCard'
+import { ToolCard, NumberField, TextField, SegmentedToggle, AwaitingInput } from './ToolCard'
 
 const WEEK_OPTIONS: { value: WaveWeek; label: string }[] = [
   { value: 1, label: 'Week 1' },
@@ -42,9 +42,11 @@ export function FiveThreeOneCard() {
   return (
     <ToolCard label="5/3/1" sub="Training Max, the 3-week wave, Joker sets and Boring But Big — off one estimated 1RM.">
       <div className="space-y-3">
-        <NumberField label="Lift (optional label)" value={lift} onChange={setLift} placeholder="e.g. Squat" />
+        <TextField label="Lift (optional label)" value={lift} onChange={setLift} placeholder="e.g. Squat" />
         <NumberField label="Estimated 1RM" value={e1rm} onChange={setE1rm} placeholder="315" suffix="lb" />
       </div>
+
+      {!valid && <AwaitingInput need="an estimated 1RM" />}
 
       {valid && (
         <div className="mt-4 space-y-4">

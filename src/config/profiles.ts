@@ -58,7 +58,7 @@ export const PROFILES: Record<ProfileId, Profile> = {
     id: 'pronit',
     name: 'Pronit',
     dosha: 'Pitta',
-    body: { bodyweight: '75 kg', bodyweightKg: 75 },
+    body: { bodyweight: '165 lb (75 kg)', bodyweightKg: 75 },
     targets: { proteinG: '150', calories: '2550' },
     sex: 'male',
     progress: {
@@ -74,7 +74,7 @@ export const PROFILES: Record<ProfileId, Profile> = {
     name: 'Aishwarya',
     program: 'Phase 1 · Weeks 1–4 · Glutes, Core & Strength',
     body: {
-      bodyweight: '70 kg (155 lb)',
+      bodyweight: '155 lb (70 kg)',
       bodyweightKg: 70,
       fatMass: '49.1 lb',
       leanMass: '106 lb',
