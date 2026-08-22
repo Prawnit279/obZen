@@ -1,5 +1,5 @@
 import { X, Repeat } from 'lucide-react'
-import { guideFor, MUSCLE_LABEL } from '@/data/exercise-guides'
+import { guideFor, coreDetailFor, MUSCLE_LABEL } from '@/data/exercise-guides'
 import { MuscleFigure, MUSCLE_PRIMARY_COLOR, MUSCLE_SECONDARY_COLOR } from './MuscleFigure'
 import { ExerciseAnimation } from './ExerciseAnimation'
 import { motionFor } from '@/data/exercise-motions'
@@ -38,6 +38,7 @@ export function ExerciseDetailSheet({ exerciseId, name, muscle, target, cue, onS
   const guide = guideFor(exerciseId, muscle)
   const swaps = LIBRARY_BY_ID[exerciseId]?.swaps ?? []
   const motion = motionFor(exerciseId)
+  const detail = coreDetailFor(exerciseId)
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end" style={{ background: 'rgba(0,0,0,0.7)' }}>
@@ -83,6 +84,22 @@ export function ExerciseDetailSheet({ exerciseId, name, muscle, target, cue, onS
             </section>
           )}
 
+          {/* Setting up, before the first rep */}
+          {detail?.setup && (
+            <section>
+              <h3 className="text-[11px] uppercase tracking-widest mb-2" style={{ color: 'var(--muted)' }}>
+                Setting up
+              </h3>
+              <ul className="space-y-1.5">
+                {detail.setup.map((line, i) => (
+                  <li key={i} className="text-[14px] leading-snug pl-3" style={{ color: 'var(--accent)', borderLeft: '2px solid var(--border)' }}>
+                    {line}
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )}
+
           {/* How to do it */}
           {guide && guide.steps.length > 0 && (
             <section>
@@ -107,6 +124,46 @@ export function ExerciseDetailSheet({ exerciseId, name, muscle, target, cue, onS
             >
               {cue}
             </p>
+          )}
+
+          {/* Common faults and their fixes */}
+          {detail?.mistakes && (
+            <section>
+              <h3 className="text-[11px] uppercase tracking-widest mb-2" style={{ color: 'var(--muted)' }}>
+                Common mistakes
+              </h3>
+              <div className="space-y-2.5">
+                {detail.mistakes.map((m, i) => (
+                  <div key={i} className="rounded-[2px] p-3" style={{ background: 'var(--elevated)' }}>
+                    <div className="flex gap-2 text-[13px] leading-snug">
+                      <span className="shrink-0" style={{ color: 'var(--skip-text)' }}>✕</span>
+                      <span style={{ color: 'var(--muted)' }}>{m.wrong}</span>
+                    </div>
+                    <div className="flex gap-2 text-[13px] leading-snug mt-1">
+                      <span className="shrink-0" style={{ color: 'var(--complete-text)' }}>✓</span>
+                      <span style={{ color: 'var(--accent)' }}>{m.fix}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {/* What a good set looks like */}
+          {detail?.cues && (
+            <section>
+              <h3 className="text-[11px] uppercase tracking-widest mb-2" style={{ color: 'var(--muted)' }}>
+                You did it right if
+              </h3>
+              <ul className="space-y-1">
+                {detail.cues.map((c, i) => (
+                  <li key={i} className="flex gap-2 text-[14px] leading-snug" style={{ color: 'var(--accent)' }}>
+                    <span className="shrink-0" style={{ color: 'var(--complete-text)' }}>·</span>
+                    <span>{c}</span>
+                  </li>
+                ))}
+              </ul>
+            </section>
           )}
 
           {/* Swap options straight from the plan */}

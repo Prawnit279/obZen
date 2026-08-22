@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { EXERCISE_MOTIONS, motionFor } from '@/data/exercise-motions'
-import { EXERCISE_GUIDES, guideFor, MUSCLE_LABEL } from '@/data/exercise-guides'
+import { EXERCISE_GUIDES, guideFor, coreDetailFor, MUSCLE_LABEL } from '@/data/exercise-guides'
 import { EXERCISE_LIBRARY, toExerciseId } from '@/data/obzen-program'
 
 const JOINTS = ['head', 'neck', 'hip', 'knee', 'ankle', 'elbow', 'hand'] as const
@@ -88,5 +88,47 @@ describe('library coverage', () => {
                      'Barbell Rear Delt Row', 'Dumbbell Lateral Raises']) {
       expect(names, `${n} missing from library`).toContain(n)
     }
+  })
+})
+
+describe('core lifts — the ones actually trained most', () => {
+  const CORE = ['deadlift', 'barbell-squat', 'bench-press', 'hip-thrust-machine',
+    'romanian-deadlift', 'pull-ups', 'leg-press', 'barbell-row', 'push-up',
+    'hanging-leg-raises', 'bar-dips']
+
+  it('each has a smoother 5-keyframe animation', () => {
+    for (const id of CORE) {
+      expect(motionFor(id)?.poses.length, `${id} keyframes`).toBeGreaterThanOrEqual(5)
+    }
+  })
+
+  it('each has setup, common mistakes and success cues', () => {
+    for (const id of CORE) {
+      const d = coreDetailFor(id)
+      expect(d?.setup?.length, `${id} setup`).toBeGreaterThan(0)
+      expect(d?.mistakes?.length, `${id} mistakes`).toBeGreaterThan(0)
+      expect(d?.cues?.length, `${id} cues`).toBeGreaterThan(0)
+    }
+  })
+
+  it('every mistake pairs a fault with its fix', () => {
+    for (const id of CORE) {
+      for (const m of coreDetailFor(id)!.mistakes!) {
+        expect(m.wrong.length).toBeGreaterThan(0)
+        expect(m.fix.length).toBeGreaterThan(0)
+      }
+    }
+  })
+
+  it('variants inherit their parent lift detail', () => {
+    // A back squat should get the squat guidance, a chin-up the pull-up's.
+    expect(coreDetailFor('barbell-back-squat')).toBe(coreDetailFor('barbell-squat'))
+    expect(coreDetailFor('chin-ups')).toBe(coreDetailFor('pull-ups'))
+    expect(coreDetailFor('seated-cable-row')).toBe(coreDetailFor('barbell-row'))
+    expect(coreDetailFor('assisted-dip')).toBe(coreDetailFor('bar-dips'))
+  })
+
+  it('leaves non-core movements without the extra detail', () => {
+    expect(coreDetailFor('face-pull')).toBeUndefined()
   })
 })

@@ -49,11 +49,13 @@ const pose = (over: Partial<Pose>): Pose => ({ ...STAND, ...over })
 export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
   // ── Squat pattern ──────────────────────────────────────────────────────────
   'barbell-squat': {
-    equipment: 'bar', durationSec: 3.2, caption: 'Sit between the hips, drive up',
+    equipment: 'bar', durationSec: 4, caption: 'Sit between the hips, drive up',
     poses: [
       pose({ hand: [96, 46], elbow: [88, 54] }),
-      pose({ head: [94, 60], neck: [95, 72], hip: [102, 104], knee: [88, 116], ankle: [100, 138], hand: [91, 68], elbow: [83, 76] }),
-      pose({ head: [92, 74], neck: [93, 86], hip: [103, 116], knee: [82, 120], ankle: [100, 138], hand: [89, 82], elbow: [81, 90] }),
+      pose({ head: [97, 48], neck: [98, 60], hip: [101, 94], knee: [94, 114], hand: [93, 56], elbow: [85, 64] }),
+      pose({ head: [94, 60], neck: [95, 72], hip: [102, 104], knee: [88, 116], hand: [91, 68], elbow: [83, 76] }),
+      pose({ head: [93, 68], neck: [94, 80], hip: [103, 111], knee: [85, 118], hand: [90, 76], elbow: [82, 84] }),
+      pose({ head: [92, 74], neck: [93, 86], hip: [103, 116], knee: [82, 120], hand: [89, 82], elbow: [81, 90] }),
     ],
   },
   'barbell-back-squat': {
@@ -89,11 +91,13 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'leg-press': {
-    equipment: 'none', durationSec: 3, ground: false, bench: [40, 108, 70],
+    equipment: 'none', durationSec: 3.6, ground: false, bench: [40, 108, 70],
     caption: 'Feet high and wide, never lock out',
     poses: [
       { head: [50, 96], neck: [64, 100], hip: [96, 104], knee: [130, 96], ankle: [160, 88], elbow: [66, 112], hand: [80, 116] },
+      { head: [50, 96], neck: [64, 100], hip: [96, 104], knee: [126, 90], ankle: [151, 91], elbow: [66, 112], hand: [80, 116] },
       { head: [50, 96], neck: [64, 100], hip: [96, 104], knee: [120, 82], ankle: [140, 96], elbow: [66, 112], hand: [80, 116] },
+      { head: [50, 96], neck: [64, 100], hip: [96, 104], knee: [113, 77], ankle: [129, 99], elbow: [66, 112], hand: [80, 116] },
       { head: [50, 96], neck: [64, 100], hip: [96, 104], knee: [108, 74], ankle: [120, 100], elbow: [66, 112], hand: [80, 116] },
     ],
   },
@@ -170,18 +174,22 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
 
   // ── Hinge pattern ──────────────────────────────────────────────────────────
   'deadlift': {
-    equipment: 'bar', durationSec: 3.4, caption: 'Bar against the shins, push the floor away',
+    equipment: 'bar', durationSec: 4, caption: 'Bar against the shins, push the floor away',
     poses: [
       pose({ head: [92, 66], neck: [94, 78], hip: [104, 104], knee: [96, 118], hand: [102, 128], elbow: [98, 104] }),
-      pose({ head: [96, 52], neck: [97, 64], hip: [102, 94], knee: [98, 116], hand: [102, 110], elbow: [99, 88] }),
+      pose({ head: [93, 62], neck: [95, 74], hip: [104, 100], knee: [97, 118], hand: [102, 122], elbow: [98, 99] }),
+      pose({ head: [96, 54], neck: [97, 66], hip: [103, 95], knee: [99, 117], hand: [102, 112], elbow: [99, 90] }),
+      pose({ head: [98, 46], neck: [99, 58], hip: [101, 90], knee: [100, 115], hand: [101, 100], elbow: [100, 79] }),
       pose({ hand: [100, 90], elbow: [100, 70] }),
     ],
   },
   'romanian-deadlift': {
-    equipment: 'bar', durationSec: 3.2, caption: 'Push the hips back, stop at the stretch',
+    equipment: 'bar', durationSec: 3.8, caption: 'Push the hips back, stop at the stretch',
     poses: [
       pose({ hand: [100, 90], elbow: [100, 70] }),
+      pose({ head: [95, 44], neck: [96, 56], hip: [104, 87], knee: [102, 114], hand: [99, 96], elbow: [98, 76] }),
       pose({ head: [90, 52], neck: [92, 62], hip: [108, 88], knee: [104, 114], hand: [98, 104], elbow: [96, 84] }),
+      pose({ head: [86, 62], neck: [89, 71], hip: [110, 89], knee: [105, 114], hand: [97, 111], elbow: [94, 91] }),
       pose({ head: [82, 70], neck: [86, 78], hip: [112, 90], knee: [106, 114], hand: [96, 118], elbow: [92, 98] }),
     ],
   },
@@ -262,11 +270,13 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
 
   // ── Hip thrust / glute ─────────────────────────────────────────────────────
   'hip-thrust-machine': {
-    equipment: 'none', durationSec: 3, bench: [56, 96, 34],
+    equipment: 'none', durationSec: 3.6, bench: [56, 96, 34],
     caption: 'Chin tucked, squeeze at the top',
     poses: [
       { head: [58, 88], neck: [70, 92], hip: [104, 116], knee: [130, 108], ankle: [136, 138], elbow: [72, 104], hand: [84, 108] },
+      { head: [58, 87], neck: [70, 91], hip: [105, 110], knee: [131, 105], ankle: [136, 138], elbow: [72, 102], hand: [84, 105] },
       { head: [58, 86], neck: [70, 90], hip: [106, 104], knee: [132, 102], ankle: [136, 138], elbow: [72, 100], hand: [84, 102] },
+      { head: [58, 85], neck: [70, 89], hip: [107, 98], knee: [133, 99], ankle: [136, 138], elbow: [72, 98], hand: [84, 99] },
       { head: [58, 84], neck: [70, 88], hip: [108, 92], knee: [134, 96], ankle: [136, 138], elbow: [72, 96], hand: [84, 96] },
     ],
   },
@@ -339,11 +349,13 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
 
   // ── Horizontal press ───────────────────────────────────────────────────────
   'bench-press': {
-    equipment: 'bar', durationSec: 3, ground: false, bench: [56, 108, 88],
+    equipment: 'bar', durationSec: 3.6, ground: false, bench: [56, 108, 88],
     caption: 'Shoulder blades set, press over the shoulders',
     poses: [
       { head: [62, 100], neck: [76, 104], hip: [116, 106], knee: [140, 120], ankle: [146, 138], elbow: [78, 84], hand: [78, 66] },
+      { head: [62, 100], neck: [76, 104], hip: [116, 106], knee: [140, 120], ankle: [146, 138], elbow: [75, 88], hand: [78, 74] },
       { head: [62, 100], neck: [76, 104], hip: [116, 106], knee: [140, 120], ankle: [146, 138], elbow: [70, 92], hand: [78, 84] },
+      { head: [62, 100], neck: [76, 104], hip: [116, 106], knee: [140, 120], ankle: [146, 138], elbow: [67, 96], hand: [78, 92] },
       { head: [62, 100], neck: [76, 104], hip: [116, 106], knee: [140, 120], ankle: [146, 138], elbow: [66, 98], hand: [78, 98] },
     ],
   },
@@ -366,10 +378,12 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'push-up': {
-    equipment: 'none', durationSec: 2.8, caption: 'Rigid plank, elbows about 45°',
+    equipment: 'none', durationSec: 3.4, caption: 'Rigid plank, elbows about 45°',
     poses: [
       { head: [60, 96], neck: [74, 100], hip: [116, 112], knee: [146, 124], ankle: [172, 134], elbow: [72, 118], hand: [70, 138] },
+      { head: [60, 101], neck: [74, 105], hip: [116, 116], knee: [146, 126], ankle: [172, 135], elbow: [69, 121], hand: [70, 138] },
       { head: [60, 106], neck: [74, 110], hip: [116, 120], knee: [146, 128], ankle: [172, 136], elbow: [66, 124], hand: [70, 138] },
+      { head: [60, 111], neck: [74, 115], hip: [116, 123], knee: [146, 130], ankle: [172, 137], elbow: [63, 126], hand: [70, 138] },
       { head: [60, 116], neck: [74, 120], hip: [116, 126], knee: [146, 132], ankle: [172, 138], elbow: [60, 128], hand: [70, 138] },
     ],
   },
@@ -382,11 +396,13 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'bar-dips': {
-    equipment: 'none', durationSec: 3, ground: false,
+    equipment: 'none', durationSec: 3.4, ground: false,
     caption: 'Lean forward, stop at the stretch',
     poses: [
       { head: [100, 40], neck: [100, 52], hip: [104, 88], knee: [112, 112], ankle: [104, 132], elbow: [90, 68], hand: [86, 86] },
+      { head: [99, 46], neck: [99, 58], hip: [104, 94], knee: [113, 117], ankle: [104, 136], elbow: [88, 72], hand: [86, 86] },
       { head: [98, 52], neck: [98, 64], hip: [104, 100], knee: [114, 122], ankle: [104, 140], elbow: [86, 76], hand: [86, 86] },
+      { head: [97, 57], neck: [97, 69], hip: [104, 105], knee: [115, 126], ankle: [104, 143], elbow: [84, 79], hand: [86, 86] },
       { head: [96, 62], neck: [96, 74], hip: [104, 110], knee: [116, 130], ankle: [104, 146], elbow: [82, 82], hand: [86, 86] },
     ],
   },
@@ -471,11 +487,13 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
 
   // ── Vertical pull ──────────────────────────────────────────────────────────
   'pull-ups': {
-    equipment: 'fixedBar', durationSec: 3, ground: false,
+    equipment: 'fixedBar', durationSec: 3.6, ground: false,
     caption: 'Full hang, chest toward the bar',
     poses: [
       { head: [100, 54], neck: [100, 66], hip: [100, 102], knee: [104, 128], ankle: [100, 150], elbow: [100, 46], hand: [100, 26] },
+      { head: [100, 49], neck: [100, 61], hip: [100, 97], knee: [104, 123], ankle: [100, 145], elbow: [96, 44], hand: [100, 26] },
       { head: [100, 44], neck: [100, 56], hip: [100, 92], knee: [104, 118], ankle: [100, 140], elbow: [92, 42], hand: [100, 26] },
+      { head: [100, 39], neck: [100, 51], hip: [100, 87], knee: [104, 113], ankle: [100, 135], elbow: [89, 41], hand: [100, 26] },
       { head: [100, 34], neck: [100, 46], hip: [100, 82], knee: [104, 108], ankle: [100, 130], elbow: [86, 40], hand: [100, 26] },
     ],
   },
@@ -545,10 +563,12 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'barbell-row': {
-    equipment: 'bar', durationSec: 2.8, caption: 'Hinge to 45°, row to the lower ribs',
+    equipment: 'bar', durationSec: 3.4, caption: 'Hinge to 45°, row to the lower ribs',
     poses: [
       pose({ head: [84, 62], neck: [88, 70], hip: [110, 90], knee: [106, 114], elbow: [96, 96], hand: [96, 116] }),
+      pose({ head: [84, 62], neck: [88, 70], hip: [110, 90], knee: [106, 114], elbow: [94, 92], hand: [96, 110] }),
       pose({ head: [84, 62], neck: [88, 70], hip: [110, 90], knee: [106, 114], elbow: [92, 88], hand: [96, 104] }),
+      pose({ head: [84, 62], neck: [88, 70], hip: [110, 90], knee: [106, 114], elbow: [89, 84], hand: [96, 98] }),
       pose({ head: [84, 62], neck: [88, 70], hip: [110, 90], knee: [106, 114], elbow: [86, 80], hand: [96, 92] }),
     ],
   },
@@ -811,11 +831,13 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'hanging-leg-raises': {
-    equipment: 'fixedBar', durationSec: 3, ground: false,
+    equipment: 'fixedBar', durationSec: 3.6, ground: false,
     caption: 'Curl the pelvis as the legs rise',
     poses: [
       { head: [100, 52], neck: [100, 64], hip: [100, 100], knee: [100, 126], ankle: [100, 148], elbow: [100, 44], hand: [100, 26] },
+      { head: [100, 52], neck: [100, 64], hip: [100, 100], knee: [110, 121], ankle: [120, 136], elbow: [100, 44], hand: [100, 26] },
       { head: [100, 52], neck: [100, 64], hip: [100, 100], knee: [120, 114], ankle: [138, 122], elbow: [100, 44], hand: [100, 26] },
+      { head: [100, 52], neck: [100, 64], hip: [100, 100], knee: [126, 105], ankle: [148, 106], elbow: [100, 44], hand: [100, 26] },
       { head: [100, 52], neck: [100, 64], hip: [100, 100], knee: [130, 96], ankle: [154, 92], elbow: [100, 44], hand: [100, 26] },
     ],
   },

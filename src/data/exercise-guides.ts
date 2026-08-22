@@ -27,6 +27,12 @@ export interface ExerciseGuide {
   secondary?: MuscleId[]
   /** How to perform it, in order. */
   steps: string[]
+  /** Getting into position before the first rep. */
+  setup?: string[]
+  /** What commonly goes wrong, and the correction. */
+  mistakes?: { wrong: string; fix: string }[]
+  /** How to know the set was a good one. */
+  cues?: string[]
 }
 
 /**
@@ -384,4 +390,192 @@ export function guideFor(exerciseId: string, muscleGroup?: string): ExerciseGuid
   if (guide) return guide
   const primary = muscleGroup ? GROUP_FALLBACK[muscleGroup] : undefined
   return primary ? { primary, steps: [] } : undefined
+}
+
+// ── Extra depth for the lifts actually trained most ──────────────────────────
+
+/**
+ * Setup, common faults and success cues for the core lifts — deadlift, squat,
+ * bench, hip thrust, RDL, pull-up, leg press, rows, push-up, leg raise and dip.
+ * Layered onto the base guides rather than duplicating them, and shared across
+ * each lift's close variants.
+ */
+const CORE_DETAIL: Record<string, Pick<ExerciseGuide, 'setup' | 'mistakes' | 'cues'>> = {
+  deadlift: {
+    setup: [
+      'Bar over mid-foot, roughly an inch from the shins.',
+      'Grip just outside the knees, then drop the hips until the shoulders sit slightly ahead of the bar.',
+      'Take a breath into the belly and brace before the bar moves.',
+    ],
+    mistakes: [
+      { wrong: 'Hips shoot up first, turning it into a stiff-legged pull', fix: 'Push the floor away with the legs — hips and chest rise together.' },
+      { wrong: 'Bar drifts away from the shins', fix: 'Keep the lats engaged, as if squeezing oranges in the armpits.' },
+      { wrong: 'Rounding the lower back to chase one more rep', fix: 'End the set the moment the back rounds. That rep is not worth it.' },
+      { wrong: 'Leaning back and hyperextending at lockout', fix: 'Finish standing tall with the glutes squeezed, ribs down.' },
+    ],
+    cues: ['Bar stays in contact with the legs the whole way', 'Same back angle off the floor as at setup'],
+  },
+  'barbell-squat': {
+    setup: [
+      'Bar on the upper back, not the neck; hands as narrow as the shoulders allow.',
+      'Feet shoulder-width, toes turned out 15–30°.',
+      'Big breath, brace the whole trunk, then unrack and take two steps back.',
+    ],
+    mistakes: [
+      { wrong: 'Knees collapse inward out of the hole', fix: 'Screw the feet into the floor and think about spreading it apart.' },
+      { wrong: 'Hips rise faster than the chest ("good-morning" squat)', fix: 'Drive the whole torso up as one piece; keep the chest proud.' },
+      { wrong: 'Heels lift off the floor', fix: 'Push through the mid-foot; check ankle mobility or use lifting shoes.' },
+      { wrong: 'Cutting depth as the weight climbs', fix: 'Earn depth before you add weight — thigh to parallel or below.' },
+    ],
+    cues: ['Knees track over the toes throughout', 'Depth is the same on the last rep as the first'],
+  },
+  'bench-press': {
+    setup: [
+      'Five points of contact: head, upper back, glutes, and both feet flat.',
+      'Pull the shoulder blades back and down, and keep them pinned there.',
+      'Grip so the forearms are vertical at the bottom.',
+    ],
+    mistakes: [
+      { wrong: 'Elbows flared to 90°, stressing the shoulder', fix: 'Tuck to roughly 45° from the torso.' },
+      { wrong: 'Bouncing the bar off the chest', fix: 'Touch lightly, pause, then press.' },
+      { wrong: 'Shoulders rolling forward at lockout', fix: 'Keep the blades retracted from first rep to last.' },
+      { wrong: 'Feet wandering or hips lifting off the bench', fix: 'Drive the feet down and keep the glutes in contact.' },
+    ],
+    cues: ['Bar path is a shallow arc from lower chest to over the shoulders', 'Wrists stacked over the elbows'],
+  },
+  'hip-thrust-machine': {
+    setup: [
+      'Bench or pad just under the shoulder blades.',
+      'Feet flat, shins vertical when the hips are at the top.',
+      'Chin tucked so you are looking at your knees, not the ceiling.',
+    ],
+    mistakes: [
+      { wrong: 'Arching the lower back to fake extra height', fix: 'Keep the ribs down — the movement comes from the hips, not the spine.' },
+      { wrong: 'Feet too close, turning it into a quad exercise', fix: 'Walk the feet out until the shins are vertical at the top.' },
+      { wrong: 'Rushing the top without a squeeze', fix: 'Hold at lockout for a full second every rep.' },
+    ],
+    cues: ['Torso and thighs form a straight line at the top', 'You feel it in the glutes, not the lower back'],
+  },
+  'romanian-deadlift': {
+    setup: [
+      'Start standing with the bar at the hips, knees softly bent.',
+      'Brace, set the lats, and keep the bar in contact with the legs.',
+    ],
+    mistakes: [
+      { wrong: 'Squatting the weight down instead of hinging', fix: 'Push the hips backwards; the knee angle barely changes.' },
+      { wrong: 'Chasing the floor and rounding the back', fix: 'Stop at the hamstring stretch — range comes from hips, not spine.' },
+      { wrong: 'Bar drifting forward of the thighs', fix: 'Drag it down the legs; keep the lats tight.' },
+    ],
+    cues: ['A clear stretch in the hamstrings at the bottom', 'Back angle changes, spine shape does not'],
+  },
+  'pull-ups': {
+    setup: [
+      'Overhand grip just outside shoulder width.',
+      'Start from a dead hang with the shoulders pulled down away from the ears.',
+    ],
+    mistakes: [
+      { wrong: 'Kipping or swinging to get up', fix: 'Keep the legs still — squeeze the glutes and brace the abs.' },
+      { wrong: 'Half reps that never reach a full hang', fix: 'Lower all the way each rep; the bottom is where strength is built.' },
+      { wrong: 'Shrugging the shoulders at the start of the pull', fix: 'Depress the shoulder blades first, then pull.' },
+    ],
+    cues: ['Chest rises toward the bar, not just the chin', 'Elbows drive down and back'],
+  },
+  'leg-press': {
+    setup: [
+      'Feet high and wide on the platform to bias glutes and hamstrings.',
+      'Back and hips flat against the pad before the first rep.',
+    ],
+    mistakes: [
+      { wrong: 'Lower back rounding off the pad at the bottom', fix: 'Shorten the range — stop before the hips tuck under.' },
+      { wrong: 'Locking the knees hard at the top', fix: 'Stop just short of lockout and keep tension on the muscle.' },
+      { wrong: 'Hands pushing on the knees', fix: 'Hold the handles; let the legs do the work.' },
+    ],
+    cues: ['Knees track in line with the toes', 'Hips never lift away from the pad'],
+  },
+  'barbell-row': {
+    setup: [
+      'Hinge to roughly 45°, back flat, bar hanging under the shoulders.',
+      'Brace hard — the torso angle must not change during the set.',
+    ],
+    mistakes: [
+      { wrong: 'Standing up a little on every rep to heave the weight', fix: 'Lighten the load and hold the hinge still.' },
+      { wrong: 'Pulling to the chest with the elbows flared', fix: 'Row to the lower ribs with the elbows closer to the body.' },
+      { wrong: 'Jerking through the lower back', fix: 'Initiate with the shoulder blades, not the hips.' },
+    ],
+    cues: ['Torso angle identical on rep 1 and the last rep', 'Squeeze the blades together at the top'],
+  },
+  'push-up': {
+    setup: [
+      'Hands just outside shoulder width, under the shoulders.',
+      'Set a rigid plank: glutes squeezed, ribs down, neck neutral.',
+    ],
+    mistakes: [
+      { wrong: 'Hips sagging toward the floor', fix: 'Squeeze the glutes and brace the abs before you descend.' },
+      { wrong: 'Elbows flaring out to 90°', fix: 'Keep them at about 45° from the torso.' },
+      { wrong: 'Head reaching for the floor before the chest', fix: 'Lead with the chest; the whole body moves as one plank.' },
+    ],
+    cues: ['A straight line from head to heels the whole set', 'Chest touches before anything else'],
+  },
+  'hanging-leg-raises': {
+    setup: [
+      'Hang from the bar with the shoulders active, not fully relaxed.',
+      'Squeeze the legs together and brace before the first rep.',
+    ],
+    mistakes: [
+      { wrong: 'Swinging and using momentum', fix: 'Pause at the bottom of every rep to kill the swing.' },
+      { wrong: 'Only lifting the legs, never the pelvis', fix: 'Curl the pelvis up at the top — that is what works the abs.' },
+      { wrong: 'Dropping the legs and losing tension', fix: 'Lower with the same tempo you raised.' },
+    ],
+    cues: ['The lower back rounds slightly at the top', 'No swing between reps'],
+  },
+  'bar-dips': {
+    setup: [
+      'Mount the bars with the arms locked and the shoulders pulled down.',
+      'Lean the torso forward for chest, stay upright for triceps.',
+    ],
+    mistakes: [
+      { wrong: 'Dropping too deep and stressing the shoulder', fix: 'Stop where the shoulder feels a stretch — never below it.' },
+      { wrong: 'Shoulders shrugging up toward the ears', fix: 'Keep them actively pressed down throughout.' },
+      { wrong: 'Bouncing out of the bottom', fix: 'Pause briefly, then press with control.' },
+    ],
+    cues: ['Shoulders stay below the elbows at the bottom', 'No shrug at any point'],
+  },
+}
+
+/** Variants that share a core lift's setup, faults and cues. */
+const DETAIL_ALIASES: Record<string, string> = {
+  'barbell-back-squat': 'barbell-squat',
+  'smith-machine-squat': 'barbell-squat',
+  'goblet-squat': 'barbell-squat',
+  'trap-bar-deadlift': 'deadlift',
+  'sumo-deadlift': 'deadlift',
+  'rack-pull': 'deadlift',
+  'kettlebell-deadlift': 'deadlift',
+  'dumbbell-rdl': 'romanian-deadlift',
+  'single-leg-rdl': 'romanian-deadlift',
+  'barbell-hip-thrust': 'hip-thrust-machine',
+  'single-leg-hip-thrust': 'hip-thrust-machine',
+  'glute-bridge': 'hip-thrust-machine',
+  'chin-ups': 'pull-ups',
+  'neutral-grip-pull-ups': 'pull-ups',
+  'weighted-pull-ups': 'pull-ups',
+  'assisted-pull-up': 'pull-ups',
+  'band-assisted-pull-up': 'pull-ups',
+  'dumbbell-bench-press': 'bench-press',
+  'close-grip-bench-press': 'bench-press',
+  'weighted-push-ups': 'push-up',
+  'seated-cable-row': 'barbell-row',
+  'one-arm-db-row': 'barbell-row',
+  'chest-supported-row': 'barbell-row',
+  'machine-row': 'barbell-row',
+  'assisted-dip': 'bar-dips',
+  'bench-dip': 'bar-dips',
+  'bar-knee-raises': 'hanging-leg-raises',
+  'hanging-knee-raise': 'hanging-leg-raises',
+  'leg-lowers': 'hanging-leg-raises',
+}
+
+/** Setup/faults/cues for a lift, following variant aliases. */
+export function coreDetailFor(exerciseId: string) {
+  return CORE_DETAIL[exerciseId] ?? CORE_DETAIL[DETAIL_ALIASES[exerciseId] ?? '']
 }
