@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { ChevronDown, ChevronUp, GripVertical, Zap, Trash2 } from 'lucide-react'
+import { ChevronDown, ChevronUp, GripVertical, Zap, Trash2, BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import type { ExerciseSessionState, LoggedSet } from '@/db/dexie'
 import type { ProgramExercise } from '@/data/obzen-program'
@@ -108,13 +108,14 @@ export function ExerciseCard({
                 <button
                   onClick={() => setShowDetail(true)}
                   className={cn(
-                    'text-[15px] leading-snug text-left underline decoration-dotted underline-offset-4',
+                    'text-[15px] leading-snug text-left underline decoration-dashed underline-offset-4',
                     status === 'skipped' && 'opacity-50',
                     status === 'complete' && 'line-through opacity-60'
                   )}
                   style={{
                     color: status === 'skipped' ? 'var(--dim)' : 'var(--accent)',
-                    textDecorationColor: 'var(--border-strong)',
+                    // Visible enough to read as tappable on both themes.
+                    textDecorationColor: 'var(--muted)',
                   }}
                   aria-label={`How to perform ${displayName}`}
                 >
@@ -174,8 +175,17 @@ export function ExerciseCard({
               )}
             </div>
 
-            {/* Right: history toggle + remove */}
+            {/* Right: guide, history toggle, remove */}
             <div className="shrink-0 flex items-center gap-1">
+              <button
+                onClick={() => setShowDetail(true)}
+                className="p-1 transition-opacity hover:opacity-70"
+                style={{ color: 'var(--muted)' }}
+                aria-label={`How to perform ${displayName}`}
+                title="How to perform it · muscles worked · swaps"
+              >
+                <BookOpen size={16} />
+              </button>
               <button
                 onClick={() => setShowHistory(h => !h)}
                 className="p-1 transition-opacity hover:opacity-70"
