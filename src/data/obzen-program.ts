@@ -297,16 +297,39 @@ function buildLibrary(programs: Record<string, ProgramDay>[]): LibraryExercise[]
       }
     }
   }
-  // Bench Press completes the SBD total but appears in neither program, so it
-  // is added here as a pickable catalog entry.
-  if (!byName.has('Bench Press')) {
-    byName.set('Bench Press', withTracking({
-      name: 'Bench Press', muscle: 'chest', sets: 3, reps: '5', rest: '2–3 min',
-      swaps: ['Dumbbell Bench Press', 'Close-Grip Bench Press', 'Chest Press Machine'],
-    }))
+  // Movements that belong in the catalog but appear in neither program —
+  // Bench Press completes the SBD total, the rest are common alternatives.
+  for (const extra of EXTRA_LIBRARY) {
+    if (!byName.has(extra.name)) byName.set(extra.name, withTracking(extra))
   }
   return [...byName.values()].sort((a, b) => a.name.localeCompare(b.name))
 }
+
+/** Pickable movements outside either program's day templates. */
+const EXTRA_LIBRARY: Omit<LibraryExercise, 'trackingMode' | 'isCompetitionLift'>[] = [
+  { name: 'Bench Press', muscle: 'chest', sets: 3, reps: '5', rest: '2–3 min',
+    swaps: ['Dumbbell Bench Press', 'Close-Grip Bench Press', 'Chest Press Machine'] },
+  { name: 'Bar Dips', muscle: 'chest', sets: 3, reps: '6–10', rest: '90s',
+    swaps: ['Assisted Dip', 'Bench Dip', 'Push-Up'] },
+  { name: 'Pull-Ups', muscle: 'back', sets: 3, reps: '5–8', rest: '90s',
+    swaps: ['Chin-Ups', 'Neutral Grip Pull-Ups', 'Lat Pulldown'] },
+  { name: 'Chin-Ups', muscle: 'back', sets: 3, reps: '5–8', rest: '90s',
+    swaps: ['Pull-Ups', 'Neutral Grip Pull-Ups', 'Lat Pulldown'] },
+  { name: 'Neutral Grip Pull-Ups', muscle: 'back', sets: 3, reps: '5–8', rest: '90s',
+    swaps: ['Pull-Ups', 'Chin-Ups', 'Lat Pulldown'] },
+  { name: 'Barbell Rear Delt Row', muscle: 'shoulders', sets: 3, reps: '10–12', rest: '75s',
+    swaps: ['Dumbbell Rear Delt Row', 'Face Pull', 'Reverse Pec Deck'] },
+  { name: 'Dumbbell Rear Delt Row', muscle: 'shoulders', sets: 3, reps: '10–12', rest: '75s',
+    swaps: ['Barbell Rear Delt Row', 'Face Pull', 'Rear Delt Fly'] },
+  { name: 'Barbell Front Raises', muscle: 'shoulders', sets: 3, reps: '10–12', rest: '60s',
+    swaps: ['Dumbbell Lateral Raises', 'Landmine Press'] },
+  { name: 'Dumbbell Lateral Raises', muscle: 'shoulders', sets: 3, reps: '12–15', rest: '60s',
+    swaps: ['Cable Lateral Raises', 'Barbell Front Raises'] },
+  { name: 'Barbell Curls', muscle: 'arms', sets: 3, reps: '8–10', rest: '60s',
+    swaps: ['Hammer Curls', 'Zottman Curl', 'Cable Bicep Curls'] },
+  { name: 'Zottman Curl', muscle: 'arms', sets: 3, reps: '10–12', rest: '60s',
+    swaps: ['Barbell Curls', 'Hammer Curls'] },
+]
 
 /** Combined catalog — every movement from both programs is pickable. */
 export const EXERCISE_LIBRARY: LibraryExercise[] = buildLibrary([PRONIT_PROGRAM, AISHWARYA_PROGRAM])

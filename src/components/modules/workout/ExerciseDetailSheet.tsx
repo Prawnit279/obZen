@@ -1,6 +1,8 @@
 import { X, Repeat } from 'lucide-react'
 import { guideFor, MUSCLE_LABEL } from '@/data/exercise-guides'
-import { MuscleMap, MUSCLE_PRIMARY_COLOR, MUSCLE_SECONDARY_COLOR } from './MuscleMap'
+import { MuscleFigure, MUSCLE_PRIMARY_COLOR, MUSCLE_SECONDARY_COLOR } from './MuscleFigure'
+import { ExerciseAnimation } from './ExerciseAnimation'
+import { motionFor } from '@/data/exercise-motions'
 import { LIBRARY_BY_ID, toExerciseId } from '@/data/obzen-program'
 
 interface Props {
@@ -35,6 +37,7 @@ function Legend({ colour, label, muscles }: { colour: string; label: string; mus
 export function ExerciseDetailSheet({ exerciseId, name, muscle, target, cue, onSwap, onClose }: Props) {
   const guide = guideFor(exerciseId, muscle)
   const swaps = LIBRARY_BY_ID[exerciseId]?.swaps ?? []
+  const motion = motionFor(exerciseId)
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end" style={{ background: 'rgba(0,0,0,0.7)' }}>
@@ -60,10 +63,13 @@ export function ExerciseDetailSheet({ exerciseId, name, muscle, target, cue, onS
         </header>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-5">
+          {/* The movement itself */}
+          {motion && <ExerciseAnimation motion={motion} label={name} />}
+
           {/* What it works */}
           {guide && (
             <section>
-              <MuscleMap primary={guide.primary} secondary={guide.secondary} />
+              <MuscleFigure primary={guide.primary} secondary={guide.secondary} />
               <div className="space-y-2 mt-3">
                 <Legend
                   colour={MUSCLE_PRIMARY_COLOR} label="Primary"

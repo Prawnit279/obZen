@@ -3,7 +3,7 @@
  *
  * Kept as static data (no images to ship, works offline) and rendered as a
  * highlighted body diagram plus written steps. Muscle ids match the regions
- * drawn in MuscleMap.
+ * drawn in MuscleFigure.
  */
 
 export type MuscleId =
@@ -266,6 +266,96 @@ export const EXERCISE_GUIDES: Record<string, ExerciseGuide> = {
       'Drop the heels for a full stretch.',
       'Rise as high as possible onto the toes.',
       'Pause at the top — no bouncing.',
+    ],
+  },
+  'bar-dips': {
+    primary: ['chest', 'triceps'], secondary: ['frontDelts'],
+    steps: [
+      'Grip the bars and lock the arms, shoulders down away from the ears.',
+      'Lean the torso forward to bias the chest; stay upright to bias triceps.',
+      'Lower until the shoulder feels a stretch — never below it.',
+      'Press back up without slamming the elbows straight.',
+    ],
+  },
+  'pull-ups': {
+    primary: ['lats'], secondary: ['biceps', 'rearDelts', 'forearms'],
+    steps: [
+      'Overhand grip, hands just outside shoulder width.',
+      'Start from a full hang with the shoulders active.',
+      'Pull the elbows down and back until the chin clears the bar.',
+      'Lower under control to a full hang each rep.',
+    ],
+  },
+  'chin-ups': {
+    primary: ['lats', 'biceps'], secondary: ['rearDelts', 'forearms'],
+    steps: [
+      'Underhand grip, hands about shoulder width.',
+      'Hang fully, then drive the elbows down toward the ribs.',
+      'Bring the chest toward the bar rather than just the chin.',
+      'Lower slowly — the biceps take more of the work here.',
+    ],
+  },
+  'neutral-grip-pull-ups': {
+    primary: ['lats'], secondary: ['biceps', 'forearms'],
+    steps: [
+      'Palms facing each other on parallel handles.',
+      'Full hang to start, shoulders packed down.',
+      'Pull until the chest is level with the hands.',
+      'This grip is usually the kindest on the shoulders.',
+    ],
+  },
+  'barbell-rear-delt-row': {
+    primary: ['rearDelts'], secondary: ['traps', 'lats', 'biceps'],
+    steps: [
+      'Hinge forward with a wide, overhand grip on the bar.',
+      'Row toward the upper chest with the elbows flaring out.',
+      'Squeeze the shoulder blades together at the top.',
+      'Lower under control without standing up.',
+    ],
+  },
+  'dumbbell-rear-delt-row': {
+    primary: ['rearDelts'], secondary: ['traps', 'lats'],
+    steps: [
+      'Hinge forward, dumbbells hanging straight down.',
+      'Row with the elbows high and wide, not tucked.',
+      'Pause briefly with the shoulder blades pinched.',
+      'Lower slowly to a full stretch.',
+    ],
+  },
+  'barbell-front-raises': {
+    primary: ['frontDelts'], secondary: ['sideDelts'],
+    steps: [
+      'Stand tall, bar resting against the thighs.',
+      'Raise the bar with straight arms to about eye level.',
+      'Keep the ribs down — no leaning back to swing it up.',
+      'Lower under control.',
+    ],
+  },
+  'dumbbell-lateral-raises': {
+    primary: ['sideDelts'],
+    steps: [
+      'Stand with a slight forward lean, dumbbells at the sides.',
+      'Raise out to shoulder height, leading with the elbows.',
+      'Keep a soft elbow and avoid shrugging.',
+      'Lower slowly — this one does not need heavy weight.',
+    ],
+  },
+  'barbell-curls': {
+    primary: ['biceps'], secondary: ['forearms'],
+    steps: [
+      'Stand tall, hands about shoulder width, elbows at the sides.',
+      'Curl the bar up while the elbows stay pinned in place.',
+      'Squeeze at the top without swinging the hips.',
+      'Lower all the way to a full stretch.',
+    ],
+  },
+  'zottman-curl': {
+    primary: ['biceps', 'forearms'],
+    steps: [
+      'Curl up with the palms facing you.',
+      'At the top, rotate the palms to face down.',
+      'Lower slowly in that pronated position.',
+      'Rotate back at the bottom and repeat.',
     ],
   },
   'hanging-leg-raises': {

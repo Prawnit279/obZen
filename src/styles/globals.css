@@ -34,6 +34,14 @@
     --skip-text:       #fca5a5;
     --skip-bg:         rgba(127, 29, 29, 0.06);
 
+    /* Muscle map — dark purple marks the primary mover, navy blue the
+       assisting muscles. Both are also named in the legend, so meaning never
+       rests on colour alone. */
+    --muscle-primary:   #7c3aed;
+    --muscle-secondary: #1e40af;
+    --muscle-body:      #3f3f46;
+    --muscle-outline:   #52525b;
+
     /* Chart series — distinct hues, tuned for a dark surface. Dash patterns
        still differ per series, so colour is reinforcement, not the only cue. */
     --series-1: #6ea8fe;
@@ -79,6 +87,13 @@
     --skip-border:     #c62828;
     --skip-text:       #b71c1c;
     --skip-bg:         rgba(198, 40, 40, 0.08);
+
+    /* Muscle map — deeper on light so the shading still reads against a
+       lighter body silhouette. */
+    --muscle-primary:   #6d28d9;
+    --muscle-secondary: #1e3a8a;
+    --muscle-body:      #c4c4cc;
+    --muscle-outline:   #8a8a94;
 
     /* Chart series — same hues, darkened so they read on a light surface. */
     --series-1: #1f5fbf;
@@ -275,4 +290,9 @@
     @apply text-[11px] uppercase tracking-widest mb-3;
     color: var(--muted);
   }
+}
+
+/* Hold the opening pose for anyone who prefers reduced motion. */
+@media (prefers-reduced-motion: reduce) {
+  .exercise-animation animate { display: none; }
 }
