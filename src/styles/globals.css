@@ -41,6 +41,9 @@
     --muscle-secondary: #1e40af;
     --muscle-body:      #3f3f46;
     --muscle-outline:   #52525b;
+    /* Iron stays neutral: purple and blue already mean "muscle worked". */
+    --equip-iron:       #8b8f98;
+    --equip-plate:      #6b7079;
 
     /* Chart series — distinct hues, tuned for a dark surface. Dash patterns
        still differ per series, so colour is reinforcement, not the only cue. */
@@ -94,6 +97,8 @@
     --muscle-secondary: #1e3a8a;
     --muscle-body:      #c4c4cc;
     --muscle-outline:   #8a8a94;
+    --equip-iron:       #6b7079;
+    --equip-plate:      #4b5058;
 
     /* Chart series — same hues, darkened so they read on a light surface. */
     --series-1: #1f5fbf;
