@@ -203,7 +203,10 @@ export function WorkoutProgress() {
               <li key={pr.exerciseId} className="flex items-baseline justify-between gap-3">
                 <span className="text-[15px] truncate" style={{ color: 'var(--accent)' }}>{pr.name}</span>
                 <span className="text-[13px] tabular-nums shrink-0" style={{ color: 'var(--muted)' }}>
-                  {lb(pr.e1rm)} lb
+                  {lb(pr.weightKg)} lb × {pr.reps}
+                  <span className="ml-2 text-[11px]" style={{ color: 'var(--dim)' }}>
+                    ~{lb(pr.e1rm)} est. 1RM
+                  </span>
                   <span className="ml-2 text-[11px]" style={{ color: 'var(--dim)' }}>{pr.date}</span>
                 </span>
               </li>

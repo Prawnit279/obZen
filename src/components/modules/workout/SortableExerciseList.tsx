@@ -14,6 +14,7 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable'
 import type { ExerciseSessionState, LoggedSet } from '@/db/dexie'
+import type { ProgressionSuggestion } from '@/lib/progress'
 import type { ProgramExercise } from '@/data/obzen-program'
 import { ExerciseCard } from './ExerciseCard'
 
@@ -28,6 +29,8 @@ interface Props {
   onUpdateSet: (exerciseId: string, index: number, set: LoggedSet) => void
   onRemoveSet: (exerciseId: string, index: number) => void
   onRemoveExercise: (exerciseId: string) => void
+  onSwapExercise?: (exerciseId: string, toName: string) => void
+  progressions?: Record<string, ProgressionSuggestion>
 }
 
 export function SortableExerciseList({
@@ -41,6 +44,8 @@ export function SortableExerciseList({
   onUpdateSet,
   onRemoveSet,
   onRemoveExercise,
+  onSwapExercise,
+  progressions,
 }: Props) {
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -97,6 +102,8 @@ export function SortableExerciseList({
               onUpdateSet={(i, set) => onUpdateSet(ex.exerciseId, i, set)}
               onRemoveSet={i => onRemoveSet(ex.exerciseId, i)}
               onRemoveExercise={() => onRemoveExercise(ex.exerciseId)}
+              onSwapExercise={onSwapExercise && (toName => onSwapExercise(ex.exerciseId, toName))}
+              progression={progressions?.[ex.exerciseId]}
             />
           ))}
         </div>

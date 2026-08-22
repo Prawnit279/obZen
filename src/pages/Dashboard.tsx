@@ -13,7 +13,7 @@ import {
 import { DAILY_AYURVEDA_TIPS } from '@/data/ayurveda'
 import { VEDIC_REMEDIES } from '@/data/vedic-remedies'
 import { getProgram, getScheduledDay } from '@/data/obzen-program'
-import { SHOW_NUTRITION, SHOW_VEDIC } from '@/config/features'
+import { SHOW_NUTRITION, SHOW_VEDIC, SHOW_ASTROLOGY } from '@/config/features'
 import { PROFILES, PROFILE_IDS } from '@/config/profiles'
 import { useProfileStore } from '@/store/useProfileStore'
 import { Card, CardHeader } from '@/components/ui/Card'
@@ -138,13 +138,17 @@ export default function Dashboard() {
           {PROFILES[activeId].name}'s day
         </div>
         <div className="flex items-center gap-3 mt-1 flex-wrap">
-          <span className="text-[10px] uppercase tracking-widest text-noir-dim">
-            {planetaryDay.planet} Day
-          </span>
-          <span className="text-noir-dim">·</span>
-          <span className="text-[10px] uppercase tracking-widest text-noir-dim">
-            {getMoonPhaseName()}
-          </span>
+          {SHOW_ASTROLOGY && (
+            <>
+              <span className="text-[10px] uppercase tracking-widest text-noir-dim">
+                {planetaryDay.planet} Day
+              </span>
+              <span className="text-noir-dim">·</span>
+              <span className="text-[10px] uppercase tracking-widest text-noir-dim">
+                {getMoonPhaseName()}
+              </span>
+            </>
+          )}
           {isPittaSeasonPeak() && (
             <Badge variant="red" className="text-[9px]">Pitta Season</Badge>
           )}
@@ -172,7 +176,7 @@ export default function Dashboard() {
       {dashTab === 'today' && <>
 
       {/* Smart warnings */}
-      {(showForearmWarning || showRestWarning || isSaturday()) && (
+      {(showForearmWarning || showRestWarning || (SHOW_ASTROLOGY && isSaturday())) && (
         <div className="space-y-2">
           {showRestWarning && (
             <div className="flex items-start gap-2 p-3 border border-noir-red/40 rounded-[2px] bg-noir-red/5">
@@ -196,7 +200,7 @@ export default function Dashboard() {
               </div>
             </div>
           )}
-          {isSaturday() && (
+          {SHOW_ASTROLOGY && isSaturday() && (
             <div className="flex items-start gap-2 p-3 border border-noir-border rounded-[2px]">
               <Flame size={14} className="text-noir-muted mt-0.5 shrink-0" />
               <div>

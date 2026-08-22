@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useNavigate } from 'react-router-dom'
 import { useCalendarStore } from '@/store/useCalendarStore'
 import { useProfileStore } from '@/store/useProfileStore'
+import { SHOW_ASTROLOGY } from '@/config/features'
 import { belongsToProfile, sessionHasActivity } from '@/lib/workoutSession'
 import { Card } from '@/components/ui/Card'
 import { cn, getMoonPhaseName } from '@/lib/utils'
@@ -519,11 +520,13 @@ export default function Calendar() {
             </div>
           </Card>
 
-          <div className="flex items-center gap-2">
-            <div className="text-[10px] uppercase tracking-widest text-noir-dim">{getMoonPhaseName()}</div>
-            <span className="text-noir-dim">·</span>
-            <div className="text-[10px] uppercase tracking-widest text-noir-dim">♄ Saturn = Saturday</div>
-          </div>
+          {SHOW_ASTROLOGY && (
+            <div className="flex items-center gap-2">
+              <div className="text-[10px] uppercase tracking-widest text-noir-dim">{getMoonPhaseName()}</div>
+              <span className="text-noir-dim">·</span>
+              <div className="text-[10px] uppercase tracking-widest text-noir-dim">♄ Saturn = Saturday</div>
+            </div>
+          )}
 
           {monthEvents.length > 0 && (
             <div className="space-y-1.5">

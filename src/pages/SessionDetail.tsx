@@ -56,6 +56,15 @@ export default function SessionDetail() {
     )
   }
 
+  // A workout can be finished after the fact — mark a past session complete
+  // (or reopen it) without having to hunt for the right date in Train.
+  const toggleComplete = async () => {
+    if (session.id == null) return
+    await db.workoutDaySessions.update(session.id, {
+      completedAt: session.completedAt ? undefined : new Date(`${session.date}T12:00:00`).toISOString(),
+    })
+  }
+
   const map = Object.fromEntries(session.exercises.map(e => [e.exerciseId, e]))
   const ordered = session.order.map(eid => map[eid]).filter(Boolean) as ExerciseSessionState[]
   const allOrdered = ordered.length > 0 ? ordered : session.exercises
@@ -89,6 +98,26 @@ export default function SessionDetail() {
             </span>
           )}
         </div>
+
+        {/* Finish (or reopen) a workout after the day it was trained. */}
+        <button
+          onClick={toggleComplete}
+          className="mt-3 w-full py-2.5 rounded-[2px] text-[12px] uppercase tracking-widest transition-opacity hover:opacity-80"
+          style={session.completedAt
+            ? { border: '1px solid var(--border)', color: 'var(--muted)' }
+            : { border: '1px solid var(--complete-border)', color: 'var(--complete-text)' }}
+        >
+          {session.completedAt ? 'Reopen workout' : 'Mark workout complete'}
+        </button>
+
+        {/* Editing sets happens in Train, on this session's own date. */}
+        <button
+          onClick={() => navigate(`/workout?date=${session.date}&day=${encodeURIComponent(session.dayLabel)}`)}
+          className="mt-2 w-full py-2.5 rounded-[2px] text-[12px] uppercase tracking-widest transition-opacity hover:opacity-80"
+          style={{ border: '1px solid var(--border)', color: 'var(--muted)' }}
+        >
+          Edit sets for this day
+        </button>
       </div>
 
       {/* Exercises */}

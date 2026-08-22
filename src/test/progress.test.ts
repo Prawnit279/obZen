@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest'
 import type { WorkoutDaySession, LoggedSet } from '@/db/dexie'
 import {
-  toKg, isRealSet, epley1RM, bestE1RM, e1rmSeries, bestCurrentE1RM, sbdTotal,
-  isoWeekKey, exerciseTonnage, weeklyVolume, exercisePRs, recentPRs,
-  dotsScore, strengthStandard, trackingSeries, weeklyRepVolume, delta,
+  toKg, isRealSet, epley1RM, bestE1RM, e1rmSeries, bestCurrentE1RM, sbdTotal, recentPRs,
+  isoWeekKey, exerciseTonnage, weeklyVolume, exercisePRs,
+  dotsScore, strengthStandard, trackingSeries, weeklyRepVolume, delta, suggestProgression, topOfRepRange, kgToLb,
 } from '@/lib/progress'
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
@@ -342,5 +342,75 @@ describe('delta', () => {
   })
   it('is 0 for a single point', () => {
     expect(delta([{ date: 'a', value: 30 }])).toBe(0)
+  })
+})
+
+describe('recentPRs — reports the weight actually lifted', () => {
+  it('uses the heaviest real set, not the inflated e1RM', () => {
+    // 90 kg x 12 gives an Epley e1RM of 126 — showing that as a "personal
+    // record" would claim a lift that never happened.
+    const sessions = [session('2026-08-10', 'hip-thrust-machine', [set(90, 12)])]
+    const [pr] = recentPRs(sessions)
+
+    expect(pr.weightKg).toBe(90)
+    expect(pr.reps).toBe(12)
+    expect(pr.e1rm).toBeCloseTo(126, 1) // still available, clearly secondary
+  })
+
+  it('prefers the heaviest set over one with more reps', () => {
+    const sessions = [
+      session('2026-08-10', 'hip-thrust-machine', [set(60, 15), set(100, 5)]),
+    ]
+    const [pr] = recentPRs(sessions)
+    expect(pr.weightKg).toBe(100)
+    expect(pr.reps).toBe(5)
+  })
+
+  it('dates the PR to the session where the heaviest set happened', () => {
+    const sessions = [
+      session('2026-08-01', 'hip-thrust-machine', [set(100, 5)]),
+      session('2026-08-10', 'hip-thrust-machine', [set(80, 5)]),
+    ]
+    const [pr] = recentPRs(sessions)
+    expect(pr.weightKg).toBe(100)
+    expect(pr.date).toBe('2026-08-01')
+  })
+})
+
+describe('suggestProgression — her plan\'s add-load rule', () => {
+  const at = (date: string, sets: LoggedSet[]) => session(date, 'hip-thrust-machine', sets)
+
+  it('suggests more load after two sessions at the top of the range', () => {
+    const sessions = [at('2026-08-05', [set(40, 12), set(40, 12)]), at('2026-08-08', [set(40, 12), set(40, 12)])]
+    const s = suggestProgression(sessions, 'hip-thrust-machine', '10–12', 'legs')
+    expect(s).toBeDefined()
+    expect(s!.currentKg).toBe(40)
+    expect(kgToLb(s!.nextKg - s!.currentKg)).toBeCloseTo(5, 1) // +5 lb, lower body
+  })
+
+  it('stays silent after only one qualifying session', () => {
+    const sessions = [at('2026-08-08', [set(40, 12)])]
+    expect(suggestProgression(sessions, 'hip-thrust-machine', '10–12', 'legs')).toBeUndefined()
+  })
+
+  it('stays silent when a set fell short of the range', () => {
+    const sessions = [at('2026-08-05', [set(40, 12), set(40, 10)]), at('2026-08-08', [set(40, 12), set(40, 12)])]
+    expect(suggestProgression(sessions, 'hip-thrust-machine', '10–12', 'legs')).toBeUndefined()
+  })
+
+  it('uses the smaller jump for upper body', () => {
+    const sessions = [at('2026-08-05', [set(20, 10)]), at('2026-08-08', [set(20, 10)])]
+    const s = suggestProgression(sessions, 'hip-thrust-machine', '10', 'shoulders')
+    expect(kgToLb(s!.nextKg - s!.currentKg)).toBeCloseTo(2.5, 1)
+  })
+
+  it('does not apply to timed holds', () => {
+    expect(topOfRepRange('20–30s')).toBeUndefined()
+  })
+
+  it('reads the top of a range correctly', () => {
+    expect(topOfRepRange('10–12')).toBe(12)
+    expect(topOfRepRange('8/leg')).toBe(8)
+    expect(topOfRepRange('5')).toBe(5)
   })
 })

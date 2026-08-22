@@ -2,7 +2,7 @@ import { create } from 'zustand'
 import { db } from '@/db/dexie'
 import type { WorkoutDaySession, ExerciseSessionState, LoggedSet } from '@/db/dexie'
 import { todayISO } from '@/lib/utils'
-import { getProgram, formatTarget, toExerciseId } from '@/data/obzen-program'
+import { getProgram, formatTarget, toExerciseId, LIBRARY_BY_ID } from '@/data/obzen-program'
 import { useProfileStore } from '@/store/useProfileStore'
 import { sessionProfile } from '@/lib/workoutSession'
 
@@ -54,6 +54,7 @@ interface WorkoutDayState {
   reorderExercises: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', newOrder: string[], date?: string) => Promise<void>
   addExercise: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exercise: ExerciseSessionState, date?: string) => Promise<void>
   removeExercise: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, date?: string) => Promise<void>
+  swapExercise: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, toName: string, date?: string) => Promise<void>
   setExerciseNote: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, note: string, date?: string) => Promise<void>
   updateExerciseUnit: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, unit: 'lbs' | 'kg', date?: string) => Promise<void>
 }
@@ -243,6 +244,33 @@ export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => {
         exercises: s.exercises.filter(e => e.exerciseId !== exerciseId),
         order: s.order.filter(id => id !== exerciseId),
       }))
+    },
+
+    // Replace a movement with one of its listed alternatives, in place. Any
+    // sets already logged stay with the old exercise's slot being replaced —
+    // swapping is meant for before you start, not mid-exercise.
+    swapExercise: async (dayLabel, exerciseId, toName, date = todayISO()) => {
+      const key = `${activeProfile()}::${dayLabel}::${date}`
+      const newId = toExerciseId(toName)
+      const entry = LIBRARY_BY_ID[newId]
+
+      await mutate(key, s => {
+        if (s.exercises.some(e => e.exerciseId === newId)) return s // already there
+        const replacement: ExerciseSessionState = {
+          exerciseId: newId,
+          name: toName,
+          muscle: entry?.muscle,
+          target: entry ? formatTarget(entry) : undefined,
+          status: 'pending',
+          sets: [],
+          addedFrom: 'library',
+        }
+        return {
+          ...s,
+          exercises: s.exercises.map(e => (e.exerciseId === exerciseId ? replacement : e)),
+          order: s.order.map(id => (id === exerciseId ? newId : id)),
+        }
+      })
     },
 
     setExerciseNote: async (dayLabel, exerciseId, note, date = todayISO()) => {

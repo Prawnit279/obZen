@@ -273,19 +273,42 @@ export function exercisePRs(
 export interface RecentPR {
   exerciseId: string
   name: string
+  /** Heaviest set actually performed — the weight on the bar. */
+  weightKg: number
+  /** Reps achieved at that weight. */
+  reps: number
+  /** Estimated 1RM, shown as a secondary figure. */
   e1rm: number
   date: string
 }
 
-/** Every exercise's all-time e1RM PR, most recent first. */
+/**
+ * Each exercise's personal record, most recent first.
+ *
+ * The PR is the heaviest set actually lifted, not the estimated 1RM. Epley
+ * multiplies by 1 + reps/30, so a 12-rep set reads 40% above the weight on the
+ * bar — presenting that as a "personal record" is misleading, especially for
+ * higher-rep hypertrophy work. e1RM is still returned, as a secondary figure.
+ */
 export function recentPRs(sessions: WorkoutDaySession[], bodyweightKg = 0): RecentPR[] {
   const ids = new Set(sessions.flatMap(s => s.exercises.map(e => e.exerciseId)))
   return [...ids]
     .map(id => {
       const pr = exercisePRs(sessions, id, bodyweightKg)
-      return pr.bestE1RM
-        ? { exerciseId: id, name: pr.name, e1rm: pr.bestE1RM.e1rm, date: pr.bestE1RM.date }
-        : null
+      // Heaviest actual set across every rep count.
+      const heaviest = pr.byRep.reduce<RepPR | undefined>(
+        (best, row) => (!best || row.weightKg > best.weightKg ? row : best),
+        undefined
+      )
+      if (!heaviest) return null
+      return {
+        exerciseId: id,
+        name: pr.name,
+        weightKg: heaviest.weightKg,
+        reps: heaviest.reps,
+        e1rm: pr.bestE1RM?.e1rm ?? 0,
+        date: heaviest.date,
+      }
     })
     .filter((x): x is RecentPR => x !== null)
     .sort((a, b) => b.date.localeCompare(a.date))
@@ -459,4 +482,71 @@ export function weeklyRepVolume(sessions: WorkoutDaySession[], exerciseId: strin
 export function delta(points: TrackPoint[]): number {
   if (points.length < 2) return 0
   return points[points.length - 1].value - points[0].value
+}
+
+// ── Progression suggestions ──────────────────────────────────────────────────
+
+/** Top of a prescribed rep range: '10–12' -> 12, '8/leg' -> 8, '5' -> 5. */
+export function topOfRepRange(reps: string | undefined): number | undefined {
+  if (!reps) return undefined
+  // Timed holds ('20–30s') are not a rep target.
+  if (/s\s*$/i.test(reps.trim())) return undefined
+  const numbers = reps.match(/\d+/g)
+  if (!numbers || numbers.length === 0) return undefined
+  return Math.max(...numbers.map(Number))
+}
+
+export interface ProgressionSuggestion {
+  /** Suggested next working weight in kg. */
+  nextKg: number
+  /** The weight it is based on. */
+  currentKg: number
+  /** How many qualifying sessions in a row, for the explanation. */
+  qualifyingSessions: number
+}
+
+/** Upper-body movements progress in smaller jumps than lower-body ones. */
+const UPPER_BODY: ReadonlySet<string> = new Set(['back', 'chest', 'shoulders', 'arms'])
+
+/**
+ * Her plan's progression rule: add load once the top of the rep range is hit on
+ * every working set, two sessions running — 5–10 lb lower body, 2.5–5 lb upper.
+ * The conservative end of each range is used.
+ *
+ * Returns undefined until the rule is actually met, so the app never nudges her
+ * upward early. Sets/reps themselves stay as written; Phase 1 only adds load.
+ */
+export function suggestProgression(
+  sessions: WorkoutDaySession[],
+  exerciseId: string,
+  repTarget: string | undefined,
+  muscleGroup: string | undefined
+): ProgressionSuggestion | undefined {
+  const top = topOfRepRange(repTarget)
+  if (top === undefined) return undefined
+
+  // Most recent sessions containing this exercise, newest first.
+  const history = sessions
+    .filter(s => s.exercises.some(e => e.exerciseId === exerciseId && realSets(e).length > 0))
+    .sort((a, b) => b.date.localeCompare(a.date))
+    .slice(0, 2)
+
+  if (history.length < 2) return undefined
+
+  let heaviest = 0
+  for (const session of history) {
+    const ex = session.exercises.find(e => e.exerciseId === exerciseId)!
+    const sets = realSets(ex)
+    // Every working set must have reached the top of the range.
+    if (!sets.every(s => s.reps >= top)) return undefined
+    heaviest = Math.max(heaviest, ...sets.map(s => toKg(s.weight, s.unit)))
+  }
+  if (heaviest <= 0) return undefined
+
+  const incrementLb = muscleGroup && UPPER_BODY.has(muscleGroup) ? 2.5 : 5
+  return {
+    currentKg: heaviest,
+    nextKg: heaviest + lbToKg(incrementLb),
+    qualifyingSessions: history.length,
+  }
 }

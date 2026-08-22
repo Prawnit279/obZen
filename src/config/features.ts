@@ -8,3 +8,10 @@
  */
 export const SHOW_NUTRITION = false
 export const SHOW_VEDIC = false
+
+/**
+ * Astrology surfaces outside the Vedic module — the planetary day, moon phase
+ * and Saturn-day prompt on Home, and the moon/Saturn line on the Calendar.
+ * Ayurveda (dosha, Pitta season) is a separate system and stays visible.
+ */
+export const SHOW_ASTROLOGY = false

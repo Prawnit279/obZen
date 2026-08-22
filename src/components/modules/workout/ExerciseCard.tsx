@@ -8,6 +8,9 @@ import type { ProgramExercise } from '@/data/obzen-program'
 import { PULL_HEAVY_EXERCISES, FOREARM_LOAD_EXERCISES } from '@/data/obzen-program'
 import { ExerciseHistory } from './ExerciseHistory'
 import { SetLogger } from './SetLogger'
+import { ExerciseDetailSheet } from './ExerciseDetailSheet'
+import { displayLb } from '@/lib/progress'
+import type { ProgressionSuggestion } from '@/lib/progress'
 
 // ---------------------------------------------------------------------------
 // Status-based style maps
@@ -32,6 +35,10 @@ interface Props {
   onRemoveSet: (index: number) => void
   /** Drop this exercise from the day entirely. */
   onRemoveExercise: () => void
+  /** Replace this exercise with one of its listed alternatives. */
+  onSwapExercise?: (toName: string) => void
+  /** Add-load suggestion when the plan's progression rule is met. */
+  progression?: ProgressionSuggestion
 }
 
 export function ExerciseCard({
@@ -44,8 +51,11 @@ export function ExerciseCard({
   onUpdateSet,
   onRemoveSet,
   onRemoveExercise,
+  onSwapExercise,
+  progression,
 }: Props) {
   const [showHistory, setShowHistory] = useState(false)
+  const [showDetail, setShowDetail] = useState(false)
   const [confirmRemove, setConfirmRemove] = useState(false)
 
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
@@ -93,18 +103,23 @@ export function ExerciseCard({
         <div className="flex-1 min-w-0 px-3 py-3">
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
-              {/* Exercise name */}
+              {/* Exercise name — tap for form, muscles worked and swaps */}
               <div className="flex items-center gap-2 flex-wrap">
-                <span
+                <button
+                  onClick={() => setShowDetail(true)}
                   className={cn(
-                    'text-[15px] leading-snug',
+                    'text-[15px] leading-snug text-left underline decoration-dotted underline-offset-4',
                     status === 'skipped' && 'opacity-50',
                     status === 'complete' && 'line-through opacity-60'
                   )}
-                  style={{ color: status === 'skipped' ? 'var(--dim)' : 'var(--accent)' }}
+                  style={{
+                    color: status === 'skipped' ? 'var(--dim)' : 'var(--accent)',
+                    textDecorationColor: 'var(--border-strong)',
+                  }}
+                  aria-label={`How to perform ${displayName}`}
                 >
                   {displayName}
-                </span>
+                </button>
                 {exerciseState.addedFrom && (
                   <span className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
                     +{exerciseState.addedFrom}
@@ -134,6 +149,17 @@ export function ExerciseCard({
                 <div className="text-[11px] mt-0.5 uppercase tracking-widest" style={{ color: 'var(--muted)' }}>
                   {target}
                   {muscle && <span className="ml-2 normal-case capitalize">{muscle}</span>}
+                </div>
+              )}
+
+              {/* Add-load suggestion, once the plan's rule is met */}
+              {progression && status !== 'skipped' && (
+                <div
+                  className="text-[12px] mt-1.5 px-2 py-1 rounded-[2px] inline-block"
+                  style={{ color: 'var(--complete-text)', border: '1px solid var(--complete-border)' }}
+                >
+                  Try {displayLb(progression.nextKg)} lb today — you hit the top of the range twice at{' '}
+                  {displayLb(progression.currentKg)} lb
                 </div>
               )}
 
@@ -261,6 +287,22 @@ export function ExerciseCard({
           onAddSet={onAddSet}
           onUpdateSet={onUpdateSet}
           onRemoveSet={onRemoveSet}
+        />
+      )}
+
+      {/* Form, muscles worked and swap options */}
+      {showDetail && (
+        <ExerciseDetailSheet
+          exerciseId={exerciseState.exerciseId}
+          name={displayName}
+          muscle={muscle}
+          target={target}
+          cue={cue}
+          onSwap={onSwapExercise && (toName => {
+            onSwapExercise(toName)
+            setShowDetail(false)
+          })}
+          onClose={() => setShowDetail(false)}
         />
       )}
     </div>

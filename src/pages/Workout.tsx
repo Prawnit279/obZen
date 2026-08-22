@@ -1,11 +1,14 @@
 import { useState, useEffect, useMemo } from 'react'
 import { useLiveQuery } from 'dexie-react-hooks'
+import { useSearchParams } from 'react-router-dom'
 import { Plus, AlertTriangle, Zap } from 'lucide-react'
 import { getProgram, EXERCISE_LIBRARY, toExerciseId, PULL_HEAVY_EXERCISES, FOREARM_LOAD_EXERCISES } from '@/data/obzen-program'
 import type { ProgramExercise } from '@/data/obzen-program'
 import { useProfileStore } from '@/store/useProfileStore'
 import { PROFILES, PROFILE_IDS } from '@/config/profiles'
 import { belongsToProfile } from '@/lib/workoutSession'
+import { suggestProgression } from '@/lib/progress'
+import type { ProgressionSuggestion } from '@/lib/progress'
 import { db } from '@/db/dexie'
 import { todayISO } from '@/lib/utils'
 import { cn } from '@/lib/utils'
@@ -96,6 +99,19 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
   const program = getProgram(activeId)[dayLabel]
   const programMap = useMemo(() => buildProgramMap(activeId), [activeId])
 
+  // Add-load suggestions come from this profile's own logged history.
+  const allSessions = useLiveQuery(() => db.workoutDaySessions.toArray(), []) ?? []
+  const progressions = useMemo(() => {
+    const mine = allSessions.filter(s => belongsToProfile(s, activeId) && s.date < sessionDate)
+    const out: Record<string, ProgressionSuggestion> = {}
+    for (const ex of session?.exercises ?? []) {
+      const prog = programMap[ex.exerciseId]
+      const s = suggestProgression(mine, ex.exerciseId, prog?.reps, prog?.muscle)
+      if (s) out[ex.exerciseId] = s
+    }
+    return out
+  }, [allSessions, activeId, sessionDate, session, programMap])
+
   // Derive ordered exercises
   const orderedExercises = useMemo(() => {
     if (!session) return []
@@ -183,6 +199,8 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
           onUpdateSet={(exerciseId, index, set) => store.updateLoggedSet(dayLabel, exerciseId, index, set, sessionDate)}
           onRemoveSet={(exerciseId, index) => store.removeLoggedSet(dayLabel, exerciseId, index, sessionDate)}
           onRemoveExercise={exerciseId => store.removeExercise(dayLabel, exerciseId, sessionDate)}
+          onSwapExercise={(exerciseId, toName) => store.swapExercise(dayLabel, exerciseId, toName, sessionDate)}
+          progressions={progressions}
         />
       )}
 
@@ -235,9 +253,17 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
 
 export default function Workout() {
   const [tab, setTab] = useState<Tab>('program')
-  const [selectedDay, setSelectedDay] = useState<DayLabel | 'Rest'>('Day 1')
+  // "Edit sets for this day" in a past session links here with the date and day,
+  // so editing a finished workout lands on the right session.
+  const [searchParams] = useSearchParams()
+  const linkedDate = searchParams.get('date')
+  const linkedDay = searchParams.get('day') as DayLabel | null
+
+  const [selectedDay, setSelectedDay] = useState<DayLabel | 'Rest'>(
+    linkedDay && DAYS.includes(linkedDay) ? linkedDay : 'Day 1'
+  )
   // Which date is being logged — today unless the user backdates a session.
-  const [sessionDate, setSessionDate] = useState<string>(TODAY)
+  const [sessionDate, setSessionDate] = useState<string>(linkedDate ?? TODAY)
   const activeProfileId = useProfileStore(s => s.activeId)
   const setActiveProfile = useProfileStore(s => s.setActive)
 
