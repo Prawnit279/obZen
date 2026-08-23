@@ -132,3 +132,39 @@ describe('core lifts — the ones actually trained most', () => {
     expect(coreDetailFor('face-pull')).toBeUndefined()
   })
 })
+
+describe('drawing angle', () => {
+  /** Mirrors the renderer's rule; see isProfileView in ExerciseAnimation. */
+  const drawsInProfile = (id: string) => {
+    const m = EXERCISE_MOTIONS[id]
+    if (m.view === 'side') return true
+    return Math.abs(m.poses[0].hip[1] - m.poses[0].neck[1]) < 18
+  }
+
+  it('draws hinges and rows in profile, where the hip angle is visible', () => {
+    const hingesAndRows = [
+      'deadlift', 'sumo-deadlift', 'trap-bar-deadlift', 'kettlebell-deadlift',
+      'romanian-deadlift', 'dumbbell-rdl', 'single-leg-rdl', 'good-morning',
+      'cable-pull-through', 'barbell-row', 'seated-cable-row', 'machine-row',
+      'one-arm-db-row', 'chest-supported-row', 'inverted-row',
+      'barbell-rear-delt-row', 'dumbbell-rear-delt-row',
+    ]
+    for (const id of hingesAndRows) {
+      expect(drawsInProfile(id), `${id} should be drawn in profile`).toBe(true)
+    }
+  })
+
+  it('draws lying movements in profile without needing a flag', () => {
+    // Their geometry gives them away: no vertical room to draw a front figure.
+    for (const id of ['bench-press', 'leg-press', 'dead-bug', 'push-up']) {
+      expect(EXERCISE_MOTIONS[id].view, `${id} should not need a flag`).toBeUndefined()
+      expect(drawsInProfile(id), `${id} should be drawn in profile`).toBe(true)
+    }
+  })
+
+  it('keeps upright movements facing the viewer', () => {
+    for (const id of ['barbell-squat', 'pull-ups', 'db-shoulder-press', 'db-lateral-raises', 'goblet-squat']) {
+      expect(drawsInProfile(id), `${id} should face forward`).toBe(false)
+    }
+  })
+})

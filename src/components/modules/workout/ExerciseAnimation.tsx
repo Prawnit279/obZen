@@ -55,14 +55,20 @@ function loopOf(motion: ExerciseMotion): Pose[] {
 }
 
 /**
- * Whether the lifter is lying or reclined — bench, hip thrust, push-up, leg
- * press, floor core work. Their poses lay the body out horizontally, so the
- * vertical spacing a front-on figure needs simply is not there; those are drawn
- * from the side, which is the only angle that shows the movement anyway.
+ * Whether to draw this movement in profile instead of facing the viewer. Two
+ * separate reasons, so two separate mechanisms:
  *
- * Read from the pose rather than a flag, so new motions classify themselves.
+ * Lying and reclined work — bench, hip thrust, push-up, leg press, floor core —
+ * lays the body out horizontally, leaving no vertical room for a front-on
+ * figure (a bench press has a 2px torso). That is read off the pose, so new
+ * motions classify themselves.
+ *
+ * Hinges and rows travel front-to-back, the one axis a front view cannot show.
+ * Geometry cannot catch those: an RDL starts standing tall, so its opening pose
+ * is indistinguishable from a squat's. They opt in explicitly instead.
  */
-function isRecumbent(motion: ExerciseMotion): boolean {
+function isProfileView(motion: ExerciseMotion): boolean {
+  if (motion.view === 'side') return true
   const p = motion.poses[0]
   return Math.abs(p.hip[1] - p.neck[1]) < 18
 }
@@ -303,7 +309,7 @@ function SideRig({ motion }: { motion: ExerciseMotion }) {
 
 export function ExerciseAnimation({ motion, label }: { motion: ExerciseMotion; label: string }) {
   const sides: Side[] = [-1, 1]
-  const recumbent = isRecumbent(motion)
+  const profile = isProfileView(motion)
   return (
     <div
       className="rounded-[2px] py-2 exercise-animation"
@@ -314,7 +320,7 @@ export function ExerciseAnimation({ motion, label }: { motion: ExerciseMotion; l
           <line x1="24" y1="146" x2="176" y2="146" stroke={OUTLINE} strokeWidth="1.5" strokeDasharray="4 4" />
         )}
         {motion.bench && (
-          recumbent
+          profile
             ? <rect
                 x={Math.min(motion.bench[0], motion.bench[2])} y={motion.bench[1]}
                 width={Math.abs(motion.bench[2] - motion.bench[0])} height="6" rx="2" fill={OUTLINE}
@@ -322,7 +328,7 @@ export function ExerciseAnimation({ motion, label }: { motion: ExerciseMotion; l
             : <rect x={MID - 42} y={motion.bench[1]} width="84" height="6" rx="2" fill={OUTLINE} />
         )}
 
-        {recumbent ? (
+        {profile ? (
           <SideRig motion={motion} />
         ) : (
           <>

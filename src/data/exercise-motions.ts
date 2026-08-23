@@ -32,6 +32,13 @@ export interface ExerciseMotion {
   ground?: boolean
   /** Bench/box as [x, y, width]. */
   bench?: [number, number, number]
+  /**
+   * Force the profile view. Hinges and rows travel front-to-back, which is
+   * exactly the axis a front-on figure cannot show — the hip angle that makes
+   * a deadlift a deadlift disappears head-on. Lying movements pick the profile
+   * view from their own geometry and do not need this.
+   */
+  view?: 'side'
 }
 
 // ── Base poses reused as starting points ─────────────────────────────────────
@@ -174,7 +181,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
 
   // ── Hinge pattern ──────────────────────────────────────────────────────────
   'deadlift': {
-    equipment: 'bar', durationSec: 4, caption: 'Bar against the shins, push the floor away',
+    equipment: 'bar', view: 'side', durationSec: 4, caption: 'Bar against the shins, push the floor away',
     poses: [
       pose({ head: [92, 66], neck: [94, 78], hip: [104, 104], knee: [96, 118], hand: [102, 128], elbow: [98, 104] }),
       pose({ head: [93, 62], neck: [95, 74], hip: [104, 100], knee: [97, 118], hand: [102, 122], elbow: [98, 99] }),
@@ -184,7 +191,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'romanian-deadlift': {
-    equipment: 'bar', durationSec: 3.8, caption: 'Push the hips back, stop at the stretch',
+    equipment: 'bar', view: 'side', durationSec: 3.8, caption: 'Push the hips back, stop at the stretch',
     poses: [
       pose({ hand: [100, 90], elbow: [100, 70] }),
       pose({ head: [95, 44], neck: [96, 56], hip: [104, 87], knee: [102, 114], hand: [99, 96], elbow: [98, 76] }),
@@ -194,7 +201,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'dumbbell-rdl': {
-    equipment: 'dumbbell', durationSec: 3.2, caption: 'Hips back, dumbbells close to the legs',
+    equipment: 'dumbbell', view: 'side', durationSec: 3.2, caption: 'Hips back, dumbbells close to the legs',
     poses: [
       pose({ hand: [102, 90], elbow: [101, 70] }),
       pose({ head: [90, 52], neck: [92, 62], hip: [108, 88], knee: [104, 114], hand: [100, 104] }),
@@ -202,7 +209,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'single-leg-rdl': {
-    equipment: 'dumbbell', durationSec: 3.2, caption: 'One leg back, hips level',
+    equipment: 'dumbbell', view: 'side', durationSec: 3.2, caption: 'One leg back, hips level',
     poses: [
       pose({ hand: [102, 90], elbow: [101, 70] }),
       pose({ head: [86, 56], neck: [90, 64], hip: [108, 88], knee: [116, 106], ankle: [130, 118], hand: [98, 106] }),
@@ -210,7 +217,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'good-morning': {
-    equipment: 'bar', durationSec: 3.2, caption: 'Bar on the back, hinge at the hips',
+    equipment: 'bar', view: 'side', durationSec: 3.2, caption: 'Bar on the back, hinge at the hips',
     poses: [
       pose({ hand: [96, 46], elbow: [88, 54] }),
       pose({ head: [88, 54], neck: [91, 62], hip: [108, 88], knee: [104, 114], hand: [88, 58], elbow: [82, 66] }),
@@ -218,7 +225,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'trap-bar-deadlift': {
-    equipment: 'bar', durationSec: 3.4, caption: 'Handles at your sides, stand up tall',
+    equipment: 'bar', view: 'side', durationSec: 3.4, caption: 'Handles at your sides, stand up tall',
     poses: [
       pose({ head: [94, 64], neck: [96, 76], hip: [104, 102], knee: [98, 118], hand: [104, 126], elbow: [100, 102] }),
       pose({ head: [97, 52], neck: [98, 64], hip: [102, 94], knee: [99, 116], hand: [103, 108] }),
@@ -226,7 +233,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'sumo-deadlift': {
-    equipment: 'bar', durationSec: 3.4, caption: 'Wide stance, hips close to the bar',
+    equipment: 'bar', view: 'side', durationSec: 3.4, caption: 'Wide stance, hips close to the bar',
     poses: [
       pose({ head: [96, 62], neck: [97, 74], hip: [102, 100], knee: [86, 118], hand: [100, 126], elbow: [99, 100] }),
       pose({ head: [98, 52], neck: [99, 64], hip: [101, 94], knee: [90, 118], hand: [100, 110] }),
@@ -242,7 +249,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'kettlebell-deadlift': {
-    equipment: 'dumbbell', durationSec: 3, caption: 'Bell between the feet, hinge and stand',
+    equipment: 'dumbbell', view: 'side', durationSec: 3, caption: 'Bell between the feet, hinge and stand',
     poses: [
       pose({ head: [94, 64], neck: [96, 76], hip: [104, 102], knee: [98, 118], hand: [100, 124], elbow: [99, 102] }),
       pose({ head: [97, 52], neck: [98, 64], hip: [102, 94], knee: [99, 116], hand: [100, 108] }),
@@ -339,7 +346,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'cable-pull-through': {
-    equipment: 'none', durationSec: 3, caption: 'Hinge, then snap the hips through',
+    equipment: 'none', view: 'side', durationSec: 3, caption: 'Hinge, then snap the hips through',
     poses: [
       pose({ hand: [96, 92], elbow: [98, 74] }),
       pose({ head: [90, 54], neck: [92, 64], hip: [108, 88], knee: [104, 114], hand: [90, 104], elbow: [92, 88] }),
@@ -554,7 +561,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
 
   // ── Horizontal pull ────────────────────────────────────────────────────────
   'seated-cable-row': {
-    equipment: 'bar', durationSec: 2.8, ground: false, bench: [58, 106, 40],
+    equipment: 'bar', view: 'side', durationSec: 2.8, ground: false, bench: [58, 106, 40],
     caption: 'Pull to the belly button, no rocking',
     poses: [
       { head: [80, 54], neck: [82, 66], hip: [84, 102], knee: [122, 104], ankle: [150, 116], elbow: [104, 76], hand: [130, 84] },
@@ -563,7 +570,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'barbell-row': {
-    equipment: 'bar', durationSec: 3.4, caption: 'Hinge to 45°, row to the lower ribs',
+    equipment: 'bar', view: 'side', durationSec: 3.4, caption: 'Hinge to 45°, row to the lower ribs',
     poses: [
       pose({ head: [84, 62], neck: [88, 70], hip: [110, 90], knee: [106, 114], elbow: [96, 96], hand: [96, 116] }),
       pose({ head: [84, 62], neck: [88, 70], hip: [110, 90], knee: [106, 114], elbow: [94, 92], hand: [96, 110] }),
@@ -573,7 +580,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'barbell-rear-delt-row': {
-    equipment: 'bar', durationSec: 2.8, caption: 'Wide grip, elbows flare to the sides',
+    equipment: 'bar', view: 'side', durationSec: 2.8, caption: 'Wide grip, elbows flare to the sides',
     poses: [
       pose({ head: [84, 66], neck: [88, 74], hip: [110, 92], knee: [106, 114], elbow: [98, 98], hand: [98, 118] }),
       pose({ head: [84, 66], neck: [88, 74], hip: [110, 92], knee: [106, 114], elbow: [100, 86], hand: [98, 104] }),
@@ -581,7 +588,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'dumbbell-rear-delt-row': {
-    equipment: 'dumbbell', durationSec: 2.8, caption: 'Elbows high and wide, squeeze the rear delts',
+    equipment: 'dumbbell', view: 'side', durationSec: 2.8, caption: 'Elbows high and wide, squeeze the rear delts',
     poses: [
       pose({ head: [84, 66], neck: [88, 74], hip: [110, 92], knee: [106, 114], elbow: [96, 98], hand: [96, 118] }),
       pose({ head: [84, 66], neck: [88, 74], hip: [110, 92], knee: [106, 114], elbow: [100, 86], hand: [96, 104] }),
@@ -607,7 +614,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'machine-row': {
-    equipment: 'none', durationSec: 2.8, bench: [66, 104, 24],
+    equipment: 'none', view: 'side', durationSec: 2.8, bench: [66, 104, 24],
     caption: 'Seated machine row, blades together',
     poses: [
       { head: [80, 54], neck: [82, 66], hip: [84, 100], knee: [112, 108], ankle: [116, 134], elbow: [106, 74], hand: [132, 78] },
