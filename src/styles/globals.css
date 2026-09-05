@@ -51,6 +51,8 @@
     --series-2: #7ee2a8;
     --series-3: #f2b366;
     --series-4: #d99ae8;
+    --series-5: #67d4d4;
+    --series-6: #f28b8b;
 
     --duration-fast:   150ms;
     --duration-normal: 300ms;
@@ -105,6 +107,8 @@
     --series-2: #1d7a4f;
     --series-3: #a35c10;
     --series-4: #7b3f9e;
+    --series-5: #0f6e6e;
+    --series-6: #b03b3b;
 
     color-scheme: light;
   }

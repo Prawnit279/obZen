@@ -1,39 +1,37 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/db/dexie'
+import { LIBRARY_BY_ID } from '@/data/obzen-program'
+import { belongsToProfile } from '@/lib/workoutSession'
+import { useProfileStore } from '@/store/useProfileStore'
+import { PROFILES } from '@/config/profiles'
+import { realSets, setWeightLb } from '@/lib/progress'
 
-const KEY_EXERCISES = ['Barbell Squat', 'Weighted Pull-ups', 'Deadlift']
-const LINE_COLORS = ['#d4d4d4', '#888888', '#555555']
-
-function parseWeight(w: string): number {
-  if (!w || w === '—' || w.toLowerCase() === 'bw') return 0
-  const m = w.match(/(\d+(?:\.\d+)?)/)
-  return m ? parseFloat(m[1]) : 0
-}
+const LINE_COLORS = ['var(--series-1)', 'var(--series-2)', 'var(--series-3)']
 
 function dateToMs(iso: string): number {
   return new Date(iso + 'T12:00:00').getTime()
 }
 
 export function ProgressOverloadChart() {
-  const logs = useLiveQuery(
-    () => db.exerciseLogs.toArray(),
-    []
-  )
+  const { activeId } = useProfileStore()
+  const keyLiftIds = PROFILES[activeId].progress.keyLiftIds
+  const sessions = useLiveQuery(() => db.workoutDaySessions.toArray(), [])
 
-  if (!logs) return <Empty text="Loading…" />
+  if (!sessions) return <Empty text="Loading…" />
 
-  // Filter to key exercises, compute max working weight per date
+  // Heaviest working weight per key lift per date, for the active profile.
   const seriesMap: Record<string, Record<string, number>> = {}
-  for (const ex of KEY_EXERCISES) seriesMap[ex] = {}
+  for (const id of keyLiftIds) seriesMap[id] = {}
 
-  for (const log of logs) {
-    if (!KEY_EXERCISES.includes(log.exerciseName)) continue
-    const maxW = log.sets
-      .filter(s => s.completed && !s.isWarmup)
-      .reduce((acc, s) => Math.max(acc, parseWeight(s.weight)), 0)
-    if (maxW === 0) continue
-    const prev = seriesMap[log.exerciseName][log.date] ?? 0
-    seriesMap[log.exerciseName][log.date] = Math.max(prev, maxW)
+  for (const session of sessions) {
+    if (!belongsToProfile(session, activeId)) continue
+    for (const ex of session.exercises) {
+      if (!keyLiftIds.includes(ex.exerciseId)) continue
+      const maxW = realSets(ex).reduce((acc, s) => Math.max(acc, setWeightLb(s)), 0)
+      if (maxW === 0) continue
+      const prev = seriesMap[ex.exerciseId][session.date] ?? 0
+      seriesMap[ex.exerciseId][session.date] = Math.max(prev, maxW)
+    }
   }
 
   // Collect all dates
@@ -65,7 +63,7 @@ export function ProgressOverloadChart() {
     return mt + ch - ((w - minW) / wRange) * ch
   }
 
-  const activeSeries = KEY_EXERCISES.filter(ex => Object.keys(seriesMap[ex]).length > 0)
+  const activeSeries = keyLiftIds.filter(ex => Object.keys(seriesMap[ex]).length > 0)
 
   return (
     <div>
@@ -89,7 +87,7 @@ export function ProgressOverloadChart() {
         <line x1={ml} y1={mt} x2={ml} y2={mt + ch} stroke="var(--dim)" strokeWidth="1" />
 
         {/* Lines + dots */}
-        {KEY_EXERCISES.map((ex, li) => {
+        {keyLiftIds.map((ex, li) => {
           const pts = Object.entries(seriesMap[ex])
             .sort((a, b) => a[0].localeCompare(b[0]))
           if (pts.length === 0) return null
@@ -124,9 +122,9 @@ export function ProgressOverloadChart() {
       <div className="flex gap-4 flex-wrap mt-1">
         {activeSeries.map(ex => (
           <div key={ex} className="flex items-center gap-1">
-            <div className="w-4 h-[2px]" style={{ background: LINE_COLORS[KEY_EXERCISES.indexOf(ex)] }} />
+            <div className="w-4 h-[2px]" style={{ background: LINE_COLORS[keyLiftIds.indexOf(ex)] }} />
             <span className="text-[8px] uppercase tracking-widest text-noir-dim">
-              {ex === 'Weighted Pull-ups' ? 'Pull-ups (+lbs)' : ex}
+              {LIBRARY_BY_ID[ex]?.name ?? ex}
             </span>
           </div>
         ))}

@@ -30,8 +30,8 @@ export interface ExerciseMotion {
   equipment: 'bar' | 'dumbbell' | 'fixedBar' | 'none'
   /** Draw the floor line (default true). */
   ground?: boolean
-  /** Bench/box as [x, y, width]. */
-  bench?: [number, number, number]
+  /** Bench, box or seat the lifter is on. */
+  bench?: { x: number; y: number; width: number }
   /**
    * Force the profile view. Hinges and rows travel front-to-back, which is
    * exactly the axis a front-on figure cannot show — the hip angle that makes
@@ -98,7 +98,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'leg-press': {
-    equipment: 'none', durationSec: 3.6, ground: false, bench: [40, 108, 70],
+    equipment: 'none', durationSec: 3.6, ground: false, bench: { x: 40, y: 108, width: 70 },
     caption: 'Feet high and wide, never lock out',
     poses: [
       { head: [50, 96], neck: [64, 100], hip: [96, 104], knee: [130, 96], ankle: [160, 88], elbow: [66, 112], hand: [80, 116] },
@@ -109,7 +109,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'leg-extension': {
-    equipment: 'none', durationSec: 2.6, ground: false, bench: [70, 96, 60],
+    equipment: 'none', durationSec: 2.6, ground: false, bench: { x: 70, y: 96, width: 60 },
     caption: 'Straighten the knee, squeeze the quad',
     poses: [
       { head: [86, 56], neck: [88, 68], hip: [92, 94], knee: [118, 96], ankle: [120, 124], elbow: [82, 84], hand: [78, 96] },
@@ -126,7 +126,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'front-foot-elevated-split-squat': {
-    equipment: 'dumbbell', durationSec: 3, bench: [118, 122, 34],
+    equipment: 'dumbbell', durationSec: 3, bench: { x: 118, y: 122, width: 34 },
     caption: 'Front foot raised, drop the back knee',
     poses: [
       pose({ hip: [98, 88], knee: [120, 108], ankle: [128, 120], hand: [92, 96], elbow: [94, 76] }),
@@ -137,7 +137,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
 
   // ── Lunge / split pattern ──────────────────────────────────────────────────
   'bulgarian-split-squat': {
-    equipment: 'dumbbell', durationSec: 3.2, bench: [130, 112, 40],
+    equipment: 'dumbbell', durationSec: 3.2, bench: { x: 130, y: 112, width: 40 },
     caption: 'Rear foot up, torso leans slightly forward',
     poses: [
       pose({ hip: [96, 86], knee: [92, 112], ankle: [86, 138], hand: [88, 96], elbow: [92, 74] }),
@@ -170,7 +170,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'step-up': {
-    equipment: 'dumbbell', durationSec: 3, bench: [124, 116, 40],
+    equipment: 'dumbbell', durationSec: 3, bench: { x: 124, y: 116, width: 40 },
     caption: 'Drive through the top foot, stand tall',
     poses: [
       pose({ hip: [96, 96], knee: [116, 110], ankle: [128, 116], hand: [90, 106], elbow: [92, 84] }),
@@ -257,7 +257,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'seated-leg-curl': {
-    equipment: 'none', durationSec: 2.6, ground: false, bench: [64, 96, 64],
+    equipment: 'none', durationSec: 2.6, ground: false, bench: { x: 64, y: 96, width: 64 },
     caption: 'Curl the heels under, slow on the way back',
     poses: [
       { head: [80, 56], neck: [82, 68], hip: [88, 94], knee: [124, 94], ankle: [152, 92], elbow: [78, 84], hand: [74, 96] },
@@ -266,7 +266,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'lying-leg-curl': {
-    equipment: 'none', durationSec: 2.6, ground: false, bench: [56, 104, 76],
+    equipment: 'none', durationSec: 2.6, ground: false, bench: { x: 56, y: 104, width: 76 },
     caption: 'Face down, curl the heels to the glutes',
     poses: [
       { head: [50, 100], neck: [64, 102], hip: [104, 102], knee: [134, 102], ankle: [162, 102], elbow: [64, 112], hand: [76, 114] },
@@ -277,7 +277,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
 
   // ── Hip thrust / glute ─────────────────────────────────────────────────────
   'hip-thrust-machine': {
-    equipment: 'none', durationSec: 3.6, bench: [56, 96, 34],
+    equipment: 'none', durationSec: 3.6, bench: { x: 56, y: 96, width: 34 },
     caption: 'Chin tucked, squeeze at the top',
     poses: [
       { head: [58, 88], neck: [70, 92], hip: [104, 116], knee: [130, 108], ankle: [136, 138], elbow: [72, 104], hand: [84, 108] },
@@ -288,7 +288,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'barbell-hip-thrust': {
-    equipment: 'bar', durationSec: 3, bench: [56, 96, 34],
+    equipment: 'bar', durationSec: 3, bench: { x: 56, y: 96, width: 34 },
     caption: 'Bar over the hips, drive to level',
     poses: [
       { head: [58, 88], neck: [70, 92], hip: [104, 116], knee: [130, 108], ankle: [136, 138], elbow: [92, 112], hand: [104, 112] },
@@ -297,7 +297,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'single-leg-hip-thrust': {
-    equipment: 'none', durationSec: 3, bench: [56, 96, 34],
+    equipment: 'none', durationSec: 3, bench: { x: 56, y: 96, width: 34 },
     caption: 'One foot down, hips stay level',
     poses: [
       { head: [58, 88], neck: [70, 92], hip: [104, 116], knee: [130, 104], ankle: [136, 138], elbow: [72, 104], hand: [84, 108] },
@@ -356,7 +356,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
 
   // ── Horizontal press ───────────────────────────────────────────────────────
   'bench-press': {
-    equipment: 'bar', durationSec: 3.6, ground: false, bench: [56, 108, 88],
+    equipment: 'bar', durationSec: 3.6, ground: false, bench: { x: 56, y: 108, width: 88 },
     caption: 'Shoulder blades set, press over the shoulders',
     poses: [
       { head: [62, 100], neck: [76, 104], hip: [116, 106], knee: [140, 120], ankle: [146, 138], elbow: [78, 84], hand: [78, 66] },
@@ -367,7 +367,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'dumbbell-bench-press': {
-    equipment: 'dumbbell', durationSec: 3, ground: false, bench: [56, 108, 88],
+    equipment: 'dumbbell', durationSec: 3, ground: false, bench: { x: 56, y: 108, width: 88 },
     caption: 'Dumbbells over the chest, control the descent',
     poses: [
       { head: [62, 100], neck: [76, 104], hip: [116, 106], knee: [140, 120], ankle: [146, 138], elbow: [78, 84], hand: [78, 64] },
@@ -376,7 +376,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'close-grip-bench-press': {
-    equipment: 'bar', durationSec: 3, ground: false, bench: [56, 108, 88],
+    equipment: 'bar', durationSec: 3, ground: false, bench: { x: 56, y: 108, width: 88 },
     caption: 'Elbows tucked, triceps do the work',
     poses: [
       { head: [62, 100], neck: [76, 104], hip: [116, 106], knee: [140, 120], ankle: [146, 138], elbow: [80, 86], hand: [80, 66] },
@@ -423,7 +423,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'bench-dip': {
-    equipment: 'none', durationSec: 2.6, bench: [70, 100, 44],
+    equipment: 'none', durationSec: 2.6, bench: { x: 70, y: 100, width: 44 },
     caption: 'Hands behind, elbows straight back',
     poses: [
       { head: [104, 48], neck: [104, 60], hip: [108, 96], knee: [140, 100], ankle: [166, 128], elbow: [92, 78], hand: [90, 98] },
@@ -432,7 +432,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'chest-press-machine': {
-    equipment: 'none', durationSec: 2.8, ground: false, bench: [66, 104, 20],
+    equipment: 'none', durationSec: 2.8, ground: false, bench: { x: 66, y: 104, width: 20 },
     caption: 'Seated press, shoulders down',
     poses: [
       { head: [80, 52], neck: [82, 64], hip: [84, 100], knee: [112, 108], ankle: [116, 134], elbow: [92, 74], hand: [104, 76] },
@@ -467,7 +467,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'machine-shoulder-press': {
-    equipment: 'none', durationSec: 2.8, bench: [80, 100, 24],
+    equipment: 'none', durationSec: 2.8, bench: { x: 80, y: 100, width: 24 },
     caption: 'Fixed path press overhead',
     poses: [
       { head: [92, 46], neck: [94, 58], hip: [96, 96], knee: [122, 104], ankle: [126, 132], elbow: [108, 62], hand: [108, 46] },
@@ -550,7 +550,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'lat-pulldown': {
-    equipment: 'bar', durationSec: 2.8, bench: [84, 100, 30],
+    equipment: 'bar', durationSec: 2.8, bench: { x: 84, y: 100, width: 30 },
     caption: 'Pull to the collarbone, chest up',
     poses: [
       { head: [96, 50], neck: [98, 62], hip: [100, 98], knee: [126, 106], ankle: [130, 134], elbow: [98, 40], hand: [98, 22] },
@@ -561,7 +561,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
 
   // ── Horizontal pull ────────────────────────────────────────────────────────
   'seated-cable-row': {
-    equipment: 'bar', view: 'side', durationSec: 2.8, ground: false, bench: [58, 106, 40],
+    equipment: 'bar', view: 'side', durationSec: 2.8, ground: false, bench: { x: 58, y: 106, width: 40 },
     caption: 'Pull to the belly button, no rocking',
     poses: [
       { head: [80, 54], neck: [82, 66], hip: [84, 102], knee: [122, 104], ankle: [150, 116], elbow: [104, 76], hand: [130, 84] },
@@ -596,7 +596,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'one-arm-db-row': {
-    equipment: 'dumbbell', durationSec: 2.8, bench: [116, 100, 40],
+    equipment: 'dumbbell', durationSec: 2.8, bench: { x: 116, y: 100, width: 40 },
     caption: 'Support on the bench, row to the hip',
     poses: [
       { head: [64, 74], neck: [76, 78], hip: [112, 92], knee: [110, 116], ankle: [108, 138], elbow: [78, 100], hand: [78, 120] },
@@ -605,7 +605,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'chest-supported-row': {
-    equipment: 'bar', durationSec: 2.8, bench: [70, 90, 60],
+    equipment: 'bar', durationSec: 2.8, bench: { x: 70, y: 90, width: 60 },
     caption: 'Chest supported, pure back work',
     poses: [
       { head: [66, 70], neck: [78, 74], hip: [116, 86], knee: [124, 110], ankle: [128, 136], elbow: [86, 100], hand: [86, 120] },
@@ -614,7 +614,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'machine-row': {
-    equipment: 'none', view: 'side', durationSec: 2.8, bench: [66, 104, 24],
+    equipment: 'none', view: 'side', durationSec: 2.8, bench: { x: 66, y: 104, width: 24 },
     caption: 'Seated machine row, blades together',
     poses: [
       { head: [80, 54], neck: [82, 66], hip: [84, 100], knee: [112, 108], ankle: [116, 134], elbow: [106, 74], hand: [132, 78] },
@@ -640,7 +640,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
     ],
   },
   'reverse-pec-deck': {
-    equipment: 'none', durationSec: 2.6, bench: [84, 100, 26],
+    equipment: 'none', durationSec: 2.6, bench: { x: 84, y: 100, width: 26 },
     caption: 'Open the arms wide, squeeze the rear delts',
     poses: [
       { head: [92, 48], neck: [94, 60], hip: [96, 98], knee: [124, 106], ankle: [128, 134], elbow: [112, 62], hand: [130, 60] },

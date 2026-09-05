@@ -1,27 +1,24 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/db/dexie'
-import { EXERCISE_LIBRARY } from '@/data/obzen-program'
+import { EXERCISE_LIBRARY, LIBRARY_BY_ID } from '@/data/obzen-program'
 import type { MuscleGroup } from '@/data/obzen-program'
+import { belongsToProfile } from '@/lib/workoutSession'
+import { useProfileStore } from '@/store/useProfileStore'
+import { realSets, setWeightLb } from '@/lib/progress'
 
 const EXERCISE_MUSCLE: Record<string, MuscleGroup> = {}
 for (const ex of EXERCISE_LIBRARY) {
   EXERCISE_MUSCLE[ex.name] = ex.muscle
 }
 
-function parseWeight(w: string): number {
-  if (!w || w === '—' || w.toLowerCase() === 'bw') return 0
-  const m = w.match(/(\d+(?:\.\d+)?)/)
-  return m ? parseFloat(m[1]) : 0
-}
-
 const MUSCLES: MuscleGroup[] = ['legs', 'back', 'shoulders', 'arms', 'chest', 'core']
 const MUSCLE_COLORS: Record<MuscleGroup, string> = {
-  legs: '#d4d4d4',
-  back: '#a0a0a0',
-  shoulders: '#888888',
-  arms: '#707070',
-  chest: '#555555',
-  core: '#3a3a3a',
+  legs: 'var(--series-1)',
+  back: 'var(--series-2)',
+  shoulders: 'var(--series-3)',
+  arms: 'var(--series-4)',
+  chest: 'var(--series-5)',
+  core: 'var(--series-6)',
 }
 
 function getLast7Days(): string[] {
@@ -40,24 +37,28 @@ function fmtVol(v: number): string {
 
 export function WeeklyVolumeChart() {
   const days = getLast7Days()
-  const logs = useLiveQuery(
-    () => db.exerciseLogs.where('date').between(days[0], days[6], true, true).toArray(),
-    [days[0]]
+  const { activeId } = useProfileStore()
+  const sessions = useLiveQuery(
+    () => db.workoutDaySessions.where('date').between(days[0], days[6], true, true).toArray(),
+    [days[0], days[6]]
   )
 
-  if (!logs) return <Empty text="Loading…" />
+  if (!sessions) return <Empty text="Loading…" />
 
   const byDay: Record<string, Record<MuscleGroup, number>> = {}
   for (const d of days) {
     byDay[d] = { legs: 0, back: 0, shoulders: 0, arms: 0, chest: 0, core: 0 }
   }
-  for (const log of logs) {
-    if (!byDay[log.date]) continue
-    const muscle: MuscleGroup = EXERCISE_MUSCLE[log.exerciseName] ?? 'core'
-    const vol = log.sets
-      .filter(s => s.completed && !s.isWarmup)
-      .reduce((acc, s) => acc + parseWeight(s.weight) * s.reps, 0)
-    byDay[log.date][muscle] += vol
+  for (const session of sessions) {
+    if (!byDay[session.date] || !belongsToProfile(session, activeId)) continue
+    for (const ex of session.exercises) {
+      const muscle: MuscleGroup =
+        LIBRARY_BY_ID[ex.exerciseId]?.muscle ??
+        (ex.name ? EXERCISE_MUSCLE[ex.name] : undefined) ??
+        'core'
+      const vol = realSets(ex).reduce((acc, s) => acc + setWeightLb(s) * s.reps, 0)
+      byDay[session.date][muscle] += vol
+    }
   }
 
   const dayTotals = days.map(d => MUSCLES.reduce((a, m) => a + byDay[d][m], 0))

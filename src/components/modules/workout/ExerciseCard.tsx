@@ -37,6 +37,8 @@ interface Props {
   onRemoveExercise: () => void
   /** Replace this exercise with one of its listed alternatives. */
   onSwapExercise?: (toName: string) => void
+  /** Exercise ids already on this day, so the sheet can rule out no-op swaps. */
+  presentExerciseIds?: string[]
   /** Add-load suggestion when the plan's progression rule is met. */
   progression?: ProgressionSuggestion
 }
@@ -52,6 +54,7 @@ export function ExerciseCard({
   onRemoveSet,
   onRemoveExercise,
   onSwapExercise,
+  presentExerciseIds,
   progression,
 }: Props) {
   const [showHistory, setShowHistory] = useState(false)
@@ -308,6 +311,8 @@ export function ExerciseCard({
           muscle={muscle}
           target={target}
           cue={cue}
+          loggedSetCount={exerciseState.sets.length}
+          presentExerciseIds={presentExerciseIds}
           onSwap={onSwapExercise && (toName => {
             onSwapExercise(toName)
             setShowDetail(false)

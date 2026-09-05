@@ -321,11 +321,14 @@ export function ExerciseAnimation({ motion, label }: { motion: ExerciseMotion; l
         )}
         {motion.bench && (
           profile
+            // In profile the bench sits where the pose puts it, under the lifter.
             ? <rect
-                x={Math.min(motion.bench[0], motion.bench[2])} y={motion.bench[1]}
-                width={Math.abs(motion.bench[2] - motion.bench[0])} height="6" rx="2" fill={OUTLINE}
+                x={motion.bench.x} y={motion.bench.y}
+                width={motion.bench.width} height="6" rx="2" fill={OUTLINE}
               />
-            : <rect x={MID - 42} y={motion.bench[1]} width="84" height="6" rx="2" fill={OUTLINE} />
+            // Head-on it is edge-on beneath the figure, so it is centred on the
+            // body rather than following the pose's x.
+            : <rect x={MID - 42} y={motion.bench.y} width="84" height="6" rx="2" fill={OUTLINE} />
         )}
 
         {profile ? (

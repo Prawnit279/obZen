@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { X, Repeat } from 'lucide-react'
 import { guideFor, coreDetailFor, MUSCLE_LABEL } from '@/data/exercise-guides'
 import { MuscleFigure, MUSCLE_PRIMARY_COLOR, MUSCLE_SECONDARY_COLOR } from './MuscleFigure'
@@ -11,6 +12,10 @@ interface Props {
   muscle?: string
   target?: string
   cue?: string
+  /** Sets already logged against this exercise — swapping would discard them. */
+  loggedSetCount?: number
+  /** Exercise ids already on this day; swapping to one of these would be a no-op. */
+  presentExerciseIds?: string[]
   /** Swap the exercise for one of its listed alternatives. */
   onSwap?: (toName: string) => void
   onClose: () => void
@@ -34,11 +39,26 @@ function Legend({ colour, label, muscles }: { colour: string; label: string; mus
  * Swap options come from the movement's own plan entry, so alternatives are
  * the ones actually prescribed rather than a generic substitution list.
  */
-export function ExerciseDetailSheet({ exerciseId, name, muscle, target, cue, onSwap, onClose }: Props) {
+export function ExerciseDetailSheet({
+  exerciseId, name, muscle, target, cue,
+  loggedSetCount = 0, presentExerciseIds = [], onSwap, onClose,
+}: Props) {
   const guide = guideFor(exerciseId, muscle)
   const swaps = LIBRARY_BY_ID[exerciseId]?.swaps ?? []
   const motion = motionFor(exerciseId)
   const detail = coreDetailFor(exerciseId)
+
+  // Swapping replaces the slot outright, so anything already logged is lost.
+  // Mirrors the confirm the remove button has used all along.
+  const [pendingSwap, setPendingSwap] = useState<string | null>(null)
+
+  const requestSwap = (swapName: string) => {
+    if (loggedSetCount > 0) {
+      setPendingSwap(swapName)
+      return
+    }
+    onSwap?.(swapName)
+  }
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end" style={{ background: 'rgba(0,0,0,0.7)' }}>
@@ -173,18 +193,64 @@ export function ExerciseDetailSheet({ exerciseId, name, muscle, target, cue, onS
                 Swap for
               </h3>
               <div className="space-y-1.5">
-                {swaps.map(swapName => (
-                  <button
-                    key={swapName}
-                    onClick={() => onSwap?.(swapName)}
-                    disabled={!onSwap}
-                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-[2px] text-left transition-opacity hover:opacity-75 disabled:opacity-60"
-                    style={{ background: 'var(--elevated)', border: '1px solid var(--border)' }}
-                  >
-                    <span className="text-[14px]" style={{ color: 'var(--accent)' }}>{swapName}</span>
-                    {onSwap && <Repeat size={14} style={{ color: 'var(--dim)' }} />}
-                  </button>
-                ))}
+                {swaps.map(swapName => {
+                  const alreadyOnDay = presentExerciseIds.includes(toExerciseId(swapName))
+                  const confirming = pendingSwap === swapName
+
+                  if (confirming) {
+                    return (
+                      <div
+                        key={swapName}
+                        className="rounded-[2px] p-3 space-y-2"
+                        style={{ border: '1px solid var(--skip-border)', background: 'rgba(127,29,29,0.08)' }}
+                      >
+                        <p className="text-[13px]" style={{ color: 'var(--accent)' }}>
+                          Swap to {swapName}?
+                          <span style={{ color: 'var(--skip-text)' }}>
+                            {' '}Your {loggedSetCount} logged{' '}
+                            {loggedSetCount === 1 ? 'set' : 'sets'} will be lost.
+                          </span>
+                        </p>
+                        <div className="flex gap-2">
+                          <button
+                            onClick={() => setPendingSwap(null)}
+                            className="flex-1 py-2 rounded-[2px] text-[12px] uppercase tracking-widest"
+                            style={{ border: '1px solid var(--border)', color: 'var(--muted)' }}
+                          >
+                            Cancel
+                          </button>
+                          <button
+                            onClick={() => { setPendingSwap(null); onSwap?.(swapName) }}
+                            className="flex-1 py-2 rounded-[2px] text-[12px] uppercase tracking-widest"
+                            style={{ border: '1px solid var(--skip-border)', color: 'var(--skip-text)' }}
+                          >
+                            Swap
+                          </button>
+                        </div>
+                      </div>
+                    )
+                  }
+
+                  return (
+                    <button
+                      key={swapName}
+                      onClick={() => requestSwap(swapName)}
+                      disabled={!onSwap || alreadyOnDay}
+                      title={alreadyOnDay ? `${swapName} is already on this day` : undefined}
+                      className="w-full flex items-center justify-between px-3 py-2.5 rounded-[2px] text-left transition-opacity hover:opacity-75 disabled:opacity-60"
+                      style={{ background: 'var(--elevated)', border: '1px solid var(--border)' }}
+                    >
+                      <span className="text-[14px]" style={{ color: 'var(--accent)' }}>{swapName}</span>
+                      {alreadyOnDay ? (
+                        <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
+                          already added
+                        </span>
+                      ) : onSwap ? (
+                        <Repeat size={14} style={{ color: 'var(--dim)' }} />
+                      ) : null}
+                    </button>
+                  )
+                })}
               </div>
               <p className="text-[11px] mt-2" style={{ color: 'var(--dim)' }}>
                 Cap it at two swaps per session, so there is still enough repetition to track progress.

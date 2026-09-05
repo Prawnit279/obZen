@@ -103,6 +103,7 @@ export function SortableExerciseList({
               onRemoveSet={i => onRemoveSet(ex.exerciseId, i)}
               onRemoveExercise={() => onRemoveExercise(ex.exerciseId)}
               onSwapExercise={onSwapExercise && (toName => onSwapExercise(ex.exerciseId, toName))}
+              presentExerciseIds={ids}
               progression={progressions?.[ex.exerciseId]}
             />
           ))}
