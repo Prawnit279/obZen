@@ -12,6 +12,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { render, screen, cleanup, waitFor } from '@testing-library/react'
 import { MemoryRouter } from 'react-router-dom'
+import type { ReactElement } from 'react'
 import userEvent from '@testing-library/user-event'
 import { db } from '@/db/dexie'
 import type { LoggedSet } from '@/db/dexie'
@@ -23,6 +24,8 @@ import { ProgressOverloadChart } from '@/components/modules/dashboard/ProgressOv
 import { WeeklyVolumeChart } from '@/components/modules/dashboard/WeeklyVolumeChart'
 import { NotationViewer } from '@/components/modules/drum/NotationViewer'
 import { FiveThreeOneCard } from '@/components/modules/workout/tools/FiveThreeOneCard'
+import { OneRmCard } from '@/components/modules/workout/tools/OneRmCard'
+import { WilksDotsCard } from '@/components/modules/workout/tools/WilksDotsCard'
 import { EXERCISE_MOTIONS } from '@/data/exercise-motions'
 import { MUSCLE_LABEL } from '@/data/exercise-guides'
 import type { MuscleId } from '@/data/exercise-guides'
@@ -541,15 +544,82 @@ describe('FiveThreeOneCard — renders without crashing', () => {
   it('states the rep range Joker sets are meant for', async () => {
     renderCard()
     // Joker sets only appear once there is a Training Max to work from.
-    await userEvent.type(screen.getByPlaceholderText('315'), '300')
+    await userEvent.type(screen.getByLabelText(/estimated 1rm/i), '300')
     expect(await screen.findByText(/joker sets · 1–3 reps/i)).toBeInTheDocument()
   })
 
   it('rounds the training max and the wave to 5 lb', async () => {
     renderCard()
-    await userEvent.type(screen.getByPlaceholderText('315'), '303')
+    await userEvent.type(screen.getByLabelText(/estimated 1rm/i), '303')
     // TM = 90% of 303 = 272.7 -> 275.
     expect(await screen.findByText(/275/)).toBeInTheDocument()
+  })
+})
+
+// ── Tools form controls ──────────────────────────────────────────────────────
+
+describe('Tools fields — every control names itself', () => {
+  const renderIn = (ui: ReactElement) =>
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        {ui}
+      </MemoryRouter>
+    )
+
+  it('reaches every calculator input by its visible label', () => {
+    // The labels used to be unassociated markup, so none of these resolved.
+    renderIn(<OneRmCard />)
+    expect(screen.getByLabelText(/^weight$/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/^reps$/i)).toBeInTheDocument()
+
+    cleanup()
+    renderIn(<WilksDotsCard />)
+    expect(screen.getByLabelText(/bodyweight/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/total \(or single lift\)/i)).toBeInTheDocument()
+
+    cleanup()
+    renderIn(<FiveThreeOneCard />)
+    expect(screen.getByLabelText(/lift \(optional label\)/i)).toBeInTheDocument()
+    expect(screen.getByLabelText(/estimated 1rm/i)).toBeInTheDocument()
+  })
+
+  it('gives each field its own id, so labels cannot cross-wire', () => {
+    const { container } = renderIn(<WilksDotsCard />)
+    const ids = Array.from(container.querySelectorAll('input')).map(i => i.id)
+    expect(ids.every(Boolean)).toBe(true)
+    expect(new Set(ids).size).toBe(ids.length)
+  })
+
+  it('types into the field its label points at', async () => {
+    renderIn(<OneRmCard />)
+    await userEvent.type(screen.getByLabelText(/^weight$/i), '225')
+    expect(screen.getByLabelText(/^weight$/i)).toHaveValue(225)
+    expect(screen.getByLabelText(/^reps$/i)).toHaveValue(null)
+  })
+
+  it('says which segment is selected, not just which is tinted', () => {
+    renderIn(<WilksDotsCard />)
+    const group = screen.getByRole('group', { name: /coefficient set/i })
+    expect(group).toBeInTheDocument()
+
+    const male = screen.getByRole('button', { name: /^male coefficients$/i })
+    const female = screen.getByRole('button', { name: /^female coefficients$/i })
+    expect(male).toHaveAttribute('aria-pressed', 'true')
+    expect(female).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('moves the pressed state when a segment is chosen', async () => {
+    renderIn(<WilksDotsCard />)
+    await userEvent.click(screen.getByRole('button', { name: /^female coefficients$/i }))
+    expect(screen.getByRole('button', { name: /^female coefficients$/i })).toHaveAttribute('aria-pressed', 'true')
+    expect(screen.getByRole('button', { name: /^male coefficients$/i })).toHaveAttribute('aria-pressed', 'false')
+  })
+
+  it('names the wave and BBB groups too', async () => {
+    renderIn(<FiveThreeOneCard />)
+    await userEvent.type(screen.getByLabelText(/estimated 1rm/i), '300')
+    expect(await screen.findByRole('group', { name: /wave week/i })).toBeInTheDocument()
+    expect(screen.getByRole('group', { name: /boring but big/i })).toBeInTheDocument()
   })
 })
 

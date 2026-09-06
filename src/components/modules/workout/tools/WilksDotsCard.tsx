@@ -32,6 +32,7 @@ export function WilksDotsCard() {
     <ToolCard label="Wilks & DOTS" sub="Bodyweight-adjusted score for a total or a single lift.">
       <div className="space-y-3">
         <SegmentedToggle
+          label="Coefficient set"
           value={sex}
           onChange={setSex}
           options={[{ value: 'male', label: 'Male coefficients' }, { value: 'female', label: 'Female coefficients' }]}

@@ -59,7 +59,7 @@ export function FiveThreeOneCard() {
 
           {/* Wave */}
           <div>
-            <SegmentedToggle value={week} onChange={setWeek} options={WEEK_OPTIONS} />
+            <SegmentedToggle label="Wave week" value={week} onChange={setWeek} options={WEEK_OPTIONS} />
             <div className="grid grid-cols-3 gap-1.5 mt-2">
               {wave.map((set, i) => (
                 <div key={i} className="text-center rounded-[2px] py-2" style={{ background: 'var(--elevated)' }}>
@@ -95,7 +95,10 @@ export function FiveThreeOneCard() {
               <div className="text-[11px] uppercase tracking-widest mb-1.5" style={{ color: 'var(--muted)' }}>
                 Boring But Big — 5×10
               </div>
-              <SegmentedToggle value={bbbPct} onChange={setBbbPct} options={BBB_OPTIONS} />
+              <SegmentedToggle
+                label="Boring But Big percentage of training max"
+                value={bbbPct} onChange={setBbbPct} options={BBB_OPTIONS}
+              />
               <div className="flex items-baseline justify-between mt-2">
                 <span className="text-[18px] tabular-nums" style={{ color: 'var(--accent)' }}>
                   {bbb.weight} lb × {bbb.sets} × {bbb.reps}

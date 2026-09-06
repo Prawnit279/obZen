@@ -1,3 +1,5 @@
+import { useId } from 'react'
+
 export const CARD = { background: 'var(--surface)', border: '1px solid var(--border)' } as const
 export const INPUT = { border: '1px solid var(--border)', color: 'var(--accent)' } as const
 
@@ -21,11 +23,15 @@ export function NumberField({
   placeholder?: string
   suffix?: string
 }) {
+  // Without an id pairing the two, the visible label is decoration: assistive
+  // tech announces an unnamed number box, and tapping the label does nothing.
+  const id = useId()
   return (
     <div>
-      <label className="text-[11px] uppercase tracking-widest block mb-1" style={{ color: 'var(--muted)' }}>{label}</label>
+      <label htmlFor={id} className="text-[11px] uppercase tracking-widest block mb-1" style={{ color: 'var(--muted)' }}>{label}</label>
       <div className="flex items-center gap-2">
         <input
+          id={id}
           type="number"
           inputMode="decimal"
           value={value}
@@ -49,10 +55,12 @@ export function TextField({
   onChange: (v: string) => void
   placeholder?: string
 }) {
+  const id = useId()
   return (
     <div>
-      <label className="text-[11px] uppercase tracking-widest block mb-1" style={{ color: 'var(--muted)' }}>{label}</label>
+      <label htmlFor={id} className="text-[11px] uppercase tracking-widest block mb-1" style={{ color: 'var(--muted)' }}>{label}</label>
       <input
+        id={id}
         type="text"
         value={value}
         onChange={e => onChange(e.target.value)}
@@ -74,18 +82,29 @@ export function AwaitingInput({ need }: { need: string }) {
 }
 
 export function SegmentedToggle<T extends string | number>({
-  options, value, onChange,
+  options, value, onChange, label,
 }: {
   options: { value: T; label: string }[]
   value: T
   onChange: (v: T) => void
+  /** What the group as a whole selects, e.g. 'Wave week'. Not shown visually. */
+  label?: string
 }) {
   return (
-    <div className="flex border rounded-[2px] overflow-hidden" style={{ borderColor: 'var(--border)' }}>
+    // Which option is active was carried by background colour alone, so the
+    // selection was invisible to anyone not seeing the colour. `aria-pressed`
+    // states it, and the group carries the name the visible design implies.
+    <div
+      role="group"
+      aria-label={label}
+      className="flex border rounded-[2px] overflow-hidden"
+      style={{ borderColor: 'var(--border)' }}
+    >
       {options.map(opt => (
         <button
           key={String(opt.value)}
           onClick={() => onChange(opt.value)}
+          aria-pressed={value === opt.value}
           className="flex-1 py-2 text-[11px] uppercase tracking-widest transition-colors"
           style={{
             background: value === opt.value ? 'var(--elevated)' : 'transparent',
