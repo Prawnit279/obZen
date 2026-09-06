@@ -80,7 +80,7 @@ export function BodyweightPanel({ profileId }: { profileId: ProfileId }) {
           onClick={submit}
           disabled={!value.trim()}
           className="px-4 rounded-[2px] text-[12px] uppercase tracking-widest transition-opacity disabled:opacity-30"
-          style={{ border: '1px solid #a6a6a6', color: 'var(--accent)' }}
+          style={{ border: '1px solid var(--muted)', color: 'var(--accent)' }}
         >
           Log
         </button>

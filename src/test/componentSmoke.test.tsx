@@ -11,6 +11,7 @@
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { render, screen, cleanup, waitFor } from '@testing-library/react'
+import { MemoryRouter } from 'react-router-dom'
 import userEvent from '@testing-library/user-event'
 import { db } from '@/db/dexie'
 import type { LoggedSet } from '@/db/dexie'
@@ -21,6 +22,7 @@ import { ExerciseDetailSheet } from '@/components/modules/workout/ExerciseDetail
 import { ProgressOverloadChart } from '@/components/modules/dashboard/ProgressOverloadChart'
 import { WeeklyVolumeChart } from '@/components/modules/dashboard/WeeklyVolumeChart'
 import { NotationViewer } from '@/components/modules/drum/NotationViewer'
+import { FiveThreeOneCard } from '@/components/modules/workout/tools/FiveThreeOneCard'
 import { EXERCISE_MOTIONS } from '@/data/exercise-motions'
 import { MUSCLE_LABEL } from '@/data/exercise-guides'
 import type { MuscleId } from '@/data/exercise-guides'
@@ -517,6 +519,37 @@ describe('WeeklyVolumeChart — renders without crashing', () => {
     for (const muscle of ['legs', 'back', 'shoulders', 'arms', 'chest', 'core']) {
       expect(screen.getByText(muscle)).toBeInTheDocument()
     }
+  })
+})
+
+// ── FiveThreeOneCard ─────────────────────────────────────────────────────────
+
+describe('FiveThreeOneCard — renders without crashing', () => {
+  // The card links to the 5/3/1 guide, so it needs a router around it.
+  const renderCard = () =>
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <FiveThreeOneCard />
+      </MemoryRouter>
+    )
+
+  it('mounts before any input, asking for an estimated 1RM', () => {
+    renderCard()
+    expect(screen.getByText(/awaiting|an estimated 1rm/i)).toBeInTheDocument()
+  })
+
+  it('states the rep range Joker sets are meant for', async () => {
+    renderCard()
+    // Joker sets only appear once there is a Training Max to work from.
+    await userEvent.type(screen.getByPlaceholderText('315'), '300')
+    expect(await screen.findByText(/joker sets · 1–3 reps/i)).toBeInTheDocument()
+  })
+
+  it('rounds the training max and the wave to 5 lb', async () => {
+    renderCard()
+    await userEvent.type(screen.getByPlaceholderText('315'), '303')
+    // TM = 90% of 303 = 272.7 -> 275.
+    expect(await screen.findByText(/275/)).toBeInTheDocument()
   })
 })
 

@@ -4,7 +4,10 @@ import { EXERCISE_LIBRARY, LIBRARY_BY_ID } from '@/data/obzen-program'
 import type { MuscleGroup } from '@/data/obzen-program'
 import { belongsToProfile } from '@/lib/workoutSession'
 import { useProfileStore } from '@/store/useProfileStore'
-import { realSets, setWeightLb } from '@/lib/progress'
+import { useProgressStore } from '@/store/useProgressStore'
+import { PROFILES } from '@/config/profiles'
+import type { ProfileId } from '@/config/profiles'
+import { exerciseTonnage, kgToLb } from '@/lib/progress'
 
 const EXERCISE_MUSCLE: Record<string, MuscleGroup> = {}
 for (const ex of EXERCISE_LIBRARY) {
@@ -38,6 +41,9 @@ function fmtVol(v: number): string {
 export function WeeklyVolumeChart() {
   const days = getLast7Days()
   const { activeId } = useProfileStore()
+  const latestBodyweight = useProgressStore(s => s.latestBodyweight)
+  const bodyweightKg =
+    latestBodyweight(activeId as ProfileId) ?? PROFILES[activeId].body.bodyweightKg ?? 0
   const sessions = useLiveQuery(
     () => db.workoutDaySessions.where('date').between(days[0], days[6], true, true).toArray(),
     [days[0], days[6]]
@@ -56,7 +62,9 @@ export function WeeklyVolumeChart() {
         LIBRARY_BY_ID[ex.exerciseId]?.muscle ??
         (ex.name ? EXERCISE_MUSCLE[ex.name] : undefined) ??
         'core'
-      const vol = realSets(ex).reduce((acc, s) => acc + setWeightLb(s) * s.reps, 0)
+      // Shared with the Progress view so the two charts cannot drift: assistance
+      // is subtracted rather than added, and holds contribute no tonnage.
+      const vol = kgToLb(exerciseTonnage(ex, bodyweightKg))
       byDay[session.date][muscle] += vol
     }
   }

@@ -2,9 +2,10 @@ import { describe, it, expect } from 'vitest'
 import type { WorkoutDaySession, LoggedSet } from '@/db/dexie'
 import {
   toKg, isRealSet, epley1RM, bestE1RM, e1rmSeries, bestCurrentE1RM, sbdTotal, recentPRs,
-  isoWeekKey, exerciseTonnage, weeklyVolume, exercisePRs,
+  isoWeekKey, exerciseTonnage, weeklyVolume, fillWeeks, exercisePRs,
   dotsScore, strengthStandard, trackingSeries, weeklyRepVolume, delta, suggestProgression, topOfRepRange, kgToLb,
 } from '@/lib/progress'
+import { COMPETITION_LIFT_IDS } from '@/data/obzen-program'
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -164,12 +165,89 @@ describe('sbdTotal', () => {
 
 // ── Volume ───────────────────────────────────────────────────────────────────
 
+describe('COMPETITION_LIFT_IDS — the total is defined by the flag', () => {
+  it('is exactly squat, bench and deadlift', () => {
+    expect(COMPETITION_LIFT_IDS).toEqual(['barbell-squat', 'bench-press', 'deadlift'])
+  })
+
+  it('every competition lift has a strength standard', () => {
+    for (const id of COMPETITION_LIFT_IDS) {
+      expect(strengthStandard(id, 150, 80, 'male'), id).not.toBeNull()
+    }
+  })
+
+  it('is independent of a profile\'s charted key lifts', () => {
+    // Regression: the SBD total used to follow keyLiftIds, so re-pointing a
+    // profile's charts would silently change a figure still labelled "total".
+    const sessions = [
+      session('2026-08-10', 'barbell-squat', [set(150, 5)]),
+      session('2026-08-10', 'bench-press', [set(100, 5)]),
+      session('2026-08-10', 'deadlift', [set(200, 5)]),
+      session('2026-08-11', 'goblet-squat', [set(40, 10)]),
+    ]
+    const fromFlag = sbdTotal(sessions, COMPETITION_LIFT_IDS)
+    expect(fromFlag.loggedCount).toBe(3)
+    expect(fromFlag.totalKg).toBeCloseTo(
+      sbdTotal(sessions, ['barbell-squat', 'bench-press', 'deadlift']).totalKg, 2
+    )
+    // A different charted lift set would have produced a different "total".
+    expect(sbdTotal(sessions, ['goblet-squat', 'bench-press', 'deadlift']).totalKg)
+      .not.toBeCloseTo(fromFlag.totalKg, 2)
+  })
+})
+
 describe('isoWeekKey', () => {
   it('groups a Mon–Sun week under one key', () => {
     expect(isoWeekKey('2026-08-10')).toBe(isoWeekKey('2026-08-16')) // Mon..Sun
   })
   it('separates adjacent weeks', () => {
     expect(isoWeekKey('2026-08-16')).not.toBe(isoWeekKey('2026-08-17'))
+  })
+})
+
+describe('exerciseTonnage — scores the load actually moved', () => {
+  const BW = 70
+
+  it('counts a barbell lift as weight × reps', () => {
+    const ex = session('2026-08-10', 'deadlift', [set(100, 5), set(100, 5)]).exercises[0]
+    expect(exerciseTonnage(ex, BW)).toBeCloseTo(1000, 2)
+  })
+
+  it('subtracts assistance instead of adding it', () => {
+    // Regression: assistance used to be counted as load, so *more* help scored
+    // as more work and an unassisted rep scored as none at all.
+    const heavy = session('2026-08-10', 'assisted-pull-up', [set(30, 6)]).exercises[0]
+    const light = session('2026-08-10', 'assisted-pull-up', [set(10, 6)]).exercises[0]
+    const none  = session('2026-08-10', 'assisted-pull-up', [set(0, 6)]).exercises[0]
+
+    expect(exerciseTonnage(heavy, BW)).toBeCloseTo((70 - 30) * 6, 2)
+    expect(exerciseTonnage(light, BW)).toBeCloseTo((70 - 10) * 6, 2)
+    expect(exerciseTonnage(none, BW)).toBeCloseTo(70 * 6, 2)
+
+    // Less assistance is now strictly more work, all the way to unassisted.
+    expect(exerciseTonnage(light, BW)).toBeGreaterThan(exerciseTonnage(heavy, BW))
+    expect(exerciseTonnage(none, BW)).toBeGreaterThan(exerciseTonnage(light, BW))
+  })
+
+  it('never goes negative when assistance exceeds bodyweight', () => {
+    const ex = session('2026-08-10', 'assisted-pull-up', [set(200, 5)]).exercises[0]
+    expect(exerciseTonnage(ex, BW)).toBe(0)
+  })
+
+  it('counts the bodyweight a push-up actually moves', () => {
+    const ex = session('2026-08-10', 'push-up', [set(0, 20)]).exercises[0]
+    // Push-ups load ~0.65 of bodyweight; they used to score zero.
+    expect(exerciseTonnage(ex, BW)).toBeCloseTo(70 * 0.65 * 20, 2)
+  })
+
+  it('gives a timed hold no tonnage, because the count is seconds', () => {
+    const ex = session('2026-08-10', 'plank', [set(0, 60)]).exercises[0]
+    expect(exerciseTonnage(ex, BW)).toBe(0)
+  })
+
+  it('leaves barbell work unchanged when no bodyweight is known', () => {
+    const ex = session('2026-08-10', 'deadlift', [set(100, 5)]).exercises[0]
+    expect(exerciseTonnage(ex)).toBeCloseTo(exerciseTonnage(ex, BW), 2)
   })
 })
 
@@ -193,6 +271,11 @@ describe('weeklyVolume', () => {
     expect(weeks[0].week < weeks[1].week).toBe(true)
   })
 
+  it('scores a week of assisted work on the load moved, not the assistance', () => {
+    const weeks = weeklyVolume([session('2026-08-10', 'assisted-pull-up', [set(30, 6)])], 70)
+    expect(weeks[0].tonnageKg).toBeCloseTo((70 - 30) * 6, 2)
+  })
+
   it('omits untrained weeks entirely, so the last entry is not necessarily now', () => {
     // The "this week" stat must look the current week up by key rather than
     // taking the last entry — after a week off the last entry is stale.
@@ -207,6 +290,36 @@ describe('weeklyVolume', () => {
 })
 
 // ── PRs ──────────────────────────────────────────────────────────────────────
+
+describe('fillWeeks — a layoff reads as a gap, not as training', () => {
+  it('pads untrained weeks with zeros', () => {
+    const volume = weeklyVolume([
+      session('2026-08-10', 'deadlift', [set(100, 5)]),
+      session('2026-08-31', 'deadlift', [set(100, 5)]),
+    ])
+    // Sparse: two trained weeks, three weeks apart.
+    expect(volume).toHaveLength(2)
+
+    const filled = fillWeeks(volume, '2026-08-31', 4)
+    expect(filled).toHaveLength(4)
+    expect(filled.map(v => v.tonnageKg)).toEqual([500, 0, 0, 500])
+    expect(filled[0].week).toBe(isoWeekKey('2026-08-10'))
+    expect(filled[3].week).toBe(isoWeekKey('2026-08-31'))
+  })
+
+  it('runs oldest to newest and ends on the given week', () => {
+    const filled = fillWeeks([], '2026-08-31', 3)
+    expect(filled.map(v => v.week)).toEqual([
+      isoWeekKey('2026-08-17'), isoWeekKey('2026-08-24'), isoWeekKey('2026-08-31'),
+    ])
+    expect(filled.every(v => v.tonnageKg === 0 && v.sets === 0)).toBe(true)
+  })
+
+  it('spans a year boundary without duplicating a week', () => {
+    const filled = fillWeeks([], '2027-01-10', 6)
+    expect(new Set(filled.map(v => v.week)).size).toBe(6)
+  })
+})
 
 describe('exercisePRs', () => {
   const sessions = [
@@ -306,6 +419,33 @@ describe('strengthStandard', () => {
 })
 
 // ── Tracking modes ───────────────────────────────────────────────────────────
+
+describe('strengthStandard — eliteRatio tops each lift\'s own scale', () => {
+  const BW = 80
+
+  it('reports the Elite threshold for the lift, not a shared number', () => {
+    expect(strengthStandard('bench-press', 100, BW, 'male')!.eliteRatio).toBeCloseTo(2.0, 5)
+    expect(strengthStandard('deadlift', 100, BW, 'male')!.eliteRatio).toBeCloseTo(2.75, 5)
+    expect(strengthStandard('total', 300, BW, 'male')!.eliteRatio).toBeCloseTo(7.0, 5)
+  })
+
+  it('puts every lift at a full bar exactly at Elite', () => {
+    // Regression: one shared 2.75 divisor showed an Elite bench at 73% and a
+    // Novice total at 100%.
+    for (const key of ['barbell-squat', 'bench-press', 'deadlift', 'total']) {
+      const atElite = strengthStandard(key, 1, BW, 'male')!.eliteRatio * BW
+      const std = strengthStandard(key, atElite, BW, 'male')!
+      expect(std.band, key).toBe('Elite')
+      expect(std.ratio / std.eliteRatio, key).toBeCloseTo(1, 5)
+    }
+  })
+
+  it('leaves a novice total well short of a full bar', () => {
+    const std = strengthStandard('total', 2.75 * BW, BW, 'male')!
+    expect(std.band).toBe('Novice')
+    expect(std.ratio / std.eliteRatio).toBeLessThan(0.5)
+  })
+})
 
 describe('trackingSeries', () => {
   it('assisted mode takes the lowest assistance that session', () => {

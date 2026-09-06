@@ -339,6 +339,16 @@ export const LIBRARY_BY_ID: Record<string, LibraryExercise> = Object.fromEntries
   EXERCISE_LIBRARY.map(ex => [toExerciseId(ex.name), ex])
 )
 
+/**
+ * The squat/bench/deadlift ids that make up a powerlifting total, derived from
+ * the `isCompetitionLift` flag rather than restated. The SBD panels read this,
+ * so a profile's charted key lifts and the lifts summed into a "total" can be
+ * changed independently without the total quietly becoming something else.
+ */
+export const COMPETITION_LIFT_IDS: string[] = EXERCISE_LIBRARY
+  .filter(ex => ex.isCompetitionLift)
+  .map(ex => toExerciseId(ex.name))
+
 /** Tracking mode for a logged exercise id (defaults to `load` for custom adds). */
 export function trackingModeFor(exerciseId: string): TrackingMode {
   return LIBRARY_BY_ID[exerciseId]?.trackingMode ?? 'load'

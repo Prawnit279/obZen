@@ -48,7 +48,7 @@ export function ProgressionLadder({ profileId, exerciseId, name, path, assistanc
                 className="w-full text-left rounded-[2px] px-2 py-2 transition-colors"
                 style={{
                   background: isCurrent ? 'var(--elevated)' : 'transparent',
-                  border: `1px solid ${isCurrent ? '#a6a6a6' : done ? '#3a5a3a' : 'var(--border)'}`,
+                  border: `1px solid ${isCurrent ? 'var(--muted)' : done ? 'var(--complete-border)' : 'var(--border)'}`,
                 }}
                 aria-current={isCurrent ? 'step' : undefined}
                 aria-label={`Set current rung to ${rung}`}

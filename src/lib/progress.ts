@@ -136,7 +136,10 @@ export interface SbdTotal {
   loggedCount: number
 }
 
-/** Squat + bench + deadlift total, from the lifts flagged `isCompetitionLift`. */
+/**
+ * Total of the best e1RM for each of the given lifts. Callers pass the ids they
+ * mean — `COMPETITION_LIFT_IDS` for a true squat/bench/deadlift total.
+ */
 export function sbdTotal(sessions: WorkoutDaySession[], competitionLiftIds: string[]): SbdTotal {
   const lifts = competitionLiftIds.map(exerciseId => ({
     exerciseId,
@@ -165,9 +168,37 @@ export function isoWeekKey(dateISO: string): string {
   return `${isoYear}-W${String(week).padStart(2, '0')}`
 }
 
-/** Tonnage for one exercise in one session: Σ(reps × weight) over real sets, kg. */
-export function exerciseTonnage(ex: ExerciseSessionState): number {
-  return realSets(ex).reduce((sum, s) => sum + toKg(s.weight, s.unit) * s.reps, 0)
+/**
+ * Tonnage for one exercise in one session: Σ(reps × effective load) in kg.
+ *
+ * "Effective load" is the weight actually moved, which is not always the number
+ * in the weight field:
+ *
+ *  - `assisted` — the field holds *assistance*, so the load is bodyweight minus
+ *    it. Counting the raw figure scored more assistance as more work, which
+ *    rewarded the wrong direction, and scored an unassisted rep as zero.
+ *  - bodyweight-driven work (push-ups, pull-ups, inverted rows) moves a known
+ *    fraction of bodyweight on top of any added plates — the same
+ *    `bodyweightFactor` the e1RM maths already uses.
+ *  - `timed` — the count is seconds, so reps × weight is not a tonnage at all.
+ *    Holds contribute no tonnage rather than a meaningless product.
+ *
+ * `bodyweightKg` defaults to 0, which leaves pure barbell and machine work
+ * exactly as it was.
+ */
+export function exerciseTonnage(ex: ExerciseSessionState, bodyweightKg = 0): number {
+  const mode = trackingModeFor(ex.exerciseId)
+  if (mode === 'timed') return 0
+
+  const bodyweightLoad = bodyweightKg * bodyweightFactorFor(ex.exerciseId)
+
+  return realSets(ex).reduce((sum, s) => {
+    const logged = toKg(s.weight, s.unit)
+    const load = mode === 'assisted'
+      ? Math.max(0, bodyweightLoad - logged)
+      : logged + bodyweightLoad
+    return sum + load * s.reps
+  }, 0)
 }
 
 export interface WeeklyVolume {
@@ -176,30 +207,65 @@ export interface WeeklyVolume {
   sets: number
 }
 
-/** Total tonnage and set count per ISO week, oldest first. */
-export function weeklyVolume(sessions: WorkoutDaySession[]): WeeklyVolume[] {
+/**
+ * Total tonnage and set count per ISO week, oldest first.
+ *
+ * Only weeks that were actually trained appear — a week off is absent rather
+ * than zero, so callers must look the current week up by key instead of taking
+ * the last entry. `fillWeeks` expands a range for charting.
+ */
+export function weeklyVolume(sessions: WorkoutDaySession[], bodyweightKg = 0): WeeklyVolume[] {
   const byWeek = new Map<string, WeeklyVolume>()
   for (const session of sessions) {
     const week = isoWeekKey(session.date)
-    const entry = byWeek.get(week) ?? { week, tonnageKg: 0, sets: 0 }
-    for (const ex of session.exercises) {
-      entry.tonnageKg += exerciseTonnage(ex)
-      entry.sets += realSets(ex).length
-    }
-    byWeek.set(week, entry)
+    const prev = byWeek.get(week) ?? { week, tonnageKg: 0, sets: 0 }
+    const totals = session.exercises.reduce(
+      (acc, ex) => ({
+        tonnageKg: acc.tonnageKg + exerciseTonnage(ex, bodyweightKg),
+        sets: acc.sets + realSets(ex).length,
+      }),
+      { tonnageKg: prev.tonnageKg, sets: prev.sets }
+    )
+    byWeek.set(week, { week, ...totals })
   }
   return [...byWeek.values()].sort((a, b) => a.week.localeCompare(b.week))
+}
+
+/**
+ * Pad a sparse week series out to a continuous run of `count` ISO weeks ending
+ * at `endDateISO`, inserting zero-weeks where nothing was trained.
+ *
+ * `weeklyVolume` deliberately omits untrained weeks, which is right for looking
+ * a week up by key but wrong for a bar chart: without this, a month off renders
+ * as two adjacent bars and reads as continuous training.
+ */
+export function fillWeeks(
+  volume: WeeklyVolume[],
+  endDateISO: string,
+  count: number
+): WeeklyVolume[] {
+  const byWeek = new Map(volume.map(v => [v.week, v]))
+  const end = new Date(endDateISO + 'T12:00:00')
+
+  return Array.from({ length: count }, (_, i) => {
+    const d = new Date(end)
+    d.setDate(d.getDate() - (count - 1 - i) * 7)
+    const iso = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+    const week = isoWeekKey(iso)
+    return byWeek.get(week) ?? { week, tonnageKg: 0, sets: 0 }
+  })
 }
 
 /** Tonnage per ISO week for a single exercise, oldest first. */
 export function weeklyVolumeForExercise(
   sessions: WorkoutDaySession[],
-  exerciseId: string
+  exerciseId: string,
+  bodyweightKg = 0
 ): WeeklyVolume[] {
   const relevant = sessions
     .map(s => ({ ...s, exercises: s.exercises.filter(e => e.exerciseId === exerciseId) }))
     .filter(s => s.exercises.length > 0)
-  return weeklyVolume(relevant)
+  return weeklyVolume(relevant, bodyweightKg)
 }
 
 // ── Personal records ─────────────────────────────────────────────────────────
@@ -388,6 +454,13 @@ export interface StandardResult {
   /** kg still needed to reach the next band, or null at Elite. */
   toNextKg: number | null
   nextBand: StrengthBand | null
+  /**
+   * Bodyweight multiple at which this lift reaches Elite — the top of its own
+   * scale. Bars must scale against this rather than a single shared number:
+   * Elite bench is 2.0×BW while an Elite total is 7.0×BW, so one divisor for
+   * every row makes a maxed bench look unfinished and a novice total look done.
+   */
+  eliteRatio: number
 }
 
 /** Current strength band for a lift (or 'total'), plus the gap to the next one. */
@@ -412,6 +485,7 @@ export function strengthStandard(
     ratio,
     toNextKg: nextThreshold === undefined ? null : Math.max(0, nextThreshold * bodyweightKg - liftKg),
     nextBand: nextThreshold === undefined ? null : BANDS[bandIndex + 1],
+    eliteRatio: thresholds[thresholds.length - 1],
   }
 }
 

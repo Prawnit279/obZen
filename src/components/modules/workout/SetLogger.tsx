@@ -2,17 +2,21 @@ import { useState, useRef } from 'react'
 import { Check, Plus, Trash2 } from 'lucide-react'
 import type { LoggedSet } from '@/db/dexie'
 import { cn } from '@/lib/utils'
+import { setUnitsFor } from '@/lib/setUnits'
+import type { SetUnits } from '@/lib/setUnits'
 
 const MAX_SETS = 10
 
 interface SetRowProps {
   set: LoggedSet
+  /** What this movement's two numbers mean — reps or seconds, load or assistance. */
+  units: SetUnits
   onSave: (set: LoggedSet) => void
   onDelete: () => void
   saved: boolean
 }
 
-function SetRow({ set, onSave, onDelete, saved }: SetRowProps) {
+function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
   const [weight, setWeight] = useState(set.weight > 0 ? String(set.weight) : '')
   const [reps, setReps] = useState(set.reps > 0 ? String(set.reps) : '')
   const [unit, setUnit] = useState<'lbs' | 'kg'>(set.unit)
@@ -55,6 +59,7 @@ function SetRow({ set, onSave, onDelete, saved }: SetRowProps) {
         inputMode="decimal"
         value={weight}
         onChange={e => setWeight(e.target.value)}
+        aria-label={`${units.weightAria}, set ${set.setNumber}`}
         placeholder="—"
         className="w-16 text-center rounded-[2px] border text-[13px] bg-transparent focus:outline-none transition-colors"
         style={{
@@ -79,6 +84,7 @@ function SetRow({ set, onSave, onDelete, saved }: SetRowProps) {
         inputMode="numeric"
         value={reps}
         onChange={e => setReps(e.target.value)}
+        aria-label={`${units.countAria}, set ${set.setNumber}`}
         placeholder="—"
         className="w-12 text-center rounded-[2px] border text-[13px] bg-transparent focus:outline-none transition-colors"
         style={{
@@ -88,7 +94,7 @@ function SetRow({ set, onSave, onDelete, saved }: SetRowProps) {
         }}
       />
 
-      <span className="text-[10px] shrink-0" style={{ color: 'var(--dim)' }}>reps</span>
+      <span className="text-[10px] shrink-0" style={{ color: 'var(--dim)' }}>{units.countLabel}</span>
 
       {/* Save or delete */}
       {showDelete ? (
@@ -127,7 +133,11 @@ interface Props {
   onRemoveSet: (index: number) => void
 }
 
-export function SetLogger({ exerciseId: _exerciseId, sets, onAddSet, onUpdateSet, onRemoveSet }: Props) {
+export function SetLogger({ exerciseId, sets, onAddSet, onUpdateSet, onRemoveSet }: Props) {
+  // A plank logs seconds and an assisted pull-up logs assistance; the inputs
+  // say so, because `lib/progress.ts` reads them that way.
+  const units = setUnitsFor(exerciseId)
+
   const handleSave = (index: number, set: LoggedSet) => {
     if (index < sets.length) {
       onUpdateSet(index, set)
@@ -159,6 +169,8 @@ export function SetLogger({ exerciseId: _exerciseId, sets, onAddSet, onUpdateSet
     >
       <div className="text-[9px] uppercase tracking-widest mb-2" style={{ color: 'var(--dim)' }}>
         Log Today
+        {units.isDuration && <span style={{ color: 'var(--muted)' }}> · hold in seconds</span>}
+        {units.isAssistance && <span style={{ color: 'var(--muted)' }}> · assistance weight</span>}
       </div>
 
       <div className="space-y-1">
@@ -166,6 +178,7 @@ export function SetLogger({ exerciseId: _exerciseId, sets, onAddSet, onUpdateSet
           <SetRow
             key={i}
             set={s}
+            units={units}
             saved={!!s.timestamp}
             onSave={updated => handleSave(i, updated)}
             onDelete={() => onRemoveSet(i)}

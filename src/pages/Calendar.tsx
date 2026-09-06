@@ -165,11 +165,13 @@ function AddEventSheet({ initialDate, onClose }: AddEventSheetProps) {
 interface DaySheetProps {
   date: string
   events: CalendarEvent[]
+  /** Set when this day also has a logged workout, so it stays reachable from here. */
+  onOpenWorkout?: () => void
   onClose: () => void
   onAdd: () => void
 }
 
-function DaySheet({ date, events, onClose, onAdd }: DaySheetProps) {
+function DaySheet({ date, events, onOpenWorkout, onClose, onAdd }: DaySheetProps) {
   const d = new Date(date + 'T12:00:00')
   const label = d.toLocaleDateString('en-US', { weekday: 'long', month: 'long', day: 'numeric' })
 
@@ -189,7 +191,19 @@ function DaySheet({ date, events, onClose, onAdd }: DaySheetProps) {
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-2">
-          {events.length === 0 && (
+          {onOpenWorkout && (
+            <button
+              onClick={onOpenWorkout}
+              className="w-full flex items-center justify-between gap-3 p-3 rounded-[2px] transition-opacity hover:opacity-75"
+              style={{ background: 'var(--elevated)', border: '1px solid var(--complete-border)' }}
+            >
+              <span className="text-[13px]" style={{ color: 'var(--accent)' }}>Workout logged</span>
+              <span className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--complete-text)' }}>
+                View session
+              </span>
+            </button>
+          )}
+          {events.length === 0 && !onOpenWorkout && (
             <p className="text-[12px] text-center py-6" style={{ color: 'var(--dim)' }}>No events. Tap + to add one.</p>
           )}
           {events.map(ev => (
@@ -494,7 +508,10 @@ export default function Calendar() {
                   <button
                     key={day}
                     onClick={() => {
-                      if (workout) { navigate(`/workout/session/${workout.id}`); return }
+                      // A workout-only day goes straight to the session. When the
+                      // day also carries events, open the sheet instead — it links
+                      // to the session, so neither is unreachable.
+                      if (workout && !hasEvt) { navigate(`/workout/session/${workout.id}`); return }
                       setSelectedDate(dateStr)
                       setShowDay(true)
                     }}
@@ -505,7 +522,13 @@ export default function Calendar() {
                       isSat ? 'text-noir-muted' : 'text-noir-accent',
                       !isToday && !isSel && 'hover:bg-noir-elevated/50'
                     )}
-                    aria-label={workout ? `${day}, workout logged — open session` : String(day)}
+                    aria-label={
+                      workout
+                        ? hasEvt
+                          ? `${day}, workout logged and events — open day`
+                          : `${day}, workout logged — open session`
+                        : String(day)
+                    }
                   >
                     <span>{day}</span>
                     {(hasEvt || workout) && (
@@ -561,6 +584,11 @@ export default function Calendar() {
         <DaySheet
           date={selectedDate}
           events={dayEvents}
+          onOpenWorkout={
+            workoutByDate.has(selectedDate)
+              ? () => navigate(`/workout/session/${workoutByDate.get(selectedDate)!.id}`)
+              : undefined
+          }
           onClose={() => setShowDay(false)}
           onAdd={() => { setShowDay(false); openAdd(selectedDate) }}
         />

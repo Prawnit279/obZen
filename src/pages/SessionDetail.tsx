@@ -5,6 +5,7 @@ import { db } from '@/db/dexie'
 import type { ExerciseSessionState } from '@/db/dexie'
 import { formatDateFull } from '@/lib/utils'
 import { setWeightLb } from '@/lib/progress'
+import { setUnitsFor, formatSet } from '@/lib/setUnits'
 import { isExerciseLogged } from '@/lib/workoutSession'
 
 const STATUS_LABEL: Record<ExerciseSessionState['status'], { text: string; color: string }> = {
@@ -163,7 +164,7 @@ export default function SessionDetail() {
                           Set {s.setNumber}
                         </span>
                         <span className="font-mono tabular-nums" style={{ color: 'var(--accent)' }}>
-                          {Math.round(setWeightLb(s) * 10) / 10} lb × {s.reps}
+                          {formatSet(setUnitsFor(ex.exerciseId), setWeightLb(s), s.reps)}
                         </span>
                       </div>
                     ))}

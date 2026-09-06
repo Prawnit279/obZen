@@ -76,7 +76,7 @@ export function FiveThreeOneCard() {
           {week !== 'deload' && jokers.length > 0 && (
             <div>
               <div className="text-[11px] uppercase tracking-widest mb-1.5" style={{ color: 'var(--muted)' }}>
-                Joker sets — optional, only if the top set felt strong
+                Joker sets · 1–3 reps — optional, only if the top set felt strong
               </div>
               <div className="grid grid-cols-3 gap-1.5">
                 {jokers.map(j => (

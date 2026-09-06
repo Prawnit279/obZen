@@ -5,9 +5,9 @@ import { belongsToProfile, sessionHasActivity } from '@/lib/workoutSession'
 import { useProfileStore } from '@/store/useProfileStore'
 import { useProgressStore } from '@/store/useProgressStore'
 import { PROFILES } from '@/config/profiles'
-import { LIBRARY_BY_ID, EXERCISE_LIBRARY, toExerciseId } from '@/data/obzen-program'
+import { LIBRARY_BY_ID, EXERCISE_LIBRARY, toExerciseId, COMPETITION_LIFT_IDS } from '@/data/obzen-program'
 import {
-  e1rmSeries, bestCurrentE1RM, sbdTotal, weeklyVolume, recentPRs,
+  e1rmSeries, bestCurrentE1RM, sbdTotal, weeklyVolume, fillWeeks, recentPRs,
   dotsScore, strengthStandard, trackingSeries, weeklyRepVolume, delta, isoWeekKey, displayLb, kgToLb,
 } from '@/lib/progress'
 import { todayISO } from '@/lib/utils'
@@ -84,12 +84,16 @@ export function WorkoutProgress() {
     series: e1rmSeries(mine, id, bodyweightKg),
   }))
 
-  const total = sbdTotal(mine, cfg.keyLiftIds)
+  // The SBD total is the three competition lifts by definition — not whichever
+  // lifts this profile happens to chart, which are configured separately.
+  const total = sbdTotal(mine, COMPETITION_LIFT_IDS)
   const dots = cfg.showPowerlifting && profile.sex
     ? dotsScore(total.totalKg, bodyweightKg, profile.sex)
     : 0
 
-  const volume = weeklyVolume(mine)
+  // Bodyweight matters here: assisted and bodyweight work are scored on the
+  // load actually moved, not on the number in the weight field.
+  const volume = weeklyVolume(mine, bodyweightKg)
   // Look the current week up by key — `volume` only contains weeks that were
   // trained, so its last entry is the most recent *trained* week, which is not
   // the current one after any week off.
@@ -153,7 +157,9 @@ export function WorkoutProgress() {
               { key: 'total', name: 'Total', value: total.totalKg }].map(row => {
               const std = strengthStandard(row.key, row.value, bodyweightKg, profile.sex!)
               if (!std) return null
-              const pct = Math.min(100, (std.ratio / 2.75) * 100)
+              // Scale each row against its own Elite threshold, so a full bar
+              // means Elite for that lift rather than for a male deadlift.
+              const pct = Math.min(100, (std.ratio / std.eliteRatio) * 100)
               return (
                 <div key={row.key}>
                   <div className="flex items-baseline justify-between text-[13px]">
@@ -166,7 +172,7 @@ export function WorkoutProgress() {
                     </span>
                   </div>
                   <div className="h-[3px] mt-1.5 rounded-full" style={{ background: 'var(--elevated)' }}>
-                    <div className="h-full rounded-full" style={{ width: `${pct}%`, background: '#a6a6a6' }} />
+                    <div className="h-full rounded-full" style={{ width: `${pct}%`, background: 'var(--muted)' }} />
                   </div>
                   {std.toNextKg !== null && std.nextBand && (
                     <div className="text-[11px] mt-1" style={{ color: 'var(--dim)' }}>
@@ -189,7 +195,8 @@ export function WorkoutProgress() {
       {/* ── Weekly volume + PRs ────────────────────────────────────────── */}
       <Card label="Weekly volume (tonnage)">
         <BarChart
-          data={volume.slice(-8).map(v => ({ label: v.week.slice(-3), value: kgToLb(v.tonnageKg) }))}
+          data={fillWeeks(volume, todayISO(), 8)
+            .map(v => ({ label: v.week.slice(-3), value: kgToLb(v.tonnageKg) }))}
           unit="lb"
         />
       </Card>
@@ -253,7 +260,8 @@ export function WorkoutProgress() {
                   Weekly rep volume
                 </div>
                 <BarChart
-                  data={weeklyRepVolume(mine, id).slice(-8).map(v => ({ label: v.week.slice(-3), value: v.tonnageKg }))}
+                  data={fillWeeks(weeklyRepVolume(mine, id), todayISO(), 8)
+                    .map(v => ({ label: v.week.slice(-3), value: v.tonnageKg }))}
                   unit="reps"
                 />
               </div>

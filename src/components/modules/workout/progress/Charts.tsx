@@ -15,7 +15,7 @@ const MT = 10
 const MB = 22
 
 const AXIS = 'var(--border-strong)'
-const TICK = '#8a8a8a'
+const TICK = 'var(--dim)'
 
 /** Dash patterns cycle so overlaid series stay distinguishable without colour. */
 export const SERIES_DASHES = ['none', '5 3', '2 3', '8 3 2 3']
