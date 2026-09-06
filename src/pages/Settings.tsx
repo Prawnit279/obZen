@@ -279,7 +279,10 @@ export default function Settings() {
               {PROFILE_IDS.map(id => (
                 <button
                   key={id}
-                  onClick={() => setReassignFrom(id)}
+                  onClick={() => {
+                    setReassignFrom(id)
+                    setReassignCount(null)
+                  }}
                   className={cn(
                     'px-2.5 py-1 rounded-[2px] text-[11px] uppercase tracking-widest transition-colors border',
                     id === reassignFrom

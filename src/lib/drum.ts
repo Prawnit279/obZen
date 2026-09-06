@@ -9,8 +9,6 @@ export async function startDrumSession(focusArea: string, bookRef?: string): Pro
     duration: 0,
     bookRef,
   }) as number
-  // DEBUG — remove before shipping Phase 7
-  console.log('[obZen] drumSessions.add →', { id, focusArea, date: todayISO() })
   return id
 }
 
@@ -36,8 +34,6 @@ export async function logRudiment(sessionId: number, rudimentId: string, bpm: nu
     date: todayISO(),
     notes,
   }) as number
-  // DEBUG — remove before shipping Phase 7
-  console.log('[obZen] rudimentLogs.add →', { id, sessionId, rudimentId, bpm })
   return id
 }
 

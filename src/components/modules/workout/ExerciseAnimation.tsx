@@ -1,4 +1,7 @@
+import { createContext, useContext } from 'react'
+import type { ComponentProps } from 'react'
 import type { ExerciseMotion, Pose } from '@/data/exercise-motions'
+import { useReducedMotion } from '@/hooks/useReducedMotion'
 
 /**
  * A looping figure performing one rep, drawn facing the viewer.
@@ -19,6 +22,23 @@ const IRON = 'var(--equip-iron)'
 const PLATE = 'var(--equip-plate)'
 
 const MID = 100
+
+/** Set when the viewer prefers reduced motion, so the figure holds still. */
+const StillContext = createContext(false)
+
+/**
+ * One SMIL animation, left out entirely under prefers-reduced-motion.
+ *
+ * Dropping the element is the only thing that works — SMIL ignores CSS, so a
+ * `display: none` rule on <animate> computes to none while the animation runs
+ * on regardless. Every shape already carries the opening pose in its own
+ * attributes, so with these gone the figure simply holds that first frame.
+ */
+function Animate(props: ComponentProps<'animate'>) {
+  const still = useContext(StillContext)
+  if (still) return null
+  return <animate {...props} />
+}
 
 /** How far each joint sits from the centre line, in canvas units. */
 const SPREAD = { shoulder: 15, elbow: 17, hand: 18, hip: 8, knee: 10, ankle: 11 }
@@ -105,10 +125,10 @@ function Limb({
       x2={xOf(p0, to, side)}   y2={p0[to][1]}
       stroke={LIMB} strokeWidth={width} strokeLinecap="round"
     >
-      <animate attributeName="x1" values={xs(motion, from, side)} {...t} />
-      <animate attributeName="y1" values={ys(motion, from)} {...t} />
-      <animate attributeName="x2" values={xs(motion, to, side)} {...t} />
-      <animate attributeName="y2" values={ys(motion, to)} {...t} />
+      <Animate attributeName="x1" values={xs(motion, from, side)} {...t} />
+      <Animate attributeName="y1" values={ys(motion, from)} {...t} />
+      <Animate attributeName="x2" values={xs(motion, to, side)} {...t} />
+      <Animate attributeName="y2" values={ys(motion, to)} {...t} />
     </line>
   )
 }
@@ -130,23 +150,23 @@ function Torso({ motion }: { motion: ExerciseMotion }) {
     <>
       {/* neck */}
       <line x1={MID} y1={p0.head[1]} x2={MID} y2={p0.neck[1]} stroke={LIMB} strokeWidth="6">
-        <animate attributeName="y1" values={ys(motion, 'head')} {...t} />
-        <animate attributeName="y2" values={ys(motion, 'neck')} {...t} />
+        <Animate attributeName="y1" values={ys(motion, 'head')} {...t} />
+        <Animate attributeName="y2" values={ys(motion, 'neck')} {...t} />
       </line>
 
       <polygon points={trunkAt(p0)} fill={LIMB}>
-        <animate attributeName="points" values={loopOf(motion).map(trunkAt).join(';')} {...t} />
+        <Animate attributeName="points" values={loopOf(motion).map(trunkAt).join(';')} {...t} />
       </polygon>
 
       {/* rounded shoulder caps, so the arms hang off a deltoid rather than a corner */}
       {([-1, 1] as Side[]).map(s => (
         <circle key={s} cx={MID + s * SH} cy={p0.neck[1]} r="4.5" fill={LIMB}>
-          <animate attributeName="cy" values={ys(motion, 'neck')} {...t} />
+          <Animate attributeName="cy" values={ys(motion, 'neck')} {...t} />
         </circle>
       ))}
 
       <circle cx={MID} cy={p0.head[1]} r="9" fill={LIMB} stroke={OUTLINE} strokeWidth="0.8">
-        <animate attributeName="cy" values={ys(motion, 'head')} {...t} />
+        <Animate attributeName="cy" values={ys(motion, 'head')} {...t} />
       </circle>
     </>
   )
@@ -182,18 +202,18 @@ function Equipment({ motion }: { motion: ExerciseMotion }) {
     return (
       <>
         <line x1={l - 17} y1={p0.hand[1]} x2={r + 17} y2={p0.hand[1]} stroke={IRON} strokeWidth="3.5" strokeLinecap="round">
-          <animate attributeName="x1" values={shiftBy(leftX, -17)} {...t} />
-          <animate attributeName="y1" values={handY} {...t} />
-          <animate attributeName="x2" values={shiftBy(rightX, 17)} {...t} />
-          <animate attributeName="y2" values={handY} {...t} />
+          <Animate attributeName="x1" values={shiftBy(leftX, -17)} {...t} />
+          <Animate attributeName="y1" values={handY} {...t} />
+          <Animate attributeName="x2" values={shiftBy(rightX, 17)} {...t} />
+          <Animate attributeName="y2" values={handY} {...t} />
         </line>
         <circle cx={l - 11} cy={p0.hand[1]} r="8" fill={PLATE} stroke={OUTLINE} strokeWidth="1">
-          <animate attributeName="cx" values={shiftBy(leftX, -11)} {...t} />
-          <animate attributeName="cy" values={handY} {...t} />
+          <Animate attributeName="cx" values={shiftBy(leftX, -11)} {...t} />
+          <Animate attributeName="cy" values={handY} {...t} />
         </circle>
         <circle cx={r + 11} cy={p0.hand[1]} r="8" fill={PLATE} stroke={OUTLINE} strokeWidth="1">
-          <animate attributeName="cx" values={shiftBy(rightX, 11)} {...t} />
-          <animate attributeName="cy" values={handY} {...t} />
+          <Animate attributeName="cx" values={shiftBy(rightX, 11)} {...t} />
+          <Animate attributeName="cy" values={handY} {...t} />
         </circle>
       </>
     )
@@ -206,18 +226,18 @@ function Equipment({ motion }: { motion: ExerciseMotion }) {
     return (
       <g key={side}>
         <line x1={x0 - 7} y1={p0.hand[1]} x2={x0 + 7} y2={p0.hand[1]} stroke={IRON} strokeWidth="3" strokeLinecap="round">
-          <animate attributeName="x1" values={shiftBy(vals, -7)} {...t} />
-          <animate attributeName="y1" values={handY} {...t} />
-          <animate attributeName="x2" values={shiftBy(vals, 7)} {...t} />
-          <animate attributeName="y2" values={handY} {...t} />
+          <Animate attributeName="x1" values={shiftBy(vals, -7)} {...t} />
+          <Animate attributeName="y1" values={handY} {...t} />
+          <Animate attributeName="x2" values={shiftBy(vals, 7)} {...t} />
+          <Animate attributeName="y2" values={handY} {...t} />
         </line>
         <circle cx={x0 - 7} cy={p0.hand[1]} r="5" fill={PLATE} stroke={OUTLINE} strokeWidth="0.9">
-          <animate attributeName="cx" values={shiftBy(vals, -7)} {...t} />
-          <animate attributeName="cy" values={handY} {...t} />
+          <Animate attributeName="cx" values={shiftBy(vals, -7)} {...t} />
+          <Animate attributeName="cy" values={handY} {...t} />
         </circle>
         <circle cx={x0 + 7} cy={p0.hand[1]} r="5" fill={PLATE} stroke={OUTLINE} strokeWidth="0.9">
-          <animate attributeName="cx" values={shiftBy(vals, 7)} {...t} />
-          <animate attributeName="cy" values={handY} {...t} />
+          <Animate attributeName="cx" values={shiftBy(vals, 7)} {...t} />
+          <Animate attributeName="cy" values={handY} {...t} />
         </circle>
       </g>
     )
@@ -241,10 +261,10 @@ function SideLimb({
       x1={p0[from][0]} y1={p0[from][1]} x2={p0[to][0]} y2={p0[to][1]}
       stroke={LIMB} strokeWidth={width} strokeLinecap="round"
     >
-      <animate attributeName="x1" values={sideXs(motion, from)} {...t} />
-      <animate attributeName="y1" values={ys(motion, from)} {...t} />
-      <animate attributeName="x2" values={sideXs(motion, to)} {...t} />
-      <animate attributeName="y2" values={ys(motion, to)} {...t} />
+      <Animate attributeName="x1" values={sideXs(motion, from)} {...t} />
+      <Animate attributeName="y1" values={ys(motion, from)} {...t} />
+      <Animate attributeName="x2" values={sideXs(motion, to)} {...t} />
+      <Animate attributeName="y2" values={ys(motion, to)} {...t} />
     </line>
   )
 }
@@ -271,18 +291,18 @@ function SideEquipment({ motion }: { motion: ExerciseMotion }) {
         x1={p0.hand[0] - half} y1={p0.hand[1]} x2={p0.hand[0] + half} y2={p0.hand[1]}
         stroke={IRON} strokeWidth="3.5" strokeLinecap="round"
       >
-        <animate attributeName="x1" values={shiftBy(hx, -half)} {...t} />
-        <animate attributeName="y1" values={hy} {...t} />
-        <animate attributeName="x2" values={shiftBy(hx, half)} {...t} />
-        <animate attributeName="y2" values={hy} {...t} />
+        <Animate attributeName="x1" values={shiftBy(hx, -half)} {...t} />
+        <Animate attributeName="y1" values={hy} {...t} />
+        <Animate attributeName="x2" values={shiftBy(hx, half)} {...t} />
+        <Animate attributeName="y2" values={hy} {...t} />
       </line>
       <circle cx={p0.hand[0] - half} cy={p0.hand[1]} r={plate} fill={PLATE} stroke={OUTLINE} strokeWidth="1">
-        <animate attributeName="cx" values={shiftBy(hx, -half)} {...t} />
-        <animate attributeName="cy" values={hy} {...t} />
+        <Animate attributeName="cx" values={shiftBy(hx, -half)} {...t} />
+        <Animate attributeName="cy" values={hy} {...t} />
       </circle>
       <circle cx={p0.hand[0] + half} cy={p0.hand[1]} r={plate} fill={PLATE} stroke={OUTLINE} strokeWidth="1">
-        <animate attributeName="cx" values={shiftBy(hx, half)} {...t} />
-        <animate attributeName="cy" values={hy} {...t} />
+        <Animate attributeName="cx" values={shiftBy(hx, half)} {...t} />
+        <Animate attributeName="cy" values={hy} {...t} />
       </circle>
     </>
   )
@@ -299,8 +319,8 @@ function SideRig({ motion }: { motion: ExerciseMotion }) {
       <SideLimb motion={motion} from="neck" to="elbow" />
       <SideLimb motion={motion} from="elbow" to="hand" />
       <circle cx={p0.head[0]} cy={p0.head[1]} r="8.5" fill={LIMB} stroke={OUTLINE} strokeWidth="0.8">
-        <animate attributeName="cx" values={sideXs(motion, 'head')} {...t} />
-        <animate attributeName="cy" values={ys(motion, 'head')} {...t} />
+        <Animate attributeName="cx" values={sideXs(motion, 'head')} {...t} />
+        <Animate attributeName="cy" values={ys(motion, 'head')} {...t} />
       </circle>
       <SideEquipment motion={motion} />
     </>
@@ -310,44 +330,52 @@ function SideRig({ motion }: { motion: ExerciseMotion }) {
 export function ExerciseAnimation({ motion, label }: { motion: ExerciseMotion; label: string }) {
   const sides: Side[] = [-1, 1]
   const profile = isProfileView(motion)
+  const still = useReducedMotion()
   return (
-    <div
-      className="rounded-[2px] py-2 exercise-animation"
-      style={{ background: 'var(--elevated)', border: '1px solid var(--border)' }}
-    >
-      <svg viewBox="0 0 200 160" width="100%" height="185" role="img" aria-label={`Animated demonstration of ${label}`}>
-        {motion.ground !== false && (
-          <line x1="24" y1="146" x2="176" y2="146" stroke={OUTLINE} strokeWidth="1.5" strokeDasharray="4 4" />
-        )}
-        {motion.bench && (
-          profile
-            // In profile the bench sits where the pose puts it, under the lifter.
-            ? <rect
-                x={motion.bench.x} y={motion.bench.y}
-                width={motion.bench.width} height="6" rx="2" fill={OUTLINE}
-              />
-            // Head-on it is edge-on beneath the figure, so it is centred on the
-            // body rather than following the pose's x.
-            : <rect x={MID - 42} y={motion.bench.y} width="84" height="6" rx="2" fill={OUTLINE} />
-        )}
+    <StillContext.Provider value={still}>
+      <div
+        className="rounded-[2px] py-2 exercise-animation"
+        style={{ background: 'var(--elevated)', border: '1px solid var(--border)' }}
+      >
+        <svg
+          viewBox="0 0 200 160" width="100%" height="185" role="img"
+          aria-label={still
+            ? `Starting position for ${label}`
+            : `Animated demonstration of ${label}`}
+        >
+          {motion.ground !== false && (
+            <line x1="24" y1="146" x2="176" y2="146" stroke={OUTLINE} strokeWidth="1.5" strokeDasharray="4 4" />
+          )}
+          {motion.bench && (
+            profile
+              // In profile the bench sits where the pose puts it, under the lifter.
+              ? <rect
+                  x={motion.bench.x} y={motion.bench.y}
+                  width={motion.bench.width} height="6" rx="2" fill={OUTLINE}
+                />
+              // Head-on it is edge-on beneath the figure, so it is centred on the
+              // body rather than following the pose's x.
+              : <rect x={MID - 42} y={motion.bench.y} width="84" height="6" rx="2" fill={OUTLINE} />
+          )}
 
-        {profile ? (
-          <SideRig motion={motion} />
-        ) : (
-          <>
-            {/* legs, then torso, then arms, so the arms read in front */}
-            {sides.map(s => <Limb key={`t${s}`} motion={motion} from="hip" to="knee" side={s} width={8} />)}
-            {sides.map(s => <Limb key={`s${s}`} motion={motion} from="knee" to="ankle" side={s} width={6} />)}
-            <Torso motion={motion} />
-            {sides.map(s => <Limb key={`u${s}`} motion={motion} from="neck" to="elbow" side={s} />)}
-            {sides.map(s => <Limb key={`f${s}`} motion={motion} from="elbow" to="hand" side={s} />)}
-            <Equipment motion={motion} />
-          </>
-        )}
-      </svg>
-      <p className="text-[10px] uppercase tracking-widest text-center" style={{ color: 'var(--dim)' }}>
-        {motion.caption}
-      </p>
-    </div>
+          {profile ? (
+            <SideRig motion={motion} />
+          ) : (
+            <>
+              {/* legs, then torso, then arms, so the arms read in front */}
+              {sides.map(s => <Limb key={`t${s}`} motion={motion} from="hip" to="knee" side={s} width={8} />)}
+              {sides.map(s => <Limb key={`s${s}`} motion={motion} from="knee" to="ankle" side={s} width={6} />)}
+              <Torso motion={motion} />
+              {sides.map(s => <Limb key={`u${s}`} motion={motion} from="neck" to="elbow" side={s} />)}
+              {sides.map(s => <Limb key={`f${s}`} motion={motion} from="elbow" to="hand" side={s} />)}
+              <Equipment motion={motion} />
+            </>
+          )}
+        </svg>
+        <p className="text-[10px] uppercase tracking-widest text-center" style={{ color: 'var(--dim)' }}>
+          {motion.caption}
+        </p>
+      </div>
+    </StillContext.Provider>
   )
 }

@@ -301,7 +301,8 @@
   }
 }
 
-/* Hold the opening pose for anyone who prefers reduced motion. */
-@media (prefers-reduced-motion: reduce) {
-  .exercise-animation animate { display: none; }
-}
+/* The exercise figures hold their opening pose under prefers-reduced-motion,
+   but that cannot be done here: SMIL ignores CSS, so `display: none` on an
+   <animate> element computes to none while the animation keeps running. The
+   elements are left out in JS instead — see hooks/useReducedMotion.ts. The
+   CSS-animated yoga figures do honour their own reduced-motion rules. */

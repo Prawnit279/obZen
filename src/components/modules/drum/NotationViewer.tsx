@@ -36,6 +36,13 @@ export function NotationViewer({ data }: Props) {
     const container = containerRef.current
     if (!container) return
 
+    // Extract theme colors from CSS variables, so the score follows the theme
+    // instead of being painted white-on-black whatever the page is doing.
+    const computedStyle = getComputedStyle(document.documentElement)
+    const themeBg = computedStyle.getPropertyValue('--bg').trim() || '#0d0d0d'
+    const themeAccent = computedStyle.getPropertyValue('--accent').trim() || '#e2e2e2'
+    const themeMuted = computedStyle.getPropertyValue('--muted').trim() || '#a6a6a6'
+
     // Dynamically import VexFlow to avoid SSR issues and reduce initial bundle
     import('vexflow').then(({ Renderer, Stave, StaveNote, Voice, Formatter, Annotation, Articulation }) => {
       container.innerHTML = ''
@@ -51,10 +58,10 @@ export function NotationViewer({ data }: Props) {
 
       const context = renderer.getContext()
       context.setFont('Arial', 9)
-      // Set overall SVG color
+      // Set overall SVG color to theme background
       const svgEl = container.querySelector('svg')
       if (svgEl) {
-        svgEl.style.background = '#0a0a0a'
+        svgEl.style.background = themeBg
       }
 
       let x = PAD_X
@@ -62,7 +69,7 @@ export function NotationViewer({ data }: Props) {
       data.measures.forEach((measure, mIdx) => {
         const isFirst = mIdx === 0
         const stave = new Stave(x, PAD_Y, STAVE_W)
-        stave.setStyle({ fillStyle: '#f0f0f0', strokeStyle: '#f0f0f0' })
+        stave.setStyle({ fillStyle: themeAccent, strokeStyle: themeAccent })
 
         if (isFirst) {
           stave.addClef('percussion')
@@ -81,7 +88,7 @@ export function NotationViewer({ data }: Props) {
             duration: dur,
             type: isX ? 'x' : 'n',
           })
-          staveNote.setStyle({ fillStyle: '#f0f0f0', strokeStyle: '#f0f0f0' })
+          staveNote.setStyle({ fillStyle: themeAccent, strokeStyle: themeAccent })
 
           if (note.accent) {
             try {
@@ -94,7 +101,7 @@ export function NotationViewer({ data }: Props) {
             const ann = new Annotation(label)
               .setFont('Arial', 8, 'normal')
               .setVerticalJustification(3) // BOTTOM
-            ann.setStyle({ fillStyle: '#555555', strokeStyle: '#555555' })
+            ann.setStyle({ fillStyle: themeMuted, strokeStyle: themeMuted })
             staveNote.addModifier(ann)
           }
 
@@ -117,19 +124,20 @@ export function NotationViewer({ data }: Props) {
         x += STAVE_W
       })
 
-      // Restyle all generated SVG elements to white-on-black
+      // VexFlow colours some of the elements it generates itself, so sweep those
+      // onto the theme as well. Sticking marks are already muted and stay muted;
+      // everything else reads as foreground.
       container.querySelectorAll('svg path, svg rect, svg polygon').forEach(el => {
         const htmlEl = el as SVGElement
         const fill = htmlEl.getAttribute('fill')
         const stroke = htmlEl.getAttribute('stroke')
-        if (fill && fill !== 'none' && fill !== '#555555') htmlEl.setAttribute('fill', '#f0f0f0')
-        if (stroke && stroke !== 'none' && stroke !== '#555555') htmlEl.setAttribute('stroke', '#f0f0f0')
+        if (fill && fill !== 'none' && fill !== themeMuted) htmlEl.setAttribute('fill', themeAccent)
+        if (stroke && stroke !== 'none' && stroke !== themeMuted) htmlEl.setAttribute('stroke', themeAccent)
       })
       container.querySelectorAll('svg text').forEach(el => {
         const htmlEl = el as SVGElement
-        const fill = htmlEl.getAttribute('fill')
-        if (fill !== '#555555') {
-          htmlEl.setAttribute('fill', '#d4d4d4')
+        if (htmlEl.getAttribute('fill') !== themeMuted) {
+          htmlEl.setAttribute('fill', themeAccent)
         }
       })
     })
