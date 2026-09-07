@@ -17,6 +17,7 @@ import { SHOW_NUTRITION, SHOW_VEDIC, SHOW_ASTROLOGY } from '@/config/features'
 import { PROFILES, PROFILE_IDS } from '@/config/profiles'
 import { useProfileStore } from '@/store/useProfileStore'
 import { Card, CardHeader } from '@/components/ui/Card'
+import { SegmentedPill } from '@/components/ui/SegmentedPill'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { Badge } from '@/components/ui/Badge'
 import { CheckInModal } from '@/components/modules/dashboard/CheckInModal'
@@ -116,45 +117,13 @@ export default function Dashboard() {
           >
             {dayOfWeek()}
           </span>
-          {/* Profile switcher — segmented pill */}
-          <div
-            role="group"
-            aria-label="Active profile"
-            className="flex"
-            style={{
-              gap: 2, padding: 2,
-              borderRadius: 'var(--r-pill)',
-              background: 'rgba(255,255,255,0.05)',
-            }}
-          >
-            {PROFILE_IDS.map(id => {
-              const on = id === activeId
-              return (
-                <button
-                  key={id}
-                  onClick={() => setActive(id)}
-                  aria-pressed={on}
-                  className="transition-colors"
-                  style={{
-                    padding: '6px 12px',
-                    border: 'none',
-                    cursor: 'pointer',
-                    borderRadius: 'var(--r-pill)',
-                    fontSize: 11,
-                    fontWeight: 500,
-                    letterSpacing: '0.03em',
-                    background: on
-                      ? 'linear-gradient(140deg, var(--violet-400), var(--violet-900))'
-                      : 'transparent',
-                    color: on ? '#FFFFFF' : 'var(--ink-faint)',
-                    boxShadow: on ? '0 2px 14px rgba(76,29,149,0.6)' : 'none',
-                  }}
-                >
-                  {PROFILES[id].name}
-                </button>
-              )
-            })}
-          </div>
+          {/* Profile switcher */}
+          <SegmentedPill
+            label="Active profile"
+            value={activeId}
+            onChange={setActive}
+            options={PROFILE_IDS.map(id => ({ value: id, label: PROFILES[id].name }))}
+          />
         </div>
         <h1
           className="mt-1"
@@ -187,44 +156,16 @@ export default function Dashboard() {
       </div>
 
       {/* Tab selector */}
-      <div
-        role="group"
-        aria-label="Dashboard range"
-        className="flex"
-        style={{
-          gap: 2, padding: 2,
-          borderRadius: 'var(--r-pill)',
-          background: 'rgba(255,255,255,0.05)',
-        }}
-      >
-        {(['today', 'weekly'] as DashTab[]).map(t => {
-          const on = dashTab === t
-          return (
-            <button
-              key={t}
-              onClick={() => setDashTab(t)}
-              aria-pressed={on}
-              className="flex-1 capitalize transition-colors"
-              style={{
-                padding: '6px 12px',
-                border: 'none',
-                cursor: 'pointer',
-                borderRadius: 'var(--r-pill)',
-                fontSize: 11,
-                fontWeight: 500,
-                letterSpacing: '0.03em',
-                background: on
-                  ? 'linear-gradient(140deg, var(--violet-400), var(--violet-900))'
-                  : 'transparent',
-                color: on ? '#FFFFFF' : 'var(--ink-faint)',
-                boxShadow: on ? '0 2px 14px rgba(76,29,149,0.6)' : 'none',
-              }}
-            >
-              {t}
-            </button>
-          )
-        })}
-      </div>
+      <SegmentedPill
+        label="Dashboard range"
+        value={dashTab}
+        onChange={setDashTab}
+        grow
+        options={[
+          { value: 'today' as DashTab, label: 'Today' },
+          { value: 'weekly' as DashTab, label: 'Weekly' },
+        ]}
+      />
 
       {dashTab === 'weekly' && <WeeklySummaryTab />}
 

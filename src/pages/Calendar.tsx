@@ -9,6 +9,7 @@ import { Card } from '@/components/ui/Card'
 import { cn, getMoonPhaseName } from '@/lib/utils'
 import { ChevronLeft, ChevronRight, Plus, X, Trash2 } from 'lucide-react'
 import { db } from '@/db/dexie'
+import { SegmentedPill } from '@/components/ui/SegmentedPill'
 import type { CalendarEvent, WorkoutDaySession } from '@/db/dexie'
 
 const DAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
@@ -510,40 +511,16 @@ export default function Calendar() {
           </h1>
         </div>
         <div className="flex items-center gap-2">
-          <div
-            role="group"
-            aria-label="Calendar range"
-            className="flex"
-            style={{
-              gap: 2, padding: 2,
-              borderRadius: 'var(--r-pill)',
-              background: 'rgba(255,255,255,0.05)',
-            }}
-          >
-            {(['month', 'week', 'day'] as const).map(v => {
-              const on = view === v
-              return (
-                <button
-                  key={v}
-                  onClick={() => setView(v)}
-                  aria-pressed={on}
-                  className="capitalize transition-colors"
-                  style={{
-                    padding: '6px 12px', border: 'none', cursor: 'pointer',
-                    borderRadius: 'var(--r-pill)',
-                    fontSize: 11, fontWeight: 500, letterSpacing: '0.03em',
-                    background: on
-                      ? 'linear-gradient(140deg, var(--violet-400), var(--violet-900))'
-                      : 'transparent',
-                    color: on ? '#FFFFFF' : 'var(--ink-faint)',
-                    boxShadow: on ? '0 2px 14px rgba(76,29,149,0.6)' : 'none',
-                  }}
-                >
-                  {v}
-                </button>
-              )
-            })}
-          </div>
+          <SegmentedPill
+            label="Calendar range"
+            value={view}
+            onChange={setView}
+            options={[
+              { value: 'month' as const, label: 'Month' },
+              { value: 'week' as const, label: 'Week' },
+              { value: 'day' as const, label: 'Day' },
+            ]}
+          />
           <button
             onClick={() => openAdd(today)}
             className="flex items-center gap-1 uppercase transition-colors"

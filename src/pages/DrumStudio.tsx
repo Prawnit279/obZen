@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { RUDIMENTS, getRudimentsByFamily } from '@/data/rudiments'
 import { DRUM_BOOKS } from '@/data/drum-lessons'
 import { db } from '@/db/dexie'
+import { SegmentedPill } from '@/components/ui/SegmentedPill'
 import type { Song } from '@/db/dexie'
 import { deleteSong } from '@/lib/drum'
 import { MetronomeEngine } from '@/lib/metronome'
@@ -40,43 +41,22 @@ export default function DrumStudio() {
         </h1>
       </div>
 
-      {/* Five segments at 375px leaves ~66px each, so these scroll rather than
-          squeezing the labels to nothing. */}
-      <div
-        role="group"
-        aria-label="Drum section"
-        className="flex overflow-x-auto"
-        style={{
-          gap: 2, padding: 2,
-          borderRadius: 'var(--r-pill)',
-          background: 'rgba(255,255,255,0.05)',
-          scrollbarWidth: 'none',
-        }}
-      >
-        {(['metronome', 'rudiments', 'lessons', 'songs', 'library'] as Tab[]).map(t => {
-          const on = tab === t
-          return (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              aria-pressed={on}
-              className="flex-1 capitalize transition-colors whitespace-nowrap"
-              style={{
-                padding: '6px 10px', border: 'none', cursor: 'pointer',
-                borderRadius: 'var(--r-pill)',
-                fontSize: 11, fontWeight: 500, letterSpacing: '0.03em',
-                background: on
-                  ? 'linear-gradient(140deg, var(--violet-400), var(--violet-900))'
-                  : 'transparent',
-                color: on ? '#FFFFFF' : 'var(--ink-faint)',
-                boxShadow: on ? '0 2px 14px rgba(76,29,149,0.6)' : 'none',
-              }}
-            >
-              {t}
-            </button>
-          )
-        })}
-      </div>
+      {/* Five segments at 375px leaves roughly 66px each, so the strip scrolls
+          rather than squeezing the labels away. */}
+      <SegmentedPill
+        label="Drum section"
+        value={tab}
+        onChange={setTab}
+        grow
+        scrollable
+        options={[
+          { value: 'metronome' as Tab, label: 'Metronome' },
+          { value: 'rudiments' as Tab, label: 'Rudiments' },
+          { value: 'lessons' as Tab, label: 'Lessons' },
+          { value: 'songs' as Tab, label: 'Songs' },
+          { value: 'library' as Tab, label: 'Library' },
+        ]}
+      />
 
       {tab === 'metronome' && <MetronomeTab />}
       {tab === 'rudiments' && <RudimentsTab />}

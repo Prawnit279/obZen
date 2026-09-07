@@ -17,6 +17,7 @@ import { DaySummaryBar } from '@/components/modules/workout/DaySummaryBar'
 import { SortableExerciseList } from '@/components/modules/workout/SortableExerciseList'
 import { AddExerciseSheet } from '@/components/modules/workout/AddExerciseSheet'
 import { WorkoutHistory } from '@/components/modules/workout/WorkoutHistory'
+import { SegmentedPill } from '@/components/ui/SegmentedPill'
 import { WorkoutProgress } from '@/components/modules/workout/progress/WorkoutProgress'
 import { StrengthTools } from '@/components/modules/workout/tools/StrengthTools'
 
@@ -317,36 +318,12 @@ export default function Workout() {
         {/* Whose session this is. Switchable here so a workout can't be logged
             under the wrong profile without it being visible. */}
         <div className="flex flex-col items-end gap-1 shrink-0">
-          <div role="group" aria-label="Log as" className="flex" style={{
-          gap: 2, padding: 2,
-          borderRadius: 'var(--r-pill)',
-          background: 'rgba(255,255,255,0.05)',
-        }}>
-            {PROFILE_IDS.map(id => {
-              const on = id === activeProfileId
-              return (
-                <button
-                  key={id}
-                  onClick={() => setActiveProfile(id)}
-                  aria-pressed={on}
-                  aria-label={`Log as ${PROFILES[id].name}`}
-                  className="transition-colors"
-                  style={{
-                    padding: '6px 12px', border: 'none', cursor: 'pointer',
-                    borderRadius: 'var(--r-pill)',
-                    fontSize: 11, fontWeight: 500, letterSpacing: '0.03em',
-                    background: on
-                      ? 'linear-gradient(140deg, var(--violet-400), var(--violet-900))'
-                      : 'transparent',
-                    color: on ? '#FFFFFF' : 'var(--ink-faint)',
-                    boxShadow: on ? '0 2px 14px rgba(76,29,149,0.6)' : 'none',
-                  }}
-                >
-                  {PROFILES[id].name}
-                </button>
-              )
-            })}
-          </div>
+          <SegmentedPill
+            label="Log as"
+            value={activeProfileId}
+            onChange={setActiveProfile}
+            options={PROFILE_IDS.map(id => ({ value: id, label: PROFILES[id].name }))}
+          />
           <div style={{ fontSize: 11, color: 'var(--ink-faint)', fontVariantNumeric: 'tabular-nums' }}>
             {weekSessions ?? 0}/3 this week
           </div>
@@ -354,35 +331,18 @@ export default function Workout() {
       </div>
 
       {/* Tabs */}
-      <div role="group" aria-label="Train section" className="flex" style={{
-          gap: 2, padding: 2,
-          borderRadius: 'var(--r-pill)',
-          background: 'rgba(255,255,255,0.05)',
-        }}>
-        {(['program', 'history', 'progress', 'tools'] as Tab[]).map(t => {
-          const on = tab === t
-          return (
-            <button
-              key={t}
-              onClick={() => setTab(t)}
-              aria-pressed={on}
-              className="flex-1 capitalize transition-colors"
-              style={{
-                padding: '6px 10px', border: 'none', cursor: 'pointer',
-                borderRadius: 'var(--r-pill)',
-                fontSize: 11, fontWeight: 500, letterSpacing: '0.03em',
-                background: on
-                  ? 'linear-gradient(140deg, var(--violet-400), var(--violet-900))'
-                  : 'transparent',
-                color: on ? '#FFFFFF' : 'var(--ink-faint)',
-                boxShadow: on ? '0 2px 14px rgba(76,29,149,0.6)' : 'none',
-              }}
-            >
-              {t}
-            </button>
-          )
-        })}
-      </div>
+      <SegmentedPill
+        label="Train section"
+        value={tab}
+        onChange={setTab}
+        grow
+        options={[
+          { value: 'program' as Tab, label: 'Program' },
+          { value: 'history' as Tab, label: 'History' },
+          { value: 'progress' as Tab, label: 'Progress' },
+          { value: 'tools' as Tab, label: 'Tools' },
+        ]}
+      />
 
       {tab === 'history' && <WorkoutHistory />}
 
