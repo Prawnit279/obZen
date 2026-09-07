@@ -26,15 +26,21 @@ const CATEGORIES: { value: Category; label: string }[] = [
   { value: 'ayurveda',  label: 'Ayurveda' },
 ]
 
+/**
+ * One hue per category, drawn from the same five the charts use plus two
+ * neutrals, so the app carries a single palette rather than a second one for
+ * the calendar. Category is also always named in the label beside the dot, so
+ * meaning never rests on colour.
+ */
 const CATEGORY_COLOR: Record<Category, string> = {
-  personal:  '#888888',
-  work:      '#d4d4d4',
-  meeting:   '#fbbf24',
-  workout:   'var(--complete-text)',
-  drum:      '#f97316',
-  yoga:      '#a78bfa',
-  jam:       'var(--skip-text)',
-  ayurveda:  '#6ee7b7',
+  personal:  'var(--ink-dim)',
+  work:      'var(--ink)',
+  meeting:   'var(--lift-row)',
+  workout:   'var(--ok)',
+  drum:      'var(--lift-core)',
+  yoga:      'var(--lift-squat)',
+  jam:       'var(--lift-bench)',
+  ayurveda:  'var(--lift-deadlift)',
 }
 
 function isoDate(d: Date): string {
@@ -83,16 +89,35 @@ function AddEventSheet({ initialDate, onClose }: AddEventSheetProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end" style={{ background: 'rgba(0,0,0,0.7)' }}>
-      <div className="rounded-t-[4px] flex flex-col max-h-[90vh]" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+    <div
+      className="fixed inset-0 z-50 flex flex-col justify-end"
+      style={{ background: 'rgba(6,5,10,0.68)' }}
+    >
+      <div
+        className="flex flex-col max-h-[90vh]"
+        style={{
+          borderRadius: '26px 26px 0 0',
+          borderTop: '1px solid rgba(167,139,250,0.22)',
+          background: 'linear-gradient(170deg, #191428 0%, #0D0B14 100%)',
+          boxShadow: '0 -20px 60px rgba(0,0,0,0.6)',
+        }}
+      >
+        {/* Grab handle — the affordance that says this panel is a sheet. */}
+        <div
+          aria-hidden="true"
+          style={{
+            width: 38, height: 4, borderRadius: 2, margin: '10px auto 2px',
+            background: 'rgba(255,255,255,0.18)', flexShrink: 0,
+          }}
+        />
         <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-          <span className="text-[12px] uppercase tracking-widest" style={{ color: 'var(--accent)' }}>New Event</span>
-          <button onClick={onClose} aria-label="Close"><X size={16} style={{ color: 'var(--dim)' }} /></button>
+          <span className="text-[12px] uppercase tracking-widest" style={{ color: 'var(--ink)' }}>New Event</span>
+          <button onClick={onClose} aria-label="Close"><X size={16} style={{ color: 'var(--ink-faint)' }} /></button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-3">
           <div>
-            <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Title *</label>
+            <label className="text-[11px] uppercase tracking-widest block mb-1" style={{ color: 'var(--ink-faint)' }}>Title *</label>
             <input
               className="input w-full"
               value={title}
@@ -103,33 +128,33 @@ function AddEventSheet({ initialDate, onClose }: AddEventSheetProps) {
           </div>
 
           <div>
-            <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Date</label>
+            <label className="text-[11px] uppercase tracking-widest block mb-1" style={{ color: 'var(--ink-faint)' }}>Date</label>
             <input type="date" className="input w-full" value={date} onChange={e => setDate(e.target.value)} />
           </div>
 
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Start</label>
+              <label className="text-[11px] uppercase tracking-widest block mb-1" style={{ color: 'var(--ink-faint)' }}>Start</label>
               <input type="time" className="input w-full" value={startTime} onChange={e => setStartTime(e.target.value)} />
             </div>
             <div>
-              <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>End</label>
+              <label className="text-[11px] uppercase tracking-widest block mb-1" style={{ color: 'var(--ink-faint)' }}>End</label>
               <input type="time" className="input w-full" value={endTime} onChange={e => setEndTime(e.target.value)} />
             </div>
           </div>
 
           <div>
-            <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Category</label>
+            <label className="text-[11px] uppercase tracking-widest block mb-1" style={{ color: 'var(--ink-faint)' }}>Category</label>
             <div className="flex flex-wrap gap-1.5">
               {CATEGORIES.map(c => (
                 <button
                   key={c.value}
                   onClick={() => setCategory(c.value)}
-                  className="px-2.5 py-1 rounded-[2px] text-[9px] uppercase tracking-widest transition-colors"
+                  className="px-2.5 py-1 rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-colors"
                   style={{
-                    border: `1px solid ${category === c.value ? CATEGORY_COLOR[c.value] : 'var(--border)'}`,
-                    color: category === c.value ? CATEGORY_COLOR[c.value] : 'var(--dim)',
-                    background: category === c.value ? 'var(--elevated)' : 'transparent',
+                    border: `1px solid ${category === c.value ? CATEGORY_COLOR[c.value] : 'var(--hairline)'}`,
+                    color: category === c.value ? CATEGORY_COLOR[c.value] : 'var(--ink-faint)',
+                    background: category === c.value ? 'rgba(255,255,255,0.05)' : 'transparent',
                   }}
                 >{c.label}</button>
               ))}
@@ -137,7 +162,7 @@ function AddEventSheet({ initialDate, onClose }: AddEventSheetProps) {
           </div>
 
           <div>
-            <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Notes</label>
+            <label className="text-[11px] uppercase tracking-widest block mb-1" style={{ color: 'var(--ink-faint)' }}>Notes</label>
             <textarea
               className="input w-full resize-none"
               rows={2}
@@ -150,8 +175,8 @@ function AddEventSheet({ initialDate, onClose }: AddEventSheetProps) {
           <button
             onClick={handleSave}
             disabled={!title.trim() || saving}
-            className="w-full py-2.5 rounded-[2px] text-[11px] uppercase tracking-widest disabled:opacity-30 transition-opacity"
-            style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}
+            className="w-full py-2.5 rounded-[var(--r-control)] text-[11px] uppercase tracking-widest disabled:opacity-30 transition-opacity"
+            style={{ border: '1px solid var(--accent)', color: 'var(--ink)' }}
           >
             {saving ? 'Saving...' : 'Add Event'}
           </button>
@@ -180,13 +205,32 @@ function DaySheet({ date, events, onOpenWorkout, onClose, onAdd }: DaySheetProps
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end" style={{ background: 'rgba(0,0,0,0.7)' }}>
-      <div className="rounded-t-[4px] flex flex-col max-h-[70vh]" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+    <div
+      className="fixed inset-0 z-50 flex flex-col justify-end"
+      style={{ background: 'rgba(6,5,10,0.68)' }}
+    >
+      <div
+        className="flex flex-col max-h-[70vh]"
+        style={{
+          borderRadius: '26px 26px 0 0',
+          borderTop: '1px solid rgba(167,139,250,0.22)',
+          background: 'linear-gradient(170deg, #191428 0%, #0D0B14 100%)',
+          boxShadow: '0 -20px 60px rgba(0,0,0,0.6)',
+        }}
+      >
+        {/* Grab handle — the affordance that says this panel is a sheet. */}
+        <div
+          aria-hidden="true"
+          style={{
+            width: 38, height: 4, borderRadius: 2, margin: '10px auto 2px',
+            background: 'rgba(255,255,255,0.18)', flexShrink: 0,
+          }}
+        />
         <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-          <span className="text-[12px] uppercase tracking-widest" style={{ color: 'var(--accent)' }}>{label}</span>
+          <span className="text-[12px] uppercase tracking-widest" style={{ color: 'var(--ink)' }}>{label}</span>
           <div className="flex items-center gap-2">
-            <button onClick={onAdd} aria-label="Add event"><Plus size={16} style={{ color: 'var(--muted)' }} /></button>
-            <button onClick={onClose} aria-label="Close"><X size={16} style={{ color: 'var(--dim)' }} /></button>
+            <button onClick={onAdd} aria-label="Add event"><Plus size={16} style={{ color: 'var(--ink-dim)' }} /></button>
+            <button onClick={onClose} aria-label="Close"><X size={16} style={{ color: 'var(--ink-faint)' }} /></button>
           </div>
         </div>
 
@@ -194,39 +238,39 @@ function DaySheet({ date, events, onOpenWorkout, onClose, onAdd }: DaySheetProps
           {onOpenWorkout && (
             <button
               onClick={onOpenWorkout}
-              className="w-full flex items-center justify-between gap-3 p-3 rounded-[2px] transition-opacity hover:opacity-75"
-              style={{ background: 'var(--elevated)', border: '1px solid var(--complete-border)' }}
+              className="w-full flex items-center justify-between gap-3 p-3 rounded-[var(--r-control)] transition-opacity hover:opacity-75"
+              style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--complete-border)' }}
             >
-              <span className="text-[13px]" style={{ color: 'var(--accent)' }}>Workout logged</span>
+              <span className="text-[13px]" style={{ color: 'var(--ink)' }}>Workout logged</span>
               <span className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--complete-text)' }}>
                 View session
               </span>
             </button>
           )}
           {events.length === 0 && !onOpenWorkout && (
-            <p className="text-[12px] text-center py-6" style={{ color: 'var(--dim)' }}>No events. Tap + to add one.</p>
+            <p className="text-[12px] text-center py-6" style={{ color: 'var(--ink-faint)' }}>No events. Tap + to add one.</p>
           )}
           {events.map(ev => (
             <div
               key={ev.id}
-              className="flex items-start justify-between gap-3 p-3 rounded-[2px]"
+              className="flex items-start justify-between gap-3 p-3 rounded-[var(--r-control)]"
               style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}
             >
               <div className="flex items-start gap-2.5 flex-1 min-w-0">
-                <div className="w-2 h-2 rounded-full mt-1.5 shrink-0" style={{ background: CATEGORY_COLOR[ev.category] }} />
+                <div className="w-2 h-2 rounded-[var(--r-pill)] mt-1.5 shrink-0" style={{ background: CATEGORY_COLOR[ev.category] }} />
                 <div className="min-w-0">
-                  <p className="text-[13px] truncate" style={{ color: 'var(--accent)' }}>{ev.title}</p>
+                  <p className="text-[13px] truncate" style={{ color: 'var(--ink)' }}>{ev.title}</p>
                   {(ev.startTime || ev.endTime) && (
-                    <p className="text-[10px]" style={{ color: 'var(--muted)' }}>
+                    <p className="text-[11px]" style={{ color: 'var(--ink-dim)' }}>
                       {ev.startTime}{ev.endTime ? ` – ${ev.endTime}` : ''}
                     </p>
                   )}
-                  {ev.notes && <p className="text-[10px] mt-0.5" style={{ color: 'var(--dim)' }}>{ev.notes}</p>}
-                  <p className="text-[9px] uppercase tracking-widest mt-0.5" style={{ color: 'var(--dim)' }}>{ev.category}</p>
+                  {ev.notes && <p className="text-[11px] mt-0.5" style={{ color: 'var(--ink-faint)' }}>{ev.notes}</p>}
+                  <p className="text-[11px] uppercase tracking-widest mt-0.5" style={{ color: 'var(--ink-faint)' }}>{ev.category}</p>
                 </div>
               </div>
               <button onClick={() => handleDelete(ev.id!)} aria-label="Delete event" className="shrink-0 mt-0.5">
-                <Trash2 size={13} style={{ color: 'var(--dim)' }} className="hover:text-red-400 transition-colors" />
+                <Trash2 size={13} style={{ color: 'var(--ink-faint)' }} className="hover:text-red-400 transition-colors" />
               </button>
             </div>
           ))}
@@ -261,13 +305,13 @@ function WeekView({ selectedDate, setSelectedDate, onAdd }: WeekViewProps) {
     <div className="space-y-3">
       {/* Week nav */}
       <div className="flex items-center justify-between">
-        <button onClick={() => setSelectedDate(addDays(weekStart, -7))} className="p-1.5 text-noir-dim hover:text-noir-muted transition-colors">
+        <button onClick={() => setSelectedDate(addDays(weekStart, -7))} className="p-1.5 text-[color:var(--ink-faint)] hover:text-[color:var(--ink-dim)] transition-colors">
           <ChevronLeft size={16} />
         </button>
-        <span className="text-[11px] uppercase tracking-widest text-noir-dim">
+        <span className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)]">
           {days[0].slice(5)} – {days[6].slice(5)}
         </span>
-        <button onClick={() => setSelectedDate(addDays(weekStart, 7))} className="p-1.5 text-noir-dim hover:text-noir-muted transition-colors">
+        <button onClick={() => setSelectedDate(addDays(weekStart, 7))} className="p-1.5 text-[color:var(--ink-faint)] hover:text-[color:var(--ink-dim)] transition-colors">
           <ChevronRight size={16} />
         </button>
       </div>
@@ -286,15 +330,15 @@ function WeekView({ selectedDate, setSelectedDate, onAdd }: WeekViewProps) {
                 className={cn(
                   'flex flex-col items-center py-2 gap-0.5 transition-colors border border-transparent',
                   isToday && 'border-noir-accent',
-                  isSel && !isToday && 'bg-noir-elevated',
-                  !isToday && !isSel && 'hover:bg-noir-elevated/50'
+                  isSel && !isToday && 'bg-white/[0.05]',
+                  !isToday && !isSel && 'hover:bg-white/[0.05]/50'
                 )}>
-                <span className="text-[9px] uppercase tracking-widest" style={{ color: isSel ? 'var(--accent)' : 'var(--dim)' }}>{label}</span>
-                <span className="text-[13px]" style={{ color: isToday ? 'var(--accent)' : isSel ? 'var(--accent)' : 'var(--muted)' }}>{num}</span>
+                <span className="text-[11px] uppercase tracking-widest" style={{ color: isSel ? 'var(--ink)' : 'var(--ink-faint)' }}>{label}</span>
+                <span className="text-[13px]" style={{ color: isToday ? 'var(--ink)' : isSel ? 'var(--ink)' : 'var(--ink-dim)' }}>{num}</span>
                 {dayEvts.length > 0 && (
                   <div className="flex gap-0.5 flex-wrap justify-center px-1">
                     {dayEvts.slice(0, 3).map((ev, i) => (
-                      <span key={i} className="w-1 h-1 rounded-full" style={{ background: CATEGORY_COLOR[ev.category] }} />
+                      <span key={i} className="w-1 h-1 rounded-[var(--r-pill)]" style={{ background: CATEGORY_COLOR[ev.category] }} />
                     ))}
                   </div>
                 )}
@@ -307,22 +351,22 @@ function WeekView({ selectedDate, setSelectedDate, onAdd }: WeekViewProps) {
       {/* Selected day events */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <p className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
+          <p className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>
             {new Date(selectedDate + 'T12:00:00').toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' })}
           </p>
           <button onClick={() => onAdd(selectedDate)} aria-label="Add event">
-            <Plus size={14} style={{ color: 'var(--dim)' }} />
+            <Plus size={14} style={{ color: 'var(--ink-faint)' }} />
           </button>
         </div>
         {dayEvents.length === 0
-          ? <p className="text-[12px] text-center py-6" style={{ color: 'var(--dim)' }}>No events. Tap + to add.</p>
+          ? <p className="text-[12px] text-center py-6" style={{ color: 'var(--ink-faint)' }}>No events. Tap + to add.</p>
           : dayEvents.map(ev => (
-            <div key={ev.id} className="flex items-center gap-2.5 px-3 py-2 rounded-[2px]" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-              <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: CATEGORY_COLOR[ev.category] }} />
-              <span className="flex-1 text-[12px] truncate" style={{ color: 'var(--accent)' }}>{ev.title}</span>
-              {ev.startTime && <span className="text-[10px] shrink-0" style={{ color: 'var(--dim)' }}>{ev.startTime}</span>}
+            <div key={ev.id} className="flex items-center gap-2.5 px-3 py-2 rounded-[var(--r-control)]" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+              <div className="w-1.5 h-1.5 rounded-[var(--r-pill)] shrink-0" style={{ background: CATEGORY_COLOR[ev.category] }} />
+              <span className="flex-1 text-[12px] truncate" style={{ color: 'var(--ink)' }}>{ev.title}</span>
+              {ev.startTime && <span className="text-[11px] shrink-0" style={{ color: 'var(--ink-faint)' }}>{ev.startTime}</span>}
               <button onClick={() => db.calendarEvents.delete(ev.id!)} aria-label="Delete">
-                <Trash2 size={12} style={{ color: 'var(--dim)' }} />
+                <Trash2 size={12} style={{ color: 'var(--ink-faint)' }} />
               </button>
             </div>
           ))
@@ -355,13 +399,13 @@ function DayView({ selectedDate, setSelectedDate, onAdd }: DayViewProps) {
     <div className="space-y-3">
       {/* Day nav */}
       <div className="flex items-center justify-between">
-        <button onClick={() => setSelectedDate(addDays(selectedDate, -1))} className="p-1.5 text-noir-dim hover:text-noir-muted transition-colors">
+        <button onClick={() => setSelectedDate(addDays(selectedDate, -1))} className="p-1.5 text-[color:var(--ink-faint)] hover:text-[color:var(--ink-dim)] transition-colors">
           <ChevronLeft size={16} />
         </button>
-        <button onClick={() => setSelectedDate(today)} className="text-[11px] uppercase tracking-widest text-noir-dim hover:text-noir-accent transition-colors">
+        <button onClick={() => setSelectedDate(today)} className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] hover:text-[color:var(--ink-2)] transition-colors">
           {label}
         </button>
-        <button onClick={() => setSelectedDate(addDays(selectedDate, 1))} className="p-1.5 text-noir-dim hover:text-noir-muted transition-colors">
+        <button onClick={() => setSelectedDate(addDays(selectedDate, 1))} className="p-1.5 text-[color:var(--ink-faint)] hover:text-[color:var(--ink-dim)] transition-colors">
           <ChevronRight size={16} />
         </button>
       </div>
@@ -369,26 +413,26 @@ function DayView({ selectedDate, setSelectedDate, onAdd }: DayViewProps) {
       {/* Events */}
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <p className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>Events</p>
+          <p className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>Events</p>
           <button onClick={() => onAdd(selectedDate)} aria-label="Add event">
-            <Plus size={14} style={{ color: 'var(--dim)' }} />
+            <Plus size={14} style={{ color: 'var(--ink-faint)' }} />
           </button>
         </div>
         {sorted.length === 0
-          ? <p className="text-[12px] text-center py-8" style={{ color: 'var(--dim)' }}>No events. Tap + to add.</p>
+          ? <p className="text-[12px] text-center py-8" style={{ color: 'var(--ink-faint)' }}>No events. Tap + to add.</p>
           : sorted.map(ev => (
-            <div key={ev.id} className="flex items-start gap-2.5 px-3 py-2.5 rounded-[2px]" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-              <div className="w-1.5 h-1.5 rounded-full mt-1.5 shrink-0" style={{ background: CATEGORY_COLOR[ev.category] }} />
+            <div key={ev.id} className="flex items-start gap-2.5 px-3 py-2.5 rounded-[var(--r-control)]" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+              <div className="w-1.5 h-1.5 rounded-[var(--r-pill)] mt-1.5 shrink-0" style={{ background: CATEGORY_COLOR[ev.category] }} />
               <div className="flex-1 min-w-0">
-                <p className="text-[13px]" style={{ color: 'var(--accent)' }}>{ev.title}</p>
+                <p className="text-[13px]" style={{ color: 'var(--ink)' }}>{ev.title}</p>
                 {(ev.startTime || ev.endTime) && (
-                  <p className="text-[10px] mt-0.5" style={{ color: 'var(--muted)' }}>{ev.startTime}{ev.endTime ? ` – ${ev.endTime}` : ''}</p>
+                  <p className="text-[11px] mt-0.5" style={{ color: 'var(--ink-dim)' }}>{ev.startTime}{ev.endTime ? ` – ${ev.endTime}` : ''}</p>
                 )}
-                {ev.notes && <p className="text-[10px] mt-0.5" style={{ color: 'var(--dim)' }}>{ev.notes}</p>}
-                <p className="text-[9px] uppercase tracking-widest mt-0.5" style={{ color: 'var(--dim)' }}>{ev.category}</p>
+                {ev.notes && <p className="text-[11px] mt-0.5" style={{ color: 'var(--ink-faint)' }}>{ev.notes}</p>}
+                <p className="text-[11px] uppercase tracking-widest mt-0.5" style={{ color: 'var(--ink-faint)' }}>{ev.category}</p>
               </div>
               <button onClick={() => db.calendarEvents.delete(ev.id!)} aria-label="Delete event" className="shrink-0 mt-0.5">
-                <Trash2 size={13} style={{ color: 'var(--dim)' }} />
+                <Trash2 size={13} style={{ color: 'var(--ink-faint)' }} />
               </button>
             </div>
           ))
@@ -451,24 +495,65 @@ export default function Calendar() {
 
   return (
     <div className="page-container space-y-4">
-      <div className="flex items-center justify-between pt-2">
+      {/* Wraps rather than overlapping: at 375px the 26px title and the three
+          range controls do not fit on one line. */}
+      <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-2 pt-2">
         <div>
-          <div className="text-[11px] uppercase tracking-widest text-noir-muted">Schedule</div>
-          <div className="text-[18px] uppercase tracking-wide text-noir-white">Calendar</div>
+          <div
+            className="uppercase"
+            style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+          >
+            Schedule
+          </div>
+          <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
+            Calendar
+          </h1>
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex border border-noir-border rounded-[2px] overflow-hidden">
-            {(['month', 'week', 'day'] as const).map(v => (
-              <button key={v} onClick={() => setView(v)}
-                className={cn(
-                  'px-3 py-1.5 text-[10px] uppercase tracking-widest transition-colors border-r border-noir-border last:border-r-0',
-                  view === v ? 'bg-noir-elevated text-noir-white' : 'text-noir-dim hover:text-noir-accent'
-                )}>{v}</button>
-            ))}
+          <div
+            role="group"
+            aria-label="Calendar range"
+            className="flex"
+            style={{
+              gap: 2, padding: 2,
+              borderRadius: 'var(--r-pill)',
+              background: 'rgba(255,255,255,0.05)',
+            }}
+          >
+            {(['month', 'week', 'day'] as const).map(v => {
+              const on = view === v
+              return (
+                <button
+                  key={v}
+                  onClick={() => setView(v)}
+                  aria-pressed={on}
+                  className="capitalize transition-colors"
+                  style={{
+                    padding: '6px 12px', border: 'none', cursor: 'pointer',
+                    borderRadius: 'var(--r-pill)',
+                    fontSize: 11, fontWeight: 500, letterSpacing: '0.03em',
+                    background: on
+                      ? 'linear-gradient(140deg, var(--violet-400), var(--violet-900))'
+                      : 'transparent',
+                    color: on ? '#FFFFFF' : 'var(--ink-faint)',
+                    boxShadow: on ? '0 2px 14px rgba(76,29,149,0.6)' : 'none',
+                  }}
+                >
+                  {v}
+                </button>
+              )
+            })}
           </div>
-          <button onClick={() => openAdd(today)}
-            className="flex items-center gap-1 px-3 py-1.5 border border-noir-border rounded-[2px] text-[10px] uppercase tracking-widest text-noir-muted hover:text-noir-white hover:border-noir-strong transition-colors"
-            aria-label="Add event">
+          <button
+            onClick={() => openAdd(today)}
+            className="flex items-center gap-1 uppercase transition-colors"
+            style={{
+              padding: '7px 12px', borderRadius: 'var(--r-control)',
+              fontSize: 11, fontWeight: 500, letterSpacing: '0.08em',
+              border: '1px solid var(--hairline)', color: 'var(--ink-dim)',
+            }}
+            aria-label="Add event"
+          >
             <Plus size={12} /> Add
           </button>
         </div>
@@ -478,21 +563,30 @@ export default function Calendar() {
       {view === 'month' && (
         <>
           <div className="flex items-center justify-between">
-            <button onClick={prevMonth} className="p-1.5 text-noir-dim hover:text-noir-muted transition-colors">
+            <button onClick={prevMonth} className="p-1.5 text-[color:var(--ink-faint)] hover:text-[color:var(--ink-dim)] transition-colors">
               <ChevronLeft size={16} />
             </button>
-            <div className="text-[13px] uppercase tracking-widest text-noir-accent">
+            <div
+              className="uppercase"
+              style={{ fontSize: 13, fontWeight: 500, letterSpacing: '0.1em', color: 'var(--ink)' }}
+            >
               {MONTHS[month]} {year}
             </div>
-            <button onClick={nextMonth} className="p-1.5 text-noir-dim hover:text-noir-muted transition-colors">
+            <button onClick={nextMonth} className="p-1.5 text-[color:var(--ink-faint)] hover:text-[color:var(--ink-dim)] transition-colors">
               <ChevronRight size={16} />
             </button>
           </div>
 
           <Card noPadding>
-            <div className="grid grid-cols-7 border-b border-noir-border">
+            <div className="grid grid-cols-7 border-b border-[color:var(--hairline)]">
               {DAYS.map(d => (
-                <div key={d} className="py-2 text-center text-[9px] uppercase tracking-widest text-noir-dim">{d}</div>
+                <div
+                  key={d}
+                  className="py-2 text-center uppercase"
+                  style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', color: 'var(--ink-faint)' }}
+                >
+                  {d}
+                </div>
               ))}
             </div>
             <div className="grid grid-cols-7">
@@ -516,12 +610,19 @@ export default function Calendar() {
                       setShowDay(true)
                     }}
                     className={cn(
-                      'aspect-square flex flex-col items-center justify-center text-[12px] transition-colors border border-transparent gap-0.5',
-                      isToday && 'border-noir-accent',
-                      isSel && !isToday && 'bg-noir-elevated',
-                      isSat ? 'text-noir-muted' : 'text-noir-accent',
-                      !isToday && !isSel && 'hover:bg-noir-elevated/50'
+                      'aspect-square flex flex-col items-center justify-center transition-colors gap-1',
+                      !isToday && !isSel && 'hover:bg-white/[0.04]'
                     )}
+                    style={{
+                      fontSize: 13,
+                      borderRadius: 'var(--r-control)',
+                      // Today is ringed in the accent; a selected day is a
+                      // quiet fill, so the two never compete.
+                      border: `1px solid ${isToday ? 'rgba(167,139,250,0.55)' : 'transparent'}`,
+                      background: isSel && !isToday ? 'rgba(255,255,255,0.06)' : 'transparent',
+                      color: isSat ? 'var(--ink-dim)' : 'var(--ink-2)',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
                     aria-label={
                       workout
                         ? hasEvt
@@ -532,9 +633,23 @@ export default function Calendar() {
                   >
                     <span>{day}</span>
                     {(hasEvt || workout) && (
-                      <span className="flex gap-0.5">
-                        {hasEvt && <span className="w-1 h-1 rounded-full" style={{ background: '#888888' }} />}
-                        {workout && <span className="w-1 h-1 rounded-full" style={{ background: 'var(--complete-text)' }} />}
+                      <span className="flex" style={{ gap: 3 }}>
+                        {hasEvt && (
+                          <span
+                            style={{
+                              width: 4, height: 4, borderRadius: 'var(--r-pill)',
+                              background: 'var(--ink-faint)',
+                            }}
+                          />
+                        )}
+                        {workout && (
+                          <span
+                            style={{
+                              width: 4, height: 4, borderRadius: 'var(--r-pill)',
+                              background: 'var(--ok)',
+                            }}
+                          />
+                        )}
                       </span>
                     )}
                   </button>
@@ -545,24 +660,24 @@ export default function Calendar() {
 
           {SHOW_ASTROLOGY && (
             <div className="flex items-center gap-2">
-              <div className="text-[10px] uppercase tracking-widest text-noir-dim">{getMoonPhaseName()}</div>
-              <span className="text-noir-dim">·</span>
-              <div className="text-[10px] uppercase tracking-widest text-noir-dim">♄ Saturn = Saturday</div>
+              <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)]">{getMoonPhaseName()}</div>
+              <span className="text-[color:var(--ink-faint)]">·</span>
+              <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)]">♄ Saturn = Saturday</div>
             </div>
           )}
 
           {monthEvents.length > 0 && (
             <div className="space-y-1.5">
-              <p className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>This Month ({monthEvents.length})</p>
+              <p className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>This Month ({monthEvents.length})</p>
               {[...monthEvents].sort((a, b) => a.date.localeCompare(b.date)).slice(0, 5).map(ev => (
-                <div key={ev.id} className="flex items-center gap-2.5 px-3 py-2 rounded-[2px]" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-                  <div className="w-1.5 h-1.5 rounded-full shrink-0" style={{ background: CATEGORY_COLOR[ev.category] }} />
-                  <span className="text-[11px] flex-1 truncate" style={{ color: 'var(--accent)' }}>{ev.title}</span>
-                  <span className="text-[10px] shrink-0" style={{ color: 'var(--dim)' }}>{ev.date.slice(5)}</span>
+                <div key={ev.id} className="flex items-center gap-2.5 px-3 py-2 rounded-[var(--r-control)]" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+                  <div className="w-1.5 h-1.5 rounded-[var(--r-pill)] shrink-0" style={{ background: CATEGORY_COLOR[ev.category] }} />
+                  <span className="text-[11px] flex-1 truncate" style={{ color: 'var(--ink)' }}>{ev.title}</span>
+                  <span className="text-[11px] shrink-0" style={{ color: 'var(--ink-faint)' }}>{ev.date.slice(5)}</span>
                 </div>
               ))}
               {monthEvents.length > 5 && (
-                <p className="text-[10px] text-center" style={{ color: 'var(--dim)' }}>+{monthEvents.length - 5} more</p>
+                <p className="text-[11px] text-center" style={{ color: 'var(--ink-faint)' }}>+{monthEvents.length - 5} more</p>
               )}
             </div>
           )}
