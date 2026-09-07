@@ -328,14 +328,17 @@
     @apply bg-transparent px-3 py-1.5 text-[13px] uppercase tracking-widest rounded-[2px] transition-colors duration-150 cursor-pointer;
   }
 
+  /* One of only two component classes still in use — 33 text fields depend on
+     it, so its geometry is worth getting right here rather than per call. */
   .input {
-    background: var(--surface);
-    border: 1px solid var(--border);
-    color: var(--accent);
-    @apply rounded-[2px] px-3 py-2 text-[15px] focus:outline-none w-full;
+    background: rgba(255,255,255,0.04);
+    border: 1px solid var(--hairline);
+    color: var(--ink);
+    border-radius: var(--r-control);
+    @apply px-3 py-2 text-[15px] focus:outline-none w-full;
   }
-  .input:focus { border-color: var(--border-strong); }
-  .input::placeholder { color: var(--dim); }
+  .input:focus { border-color: rgba(167,139,250,0.45); }
+  .input::placeholder { color: var(--ink-faint); }
 
   .badge { @apply inline-flex items-center px-2 py-0.5 text-[11px] uppercase tracking-widest border rounded-[2px]; }
   .badge-default { border-color: var(--border-strong); color: var(--muted); }

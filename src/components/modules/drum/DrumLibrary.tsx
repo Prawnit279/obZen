@@ -120,17 +120,17 @@ function PDFViewer({ bookId, title, onClose }: PDFViewerProps) {
     >
       {/* Header */}
       <header className="shrink-0 flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-        <button onClick={onClose} aria-label="Close viewer"><X size={18} style={{ color: 'var(--dim)' }} /></button>
+        <button onClick={onClose} aria-label="Close viewer"><X size={18} style={{ color: 'var(--ink-faint)' }} /></button>
         <div className="flex-1 min-w-0 mx-3">
-          <p className="text-[12px] truncate" style={{ color: 'var(--accent)' }}>{title}</p>
+          <p className="text-[12px] truncate" style={{ color: 'var(--ink)' }}>{title}</p>
           {totalPages && (
-            <p className="text-[10px]" style={{ color: 'var(--dim)' }}>Page {page} / {totalPages}</p>
+            <p className="text-[11px]" style={{ color: 'var(--ink-faint)' }}>Page {page} / {totalPages}</p>
           )}
         </div>
         <button
           onClick={() => setInverted(v => !v)}
-          className="text-[10px] uppercase tracking-widest px-2 py-1 rounded-[2px] transition-opacity hover:opacity-70"
-          style={{ border: '1px solid var(--border)', color: 'var(--muted)' }}
+          className="text-[11px] uppercase tracking-widest px-2 py-1 rounded-[var(--r-control)] transition-opacity hover:opacity-70"
+          style={{ border: '1px solid var(--border)', color: 'var(--ink-dim)' }}
           aria-label="Toggle invert"
         >
           {inverted ? '☀' : '☾'}
@@ -141,7 +141,7 @@ function PDFViewer({ bookId, title, onClose }: PDFViewerProps) {
       <div className="flex-1 overflow-auto flex items-start justify-center p-2">
         {loading && (
           <div className="flex items-center justify-center py-20">
-            <span className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>Loading PDF...</span>
+            <span className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>Loading PDF...</span>
           </div>
         )}
         {error && (
@@ -167,18 +167,18 @@ function PDFViewer({ bookId, title, onClose }: PDFViewerProps) {
             onClick={() => goToPage(page - 1)}
             disabled={page <= 1}
             aria-label="Previous page"
-            className="px-4 py-1.5 text-[10px] uppercase tracking-widest rounded-[2px] disabled:opacity-30 transition-opacity hover:opacity-70"
-            style={{ border: '1px solid var(--border)', color: 'var(--muted)' }}
+            className="px-4 py-1.5 text-[11px] uppercase tracking-widest rounded-[var(--r-control)] disabled:opacity-30 transition-opacity hover:opacity-70"
+            style={{ border: '1px solid var(--border)', color: 'var(--ink-dim)' }}
           >
             ← Prev
           </button>
-          <span className="text-[10px] tabular-nums" style={{ color: 'var(--dim)' }} aria-live="polite" aria-atomic="true">{page}/{totalPages}</span>
+          <span className="text-[11px] tabular-nums" style={{ color: 'var(--ink-faint)' }} aria-live="polite" aria-atomic="true">{page}/{totalPages}</span>
           <button
             onClick={() => goToPage(page + 1)}
             disabled={page >= totalPages}
             aria-label="Next page"
-            className="px-4 py-1.5 text-[10px] uppercase tracking-widest rounded-[2px] disabled:opacity-30 transition-opacity hover:opacity-70"
-            style={{ border: '1px solid var(--border)', color: 'var(--muted)' }}
+            className="px-4 py-1.5 text-[11px] uppercase tracking-widest rounded-[var(--r-control)] disabled:opacity-30 transition-opacity hover:opacity-70"
+            style={{ border: '1px solid var(--border)', color: 'var(--ink-dim)' }}
           >
             Next →
           </button>
@@ -276,13 +276,13 @@ function AddBookSheet({ onClose, onSaved }: AddBookSheetProps) {
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col justify-end" style={{ background: 'rgba(0,0,0,0.7)' }}>
-      <div className="rounded-t-[4px] flex flex-col max-h-[85vh]" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+      <div className="rounded-t-[26px] flex flex-col max-h-[85vh]" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
         {/* Header */}
         <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-          <span className="text-[12px] uppercase tracking-widest" style={{ color: 'var(--accent)' }}>
+          <span className="text-[12px] uppercase tracking-widest" style={{ color: 'var(--ink)' }}>
             Add Book — {step === 'upload' ? '1/3 Upload' : step === 'metadata' ? '2/3 Details' : '3/3 Confirm'}
           </span>
-          <button onClick={onClose} aria-label="Close"><X size={16} style={{ color: 'var(--dim)' }} /></button>
+          <button onClick={onClose} aria-label="Close"><X size={16} style={{ color: 'var(--ink-faint)' }} /></button>
         </div>
 
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
@@ -292,18 +292,25 @@ function AddBookSheet({ onClose, onSaved }: AddBookSheetProps) {
               onDrop={handleDrop}
               onDragOver={e => e.preventDefault()}
               onClick={() => fileRef.current?.click()}
-              className="flex flex-col items-center justify-center gap-3 py-12 rounded-[2px] cursor-pointer transition-opacity hover:opacity-70"
+              className="flex flex-col items-center justify-center gap-3 py-12 rounded-[var(--r-control)] cursor-pointer transition-opacity hover:opacity-70"
               style={{ border: '1px dashed var(--border-strong)' }}
             >
-              <FileText size={24} style={{ color: 'var(--dim)' }} />
-              <p className="text-[12px]" style={{ color: 'var(--muted)' }}>Tap to select PDF or drag here</p>
-              <p className="text-[10px]" style={{ color: 'var(--dim)' }}>application/pdf only</p>
+              <FileText size={24} style={{ color: 'var(--ink-faint)' }} />
+              <p className="text-[12px]" style={{ color: 'var(--ink-dim)' }}>Tap to select PDF or drag here</p>
+              <p className="text-[11px]" style={{ color: 'var(--ink-faint)' }}>application/pdf only</p>
               {uploading && (
                 <div className="w-full max-w-xs">
-                  <div className="h-[2px] rounded-full" style={{ background: 'var(--elevated)' }}>
-                    <div className="h-full rounded-full transition-all" style={{ width: `${progress}%`, background: '#d4d4d4' }} />
+                  <div className="h-[2px] rounded-[var(--r-pill)]" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                    <div
+                      className="h-full transition-all"
+                      style={{
+                        width: `${progress}%`,
+                        borderRadius: 'var(--r-pill)',
+                        background: 'linear-gradient(90deg, var(--violet-400), var(--violet-200))',
+                      }}
+                    />
                   </div>
-                  <p className="text-[10px] text-center mt-1" style={{ color: 'var(--dim)' }}>Reading PDF... {progress}%</p>
+                  <p className="text-[11px] text-center mt-1" style={{ color: 'var(--ink-faint)' }}>Reading PDF... {progress}%</p>
                 </div>
               )}
               <input ref={fileRef} type="file" accept="application/pdf" className="hidden"
@@ -315,31 +322,35 @@ function AddBookSheet({ onClose, onSaved }: AddBookSheetProps) {
           {step === 'metadata' && (
             <div className="space-y-3">
               <div>
-                <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Title *</label>
+                <label className="text-[11px] uppercase tracking-widest block mb-1" style={{ color: 'var(--ink-faint)' }}>Title *</label>
                 <input value={title} onChange={e => setTitle(e.target.value)} className="input" placeholder="Book title" />
               </div>
               <div>
-                <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Author</label>
+                <label className="text-[11px] uppercase tracking-widest block mb-1" style={{ color: 'var(--ink-faint)' }}>Author</label>
                 <input value={author} onChange={e => setAuthor(e.target.value)} className="input" placeholder="Author name" />
               </div>
               <div>
-                <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Category</label>
+                <label className="text-[11px] uppercase tracking-widest block mb-1" style={{ color: 'var(--ink-faint)' }}>Category</label>
                 <div className="flex flex-wrap gap-1.5">
                   {CATEGORIES.map(c => (
                     <button key={c} onClick={() => setCategory(c)}
-                      className={cn('px-2.5 py-1 rounded-[2px] text-[9px] uppercase tracking-widest transition-colors')}
-                      style={{ border: `1px solid ${category === c ? '#888888' : 'var(--border)'}`, color: category === c ? 'var(--accent)' : 'var(--dim)', background: category === c ? '#181818' : 'transparent' }}
+                      className={cn('px-2.5 py-1 rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-colors')}
+                      style={{
+                        border: `1px solid ${category === c ? 'rgba(167,139,250,0.45)' : 'var(--hairline)'}`,
+                        color: category === c ? 'var(--ink)' : 'var(--ink-faint)',
+                        background: category === c ? 'rgba(139,92,246,0.14)' : 'transparent',
+                      }}
                     >{c}</button>
                   ))}
                 </div>
               </div>
               <div>
-                <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Tags (comma separated)</label>
+                <label className="text-[11px] uppercase tracking-widest block mb-1" style={{ color: 'var(--ink-faint)' }}>Tags (comma separated)</label>
                 <input value={tags} onChange={e => setTags(e.target.value)} className="input" placeholder="jazz, beginner, snare..." />
               </div>
               <button onClick={() => setStep('confirm')} disabled={!title.trim()}
-                className="w-full py-2.5 rounded-[2px] text-[11px] uppercase tracking-widest transition-opacity disabled:opacity-30"
-                style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}>
+                className="w-full py-2.5 rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-opacity disabled:opacity-30"
+                style={{ border: '1px solid var(--accent)', color: 'var(--ink)' }}>
                 Continue →
               </button>
             </div>
@@ -348,15 +359,15 @@ function AddBookSheet({ onClose, onSaved }: AddBookSheetProps) {
           {/* Step 3: Confirm */}
           {step === 'confirm' && (
             <div className="space-y-4">
-              <div className="rounded-[2px] p-4 space-y-2" style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}>
-                <p className="text-[14px]" style={{ color: 'var(--accent)' }}>{title}</p>
-                {author && <p className="text-[11px]" style={{ color: 'var(--muted)' }}>{author}</p>}
-                <div className="flex gap-3 text-[10px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
+              <div className="rounded-[var(--r-control)] p-4 space-y-2" style={{ background: 'var(--bg)', border: '1px solid var(--border)' }}>
+                <p className="text-[14px]" style={{ color: 'var(--ink)' }}>{title}</p>
+                {author && <p className="text-[11px]" style={{ color: 'var(--ink-dim)' }}>{author}</p>}
+                <div className="flex gap-3 text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>
                   <span>{category}</span>
                   {pageCount && <span>{pageCount} pages</span>}
                   <span>{formatBytes(fileSize)}</span>
                 </div>
-                {tags && <p className="text-[10px]" style={{ color: 'var(--dim)' }}>{tags}</p>}
+                {tags && <p className="text-[11px]" style={{ color: 'var(--ink-faint)' }}>{tags}</p>}
               </div>
               {saveError && (
                 <p className="text-[11px] flex items-center gap-1.5" style={{ color: 'var(--red)' }}>
@@ -365,13 +376,13 @@ function AddBookSheet({ onClose, onSaved }: AddBookSheetProps) {
               )}
               <div className="flex gap-2">
                 <button onClick={() => setStep('metadata')}
-                  className="flex-1 py-2.5 rounded-[2px] text-[11px] uppercase tracking-widest"
-                  style={{ border: '1px solid var(--border)', color: 'var(--dim)' }}>
+                  className="flex-1 py-2.5 rounded-[var(--r-control)] text-[11px] uppercase tracking-widest"
+                  style={{ border: '1px solid var(--border)', color: 'var(--ink-faint)' }}>
                   ← Back
                 </button>
                 <button onClick={handleSave} disabled={saving}
-                  className="flex-1 py-2.5 rounded-[2px] text-[11px] uppercase tracking-widest disabled:opacity-40"
-                  style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}>
+                  className="flex-1 py-2.5 rounded-[var(--r-control)] text-[11px] uppercase tracking-widest disabled:opacity-40"
+                  style={{ border: '1px solid var(--accent)', color: 'var(--ink)' }}>
                   {saving ? 'Saving...' : 'Save to Library'}
                 </button>
               </div>
@@ -418,19 +429,19 @@ function BookCard({ book, onOpen, onDelete }: BookCardProps) {
   }
 
   return (
-    <div className="rounded-[2px] p-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+    <div className="rounded-[var(--r-control)] p-4" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-start gap-3 flex-1 min-w-0">
-          <FileText size={16} style={{ color: 'var(--dim)', flexShrink: 0, marginTop: 2 }} />
+          <FileText size={16} style={{ color: 'var(--ink-faint)', flexShrink: 0, marginTop: 2 }} />
           <div className="flex-1 min-w-0">
-            <p className="text-[13px] truncate" style={{ color: 'var(--accent)' }}>{book.title}</p>
-            {book.author && <p className="text-[11px]" style={{ color: 'var(--dim)' }}>{book.author}</p>}
-            <div className="flex gap-3 mt-1 text-[10px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
+            <p className="text-[13px] truncate" style={{ color: 'var(--ink)' }}>{book.title}</p>
+            {book.author && <p className="text-[11px]" style={{ color: 'var(--ink-faint)' }}>{book.author}</p>}
+            <div className="flex gap-3 mt-1 text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>
               <span>{book.category}</span>
               {book.pageCount && <span>{book.pageCount}pp</span>}
               {book.fileSize && <span>{formatBytes(book.fileSize)}</span>}
             </div>
-            <p className="text-[10px] mt-0.5" style={{ color: 'var(--dim)' }}>Added {formatDate(book.dateAdded)}</p>
+            <p className="text-[11px] mt-0.5" style={{ color: 'var(--ink-faint)' }}>Added {formatDate(book.dateAdded)}</p>
           </div>
         </div>
 
@@ -438,8 +449,8 @@ function BookCard({ book, onOpen, onDelete }: BookCardProps) {
           {book.type === 'uploaded' && (
             <button
               onClick={onOpen}
-              className="px-3 py-1.5 rounded-[2px] text-[10px] uppercase tracking-widest transition-opacity hover:opacity-70"
-              style={{ border: '1px solid var(--border)', color: 'var(--muted)' }}
+              className="px-3 py-1.5 rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-opacity hover:opacity-70"
+              style={{ border: '1px solid var(--border)', color: 'var(--ink-dim)' }}
             >
               Open
             </button>
@@ -448,26 +459,26 @@ function BookCard({ book, onOpen, onDelete }: BookCardProps) {
             <button
               onClick={() => setMenuOpen(m => !m)}
               className="p-1.5 transition-opacity hover:opacity-70"
-              style={{ color: 'var(--dim)' }}
+              style={{ color: 'var(--ink-faint)' }}
               aria-label="Book options"
             >
               <MoreHorizontal size={14} />
             </button>
             {menuOpen && (
               <div
-                className="absolute right-0 top-full mt-1 w-44 rounded-[2px] z-10 py-1"
-                style={{ background: 'var(--elevated)', border: '1px solid var(--border)' }}
+                className="absolute right-0 top-full mt-1 w-44 rounded-[var(--r-control)] z-10 py-1"
+                style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)' }}
               >
                 {book.type === 'uploaded' && (
                   <button onClick={handleExport}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-[11px] text-left transition-colors hover:bg-noir-elevated"
-                    style={{ color: 'var(--muted)' }}>
+                    className="w-full flex items-center gap-2 px-3 py-2 text-[11px] text-left transition-colors hover:bg-white/[0.05]"
+                    style={{ color: 'var(--ink-dim)' }}>
                     <Download size={12} /> Export PDF
                   </button>
                 )}
                 {!confirmDelete ? (
                   <button onClick={() => setConfirmDelete(true)}
-                    className="w-full flex items-center gap-2 px-3 py-2 text-[11px] text-left transition-colors hover:bg-noir-elevated"
+                    className="w-full flex items-center gap-2 px-3 py-2 text-[11px] text-left transition-colors hover:bg-white/[0.05]"
                     style={{ color: 'var(--skip-text)' }}>
                     <Trash2 size={12} /> Delete
                   </button>
@@ -580,10 +591,10 @@ export function DrumLibrary() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <span className="text-[12px]" style={{ color: 'var(--accent)' }}>
+          <span className="text-[12px]" style={{ color: 'var(--ink)' }}>
             DRUM LIBRARY
           </span>
-          <span className="text-[10px] ml-2" style={{ color: 'var(--dim)' }}>
+          <span className="text-[11px] ml-2" style={{ color: 'var(--ink-faint)' }}>
             {bookCount} books · {formatBytes(totalSize)}
           </span>
         </div>
@@ -591,8 +602,8 @@ export function DrumLibrary() {
           <button
             onClick={handleSync}
             disabled={syncing}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] text-[10px] uppercase tracking-widest disabled:opacity-30 transition-opacity hover:opacity-70"
-            style={{ border: '1px solid var(--border)', color: 'var(--muted)' }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--r-control)] text-[11px] uppercase tracking-widest disabled:opacity-30 transition-opacity hover:opacity-70"
+            style={{ border: '1px solid var(--border)', color: 'var(--ink-dim)' }}
             aria-label="Sync library"
           >
             <RefreshCw size={12} className={syncing ? 'animate-spin' : ''} /> {syncing ? 'Syncing…' : 'Sync'}
@@ -600,8 +611,8 @@ export function DrumLibrary() {
           <button
             onClick={() => setShowAdd(true)}
             disabled={atLimit}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[2px] text-[10px] uppercase tracking-widest disabled:opacity-30 transition-opacity hover:opacity-70"
-            style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-[var(--r-control)] text-[11px] uppercase tracking-widest disabled:opacity-30 transition-opacity hover:opacity-70"
+            style={{ border: '1px solid var(--accent)', color: 'var(--ink)' }}
             aria-label="Add book"
           >
             <Plus size={12} /> Add Book
@@ -611,12 +622,12 @@ export function DrumLibrary() {
 
       {/* Sync feedback */}
       {syncMsg && (
-        <p className="text-[11px] text-center" style={{ color: 'var(--muted)' }}>{syncMsg}</p>
+        <p className="text-[11px] text-center" style={{ color: 'var(--ink-dim)' }}>{syncMsg}</p>
       )}
 
       {/* Capacity warning */}
       {atLimit && (
-        <div className="flex items-center gap-2 p-3 rounded-[2px]" style={{ border: '1px solid rgba(252,165,165,0.3)' }}>
+        <div className="flex items-center gap-2 p-3 rounded-[var(--r-control)]" style={{ border: '1px solid rgba(252,165,165,0.3)' }}>
           <AlertCircle size={12} style={{ color: 'var(--skip-text)' }} />
           <span className="text-[11px]" style={{ color: 'var(--skip-text)' }}>Library full (100/100). Delete a book to add more.</span>
         </div>
@@ -625,7 +636,7 @@ export function DrumLibrary() {
       {/* Search + filter */}
       <div className="flex gap-2">
         <div className="relative flex-1">
-          <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--dim)' }} />
+          <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--ink-faint)' }} />
           <input
             type="text"
             placeholder="Search books..."
@@ -635,14 +646,14 @@ export function DrumLibrary() {
           />
           {search && (
             <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2">
-              <X size={12} style={{ color: 'var(--dim)' }} />
+              <X size={12} style={{ color: 'var(--ink-faint)' }} />
             </button>
           )}
         </div>
         <button
           onClick={() => setShowFilters(f => !f)}
-          className="flex items-center gap-1 px-3 py-1.5 rounded-[2px] text-[10px] uppercase tracking-widest transition-opacity hover:opacity-70"
-          style={{ border: '1px solid var(--border)', color: 'var(--dim)' }}
+          className="flex items-center gap-1 px-3 py-1.5 rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-opacity hover:opacity-70"
+          style={{ border: '1px solid var(--border)', color: 'var(--ink-faint)' }}
         >
           Filter {showFilters ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
         </button>
@@ -653,8 +664,12 @@ export function DrumLibrary() {
         <div className="flex flex-wrap gap-1.5">
           {(['all', ...CATEGORIES] as const).map(c => (
             <button key={c} onClick={() => setCategoryFilter(c)}
-              className={cn('px-2.5 py-1 rounded-[2px] text-[9px] uppercase tracking-widest transition-colors')}
-              style={{ border: `1px solid ${categoryFilter === c ? '#888888' : 'var(--border)'}`, color: categoryFilter === c ? 'var(--accent)' : 'var(--dim)', background: categoryFilter === c ? 'var(--elevated)' : 'transparent' }}>
+              className={cn('px-2.5 py-1 rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-colors')}
+              style={{
+                border: `1px solid ${categoryFilter === c ? 'rgba(167,139,250,0.45)' : 'var(--hairline)'}`,
+                color: categoryFilter === c ? 'var(--ink)' : 'var(--ink-faint)',
+                background: categoryFilter === c ? 'rgba(139,92,246,0.14)' : 'transparent',
+              }}>
               {c}
             </button>
           ))}
@@ -664,7 +679,7 @@ export function DrumLibrary() {
       {/* Uploaded books */}
       {uploaded.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>Uploaded ({uploaded.length})</p>
+          <p className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>Uploaded ({uploaded.length})</p>
           {uploaded.map(b => (
             <BookCard key={b.id} book={b}
               onOpen={() => setViewingBook({ id: b.id!, title: b.title })}
@@ -677,7 +692,7 @@ export function DrumLibrary() {
       {/* Indexed-only books */}
       {indexed.length > 0 && (
         <div className="space-y-2">
-          <p className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>Index-only ({indexed.length})</p>
+          <p className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>Index-only ({indexed.length})</p>
           {indexed.map(b => (
             <BookCard key={b.id} book={b}
               onOpen={() => {}}
@@ -690,8 +705,8 @@ export function DrumLibrary() {
       {/* Empty state */}
       {filtered.length === 0 && (
         <div className="flex flex-col items-center gap-3 py-10 text-center">
-          <FileText size={28} style={{ color: 'var(--dim)' }} />
-          <p className="text-[12px]" style={{ color: 'var(--dim)' }}>
+          <FileText size={28} style={{ color: 'var(--ink-faint)' }} />
+          <p className="text-[12px]" style={{ color: 'var(--ink-faint)' }}>
             {search || categoryFilter !== 'all' ? 'No books match your filter.' : 'No books yet. Add your first PDF.'}
           </p>
         </div>

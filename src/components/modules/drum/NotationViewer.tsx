@@ -39,9 +39,8 @@ export function NotationViewer({ data }: Props) {
     // Extract theme colors from CSS variables, so the score follows the theme
     // instead of being painted white-on-black whatever the page is doing.
     const computedStyle = getComputedStyle(document.documentElement)
-    const themeBg = computedStyle.getPropertyValue('--bg').trim() || '#0d0d0d'
-    const themeAccent = computedStyle.getPropertyValue('--accent').trim() || '#e2e2e2'
-    const themeMuted = computedStyle.getPropertyValue('--muted').trim() || '#a6a6a6'
+    const themeAccent = computedStyle.getPropertyValue('--ink').trim() || '#F2F0F7'
+    const themeMuted = computedStyle.getPropertyValue('--ink-faint').trim() || '#837D96'
 
     // Dynamically import VexFlow to avoid SSR issues and reduce initial bundle
     import('vexflow').then(({ Renderer, Stave, StaveNote, Voice, Formatter, Annotation, Articulation }) => {
@@ -59,9 +58,11 @@ export function NotationViewer({ data }: Props) {
       const context = renderer.getContext()
       context.setFont('Arial', 9)
       // Set overall SVG color to theme background
+      // Transparent so the card behind it shows through; filling the score
+      // with the page ground painted a flat panel inside the card.
       const svgEl = container.querySelector('svg')
       if (svgEl) {
-        svgEl.style.background = themeBg
+        svgEl.style.background = 'transparent'
       }
 
       let x = PAD_X
@@ -153,17 +154,17 @@ export function NotationViewer({ data }: Props) {
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between">
-        <span className="text-[10px] uppercase tracking-widest text-noir-dim">{data.title}</span>
-        <span className="text-[10px] text-noir-dim">{data.tempo} BPM · {data.timeSignature.beats}/{data.timeSignature.value}</span>
+        <span className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)]">{data.title}</span>
+        <span className="text-[11px] text-[color:var(--ink-faint)]">{data.tempo} BPM · {data.timeSignature.beats}/{data.timeSignature.value}</span>
       </div>
       <div
-        className="overflow-x-auto rounded-[2px] border border-noir-border cursor-pointer select-none"
+        className="overflow-x-auto rounded-[var(--r-control)] border border-[color:var(--hairline)] cursor-pointer select-none"
         onClick={handleContainerClick}
         title="Tap a note to hear a click"
       >
         <div ref={containerRef} />
       </div>
-      <div className="text-[9px] text-noir-dim">* = flam  ~ = drag  &gt; = accent · tap note to hear click</div>
+      <div className="text-[11px] text-[color:var(--ink-faint)]">* = flam  ~ = drag  &gt; = accent · tap note to hear click</div>
     </div>
   )
 }

@@ -84,20 +84,20 @@ export function PracticeSession({ currentBpm, onComplete }: Props) {
 
   if (phase === 'active') {
     return (
-      <div className="space-y-4 p-4 border border-noir-accent/40 rounded-[2px] bg-noir-elevated">
+      <div className="space-y-4 p-4 border border-[color:var(--violet-400)]/40 rounded-[var(--r-control)] bg-white/[0.05]">
         <div className="flex items-center justify-between">
           <div>
-            <div className="text-[10px] uppercase tracking-widest text-noir-muted">Session in progress</div>
+            <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-dim)]">Session in progress</div>
             <div className="flex items-center gap-2 mt-1">
-              <Timer size={14} className="text-noir-dim" />
-              <span className="text-[32px] text-noir-white font-light font-mono leading-none">
+              <Timer size={14} className="text-[color:var(--ink-faint)]" />
+              <span className="text-[32px] text-[color:var(--ink)] font-light font-mono leading-none">
                 {String(Math.floor(elapsed / 60)).padStart(2, '0')}:{String(elapsed % 60).padStart(2, '0')}
               </span>
             </div>
           </div>
           <div className="text-right">
-            <div className="text-[11px] text-noir-dim">Metronome</div>
-            <div className="text-[20px] text-noir-accent">{currentBpm} BPM</div>
+            <div className="text-[11px] text-[color:var(--ink-faint)]">Metronome</div>
+            <div className="text-[20px] text-[color:var(--ink-2)]">{currentBpm} BPM</div>
           </div>
         </div>
         <Button variant="ghost" fullWidth onClick={handleStop}>
@@ -110,32 +110,32 @@ export function PracticeSession({ currentBpm, onComplete }: Props) {
 
   if (phase === 'complete') {
     return (
-      <div className="space-y-4 p-4 border border-noir-border rounded-[2px]">
+      <div className="space-y-4 p-4 border border-[color:var(--hairline)] rounded-[var(--r-control)]">
         <div className="flex items-center gap-2">
-          <CheckCircle size={14} className="text-noir-accent" />
-          <span className="text-[11px] uppercase tracking-widest text-noir-accent">Session Complete</span>
+          <CheckCircle size={14} className="text-[color:var(--ink-2)]" />
+          <span className="text-[11px] uppercase tracking-widest text-[color:var(--ink-2)]">Session Complete</span>
         </div>
-        <div className="text-[13px] text-noir-muted">
+        <div className="text-[13px] text-[color:var(--ink-dim)]">
           Duration: {formatDuration(Math.floor(elapsed / 60))}
           {elapsed % 60 > 0 && ` ${elapsed % 60}s`}
         </div>
         <div>
-          <div className="text-[10px] uppercase tracking-widest text-noir-dim mb-2">BPM Achieved</div>
+          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-2">BPM Achieved</div>
           <input
             value={bpmAchieved}
             onChange={e => setBpmAchieved(e.target.value.replace(/\D/, ''))}
             placeholder={`${currentBpm} (metronome BPM)`}
-            className="w-full bg-noir-bg border border-noir-border rounded-[2px] px-3 py-2 text-[12px] text-noir-accent placeholder:text-noir-dim focus:outline-none focus:border-noir-strong"
+            className="w-full bg-[color:var(--bg)] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-3 py-2 text-[12px] text-[color:var(--ink-2)] placeholder:text-[color:var(--ink-faint)] focus:outline-none focus:border-[color:var(--border-strong)]"
           />
         </div>
         <div>
-          <div className="text-[10px] uppercase tracking-widest text-noir-dim mb-2">Notes (optional)</div>
+          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-2">Notes (optional)</div>
           <textarea
             value={notes}
             onChange={e => setNotes(e.target.value)}
             placeholder="What you worked on, what clicked, what to revisit..."
             rows={2}
-            className="w-full bg-noir-bg border border-noir-border rounded-[2px] px-3 py-2 text-[12px] text-noir-accent placeholder:text-noir-dim focus:outline-none focus:border-noir-strong resize-none"
+            className="w-full bg-[color:var(--bg)] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-3 py-2 text-[12px] text-[color:var(--ink-2)] placeholder:text-[color:var(--ink-faint)] focus:outline-none focus:border-[color:var(--border-strong)] resize-none"
           />
         </div>
         <Button variant="primary" fullWidth onClick={handleSave} disabled={saving}>
@@ -147,8 +147,8 @@ export function PracticeSession({ currentBpm, onComplete }: Props) {
 
   // Setup phase
   return (
-    <div className="space-y-4 p-4 border border-noir-border rounded-[2px]">
-      <div className="text-[10px] uppercase tracking-widest text-noir-muted">New Practice Session</div>
+    <div className="space-y-4 p-4 border border-[color:var(--hairline)] rounded-[var(--r-control)]">
+      <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-dim)]">New Practice Session</div>
 
       {/* Focus type */}
       <div className="grid grid-cols-3 gap-1.5">
@@ -157,10 +157,10 @@ export function PracticeSession({ currentBpm, onComplete }: Props) {
             key={t}
             onClick={() => setFocusType(t)}
             className={cn(
-              'py-2 border rounded-[2px] text-[10px] uppercase tracking-widest transition-colors',
+              'py-2 border rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-colors',
               focusType === t
-                ? 'border-noir-accent text-noir-white bg-noir-elevated'
-                : 'border-noir-border text-noir-dim hover:border-noir-strong'
+                ? 'border-[color:var(--violet-400)] text-[color:var(--ink)] bg-white/[0.05]'
+                : 'border-[color:var(--hairline)] text-[color:var(--ink-faint)] hover:border-[color:var(--border-strong)]'
             )}
           >
             {t}
@@ -171,11 +171,11 @@ export function PracticeSession({ currentBpm, onComplete }: Props) {
       {/* Rudiment picker */}
       {focusType === 'rudiment' && (
         <div>
-          <div className="text-[10px] uppercase tracking-widest text-noir-dim mb-2">Select Rudiment</div>
+          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-2">Select Rudiment</div>
           <select
             value={selectedRudimentId}
             onChange={e => setSelectedRudimentId(e.target.value)}
-            className="w-full bg-noir-bg border border-noir-border rounded-[2px] px-3 py-2 text-[12px] text-noir-accent focus:outline-none focus:border-noir-strong"
+            className="w-full bg-[color:var(--bg)] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-3 py-2 text-[12px] text-[color:var(--ink-2)] focus:outline-none focus:border-[color:var(--border-strong)]"
           >
             <option value="">— choose —</option>
             {RUDIMENTS.map(r => (
@@ -188,11 +188,11 @@ export function PracticeSession({ currentBpm, onComplete }: Props) {
       {/* Lesson picker */}
       {focusType === 'lesson' && (
         <div>
-          <div className="text-[10px] uppercase tracking-widest text-noir-dim mb-2">Select Lesson</div>
+          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-2">Select Lesson</div>
           <select
             value={selectedLessonId}
             onChange={e => setSelectedLessonId(e.target.value)}
-            className="w-full bg-noir-bg border border-noir-border rounded-[2px] px-3 py-2 text-[12px] text-noir-accent focus:outline-none focus:border-noir-strong"
+            className="w-full bg-[color:var(--bg)] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-3 py-2 text-[12px] text-[color:var(--ink-2)] focus:outline-none focus:border-[color:var(--border-strong)]"
           >
             <option value="">— choose —</option>
             {DRUM_BOOKS.map(book => (
@@ -209,17 +209,17 @@ export function PracticeSession({ currentBpm, onComplete }: Props) {
       {/* Free focus area */}
       {focusType === 'free' && (
         <div>
-          <div className="text-[10px] uppercase tracking-widest text-noir-dim mb-2">Focus Area</div>
+          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-2">Focus Area</div>
           <div className="flex flex-wrap gap-1.5">
             {FOCUS_AREAS.map(area => (
               <button
                 key={area}
                 onClick={() => setFreeLabel(area)}
                 className={cn(
-                  'px-2.5 py-1.5 border rounded-[2px] text-[9px] uppercase tracking-widest transition-colors',
+                  'px-2.5 py-1.5 border rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-colors',
                   freeLabel === area
-                    ? 'border-noir-accent text-noir-white bg-noir-elevated'
-                    : 'border-noir-border text-noir-dim hover:border-noir-strong'
+                    ? 'border-[color:var(--violet-400)] text-[color:var(--ink)] bg-white/[0.05]'
+                    : 'border-[color:var(--hairline)] text-[color:var(--ink-faint)] hover:border-[color:var(--border-strong)]'
                 )}
               >
                 {area.replace(/-/g, ' ')}

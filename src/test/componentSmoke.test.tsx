@@ -655,25 +655,22 @@ describe('NotationViewer — renders without crashing', () => {
     ).toBeInTheDocument()
   })
 
-  it('takes its colours from the theme rather than hardcoded hex', async () => {
-    // The tokens are read off the document at draw time, which is what lets the
-    // score follow the light theme. Setting them inline proves they are read.
-    document.documentElement.style.setProperty('--bg', 'rgb(1, 2, 3)')
-    document.documentElement.style.setProperty('--accent', 'rgb(4, 5, 6)')
-
+  it('leaves its own ground transparent so the card behind shows through', async () => {
+    // The score used to paint itself with the page ground, which drew a flat
+    // panel inside a gradient card once the surfaces stopped being flat.
     const { container } = render(<NotationViewer data={RUDIMENT_NOTATION[0]} />)
     await waitFor(() => expect(container.querySelector('svg')).not.toBeNull(), { timeout: 4000 })
 
     const svg = container.querySelector('svg') as SVGElement
-    expect(svg.style.background).toBe('rgb(1, 2, 3)')
+    expect(svg.style.background).toBe('transparent')
   })
 
   it('paints the score in the theme foreground, not a fixed white', async () => {
     // The restyle sweep runs after VexFlow draws, so it is the last word on
     // colour: if it hardcodes a light hex, a light theme renders the score
     // near-invisible whatever the stave styles said.
-    document.documentElement.style.setProperty('--accent', 'rgb(28, 28, 33)')
-    document.documentElement.style.setProperty('--muted', 'rgb(90, 90, 100)')
+    document.documentElement.style.setProperty('--ink', 'rgb(28, 28, 33)')
+    document.documentElement.style.setProperty('--ink-faint', 'rgb(90, 90, 100)')
 
     const { container } = render(<NotationViewer data={RUDIMENT_NOTATION[0]} />)
     await waitFor(() => expect(container.querySelector('svg path')).not.toBeNull(), { timeout: 4000 })

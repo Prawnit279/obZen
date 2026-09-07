@@ -75,7 +75,7 @@ export function NotationUpload({ lessonId, onSaved }: Props) {
 
   if (saved) {
     return (
-      <div className="flex items-center gap-2 py-2 text-[11px] text-noir-accent">
+      <div className="flex items-center gap-2 py-2 text-[11px] text-[color:var(--ink-2)]">
         <CheckCircle size={13} />
         Notation saved.
       </div>
@@ -85,22 +85,22 @@ export function NotationUpload({ lessonId, onSaved }: Props) {
   if (mode === 'choose') {
     return (
       <div className="space-y-2">
-        <div className="text-[10px] uppercase tracking-widest text-noir-dim mb-3">Add Notation</div>
+        <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-3">Add Notation</div>
         <div className="grid grid-cols-2 gap-2">
           <button
             onClick={() => fileInputRef.current?.click()}
             disabled={loading}
-            className="flex flex-col items-center gap-2 p-4 border border-noir-border rounded-[2px] hover:border-noir-strong transition-colors"
+            className="flex flex-col items-center gap-2 p-4 border border-[color:var(--hairline)] rounded-[var(--r-control)] hover:border-[color:var(--border-strong)] transition-colors"
           >
-            <Upload size={18} className="text-noir-dim" />
-            <span className="text-[10px] uppercase tracking-widest text-noir-dim">{loading ? 'Reading…' : 'From PDF'}</span>
+            <Upload size={18} className="text-[color:var(--ink-faint)]" />
+            <span className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)]">{loading ? 'Reading…' : 'From PDF'}</span>
           </button>
           <button
             onClick={() => setMode('text')}
-            className="flex flex-col items-center gap-2 p-4 border border-noir-border rounded-[2px] hover:border-noir-strong transition-colors"
+            className="flex flex-col items-center gap-2 p-4 border border-[color:var(--hairline)] rounded-[var(--r-control)] hover:border-[color:var(--border-strong)] transition-colors"
           >
-            <Type size={18} className="text-noir-dim" />
-            <span className="text-[10px] uppercase tracking-widest text-noir-dim">Text Pattern</span>
+            <Type size={18} className="text-[color:var(--ink-faint)]" />
+            <span className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)]">Text Pattern</span>
           </button>
         </div>
         <input
@@ -110,7 +110,7 @@ export function NotationUpload({ lessonId, onSaved }: Props) {
           className="hidden"
           onChange={e => { const f = e.target.files?.[0]; if (f) handlePdfFile(f) }}
         />
-        {error && <div className="text-[11px] text-noir-red">{error}</div>}
+        {error && <div className="text-[11px] text-[color:var(--red)]">{error}</div>}
       </div>
     )
   }
@@ -118,11 +118,11 @@ export function NotationUpload({ lessonId, onSaved }: Props) {
   if (mode === 'pdf') {
     return (
       <div className="space-y-3">
-        <div className="text-[10px] uppercase tracking-widest text-noir-dim">Extracted PDF Text</div>
-        <div className="text-[11px] text-noir-muted bg-noir-elevated border border-noir-border rounded-[2px] p-3 max-h-32 overflow-y-auto whitespace-pre-wrap">
+        <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)]">Extracted PDF Text</div>
+        <div className="text-[11px] text-[color:var(--ink-dim)] bg-white/[0.05] border border-[color:var(--hairline)] rounded-[var(--r-control)] p-3 max-h-32 overflow-y-auto whitespace-pre-wrap">
           {pdfText}
         </div>
-        <div className="text-[10px] text-noir-dim border-l border-noir-strong pl-2">
+        <div className="text-[11px] text-[color:var(--ink-faint)] border-l border-[color:var(--border-strong)] pl-2">
           Most drum notation books use image-based PDFs. Copy any R/L sticking patterns you see and enter them below.
         </div>
         <Button variant="ghost" fullWidth onClick={() => setMode('text')}>
@@ -137,28 +137,28 @@ export function NotationUpload({ lessonId, onSaved }: Props) {
   // Text input mode
   return (
     <div className="space-y-3">
-      <div className="text-[10px] uppercase tracking-widest text-noir-dim">Sticking Pattern</div>
-      <div className="text-[10px] text-noir-dim space-y-0.5">
+      <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)]">Sticking Pattern</div>
+      <div className="text-[11px] text-[color:var(--ink-faint)] space-y-0.5">
         <div>Enter R and L tokens separated by spaces.</div>
-        <div>Use <span className="text-noir-accent">R&gt;</span> for accented notes, <span className="text-noir-accent">_</span> for rests.</div>
-        <div>Example: <span className="font-mono text-noir-accent">R L R R L R L L</span></div>
+        <div>Use <span className="text-[color:var(--ink-2)]">R&gt;</span> for accented notes, <span className="text-[color:var(--ink-2)]">_</span> for rests.</div>
+        <div>Example: <span className="font-mono text-[color:var(--ink-2)]">R L R R L R L L</span></div>
       </div>
       <textarea
         value={manualText}
         onChange={e => setManualText(e.target.value)}
         placeholder="R L R R L R L L R L R R L R L L"
         rows={3}
-        className="w-full bg-noir-bg border border-noir-border rounded-[2px] px-3 py-2 text-[12px] font-mono text-noir-accent placeholder:text-noir-dim focus:outline-none focus:border-noir-strong resize-none uppercase"
+        className="w-full bg-[color:var(--bg)] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-3 py-2 text-[12px] font-mono text-[color:var(--ink-2)] placeholder:text-[color:var(--ink-faint)] focus:outline-none focus:border-[color:var(--border-strong)] resize-none uppercase"
       />
 
       <div className="flex items-center gap-3">
         <div className="flex-1">
-          <div className="text-[10px] uppercase tracking-widest text-noir-dim mb-1.5">Tempo (BPM)</div>
+          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-1.5">Tempo (BPM)</div>
           <input
             value={tempo}
             onChange={e => setTempo(e.target.value.replace(/\D/, ''))}
             placeholder="80"
-            className="w-full bg-noir-bg border border-noir-border rounded-[2px] px-3 py-2 text-[12px] text-noir-accent focus:outline-none focus:border-noir-strong"
+            className="w-full bg-[color:var(--bg)] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-3 py-2 text-[12px] text-[color:var(--ink-2)] focus:outline-none focus:border-[color:var(--border-strong)]"
           />
         </div>
         <div className="pt-5">
@@ -175,7 +175,7 @@ export function NotationUpload({ lessonId, onSaved }: Props) {
 
       {preview && (
         <div className="space-y-2">
-          <div className="text-[10px] uppercase tracking-widest text-noir-dim">
+          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)]">
             {preview.measures.length} measure{preview.measures.length !== 1 ? 's' : ''} · {preview.measures.reduce((a, m) => a + m.notes.filter(n => !n.rest).length, 0)} notes
           </div>
           <div className="flex gap-2">
