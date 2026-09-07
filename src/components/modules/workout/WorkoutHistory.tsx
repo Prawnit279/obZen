@@ -42,20 +42,20 @@ export function WorkoutHistory() {
           <button
             key={session.id}
             onClick={() => navigate(`/workout/session/${session.id}`)}
-            className="w-full text-left rounded-[2px] p-4 flex items-center justify-between gap-3 transition-opacity hover:opacity-80"
-            style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+            className="w-full text-left rounded-[var(--r-control)] p-4 flex items-center justify-between gap-3 transition-opacity hover:opacity-80"
+            style={{ background: 'var(--card)', border: '1px solid var(--hairline)' }}
           >
             <div className="min-w-0">
-              <div className="text-[15px]" style={{ color: 'var(--accent)' }}>{formatDateFull(session.date)}</div>
-              <div className="text-[13px] mt-1" style={{ color: 'var(--muted)' }}>
+              <div className="text-[15px]" style={{ color: 'var(--ink)' }}>{formatDateFull(session.date)}</div>
+              <div className="text-[13px] mt-1" style={{ color: 'var(--ink-dim)' }}>
                 {session.dayLabel}{session.focus ? ` · ${session.focus}` : ''}
               </div>
-              <div className="text-[11px] uppercase tracking-widest mt-1.5" style={{ color: 'var(--dim)' }}>
+              <div className="text-[11px] uppercase tracking-widest mt-1.5" style={{ color: 'var(--ink-faint)' }}>
                 {doneCount} exercise{doneCount === 1 ? '' : 's'} · {setCount} set{setCount === 1 ? '' : 's'}
                 {session.completedAt && <span style={{ color: 'var(--complete-text)' }}> · complete</span>}
               </div>
             </div>
-            <ChevronRight size={16} style={{ color: 'var(--dim)' }} className="shrink-0" />
+            <ChevronRight size={16} style={{ color: 'var(--ink-faint)' }} className="shrink-0" />
           </button>
         )
       })}

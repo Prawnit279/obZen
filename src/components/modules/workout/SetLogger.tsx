@@ -39,16 +39,16 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
 
   return (
     <div
-      className="flex items-center gap-2 py-1.5 px-1 rounded-[2px] transition-colors"
-      style={{ background: saved ? 'rgba(20, 83, 45, 0.15)' : 'var(--surface)' }}
+      className="flex items-center gap-2 py-1.5 px-1 rounded-[var(--r-control)] transition-colors"
+      style={{ background: saved ? 'rgba(20, 83, 45, 0.15)' : 'var(--card)' }}
       onPointerDown={handlePressStart}
       onPointerUp={handlePressEnd}
       onPointerLeave={handlePressEnd}
     >
       {/* Set number */}
       <span
-        className="text-[10px] uppercase tracking-widest shrink-0 w-8"
-        style={{ color: 'var(--dim)' }}
+        className="uppercase shrink-0 w-9"
+        style={{ fontSize: 11, letterSpacing: '0.08em', color: 'var(--ink-faint)' }}
       >
         Set {set.setNumber}
       </span>
@@ -61,10 +61,10 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
         onChange={e => setWeight(e.target.value)}
         aria-label={`${units.weightAria}, set ${set.setNumber}`}
         placeholder="—"
-        className="w-16 text-center rounded-[2px] border text-[13px] bg-transparent focus:outline-none transition-colors"
+        className="w-16 text-center rounded-[var(--r-control)] border text-[13px] bg-transparent focus:outline-none transition-colors"
         style={{
-          color: 'var(--accent)',
-          borderColor: 'var(--border)',
+          color: 'var(--ink)',
+          borderColor: 'var(--hairline)',
           padding: '2px 4px',
         }}
       />
@@ -72,8 +72,9 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
       {/* Unit toggle */}
       <button
         onClick={() => setUnit(u => u === 'lbs' ? 'kg' : 'lbs')}
-        className="text-[9px] uppercase tracking-widest shrink-0 w-6"
-        style={{ color: 'var(--dim)' }}
+        className="uppercase shrink-0 w-7"
+        style={{ fontSize: 11, letterSpacing: '0.06em', color: 'var(--ink-faint)' }}
+        aria-label={`Unit: ${unit}. Tap to switch.`}
       >
         {unit}
       </button>
@@ -86,21 +87,21 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
         onChange={e => setReps(e.target.value)}
         aria-label={`${units.countAria}, set ${set.setNumber}`}
         placeholder="—"
-        className="w-12 text-center rounded-[2px] border text-[13px] bg-transparent focus:outline-none transition-colors"
+        className="w-12 text-center rounded-[var(--r-control)] border text-[13px] bg-transparent focus:outline-none transition-colors"
         style={{
-          color: 'var(--accent)',
-          borderColor: 'var(--border)',
+          color: 'var(--ink)',
+          borderColor: 'var(--hairline)',
           padding: '2px 4px',
         }}
       />
 
-      <span className="text-[10px] shrink-0" style={{ color: 'var(--dim)' }}>{units.countLabel}</span>
+      <span className="shrink-0" style={{ fontSize: 11, color: 'var(--ink-faint)' }}>{units.countLabel}</span>
 
       {/* Save or delete */}
       {showDelete ? (
         <button
           onClick={() => { onDelete(); setShowDelete(false) }}
-          className="ml-auto p-1 rounded-[2px] transition-colors"
+          className="ml-auto p-1 rounded-[var(--r-control)] transition-colors"
           style={{ color: 'var(--skip-text)' }}
           aria-label="Delete set"
         >
@@ -110,10 +111,10 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
         <button
           onClick={handleSave}
           className={cn(
-            'ml-auto p-1 rounded-[2px] transition-colors',
+            'ml-auto p-1 rounded-[var(--r-control)] transition-colors',
             saved ? 'opacity-40' : 'hover:opacity-70'
           )}
-          style={{ color: saved ? 'var(--complete-text)' : 'var(--muted)' }}
+          style={{ color: saved ? 'var(--complete-text)' : 'var(--ink-dim)' }}
           aria-label={saved ? 'Set saved' : 'Save set'}
         >
           {saved ? <Check size={13} /> : <Plus size={13} />}
@@ -165,12 +166,18 @@ export function SetLogger({ exerciseId, sets, onAddSet, onUpdateSet, onRemoveSet
   return (
     <div
       className="px-4 pb-3 pt-2"
-      style={{ borderTop: '1px solid var(--border)' }}
+      style={{ borderTop: '1px solid var(--hairline)' }}
     >
-      <div className="text-[9px] uppercase tracking-widest mb-2" style={{ color: 'var(--dim)' }}>
+      <div
+        className="uppercase"
+        style={{
+          fontSize: 11, fontWeight: 500, letterSpacing: '0.12em',
+          color: 'var(--ink-dim)', marginBottom: 8,
+        }}
+      >
         Log Today
-        {units.isDuration && <span style={{ color: 'var(--muted)' }}> · hold in seconds</span>}
-        {units.isAssistance && <span style={{ color: 'var(--muted)' }}> · assistance weight</span>}
+        {units.isDuration && <span style={{ color: 'var(--ink-dim)' }}> · hold in seconds</span>}
+        {units.isAssistance && <span style={{ color: 'var(--ink-dim)' }}> · assistance weight</span>}
       </div>
 
       <div className="space-y-1">
@@ -189,8 +196,8 @@ export function SetLogger({ exerciseId, sets, onAddSet, onUpdateSet, onRemoveSet
       {sets.length < MAX_SETS && (
         <button
           onClick={handleAddRow}
-          className="mt-2 flex items-center gap-1.5 text-[10px] uppercase tracking-widest transition-opacity hover:opacity-70"
-          style={{ color: 'var(--dim)' }}
+          className="mt-2 flex items-center gap-1.5 text-[11px] uppercase tracking-widest transition-opacity hover:opacity-70"
+          style={{ color: 'var(--ink-faint)' }}
         >
           <Plus size={11} />
           Add Set

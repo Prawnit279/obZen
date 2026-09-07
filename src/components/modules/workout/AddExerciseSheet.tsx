@@ -52,11 +52,11 @@ function OtherDaysTab({
         const available = program.exercises.filter(ex => !existingIds.includes(toExerciseId(ex.name)))
         return (
           <div key={day}>
-            <div className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--dim)' }}>
+            <div className="text-[10px] uppercase tracking-widest mb-2" style={{ color: 'var(--ink-faint)' }}>
               {day} — {program.focus}
             </div>
             {available.length === 0 ? (
-              <p className="text-[13px]" style={{ color: 'var(--dim)' }}>All exercises already added.</p>
+              <p className="text-[13px]" style={{ color: 'var(--ink-faint)' }}>All exercises already added.</p>
             ) : (
               <div className="space-y-1">
                 {available.map(ex => (
@@ -66,16 +66,16 @@ function OtherDaysTab({
                       muscle: ex.muscle,
                       target: formatTarget(ex),
                     }))}
-                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-[2px] text-left transition-opacity hover:opacity-70"
-                    style={{ background: 'var(--elevated)', border: '1px solid var(--border)' }}
+                    className="w-full flex items-center justify-between px-3 py-2.5 rounded-[var(--r-control)] text-left transition-opacity hover:opacity-70"
+                    style={{ background: 'var(--elevated)', border: '1px solid var(--hairline)' }}
                   >
                     <div>
-                      <div className="text-[14px]" style={{ color: 'var(--accent)' }}>{ex.name}</div>
-                      <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
+                      <div className="text-[14px]" style={{ color: 'var(--ink)' }}>{ex.name}</div>
+                      <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>
                         {ex.muscle} · {ex.sets}×{ex.reps}
                       </div>
                     </div>
-                    <Plus size={14} style={{ color: 'var(--muted)' }} />
+                    <Plus size={14} style={{ color: 'var(--ink-dim)' }} />
                   </button>
                 ))}
               </div>
@@ -108,14 +108,14 @@ function LibraryTab({
     <div className="space-y-3">
       {/* Search */}
       <div className="relative">
-        <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--dim)' }} />
+        <Search size={12} className="absolute left-3 top-1/2 -translate-y-1/2" style={{ color: 'var(--ink-faint)' }} />
         <input
           type="text"
           placeholder="Search exercises..."
           value={search}
           onChange={e => setSearch(e.target.value)}
-          className="w-full rounded-[2px] border pl-8 pr-3 py-2 text-[12px] bg-transparent focus:outline-none"
-          style={{ borderColor: 'var(--border)', color: 'var(--accent)' }}
+          className="w-full rounded-[var(--r-control)] border pl-8 pr-3 py-2 text-[12px] bg-transparent focus:outline-none"
+          style={{ borderColor: 'var(--hairline)', color: 'var(--ink)' }}
         />
       </div>
 
@@ -126,12 +126,12 @@ function LibraryTab({
             key={g}
             onClick={() => setMuscle(g)}
             className={cn(
-              'px-2.5 py-1 rounded-[2px] text-[9px] uppercase tracking-widest transition-colors',
+              'px-2.5 py-1 rounded-[var(--r-control)] text-[9px] uppercase tracking-widest transition-colors',
               muscle === g ? 'text-white' : 'hover:opacity-70'
             )}
             style={{
-              border: '1px solid ' + (muscle === g ? '#888888' : 'var(--border)'),
-              color: muscle === g ? 'var(--accent)' : 'var(--dim)',
+              border: '1px solid ' + (muscle === g ? '#888888' : 'var(--hairline)'),
+              color: muscle === g ? 'var(--ink)' : 'var(--ink-faint)',
               background: muscle === g ? 'var(--elevated)' : 'transparent',
             }}
           >
@@ -143,7 +143,7 @@ function LibraryTab({
       {/* Exercise list */}
       <div className="space-y-1 max-h-60 overflow-y-auto">
         {filtered.length === 0 ? (
-          <p className="text-[11px]" style={{ color: 'var(--dim)' }}>No exercises found.</p>
+          <p className="text-[11px]" style={{ color: 'var(--ink-faint)' }}>No exercises found.</p>
         ) : (
           filtered.slice(0, 50).map(ex => (
             <button
@@ -152,21 +152,21 @@ function LibraryTab({
                 muscle: ex.muscle,
                 target: formatTarget(ex),
               }))}
-              className="w-full flex items-center justify-between px-3 py-2.5 rounded-[2px] text-left transition-opacity hover:opacity-70"
-              style={{ background: 'var(--elevated)', border: '1px solid var(--border)' }}
+              className="w-full flex items-center justify-between px-3 py-2.5 rounded-[var(--r-control)] text-left transition-opacity hover:opacity-70"
+              style={{ background: 'var(--elevated)', border: '1px solid var(--hairline)' }}
             >
               <div>
-                <div className="text-[14px] flex items-center gap-2" style={{ color: 'var(--accent)' }}>
+                <div className="text-[14px] flex items-center gap-2" style={{ color: 'var(--ink)' }}>
                   {ex.name}
                   {ex.isCore && (
-                    <span className="text-[9px] uppercase tracking-widest px-1 py-0.5 rounded-[2px]" style={{ color: 'var(--muted)', border: '1px solid var(--border-strong)' }}>Core</span>
+                    <span className="text-[9px] uppercase tracking-widest px-1 py-0.5 rounded-[var(--r-control)]" style={{ color: 'var(--ink-dim)', border: '1px solid var(--border-strong)' }}>Core</span>
                   )}
                 </div>
-                <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
+                <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>
                   {ex.muscle} · {ex.sets}×{ex.reps}
                 </div>
               </div>
-              <Plus size={14} style={{ color: 'var(--muted)' }} />
+              <Plus size={14} style={{ color: 'var(--ink-dim)' }} />
             </button>
           ))
         )}
@@ -192,7 +192,7 @@ function CustomTab({ onAdd }: { onAdd: (ex: ExerciseSessionState) => void }) {
   return (
     <div className="space-y-3">
       <div>
-        <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>
+        <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--ink-faint)' }}>
           Exercise Name
         </label>
         <input
@@ -200,13 +200,13 @@ function CustomTab({ onAdd }: { onAdd: (ex: ExerciseSessionState) => void }) {
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder="e.g. Face Pulls"
-          className="w-full rounded-[2px] border px-3 py-2 text-[12px] bg-transparent focus:outline-none"
-          style={{ borderColor: 'var(--border)', color: 'var(--accent)' }}
+          className="w-full rounded-[var(--r-control)] border px-3 py-2 text-[12px] bg-transparent focus:outline-none"
+          style={{ borderColor: 'var(--hairline)', color: 'var(--ink)' }}
         />
       </div>
 
       <div>
-        <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>
+        <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--ink-faint)' }}>
           Muscle Group
         </label>
         <div className="flex flex-wrap gap-1.5">
@@ -214,10 +214,10 @@ function CustomTab({ onAdd }: { onAdd: (ex: ExerciseSessionState) => void }) {
             <button
               key={g}
               onClick={() => setMuscle(g)}
-              className={cn('px-2.5 py-1 rounded-[2px] text-[9px] uppercase tracking-widest transition-colors')}
+              className={cn('px-2.5 py-1 rounded-[var(--r-control)] text-[9px] uppercase tracking-widest transition-colors')}
               style={{
-                border: '1px solid ' + (muscle === g ? '#888888' : 'var(--border)'),
-                color: muscle === g ? 'var(--accent)' : 'var(--dim)',
+                border: '1px solid ' + (muscle === g ? '#888888' : 'var(--hairline)'),
+                color: muscle === g ? 'var(--ink)' : 'var(--ink-faint)',
                 background: muscle === g ? 'var(--elevated)' : 'transparent',
               }}
             >
@@ -230,8 +230,8 @@ function CustomTab({ onAdd }: { onAdd: (ex: ExerciseSessionState) => void }) {
       <button
         onClick={handleSubmit}
         disabled={!name.trim()}
-        className="w-full py-2.5 rounded-[2px] text-[11px] uppercase tracking-widest transition-opacity disabled:opacity-30"
-        style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}
+        className="w-full py-2.5 rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-opacity disabled:opacity-30"
+        style={{ border: '1px solid var(--accent)', color: 'var(--ink)' }}
       >
         Add to Today
       </button>
@@ -258,17 +258,34 @@ export function AddExerciseSheet({ currentDay, existingIds, onAdd, onClose }: Pr
   ]
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end" style={{ background: 'rgba(0,0,0,0.7)' }}>
+    <div
+      className="fixed inset-0 z-50 flex flex-col justify-end"
+      style={{ background: 'rgba(6,5,10,0.68)' }}
+    >
       <div
-        className="rounded-t-[4px] flex flex-col max-h-[80vh]"
-        style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+        className="flex flex-col max-h-[80vh]"
+        style={{
+          borderRadius: '26px 26px 0 0',
+          borderTop: '1px solid rgba(167,139,250,0.22)',
+          background: 'linear-gradient(170deg, #191428 0%, #0D0B14 100%)',
+          boxShadow: '0 -20px 60px rgba(0,0,0,0.6)',
+        }}
       >
+        {/* Grab handle — the affordance that says this panel is a sheet. */}
+        <div
+          aria-hidden="true"
+          style={{
+            width: 38, height: 4, borderRadius: 2, margin: '10px auto 2px',
+            background: 'rgba(255,255,255,0.18)', flexShrink: 0,
+          }}
+        />
+
         {/* Header */}
         <div
           className="flex items-center justify-between px-4 py-3 shrink-0"
-          style={{ borderBottom: '1px solid var(--border)' }}
+          style={{ borderBottom: '1px solid var(--hairline)' }}
         >
-          <span className="text-[12px] uppercase tracking-widest" style={{ color: 'var(--accent)' }}>
+          <span className="text-[12px] uppercase tracking-widest" style={{ color: 'var(--ink)' }}>
             Add Exercise
           </span>
           <button
@@ -276,19 +293,19 @@ export function AddExerciseSheet({ currentDay, existingIds, onAdd, onClose }: Pr
             className="transition-opacity hover:opacity-60"
             aria-label="Close sheet"
           >
-            <X size={16} style={{ color: 'var(--dim)' }} />
+            <X size={16} style={{ color: 'var(--ink-faint)' }} />
           </button>
         </div>
 
         {/* Tabs */}
-        <div className="flex shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
+        <div className="flex shrink-0" style={{ borderBottom: '1px solid var(--hairline)' }}>
           {TABS.map(t => (
             <button
               key={t.key}
               onClick={() => setTab(t.key)}
               className="flex-1 py-2.5 text-[10px] uppercase tracking-widest transition-colors"
               style={{
-                color: tab === t.key ? 'var(--accent)' : 'var(--dim)',
+                color: tab === t.key ? 'var(--ink)' : 'var(--ink-faint)',
                 borderBottom: tab === t.key ? '1px solid #d4d4d4' : 'none',
               }}
             >

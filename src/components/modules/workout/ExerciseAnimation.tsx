@@ -334,8 +334,8 @@ export function ExerciseAnimation({ motion, label }: { motion: ExerciseMotion; l
   return (
     <StillContext.Provider value={still}>
       <div
-        className="rounded-[2px] py-2 exercise-animation"
-        style={{ background: 'var(--elevated)', border: '1px solid var(--border)' }}
+        className="rounded-[var(--r-control)] py-2 exercise-animation"
+        style={{ background: 'rgba(255,255,255,0.05)', border: '1px solid var(--border)' }}
       >
         <svg
           viewBox="0 0 200 160" width="100%" height="185" role="img"
@@ -372,7 +372,7 @@ export function ExerciseAnimation({ motion, label }: { motion: ExerciseMotion; l
             </>
           )}
         </svg>
-        <p className="text-[10px] uppercase tracking-widest text-center" style={{ color: 'var(--dim)' }}>
+        <p className="text-[10px] uppercase tracking-widest text-center" style={{ color: 'var(--ink-faint)' }}>
           {motion.caption}
         </p>
       </div>

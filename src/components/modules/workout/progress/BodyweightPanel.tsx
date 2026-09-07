@@ -35,18 +35,18 @@ export function BodyweightPanel({ profileId }: { profileId: ProfileId }) {
   }
 
   return (
-    <section className="rounded-[2px] p-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-      <h3 className="text-[11px] uppercase tracking-widest mb-3" style={{ color: 'var(--muted)' }}>
+    <section className="rounded-[var(--r-control)] p-4" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
+      <h3 className="text-[11px] uppercase tracking-widest mb-3" style={{ color: 'var(--ink-dim)' }}>
         Bodyweight
       </h3>
 
       <div className="flex items-baseline gap-3 mb-3">
-        <span className="text-[22px] tabular-nums" style={{ color: 'var(--accent)' }}>
+        <span className="text-[22px] tabular-nums" style={{ color: 'var(--ink)' }}>
           {latest !== undefined ? Math.round(latest * 10) / 10 : '—'}
         </span>
-        <span className="text-[12px]" style={{ color: 'var(--muted)' }}>lb</span>
+        <span className="text-[12px]" style={{ color: 'var(--ink-dim)' }}>lb</span>
         {entries.length > 1 && (
-          <span className="text-[12px]" style={{ color: change < 0 ? 'var(--complete-text)' : 'var(--muted)' }}>
+          <span className="text-[12px]" style={{ color: change < 0 ? 'var(--complete-text)' : 'var(--ink-dim)' }}>
             {change > 0 ? '+' : ''}{Math.round(change * 10) / 10} lb
           </span>
         )}
@@ -58,7 +58,7 @@ export function BodyweightPanel({ profileId }: { profileId: ProfileId }) {
           yLabel="Bodyweight in pounds"
         />
       ) : (
-        <p className="text-[13px] py-2" style={{ color: 'var(--dim)' }}>
+        <p className="text-[13px] py-2" style={{ color: 'var(--ink-faint)' }}>
           Log twice to see a trend.
         </p>
       )}
@@ -73,14 +73,14 @@ export function BodyweightPanel({ profileId }: { profileId: ProfileId }) {
           onKeyDown={e => { if (e.key === 'Enter') submit() }}
           placeholder="Today's weight (lb)"
           aria-label="Today's bodyweight in pounds"
-          className="flex-1 rounded-[2px] px-3 py-2 text-[15px] bg-transparent focus:outline-none"
-          style={{ border: '1px solid var(--border)', color: 'var(--accent)' }}
+          className="flex-1 rounded-[var(--r-control)] px-3 py-2 text-[15px] bg-transparent focus:outline-none"
+          style={{ border: '1px solid var(--border)', color: 'var(--ink)' }}
         />
         <button
           onClick={submit}
           disabled={!value.trim()}
-          className="px-4 rounded-[2px] text-[12px] uppercase tracking-widest transition-opacity disabled:opacity-30"
-          style={{ border: '1px solid var(--muted)', color: 'var(--accent)' }}
+          className="px-4 rounded-[var(--r-control)] text-[12px] uppercase tracking-widest transition-opacity disabled:opacity-30"
+          style={{ border: '1px solid var(--muted)', color: 'var(--ink)' }}
         >
           Log
         </button>

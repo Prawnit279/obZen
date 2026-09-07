@@ -44,14 +44,14 @@ export function OneRmCard() {
         <div className="mt-4 space-y-3">
           <div className="flex gap-4">
             <div>
-              <div className="text-[22px] tabular-nums" style={{ color: 'var(--accent)' }}>{Math.round(est.epley)}</div>
-              <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Epley e1RM</div>
+              <div className="text-[22px] tabular-nums" style={{ color: 'var(--ink)' }}>{Math.round(est.epley)}</div>
+              <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-dim)' }}>Epley e1RM</div>
             </div>
             <div>
-              <div className="text-[22px] tabular-nums" style={{ color: 'var(--accent)' }}>
+              <div className="text-[22px] tabular-nums" style={{ color: 'var(--ink)' }}>
                 {est.brzycki > 0 ? Math.round(est.brzycki) : '—'}
               </div>
-              <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Brzycki e1RM</div>
+              <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-dim)' }}>Brzycki e1RM</div>
             </div>
           </div>
 
@@ -62,14 +62,14 @@ export function OneRmCard() {
           )}
 
           <div>
-            <div className="text-[11px] uppercase tracking-widest mb-1.5" style={{ color: 'var(--muted)' }}>
+            <div className="text-[11px] uppercase tracking-widest mb-1.5" style={{ color: 'var(--ink-dim)' }}>
               Working weights (% of Epley e1RM)
             </div>
             <div className="grid grid-cols-5 gap-1.5">
               {table.map(row => (
-                <div key={row.pct} className="text-center rounded-[2px] py-1.5" style={{ background: 'var(--elevated)' }}>
-                  <div className="text-[13px] tabular-nums" style={{ color: 'var(--accent)' }}>{row.weight}</div>
-                  <div className="text-[10px]" style={{ color: 'var(--dim)' }}>{row.pct}%</div>
+                <div key={row.pct} className="text-center rounded-[var(--r-control)] py-1.5" style={{ background: 'rgba(255,255,255,0.05)' }}>
+                  <div className="text-[13px] tabular-nums" style={{ color: 'var(--ink)' }}>{row.weight}</div>
+                  <div className="text-[10px]" style={{ color: 'var(--ink-faint)' }}>{row.pct}%</div>
                 </div>
               ))}
             </div>

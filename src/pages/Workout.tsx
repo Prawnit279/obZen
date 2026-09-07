@@ -11,7 +11,6 @@ import { suggestProgression } from '@/lib/progress'
 import type { ProgressionSuggestion } from '@/lib/progress'
 import { db } from '@/db/dexie'
 import { todayISO } from '@/lib/utils'
-import { cn } from '@/lib/utils'
 import { useWorkoutDayStore, selectDaySession, selectOrderedExercises } from '@/store/useWorkoutDayStore'
 import type { ExerciseSessionState } from '@/db/dexie'
 import { DaySummaryBar } from '@/components/modules/workout/DaySummaryBar'
@@ -57,14 +56,14 @@ function buildProgramMap(profileId: string): Record<string, ProgramExercise> {
 function RestDayCard() {
   return (
     <div
-      className="rounded-[2px] p-6 text-center space-y-2"
-      style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}
+      className="rounded-[var(--r-control)] p-6 text-center space-y-2"
+      style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
     >
-      <div className="text-[14px]" style={{ color: 'var(--accent)' }}>Rest Day</div>
-      <div className="text-[12px]" style={{ color: 'var(--muted)' }}>Yoga or light recovery only.</div>
+      <div className="text-[14px]" style={{ color: 'var(--ink)' }}>Rest Day</div>
+      <div className="text-[12px]" style={{ color: 'var(--ink-dim)' }}>Yoga or light recovery only.</div>
       <div
         className="text-[11px] pl-3 text-left max-w-xs mx-auto mt-3"
-        style={{ color: 'var(--dim)', borderLeft: '1px solid var(--border-strong)' }}
+        style={{ color: 'var(--ink-faint)', borderLeft: '1px solid var(--border-strong)' }}
       >
         Pitta: recovery is productive. Avoid overtraining urge.
         Cool yoga session favored.
@@ -127,7 +126,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
   if (!session) {
     return (
       <div className="flex items-center justify-center py-12">
-        <span className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
+        <span className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>
           Loading...
         </span>
       </div>
@@ -146,22 +145,22 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
       {/* Readiness warnings */}
       {lowReadiness && (
         <div
-          className="flex items-start gap-2 p-3 rounded-[2px]"
+          className="flex items-start gap-2 p-3 rounded-[var(--r-control)]"
           style={{ border: '1px solid rgba(127,29,29,0.4)' }}
         >
           <AlertTriangle size={13} style={{ color: 'var(--red)', marginTop: 1 }} className="shrink-0" />
-          <span className="text-[11px]" style={{ color: 'var(--muted)' }}>
+          <span className="text-[11px]" style={{ color: 'var(--ink-dim)' }}>
             Low readiness — consider reducing volume or choosing a rest day.
           </span>
         </div>
       )}
       {hasFlaggedExercises && (
         <div
-          className="flex items-start gap-2 p-3 rounded-[2px]"
+          className="flex items-start gap-2 p-3 rounded-[var(--r-control)]"
           style={{ border: '1px solid rgba(161,98,7,0.4)' }}
         >
           <Zap size={13} style={{ color: '#ca8a04', marginTop: 1 }} className="shrink-0" />
-          <span className="text-[11px]" style={{ color: 'var(--muted)' }}>
+          <span className="text-[11px]" style={{ color: 'var(--ink-dim)' }}>
             Forearm fatigue active — pull-heavy exercises flagged.
           </span>
         </div>
@@ -170,16 +169,25 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
       {/* Empty state — load a template or build the day manually */}
       {orderedExercises.length === 0 && (
         <div
-          className="rounded-[2px] p-5 text-center space-y-3"
-          style={{ background: 'var(--surface)', border: '1px dashed var(--border)' }}
+          className="text-center space-y-3"
+          style={{
+            padding: 20, borderRadius: 'var(--r-card)',
+            background: 'var(--card)', border: '1px dashed var(--hairline)',
+          }}
         >
-          <p className="text-[14px]" style={{ color: 'var(--muted)' }}>
+          <p style={{ fontSize: 14, color: 'var(--ink-dim)' }}>
             No exercises yet — load the {dayLabel} template as a starting point, or add your own below.
           </p>
+          {/* The one primary action on this screen, so it takes the gradient. */}
           <button
             onClick={() => store.loadTemplate(dayLabel, sessionDate)}
-            className="w-full py-3 rounded-[2px] text-[13px] uppercase tracking-widest transition-opacity hover:opacity-80"
-            style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}
+            className="w-full transition-transform active:scale-[0.98]"
+            style={{
+              padding: '15px 0', border: 'none', cursor: 'pointer', borderRadius: 16,
+              background: 'linear-gradient(145deg, var(--violet-200), var(--violet-700))',
+              boxShadow: '0 8px 26px rgba(124,58,237,0.42)',
+              fontSize: 14, fontWeight: 700, letterSpacing: '0.02em', color: '#0A0810',
+            }}
           >
             Load {dayLabel} · {program.focus}
           </button>
@@ -207,8 +215,8 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
       {/* Add Exercise button */}
       <button
         onClick={() => setShowAddSheet(true)}
-        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[2px] text-[12px] uppercase tracking-widest transition-opacity hover:opacity-70"
-        style={{ border: '1px dashed var(--border)', color: 'var(--muted)' }}
+        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[var(--r-control)] text-[12px] uppercase tracking-widest transition-opacity hover:opacity-70"
+        style={{ border: '1px dashed var(--border)', color: 'var(--ink-dim)' }}
       >
         <Plus size={13} />
         Add Exercise
@@ -218,7 +226,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
       {orderedExercises.length > 0 && (
         session.completedAt ? (
           <div
-            className="text-center text-[13px] uppercase tracking-widest py-2.5 rounded-[2px]"
+            className="text-center text-[13px] uppercase tracking-widest py-2.5 rounded-[var(--r-control)]"
             style={{ color: 'var(--complete-text)', border: '1px solid var(--complete-border)', background: 'rgba(22,101,52,0.08)' }}
           >
             ✓ Workout Complete
@@ -226,7 +234,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
         ) : (
           <button
             onClick={() => store.completeSession(dayLabel, sessionDate)}
-            className="w-full py-3 rounded-[2px] text-[13px] uppercase tracking-widest transition-opacity hover:opacity-80"
+            className="w-full py-3 rounded-[var(--r-control)] text-[13px] uppercase tracking-widest transition-opacity hover:opacity-80"
             style={{ border: '1px solid var(--complete-border)', color: 'var(--complete-text)' }}
           >
             Complete Workout
@@ -296,52 +304,84 @@ export default function Workout() {
       {/* Header */}
       <div className="flex items-center justify-between pt-2 gap-2">
         <div className="min-w-0">
-          <div className="text-[11px] uppercase tracking-widest text-noir-muted">Obzen Program</div>
-          <div className="text-[18px] uppercase tracking-wide text-noir-white">Workout</div>
+          <div
+            className="uppercase"
+            style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+          >
+            Obzen Program
+          </div>
+          <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
+            Workout
+          </h1>
         </div>
         {/* Whose session this is. Switchable here so a workout can't be logged
             under the wrong profile without it being visible. */}
         <div className="flex flex-col items-end gap-1 shrink-0">
-          <div className="flex gap-1">
-            {PROFILE_IDS.map(id => (
-              <button
-                key={id}
-                onClick={() => setActiveProfile(id)}
-                className={cn(
-                  'px-2.5 py-1 rounded-[2px] text-[10px] uppercase tracking-widest transition-colors border',
-                  id === activeProfileId
-                    ? 'border-noir-accent text-noir-white bg-noir-elevated'
-                    : 'border-noir-border text-noir-dim hover:text-noir-muted'
-                )}
-                aria-pressed={id === activeProfileId}
-                aria-label={`Log as ${PROFILES[id].name}`}
-              >
-                {PROFILES[id].name}
-              </button>
-            ))}
+          <div role="group" aria-label="Log as" className="flex" style={{
+          gap: 2, padding: 2,
+          borderRadius: 'var(--r-pill)',
+          background: 'rgba(255,255,255,0.05)',
+        }}>
+            {PROFILE_IDS.map(id => {
+              const on = id === activeProfileId
+              return (
+                <button
+                  key={id}
+                  onClick={() => setActiveProfile(id)}
+                  aria-pressed={on}
+                  aria-label={`Log as ${PROFILES[id].name}`}
+                  className="transition-colors"
+                  style={{
+                    padding: '6px 12px', border: 'none', cursor: 'pointer',
+                    borderRadius: 'var(--r-pill)',
+                    fontSize: 11, fontWeight: 500, letterSpacing: '0.03em',
+                    background: on
+                      ? 'linear-gradient(140deg, var(--violet-400), var(--violet-900))'
+                      : 'transparent',
+                    color: on ? '#FFFFFF' : 'var(--ink-faint)',
+                    boxShadow: on ? '0 2px 14px rgba(76,29,149,0.6)' : 'none',
+                  }}
+                >
+                  {PROFILES[id].name}
+                </button>
+              )
+            })}
           </div>
-          <div className="text-[11px] uppercase tracking-widest text-noir-dim">
+          <div style={{ fontSize: 11, color: 'var(--ink-faint)', fontVariantNumeric: 'tabular-nums' }}>
             {weekSessions ?? 0}/3 this week
           </div>
         </div>
       </div>
 
       {/* Tabs */}
-      <div className="flex border border-noir-border rounded-[2px] overflow-hidden">
-        {(['program', 'history', 'progress', 'tools'] as Tab[]).map(t => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={cn(
-              'flex-1 py-2 text-[10px] uppercase tracking-widest transition-colors border-r border-noir-border last:border-r-0',
-              tab === t
-                ? 'bg-noir-elevated text-noir-white'
-                : 'text-noir-dim hover:text-noir-muted hover:bg-noir-elevated/30'
-            )}
-          >
-            {t}
-          </button>
-        ))}
+      <div role="group" aria-label="Train section" className="flex" style={{
+          gap: 2, padding: 2,
+          borderRadius: 'var(--r-pill)',
+          background: 'rgba(255,255,255,0.05)',
+        }}>
+        {(['program', 'history', 'progress', 'tools'] as Tab[]).map(t => {
+          const on = tab === t
+          return (
+            <button
+              key={t}
+              onClick={() => setTab(t)}
+              aria-pressed={on}
+              className="flex-1 capitalize transition-colors"
+              style={{
+                padding: '6px 10px', border: 'none', cursor: 'pointer',
+                borderRadius: 'var(--r-pill)',
+                fontSize: 11, fontWeight: 500, letterSpacing: '0.03em',
+                background: on
+                  ? 'linear-gradient(140deg, var(--violet-400), var(--violet-900))'
+                  : 'transparent',
+                color: on ? '#FFFFFF' : 'var(--ink-faint)',
+                boxShadow: on ? '0 2px 14px rgba(76,29,149,0.6)' : 'none',
+              }}
+            >
+              {t}
+            </button>
+          )
+        })}
       </div>
 
       {tab === 'history' && <WorkoutHistory />}
@@ -358,24 +398,32 @@ export default function Workout() {
               <button
                 key={day}
                 onClick={() => setSelectedDay(day)}
-                className={cn(
-                  'flex-1 py-2.5 border rounded-[2px] text-[10px] uppercase tracking-widest transition-colors',
-                  selectedDay === day
-                    ? 'border-noir-accent text-noir-white bg-noir-elevated'
-                    : 'border-noir-border text-noir-dim hover:border-noir-strong hover:text-noir-muted'
-                )}
+                aria-pressed={selectedDay === day}
+                className="flex-1 uppercase transition-colors"
+                style={{
+                  padding: '10px 0',
+                  borderRadius: 'var(--r-control)',
+                  fontSize: 11, fontWeight: 500, letterSpacing: '0.08em',
+                  border: `1px solid ${selectedDay === day ? 'rgba(167,139,250,0.45)' : 'var(--hairline)'}`,
+                  background: selectedDay === day ? 'rgba(139,92,246,0.14)' : 'transparent',
+                  color: selectedDay === day ? 'var(--ink)' : 'var(--ink-faint)',
+                }}
               >
                 {day}
               </button>
             ))}
             <button
               onClick={() => setSelectedDay('Rest')}
-              className={cn(
-                'px-3 py-2.5 border rounded-[2px] text-[10px] uppercase tracking-widest transition-colors',
-                selectedDay === 'Rest'
-                  ? 'border-noir-accent text-noir-white bg-noir-elevated'
-                  : 'border-noir-border text-noir-dim hover:border-noir-strong hover:text-noir-muted'
-              )}
+              aria-pressed={selectedDay === 'Rest'}
+              className="uppercase transition-colors"
+              style={{
+                padding: '10px 14px',
+                borderRadius: 'var(--r-control)',
+                fontSize: 11, fontWeight: 500, letterSpacing: '0.08em',
+                border: `1px solid ${selectedDay === 'Rest' ? 'rgba(167,139,250,0.45)' : 'var(--hairline)'}`,
+                background: selectedDay === 'Rest' ? 'rgba(139,92,246,0.14)' : 'transparent',
+                color: selectedDay === 'Rest' ? 'var(--ink)' : 'var(--ink-faint)',
+              }}
             >
               Rest
             </button>
@@ -385,16 +433,20 @@ export default function Workout() {
               workout you forgot to enter at the gym. */}
           {selectedDay !== 'Rest' && (
             <div
-              className="flex items-center justify-between gap-3 px-3 py-2 rounded-[2px]"
+              className="flex items-center justify-between gap-3"
               style={{
-                background: 'var(--surface)',
-                border: `1px solid ${sessionDate === TODAY ? 'var(--border)' : 'var(--accent)'}`,
+                padding: '10px 14px',
+                borderRadius: 'var(--r-inset)',
+                background: 'var(--card)',
+                // A past date is a deliberate, easy-to-miss state — the accent
+                // border is what makes it obvious the log is not for today.
+                border: `1px solid ${sessionDate === TODAY ? 'var(--hairline)' : 'rgba(167,139,250,0.45)'}`,
               }}
             >
               <label
                 htmlFor="session-date"
-                className="text-[11px] uppercase tracking-widest shrink-0"
-                style={{ color: 'var(--muted)' }}
+                className="uppercase shrink-0"
+                style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
               >
                 {sessionDate === TODAY ? 'Logging today' : 'Logging past date'}
               </label>
@@ -402,8 +454,8 @@ export default function Workout() {
                 {sessionDate !== TODAY && (
                   <button
                     onClick={() => setSessionDate(TODAY)}
-                    className="text-[11px] uppercase tracking-widest transition-opacity hover:opacity-70"
-                    style={{ color: 'var(--muted)' }}
+                    className="uppercase transition-opacity hover:opacity-70"
+                    style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', color: 'var(--violet-100)' }}
                   >
                     Today
                   </button>
@@ -414,8 +466,11 @@ export default function Workout() {
                   value={sessionDate}
                   max={TODAY}
                   onChange={e => setSessionDate(e.target.value || TODAY)}
-                  className="rounded-[2px] px-2 py-1 text-[13px] bg-transparent focus:outline-none"
-                  style={{ border: '1px solid var(--border)', color: 'var(--accent)' }}
+                  className="bg-transparent focus:outline-none"
+                  style={{
+                    padding: '5px 8px', borderRadius: 'var(--r-control)',
+                    fontSize: 13, border: '1px solid var(--hairline)', color: 'var(--ink-2)',
+                  }}
                 />
               </div>
             </div>

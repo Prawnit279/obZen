@@ -29,12 +29,12 @@ export function ProgressionLadder({ profileId, exerciseId, name, path, assistanc
     : 'Top rung reached'
 
   return (
-    <section className="rounded-[2px] p-4" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
+    <section className="rounded-[var(--r-control)] p-4" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
       <div className="flex items-baseline justify-between gap-2 mb-3">
-        <h3 className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--muted)' }}>
+        <h3 className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-dim)' }}>
           {name} — progression
         </h3>
-        <span className="text-[11px]" style={{ color: 'var(--dim)' }}>{milestone}</span>
+        <span className="text-[11px]" style={{ color: 'var(--ink-faint)' }}>{milestone}</span>
       </div>
 
       <ol className="flex items-stretch gap-1" role="list">
@@ -45,10 +45,10 @@ export function ProgressionLadder({ profileId, exerciseId, name, path, assistanc
             <li key={rung} className="flex-1 min-w-0">
               <button
                 onClick={() => setRung(profileId, exerciseId, i)}
-                className="w-full text-left rounded-[2px] px-2 py-2 transition-colors"
+                className="w-full text-left rounded-[var(--r-control)] px-2 py-2 transition-colors"
                 style={{
-                  background: isCurrent ? 'var(--elevated)' : 'transparent',
-                  border: `1px solid ${isCurrent ? 'var(--muted)' : done ? 'var(--complete-border)' : 'var(--border)'}`,
+                  background: isCurrent ? 'rgba(255,255,255,0.05)' : 'transparent',
+                  border: `1px solid ${isCurrent ? 'var(--ink-dim)' : done ? 'var(--complete-border)' : 'var(--hairline)'}`,
                 }}
                 aria-current={isCurrent ? 'step' : undefined}
                 aria-label={`Set current rung to ${rung}`}
@@ -57,7 +57,7 @@ export function ProgressionLadder({ profileId, exerciseId, name, path, assistanc
                   {done && <Check size={10} style={{ color: 'var(--complete-text)' }} aria-hidden="true" />}
                   <span
                     className="text-[10px] uppercase tracking-widest truncate"
-                    style={{ color: isCurrent ? 'var(--accent)' : done ? 'var(--complete-text)' : 'var(--dim)' }}
+                    style={{ color: isCurrent ? 'var(--ink)' : done ? 'var(--complete-text)' : 'var(--ink-faint)' }}
                   >
                     {rung}
                   </span>
@@ -68,7 +68,7 @@ export function ProgressionLadder({ profileId, exerciseId, name, path, assistanc
         })}
       </ol>
 
-      <p className="text-[11px] mt-2" style={{ color: 'var(--dim)' }}>
+      <p className="text-[11px] mt-2" style={{ color: 'var(--ink-faint)' }}>
         Tap a rung to set where you are now.
       </p>
     </section>

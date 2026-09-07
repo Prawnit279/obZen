@@ -17,9 +17,9 @@ import type { ProgressionSuggestion } from '@/lib/progress'
 // ---------------------------------------------------------------------------
 
 const STATUS_CARD_STYLE: Record<ExerciseSessionState['status'], React.CSSProperties> = {
-  pending: { borderColor: 'var(--border)', background: 'var(--surface)' },
-  complete: { borderColor: 'var(--complete-border)', background: 'rgba(22, 101, 52, 0.08)', borderLeftWidth: 2, borderLeftColor: 'var(--complete-border)' },
-  skipped: { borderColor: 'var(--skip-border)', background: 'rgba(127, 29, 29, 0.06)', borderLeftWidth: 2, borderLeftColor: 'var(--skip-border)', opacity: 0.7 },
+  pending: { borderColor: 'var(--hairline)', background: 'var(--card)' },
+  complete: { borderColor: 'var(--complete-border)', background: 'var(--complete-bg)', borderLeftWidth: 2, borderLeftColor: 'var(--complete-border)' },
+  skipped: { borderColor: 'var(--skip-border)', background: 'var(--skip-bg)', borderLeftWidth: 2, borderLeftColor: 'var(--skip-border)', opacity: 0.7 },
 }
 
 // ---------------------------------------------------------------------------
@@ -88,15 +88,15 @@ export function ExerciseCard({
   return (
     <div
       ref={setNodeRef}
-      style={{ ...style, ...STATUS_CARD_STYLE[status] }}
-      className="rounded-[2px] border overflow-hidden transition-colors"
+      style={{ borderRadius: 'var(--r-card)', ...style, ...STATUS_CARD_STYLE[status] }}
+      className="border overflow-hidden transition-colors"
     >
       {/* Card header */}
       <div className="flex items-stretch">
         {/* Drag handle — 6px left strip */}
         <div
           className="shrink-0 w-[6px] cursor-grab active:cursor-grabbing hover:opacity-60 transition-opacity"
-          style={{ background: 'var(--border)' }}
+          style={{ background: 'rgba(255,255,255,0.07)' }}
           {...attributes}
           {...listeners}
           aria-label={`Drag to reorder ${displayName}`}
@@ -111,38 +111,47 @@ export function ExerciseCard({
                 <button
                   onClick={() => setShowDetail(true)}
                   className={cn(
-                    'text-[15px] leading-snug text-left underline decoration-dashed underline-offset-4',
+                    'text-left underline decoration-dashed underline-offset-4',
                     status === 'skipped' && 'opacity-50',
                     status === 'complete' && 'line-through opacity-60'
                   )}
                   style={{
-                    color: status === 'skipped' ? 'var(--dim)' : 'var(--accent)',
+                    fontSize: 17, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.25,
+                    color: status === 'skipped' ? 'var(--ink-faint)' : 'var(--ink)',
                     // Visible enough to read as tappable on both themes.
-                    textDecorationColor: 'var(--muted)',
+                    textDecorationColor: 'var(--ink-off)',
                   }}
                   aria-label={`How to perform ${displayName}`}
                 >
                   {displayName}
                 </button>
                 {exerciseState.addedFrom && (
-                  <span className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
+                  <span className="uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', color: 'var(--ink-faint)' }}>
                     +{exerciseState.addedFrom}
                   </span>
                 )}
                 {coached && (
                   <span
-                    className="text-[9px] uppercase tracking-widest border rounded-[2px] px-1.5 py-0.5"
-                    style={{ color: 'var(--muted)', borderColor: 'var(--border-strong)' }}
+                    className="uppercase"
+                    style={{
+                      fontSize: 11, letterSpacing: '0.08em', padding: '2px 8px',
+                      borderRadius: 'var(--r-pill)', border: '1px solid var(--hairline)',
+                      color: 'var(--ink-dim)',
+                    }}
                   >
                     Pronit coaches
                   </span>
                 )}
                 {hasWarning && (
                   <span
-                    className="flex items-center gap-0.5 text-[9px] uppercase tracking-widest border rounded-[2px] px-1.5 py-0.5"
-                    style={{ color: '#ca8a04', borderColor: 'rgba(161,98,7,0.5)' }}
+                    className="flex items-center gap-1 uppercase"
+                    style={{
+                      fontSize: 11, letterSpacing: '0.08em', padding: '2px 8px',
+                      borderRadius: 'var(--r-pill)',
+                      color: 'var(--violet-100)', border: '1px solid rgba(167,139,250,0.35)',
+                    }}
                   >
-                    <Zap size={9} />
+                    <Zap size={10} />
                     Drummer
                   </span>
                 )}
@@ -150,7 +159,7 @@ export function ExerciseCard({
 
               {/* Prescription / muscle label */}
               {(target || muscle) && (
-                <div className="text-[11px] mt-0.5 uppercase tracking-widest" style={{ color: 'var(--muted)' }}>
+                <div className="uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', color: 'var(--ink-dim)', marginTop: 4 }}>
                   {target}
                   {muscle && <span className="ml-2 normal-case capitalize">{muscle}</span>}
                 </div>
@@ -159,8 +168,12 @@ export function ExerciseCard({
               {/* Add-load suggestion, once the plan's rule is met */}
               {progression && status !== 'skipped' && (
                 <div
-                  className="text-[12px] mt-1.5 px-2 py-1 rounded-[2px] inline-block"
-                  style={{ color: 'var(--complete-text)', border: '1px solid var(--complete-border)' }}
+                  className="inline-block"
+                  style={{
+                    marginTop: 8, padding: '3px 10px', borderRadius: 'var(--r-pill)',
+                    fontSize: 11, color: 'var(--complete-text)',
+                    border: '1px solid var(--complete-border)',
+                  }}
                 >
                   Try {displayLb(progression.nextKg)} lb today — you hit the top of the range twice at{' '}
                   {displayLb(progression.currentKg)} lb
@@ -170,8 +183,10 @@ export function ExerciseCard({
               {/* Coaching cue from the plan */}
               {cue && status !== 'skipped' && (
                 <p
-                  className="text-[13px] leading-snug mt-1.5 pl-2.5"
-                  style={{ color: 'var(--muted)', borderLeft: '1px solid var(--border-strong)' }}
+                  style={{
+                    fontSize: 13, lineHeight: 1.5, marginTop: 8, paddingLeft: 10,
+                    color: 'var(--ink-dim)', borderLeft: '2px solid rgba(167,139,250,0.35)',
+                  }}
                 >
                   {cue}
                 </p>
@@ -211,10 +226,13 @@ export function ExerciseCard({
           {/* Remove confirmation */}
           {confirmRemove && (
             <div
-              className="mt-2.5 p-2.5 rounded-[2px] space-y-2"
-              style={{ border: '1px solid var(--skip-border)', background: 'rgba(127,29,29,0.08)' }}
+              className="space-y-2"
+              style={{
+                marginTop: 10, padding: 12, borderRadius: 'var(--r-inset)',
+                border: '1px solid var(--skip-border)', background: 'var(--skip-bg)',
+              }}
             >
-              <p className="text-[13px]" style={{ color: 'var(--accent)' }}>
+              <p style={{ fontSize: 13, color: 'var(--ink-2)' }}>
                 Remove {displayName} from this day?
                 {exerciseState.sets.length > 0 && (
                   <span style={{ color: 'var(--skip-text)' }}>
@@ -226,15 +244,23 @@ export function ExerciseCard({
               <div className="flex gap-2">
                 <button
                   onClick={() => setConfirmRemove(false)}
-                  className="px-3 py-1.5 text-[12px] uppercase tracking-widest rounded-[2px] transition-opacity hover:opacity-70"
-                  style={{ border: '1px solid var(--border-strong)', color: 'var(--muted)' }}
+                  className="uppercase transition-opacity hover:opacity-70"
+                  style={{
+                    padding: '7px 14px', borderRadius: 'var(--r-control)',
+                    fontSize: 11, fontWeight: 500, letterSpacing: '0.08em',
+                    border: '1px solid var(--hairline)', color: 'var(--ink-dim)',
+                  }}
                 >
                   Cancel
                 </button>
                 <button
                   onClick={onRemoveExercise}
-                  className="px-3 py-1.5 text-[12px] uppercase tracking-widest rounded-[2px] transition-opacity hover:opacity-70"
-                  style={{ border: '1px solid var(--skip-border)', color: 'var(--skip-text)' }}
+                  className="uppercase transition-opacity hover:opacity-70"
+                  style={{
+                    padding: '7px 14px', borderRadius: 'var(--r-control)',
+                    fontSize: 11, fontWeight: 500, letterSpacing: '0.08em',
+                    border: '1px solid var(--skip-border)', color: 'var(--skip-text)',
+                  }}
                   aria-label={`Confirm remove ${displayName}`}
                 >
                   Remove
@@ -249,16 +275,24 @@ export function ExerciseCard({
               <>
                 <button
                   onClick={() => onStatusChange('complete')}
-                  className="px-3 py-1 text-[10px] uppercase tracking-widest rounded-[2px] transition-opacity hover:opacity-70"
-                  style={{ border: '1px solid var(--complete-border)', color: 'var(--complete-text)' }}
+                  className="uppercase transition-opacity hover:opacity-70"
+                  style={{
+                    padding: '6px 12px', borderRadius: 'var(--r-control)',
+                    fontSize: 11, fontWeight: 500, letterSpacing: '0.08em',
+                    border: '1px solid var(--complete-border)', color: 'var(--complete-text)',
+                  }}
                   aria-label={`Complete ${displayName}`}
                 >
                   Complete
                 </button>
                 <button
                   onClick={() => onStatusChange('skipped')}
-                  className="px-3 py-1 text-[10px] uppercase tracking-widest rounded-[2px] transition-opacity hover:opacity-70"
-                  style={{ border: '1px solid var(--skip-border)', color: 'var(--skip-text)' }}
+                  className="uppercase transition-opacity hover:opacity-70"
+                  style={{
+                    padding: '7px 14px', borderRadius: 'var(--r-control)',
+                    fontSize: 11, fontWeight: 500, letterSpacing: '0.08em',
+                    border: '1px solid var(--skip-border)', color: 'var(--skip-text)',
+                  }}
                   aria-label={`Skip ${displayName}`}
                 >
                   Skip
@@ -268,8 +302,12 @@ export function ExerciseCard({
             {(status === 'complete' || status === 'skipped') && (
               <button
                 onClick={() => onStatusChange('pending')}
-                className="px-3 py-1 text-[10px] uppercase tracking-widest rounded-[2px] transition-opacity hover:opacity-70"
-                style={{ border: '1px solid var(--border-strong)', color: 'var(--muted)' }}
+                className="uppercase transition-opacity hover:opacity-70"
+                style={{
+                  padding: '6px 12px', borderRadius: 'var(--r-control)',
+                  fontSize: 11, fontWeight: 500, letterSpacing: '0.08em',
+                  border: '1px solid var(--hairline)', color: 'var(--ink-dim)',
+                }}
                 aria-label={`Undo ${displayName}`}
               >
                 Undo
