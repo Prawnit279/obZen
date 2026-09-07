@@ -25,7 +25,7 @@ export default {
         },
       },
       fontFamily: {
-        sans: ['Inter', 'system-ui', 'sans-serif'],
+        sans: ['Satoshi', 'Inter', 'system-ui', 'sans-serif'],
       },
       fontSize: {
         label: ['11px', { letterSpacing: '0.08em', lineHeight: '1.4' }],

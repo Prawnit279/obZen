@@ -68,7 +68,13 @@ export function WeekStrip() {
               >
                 {weekday}
               </span>
-              <span className="text-[13px] tabular-nums" style={{ color: isToday ? 'var(--accent)' : 'var(--dim)' }}>
+              <span
+                className="text-[13px]"
+                style={{
+                  color: isToday ? 'var(--ink)' : 'var(--ink-dim)',
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
                 {d.getDate()}
               </span>
             </div>
@@ -80,11 +86,15 @@ export function WeekStrip() {
             return (
               <div
                 key={iso}
-                className="flex items-center justify-between gap-2 py-2 px-2 rounded-[2px]"
-                style={{ background: isToday ? 'var(--elevated)' : 'transparent' }}
+                className="flex items-center justify-between gap-2 py-2 px-2"
+                style={{
+                  borderRadius: 'var(--r-inset)',
+                  background: isToday ? 'rgba(255,255,255,0.035)' : 'transparent',
+                }}
               >
                 {dayCol}
-                <span className="text-[12px]" style={{ color: 'var(--dim)' }}>—</span>
+                {/* Absence is information — kept visible, at the ghost weight. */}
+                <span className="text-[12px]" style={{ color: 'var(--ink-ghost)' }}>—</span>
               </div>
             )
           }
@@ -93,12 +103,16 @@ export function WeekStrip() {
             <button
               key={iso}
               onClick={() => navigate(`/workout/session/${session.id}`)}
-              className="w-full flex items-center justify-between py-2 px-2 rounded-[2px] text-left transition-opacity hover:opacity-80"
-              style={{ background: isToday ? 'var(--elevated)' : 'transparent', border: '1px solid var(--border)' }}
+              className="w-full flex items-center justify-between py-2 px-2 text-left transition-opacity hover:opacity-80"
+              style={{
+                borderRadius: 'var(--r-inset)',
+                background: isToday ? 'rgba(255,255,255,0.035)' : 'transparent',
+                border: '1px solid var(--hairline-soft)',
+              }}
             >
               {dayCol}
               <div className="flex-1 min-w-0 px-2">
-                <div className="text-[13px] truncate" style={{ color: 'var(--accent)' }}>
+                <div className="text-[13px] truncate" style={{ color: 'var(--ink-2)' }}>
                   {session.dayLabel}{session.focus ? ` · ${session.focus}` : ''}
                 </div>
                 <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>

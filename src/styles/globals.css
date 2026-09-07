@@ -4,61 +4,113 @@
 
 @layer base {
   /* ── Noircut base tokens (theme-invariant) ─────────────────────────── */
+  /* ── Restyle token system ────────────────────────────────────
+     Near-black ground, one violet accent family, gradient card surfaces, glow
+     reserved for live values. Defined once here; nothing outside this block
+     should carry a raw hex.
+
+     The legacy noircut names (--elevated, --border, --dim, --muted, --accent,
+     --white) are kept below as aliases onto the new scale. Screens migrate one
+     at a time, and an un-migrated screen still has to be legible on the new
+     ground — the aliases are what keep it so. They go when the last screen
+     lands. */
   :root {
-    /* Lifted one shade lighter than the original noircut for readability,
-       while staying firmly dark. Content greys (--dim/--muted) and --accent
-       are brightened for contrast; --white stays pure. */
-    --bg:            #0d0d0d;
-    --surface:       #161616;
-    --elevated:      #1e1e1e;
-    --border:        #323232;
-    --border-strong: #454545;
-    --dim:           #6f6f6f;
-    --muted:         #a6a6a6;
-    --accent:        #e2e2e2;
-    --white:         #ffffff;
-    --red:           #d24444;
+    /* ground */
+    --bg:            #06050A;
+    --surface:       #0A0810;
+    --card:          linear-gradient(155deg, rgba(255,255,255,0.055), rgba(255,255,255,0.018));
+    --card-accent:   linear-gradient(160deg, rgba(139,92,246,0.13) 0%, rgba(76,29,149,0.16) 38%, rgba(255,255,255,0.02) 72%, rgba(255,255,255,0.015) 100%);
+    --hairline:      rgba(255,255,255,0.07);
+    --hairline-soft: rgba(255,255,255,0.045);
 
-    /* Theme-variable tokens — defaults match Noircut */
-    --theme-primary:        #d4d4d4;
-    --theme-secondary:      #888888;
-    --theme-glow:           rgba(212,212,212,0.04);
-    --theme-border-active:  #d4d4d4;
-    --theme-text-active:    #ffffff;
+    /* accent — one hue, six steps */
+    --violet-100: #C4B5FD;   /* glow, live values, selected ring */
+    --violet-200: #A78BFA;   /* chart lines, primary gradient start */
+    --violet-400: #8B5CF6;   /* accent base */
+    --violet-600: #6D28D9;
+    --violet-700: #5B21B6;   /* primary gradient end */
+    --violet-900: #4C1D95;   /* deep end of card + tab gradients */
 
-    /* Fixed semantic tokens — never change with theme */
-    --complete-border: #166534;
-    --complete-text:   #86efac;
-    --complete-bg:     rgba(22, 101, 52, 0.08);
-    --skip-border:     #7f1d1d;
-    --skip-text:       #fca5a5;
-    --skip-bg:         rgba(127, 29, 29, 0.06);
+    /* ink — body copy sits at --ink-dim or lighter; --ink-off is for 10–11px
+       labels only; --ink-ghost marks future/untracked slots and is never text
+       the reader needs. */
+    --ink:       #F2F0F7;
+    --ink-2:     #CFC9DE;
+    --ink-dim:   #A29DB4;
+    --ink-faint: #837D96;
+    --ink-off:   #6E6980;
+    --ink-ghost: #4B4757;
 
-    /* Muscle map — dark purple marks the primary mover, navy blue the
-       assisting muscles. Both are also named in the legend, so meaning never
-       rests on colour alone. */
-    --muscle-primary:   #7c3aed;
-    --muscle-secondary: #1e40af;
-    --muscle-body:      #3f3f46;
-    --muscle-outline:   #52525b;
-    /* Iron stays neutral: purple and blue already mean "muscle worked". */
-    --equip-iron:       #8b8f98;
-    --equip-plate:      #6b7079;
+    /* per-lift hues — fixed assignment, kept wherever the lift appears */
+    --lift-squat:    #A78BFA;
+    --lift-deadlift: #6366F1;
+    --lift-bench:    #C084FC;
+    --lift-row:      #22D3EE;
+    --lift-core:     #F472B6;
 
-    /* Chart series — distinct hues, tuned for a dark surface. Dash patterns
-       still differ per series, so colour is reinforcement, not the only cue. */
-    --series-1: #6ea8fe;
-    --series-2: #7ee2a8;
-    --series-3: #f2b366;
-    --series-4: #d99ae8;
-    --series-5: #67d4d4;
-    --series-6: #f28b8b;
+    /* semantic */
+    --ok:  #86EFAC;
+    --red: #F87171;
 
-    --duration-fast:   150ms;
-    --duration-normal: 300ms;
-    --ease-out-expo:   cubic-bezier(0.16, 1, 0.3, 1);
+    /* geometry */
+    --r-card:    22px;
+    --r-inset:   14px;
+    --r-control: 12px;
+    --r-bar:     6px;
+    --r-pill:    999px;
 
-    /* Native controls (date/time pickers, scrollbars) follow the theme. */
+    /* motion */
+    --t-fast:  160ms;
+    --t-base:  200ms;
+    --t-sheet: 300ms;
+    --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+
+    /* ── legacy noircut aliases — removed as screens migrate ─────────── */
+    --elevated:      #120F1A;
+    --border:        var(--hairline);
+    --border-strong: rgba(255,255,255,0.13);
+    --dim:           var(--ink-off);
+    --muted:         var(--ink-dim);
+    --accent:        var(--ink);
+    --white:         #FFFFFF;
+
+    --theme-primary:       var(--violet-400);
+    --theme-secondary:     var(--violet-700);
+    --theme-glow:          rgba(139,92,246,0.07);
+    --theme-border-active: var(--violet-200);
+    --theme-text-active:   #FFFFFF;
+
+    /* Set state — kept semantic rather than folded into the violet family, so
+       done and skipped never read as "selected". */
+    --complete-border: #2F6D4A;
+    --complete-text:   var(--ok);
+    --complete-bg:     rgba(47,109,74,0.10);
+    --skip-border:     #7F1D1D;
+    --skip-text:       #FCA5A5;
+    --skip-bg:         rgba(127,29,29,0.08);
+
+    /* Muscle map — purple primary, blue assisting, both named in the legend so
+       meaning never rests on colour. */
+    --muscle-primary:   var(--violet-400);
+    --muscle-secondary: #4F46E5;
+    --muscle-body:      #2A2536;
+    --muscle-outline:   #453E56;
+    --equip-iron:       #8B8F98;
+    --equip-plate:      #6B7079;
+
+    /* Chart series — the per-lift hues, so a lift keeps its colour in every
+       chart it appears in. */
+    --series-1: var(--lift-squat);
+    --series-2: var(--lift-deadlift);
+    --series-3: var(--lift-bench);
+    --series-4: var(--lift-row);
+    --series-5: var(--lift-core);
+    --series-6: #FBBF24;
+
+    --duration-fast:   var(--t-fast);
+    --duration-normal: var(--t-base);
+    --ease-out-expo:   var(--ease-out);
+
     color-scheme: dark;
   }
 
@@ -113,18 +165,10 @@
     color-scheme: light;
   }
 
-  /* ── Theme: Noircut (default — same as :root) ──────────────────────── */
-  [data-theme="noircut"] {
-    --bg:      #0d0d0d;
-    --surface: #161616;
-    --elevated:#1e1e1e;
-    --border:  #323232;
-    --theme-primary:       #e2e2e2;
-    --theme-secondary:     #a6a6a6;
-    --theme-glow:          rgba(226,226,226,0.05);
-    --theme-border-active: #e2e2e2;
-    --theme-text-active:   #ffffff;
-  }
+  /* ── Theme: Noircut (default) ───────────────────────────────
+     Inherits the restyle tokens instead of overriding them. Kept as a
+     registered id so the stored preference and the switcher keep working. */
+  [data-theme="noircut"] { color-scheme: dark; }
 
   /* ── Theme: Crimson ─────────────────────────────────────────────────── */
   [data-theme="crimson"] {
@@ -200,9 +244,11 @@
     overflow: hidden;
     background-color: var(--bg);
     color: var(--accent);
-    font-family: 'Inter', system-ui, sans-serif;
+    font-family: 'Satoshi', 'Inter', system-ui, sans-serif;
     font-size: 15px;
-    line-height: 1.65;
+    line-height: 1.55;
+    /* Values must not jitter when a range switches. */
+    font-variant-numeric: tabular-nums;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
@@ -289,6 +335,9 @@
 
   .page-container {
     @apply flex-1 overflow-y-auto px-4 pb-24 md:pb-4;
+    /* Without this a flex:1 column will not shrink below its content, so an
+       expand-in-place silently clips what follows and offers no scrollbar. */
+    min-height: 0;
     /* Clear the device status bar / notch (viewport-fit=cover) so top content
        like the back arrow isn't overlapped. Falls back to 1rem when there's
        no inset. */
@@ -298,6 +347,26 @@
   .section-title {
     @apply text-[11px] uppercase tracking-widest mb-3;
     color: var(--muted);
+  }
+}
+
+/* Keyboard focus is never removed. Tailwind's preflight and the app's own
+   `focus:outline-none` both strip it, so it is restored here at the token
+   colour for every focusable thing. Pointer focus stays quiet. */
+:focus-visible {
+  outline: 2px solid rgba(139, 92, 246, 0.4);
+  outline-offset: 2px;
+  border-radius: inherit;
+}
+
+/* Motion is opt-out at the root: every transition in the app is colour, opacity
+   or transform, and all of them stop here when the viewer asks for less. */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    transition: none !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
   }
 }
 

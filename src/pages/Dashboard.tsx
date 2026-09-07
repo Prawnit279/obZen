@@ -27,7 +27,6 @@ import { MacroComplianceChart } from '@/components/modules/dashboard/MacroCompli
 import { ProgressOverloadChart } from '@/components/modules/dashboard/ProgressOverloadChart'
 import { useNavigate } from 'react-router-dom'
 import { Zap, AlertTriangle, Flame, Plus, Edit2 } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 type DashTab = 'today' | 'weekly'
 
@@ -111,30 +110,62 @@ export default function Dashboard() {
       {/* Header */}
       <div className="pt-2">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-[11px] uppercase tracking-widest text-noir-muted">{dayOfWeek()}</span>
-          {/* Profile switcher */}
-          <div className="flex gap-1">
-            {PROFILE_IDS.map(id => (
-              <button
-                key={id}
-                onClick={() => setActive(id)}
-                className={cn(
-                  'px-2.5 py-1 rounded-[2px] text-[10px] uppercase tracking-widest transition-colors border',
-                  id === activeId
-                    ? 'border-noir-accent text-noir-white bg-noir-elevated'
-                    : 'border-noir-border text-noir-dim hover:text-noir-muted'
-                )}
-                aria-pressed={id === activeId}
-              >
-                {PROFILES[id].name}
-              </button>
-            ))}
+          <span
+            className="uppercase"
+            style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+          >
+            {dayOfWeek()}
+          </span>
+          {/* Profile switcher — segmented pill */}
+          <div
+            role="group"
+            aria-label="Active profile"
+            className="flex"
+            style={{
+              gap: 2, padding: 2,
+              borderRadius: 'var(--r-pill)',
+              background: 'rgba(255,255,255,0.05)',
+            }}
+          >
+            {PROFILE_IDS.map(id => {
+              const on = id === activeId
+              return (
+                <button
+                  key={id}
+                  onClick={() => setActive(id)}
+                  aria-pressed={on}
+                  className="transition-colors"
+                  style={{
+                    padding: '6px 12px',
+                    border: 'none',
+                    cursor: 'pointer',
+                    borderRadius: 'var(--r-pill)',
+                    fontSize: 11,
+                    fontWeight: 500,
+                    letterSpacing: '0.03em',
+                    background: on
+                      ? 'linear-gradient(140deg, var(--violet-400), var(--violet-900))'
+                      : 'transparent',
+                    color: on ? '#FFFFFF' : 'var(--ink-faint)',
+                    boxShadow: on ? '0 2px 14px rgba(76,29,149,0.6)' : 'none',
+                  }}
+                >
+                  {PROFILES[id].name}
+                </button>
+              )
+            })}
           </div>
         </div>
-        <div className="text-[18px] uppercase tracking-wide text-noir-white leading-tight mt-1">
+        <h1
+          className="mt-1"
+          style={{
+            fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em',
+            lineHeight: 1.1, color: 'var(--ink)',
+          }}
+        >
           {formatDateLong(new Date())}
-        </div>
-        <div className="text-[13px] text-noir-muted mt-0.5">
+        </h1>
+        <div style={{ fontSize: 13, color: 'var(--ink-dim)', marginTop: 2 }}>
           {PROFILES[activeId].name}'s day
         </div>
         <div className="flex items-center gap-3 mt-1 flex-wrap">
@@ -150,25 +181,49 @@ export default function Dashboard() {
             </>
           )}
           {isPittaSeasonPeak() && (
-            <Badge variant="red" className="text-[9px]">Pitta Season</Badge>
+            <Badge variant="red">Pitta Season</Badge>
           )}
         </div>
       </div>
 
       {/* Tab selector */}
-      <div className="flex border border-noir-border rounded-[2px] overflow-hidden">
-        {(['today', 'weekly'] as DashTab[]).map(t => (
-          <button
-            key={t}
-            onClick={() => setDashTab(t)}
-            className={cn(
-              'flex-1 py-2 text-[10px] uppercase tracking-widest transition-colors border-r border-noir-border last:border-r-0',
-              dashTab === t ? 'bg-noir-elevated text-noir-white' : 'text-noir-dim hover:text-noir-muted hover:bg-noir-elevated/30'
-            )}
-          >
-            {t}
-          </button>
-        ))}
+      <div
+        role="group"
+        aria-label="Dashboard range"
+        className="flex"
+        style={{
+          gap: 2, padding: 2,
+          borderRadius: 'var(--r-pill)',
+          background: 'rgba(255,255,255,0.05)',
+        }}
+      >
+        {(['today', 'weekly'] as DashTab[]).map(t => {
+          const on = dashTab === t
+          return (
+            <button
+              key={t}
+              onClick={() => setDashTab(t)}
+              aria-pressed={on}
+              className="flex-1 capitalize transition-colors"
+              style={{
+                padding: '6px 12px',
+                border: 'none',
+                cursor: 'pointer',
+                borderRadius: 'var(--r-pill)',
+                fontSize: 11,
+                fontWeight: 500,
+                letterSpacing: '0.03em',
+                background: on
+                  ? 'linear-gradient(140deg, var(--violet-400), var(--violet-900))'
+                  : 'transparent',
+                color: on ? '#FFFFFF' : 'var(--ink-faint)',
+                boxShadow: on ? '0 2px 14px rgba(76,29,149,0.6)' : 'none',
+              }}
+            >
+              {t}
+            </button>
+          )
+        })}
       </div>
 
       {dashTab === 'weekly' && <WeeklySummaryTab />}
@@ -179,11 +234,17 @@ export default function Dashboard() {
       {(showForearmWarning || showRestWarning || (SHOW_ASTROLOGY && isSaturday())) && (
         <div className="space-y-2">
           {showRestWarning && (
-            <div className="flex items-start gap-2 p-3 border border-noir-red/40 rounded-[2px] bg-noir-red/5">
-              <AlertTriangle size={14} className="text-noir-red mt-0.5 shrink-0" />
+            <div
+              className="flex items-start gap-2"
+              style={{
+                padding: '12px 14px', borderRadius: 'var(--r-inset)',
+                border: '1px solid rgba(248,113,113,0.32)', background: 'rgba(248,113,113,0.06)',
+              }}
+            >
+              <AlertTriangle size={14} style={{ color: 'var(--red)' }} className="mt-0.5 shrink-0" />
               <div>
-                <div className="text-[10px] uppercase tracking-widest text-noir-red mb-0.5">Low Readiness</div>
-                <div className="text-[12px] text-noir-muted">
+                <div className="uppercase" style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', marginBottom: 2, color: 'var(--red)' }}>Low Readiness</div>
+                <div style={{ fontSize: 13, color: 'var(--ink-dim)' }}>
                   {checkIn?.soreness === 'high' && 'High soreness. '}
                   {checkIn && checkIn.energy <= 2 && 'Low energy. '}
                   Consider yoga or rest only today.
@@ -192,20 +253,32 @@ export default function Dashboard() {
             </div>
           )}
           {showForearmWarning && (
-            <div className="flex items-start gap-2 p-3 border border-yellow-700/40 rounded-[2px] bg-yellow-900/5">
-              <Zap size={14} className="text-yellow-600 mt-0.5 shrink-0" />
+            <div
+              className="flex items-start gap-2"
+              style={{
+                padding: '12px 14px', borderRadius: 'var(--r-inset)',
+                border: '1px solid rgba(167,139,250,0.30)', background: 'rgba(139,92,246,0.07)',
+              }}
+            >
+              <Zap size={14} style={{ color: 'var(--violet-100)' }} className="mt-0.5 shrink-0" />
               <div>
-                <div className="text-[10px] uppercase tracking-widest text-yellow-600 mb-0.5">Forearm Fatigue</div>
-                <div className="text-[12px] text-noir-muted">Reduce pull-up volume. Skip Hammer Curls.</div>
+                <div className="uppercase" style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', marginBottom: 2, color: 'var(--violet-100)' }}>Forearm Fatigue</div>
+                <div style={{ fontSize: 13, color: 'var(--ink-dim)' }}>Reduce pull-up volume. Skip Hammer Curls.</div>
               </div>
             </div>
           )}
           {SHOW_ASTROLOGY && isSaturday() && (
-            <div className="flex items-start gap-2 p-3 border border-noir-border rounded-[2px]">
-              <Flame size={14} className="text-noir-muted mt-0.5 shrink-0" />
+            <div
+              className="flex items-start gap-2"
+              style={{
+                padding: '12px 14px', borderRadius: 'var(--r-inset)',
+                border: '1px solid var(--hairline)',
+              }}
+            >
+              <Flame size={14} style={{ color: 'var(--ink-dim)' }} className="mt-0.5 shrink-0" />
               <div>
-                <div className="text-[10px] uppercase tracking-widest text-noir-accent mb-0.5">Saturn Day</div>
-                <div className="text-[12px] text-noir-muted">Om Shani Namaha · Service · No new starts.</div>
+                <div className="uppercase" style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', marginBottom: 2, color: 'var(--ink-2)' }}>Saturn Day</div>
+                <div style={{ fontSize: 13, color: 'var(--ink-dim)' }}>Om Shani Namaha · Service · No new starts.</div>
               </div>
             </div>
           )}
@@ -216,15 +289,29 @@ export default function Dashboard() {
       {!checkIn ? (
         <button
           onClick={() => setCheckInOpen(true)}
-          className="w-full border border-dashed border-noir-border rounded-[2px] py-4 text-[11px] uppercase tracking-widest text-noir-dim hover:border-noir-strong hover:text-noir-muted transition-colors flex items-center justify-center gap-2"
+          className="w-full uppercase transition-colors flex items-center justify-center gap-2"
+          style={{
+            border: '1px dashed var(--hairline)',
+            borderRadius: 'var(--r-card)',
+            padding: '16px 0',
+            fontSize: 11,
+            fontWeight: 500,
+            letterSpacing: '0.12em',
+            color: 'var(--ink-faint)',
+          }}
         >
           <Plus size={13} />
           Log today's check-in
         </button>
       ) : (
         <Card>
-          <div className="flex items-center justify-between mb-3">
-            <span className="text-[10px] uppercase tracking-widest text-noir-muted">Today's Check-in</span>
+          <div className="flex items-center justify-between">
+            <span
+              className="uppercase"
+              style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+            >
+              Today's Check-in
+            </span>
             <button
               onClick={() => setCheckInOpen(true)}
               className="text-noir-dim hover:text-noir-muted transition-colors"
@@ -235,22 +322,27 @@ export default function Dashboard() {
           </div>
           <div className="grid grid-cols-4 gap-2">
             <div className="text-center">
-              <div className="text-[20px] text-noir-white leading-none">{checkIn.mood}</div>
-              <div className="text-[9px] uppercase tracking-widest text-noir-dim mt-1">Mood</div>
+              <div style={{ fontSize: 20, fontWeight: 700, lineHeight: 1, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{checkIn.mood}</div>
+              <div className="uppercase" style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', color: 'var(--ink-faint)', marginTop: 6 }}>Mood</div>
             </div>
             <div className="text-center">
-              <div className="text-[20px] text-noir-white leading-none">{checkIn.energy}</div>
-              <div className="text-[9px] uppercase tracking-widest text-noir-dim mt-1">Energy</div>
+              <div style={{ fontSize: 20, fontWeight: 700, lineHeight: 1, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{checkIn.energy}</div>
+              <div className="uppercase" style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', color: 'var(--ink-faint)', marginTop: 6 }}>Energy</div>
             </div>
             <div className="text-center">
-              <div className="text-[13px] text-noir-accent capitalize leading-none mt-1">{checkIn.soreness}</div>
-              <div className="text-[9px] uppercase tracking-widest text-noir-dim mt-1.5">Soreness</div>
+              <div className="capitalize" style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.35, color: 'var(--ink-2)' }}>
+                {checkIn.soreness}
+              </div>
+              <div className="uppercase" style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', color: 'var(--ink-faint)', marginTop: 6 }}>Soreness</div>
             </div>
             <div className="text-center">
-              <div className={`text-[13px] leading-none mt-1 ${checkIn.forearmFatigue ? 'text-yellow-500' : 'text-noir-dim'}`}>
+              <div style={{
+                fontSize: 15, fontWeight: 500, lineHeight: 1.35,
+                color: checkIn.forearmFatigue ? 'var(--violet-100)' : 'var(--ink-faint)',
+              }}>
                 {checkIn.forearmFatigue ? 'Yes' : 'No'}
               </div>
-              <div className="text-[9px] uppercase tracking-widest text-noir-dim mt-1.5">Forearm</div>
+              <div className="uppercase" style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', color: 'var(--ink-faint)', marginTop: 6 }}>Forearm</div>
             </div>
           </div>
         </Card>
@@ -258,20 +350,28 @@ export default function Dashboard() {
 
       {/* Today's workout */}
       <Card
-        className="cursor-pointer hover:border-noir-strong transition-colors"
+        elevated
+        className="cursor-pointer transition-colors"
         onClick={() => navigate('/workout')}
       >
         <CardHeader label="Today's Workout" />
         {program ? (
-          <>
-            <div className="text-[13px] text-noir-accent">{programDayLabel}</div>
-            <div className="text-[11px] text-noir-muted mt-0.5">{program.focus}</div>
-            <div className="text-[10px] uppercase tracking-widest text-noir-dim mt-2">
+          <div className="flex flex-col" style={{ gap: 6 }}>
+            <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
+              {programDayLabel}
+            </div>
+            <div style={{ fontSize: 13, color: 'var(--ink-dim)' }}>{program.focus}</div>
+            <div
+              className="uppercase"
+              style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', color: 'var(--ink-faint)' }}
+            >
               {program.exercises.length} exercises · tap to start
             </div>
-          </>
+          </div>
         ) : (
-          <div className="text-[15px] text-noir-accent">{programDayLabel}</div>
+          <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
+            {programDayLabel}
+          </div>
         )}
       </Card>
 
@@ -304,16 +404,18 @@ export default function Dashboard() {
       {/* Ayurveda tip */}
       <Card>
         <CardHeader label="Ayurveda · Today" />
-        <p className="text-[13px] text-noir-muted leading-relaxed">{dailyTip}</p>
+        <p style={{ fontSize: 13, lineHeight: 1.55, color: 'var(--ink-dim)' }}>{dailyTip}</p>
       </Card>
 
       {/* Vedic remedy */}
       {SHOW_VEDIC && (
         <Card>
           <CardHeader label={`Vedic · ${dailyRemedy.planet}`} />
-          <p className="text-[13px] text-noir-accent italic leading-relaxed">"{dailyRemedy.affirmation}"</p>
+          <p style={{ fontSize: 13, lineHeight: 1.55, fontStyle: 'italic', color: 'var(--ink-2)' }}>
+            "{dailyRemedy.affirmation}"
+          </p>
           {dailyRemedy.remedies[0] && (
-            <p className="text-[12px] text-noir-muted mt-2">{dailyRemedy.remedies[0]}</p>
+            <p style={{ fontSize: 13, color: 'var(--ink-dim)' }}>{dailyRemedy.remedies[0]}</p>
           )}
         </Card>
       )}
