@@ -11,17 +11,23 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
   fullWidth?: boolean
 }
 
+/**
+ * `primary` is the one variant that fills — it takes the accent gradient and
+ * should appear at most once per screen. Everything else is an outline on the
+ * hairline, so a screen never reads as having several equal calls to action.
+ */
 const variantClasses: Record<Variant, string> = {
-  default: 'border-noir-border text-noir-accent hover:border-noir-strong hover:text-noir-white bg-transparent',
-  primary: 'border-noir-accent text-noir-bg bg-noir-accent hover:bg-noir-white hover:border-noir-white',
-  ghost: 'border-transparent text-noir-muted hover:text-noir-accent bg-transparent',
-  danger: 'border-noir-red text-noir-red hover:bg-noir-red hover:text-noir-white bg-transparent',
+  default: 'border-[color:var(--hairline)] text-[color:var(--ink-2)] hover:border-[color:var(--border-strong)] hover:text-[color:var(--ink)] bg-transparent',
+  primary: 'border-transparent text-[#0A0810] bg-gradient-to-br from-[color:var(--violet-200)] to-[color:var(--violet-700)] shadow-[0_8px_26px_rgba(124,58,237,0.42)] active:scale-[0.98]',
+  ghost: 'border-transparent text-[color:var(--ink-dim)] hover:text-[color:var(--ink)] bg-transparent',
+  danger: 'border-[color:var(--skip-border)] text-[color:var(--skip-text)] hover:bg-[color:var(--skip-bg)] bg-transparent',
 }
 
+/** `sm` sits at the 11px floor rather than below it. */
 const sizeClasses: Record<Size, string> = {
-  sm: 'px-2 py-1 text-[10px]',
-  md: 'px-3 py-1.5 text-[12px]',
-  lg: 'px-4 py-2 text-[13px]',
+  sm: 'px-3 py-1.5 text-[11px]',
+  md: 'px-4 py-2 text-[12px]',
+  lg: 'px-5 py-2.5 text-[13px]',
 }
 
 export function Button({
@@ -36,7 +42,7 @@ export function Button({
   return (
     <button
       className={cn(
-        'border rounded-[2px] uppercase tracking-widest font-normal transition-colors duration-150 cursor-pointer',
+        'border rounded-[var(--r-control)] uppercase tracking-widest font-medium transition-all duration-150 cursor-pointer',
         variantClasses[variant],
         sizeClasses[size],
         fullWidth && 'w-full',

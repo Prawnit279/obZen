@@ -7,10 +7,8 @@ export function ThemeSwitcher() {
 
   return (
     <div className="space-y-3">
-      <div className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--muted)' }}>
-        Appearance
-      </div>
-
+      {/* No heading here — every caller already labels the section, and two
+          "Appearance" headings stacked was the result. */}
       <div className="flex items-center gap-4 flex-wrap">
         {THEMES.map(theme => {
           const isActive = activeTheme === theme.id
@@ -24,10 +22,11 @@ export function ThemeSwitcher() {
             >
               {/* Swatch circle */}
               <div
-                className="rounded-full flex items-center justify-center"
+                className="flex items-center justify-center"
                 style={{
-                  width: 32,
-                  height: 32,
+                  width: 34,
+                  height: 34,
+                  borderRadius: 'var(--r-pill)',
                   background: theme.dot,
                   border: `1px solid ${theme.borderActive}`,
                   boxShadow: isActive
@@ -37,10 +36,10 @@ export function ThemeSwitcher() {
               >
                 {/* Center dot */}
                 <div
-                  className="rounded-full"
                   style={{
-                    width: 8,
-                    height: 8,
+                    width: 10,
+                    height: 10,
+                    borderRadius: 'var(--r-pill)',
                     background: theme.borderActive,
                     opacity: isActive ? 1 : 0.5,
                   }}
@@ -49,10 +48,13 @@ export function ThemeSwitcher() {
 
               {/* Label — only under active swatch */}
               <span
-                className="text-[9px] uppercase tracking-widest"
-                style={{ color: isActive ? theme.textActive : 'var(--dim)' }}
+                className="uppercase"
+                style={{
+                  fontSize: 11, letterSpacing: '0.08em',
+                  color: isActive ? 'var(--ink)' : 'var(--ink-faint)',
+                }}
               >
-                {isActive ? theme.name : ''}
+                {theme.name}
               </span>
             </button>
           )

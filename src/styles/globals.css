@@ -114,53 +114,67 @@
     color-scheme: dark;
   }
 
-  /* ── Theme: Daylight (the one light theme) ──────────────────────────────
-     Token *roles* are unchanged, only their values invert: --accent stays
-     "primary text" and --white stays "strongest text", so both become dark
-     here. The names read oddly in isolation but keep every component that
-     uses them correct without edits. Semantic greens/reds are darkened —
-     the dark theme's pale mint/rose are unreadable on a light surface. */
+  /* ── Theme: Daylight ────────────────────────────────────────
+     The one light theme, and the only one that has to restate the whole
+     system: the ink scale inverts, the card gradient tints dark instead of
+     light, and the violet ramp darkens so an accent still reads on white.
+     Leaving any of these to the dark defaults puts near-white ink on a
+     near-white ground. */
   [data-theme="light"] {
-    --bg:            #f4f4f5;
-    --surface:       #ffffff;
-    --elevated:      #ebebed;
-    --border:        #dcdce0;
-    --border-strong: #b6b6bd;
-    --dim:           #86868f;
-    --muted:         #5a5a64;
-    --accent:        #1c1c21;
-    --white:         #0a0a0d;
-    --red:           #c62828;
+    --bg:            #F4F4F7;
+    --surface:       #FFFFFF;
+    --card:          linear-gradient(155deg, rgba(22,18,31,0.045), rgba(22,18,31,0.015));
+    --card-accent:   linear-gradient(160deg, rgba(139,92,246,0.14) 0%, rgba(109,40,217,0.10) 40%, rgba(22,18,31,0.02) 74%, rgba(22,18,31,0.015) 100%);
+    --hairline:      rgba(22,18,31,0.11);
+    --hairline-soft: rgba(22,18,31,0.06);
 
-    --theme-primary:       #1c1c21;
-    --theme-secondary:     #5a5a64;
-    --theme-glow:          rgba(0,0,0,0.04);
-    --theme-border-active: #1c1c21;
-    --theme-text-active:   #0a0a0d;
+    /* Accent darkens: --violet-100 marks live values, so on white it has to be
+       the strongest of the ramp rather than the palest. */
+    --violet-100: #5B21B6;
+    --violet-200: #6D28D9;
+    --violet-400: #7C3AED;
+    --violet-600: #6D28D9;
+    --violet-700: #5B21B6;
+    --violet-900: #4C1D95;
 
-    --complete-border: #2e7d32;
-    --complete-text:   #1b5e20;
-    --complete-bg:     rgba(46, 125, 50, 0.10);
-    --skip-border:     #c62828;
-    --skip-text:       #b71c1c;
-    --skip-bg:         rgba(198, 40, 40, 0.08);
+    --ink:       #16121F;
+    --ink-2:     #35304A;
+    --ink-dim:   #55506B;
+    --ink-faint: #6E6885;
+    --ink-off:   #857FA0;
+    --ink-ghost: #B7B2C6;
 
-    /* Muscle map — deeper on light so the shading still reads against a
-       lighter body silhouette. */
-    --muscle-primary:   #6d28d9;
-    --muscle-secondary: #1e3a8a;
-    --muscle-body:      #c4c4cc;
-    --muscle-outline:   #8a8a94;
-    --equip-iron:       #6b7079;
-    --equip-plate:      #4b5058;
+    /* Lift hues darken so they hold against white at 1.9px. */
+    --lift-squat:    #6D28D9;
+    --lift-deadlift: #3730A3;
+    --lift-bench:    #9333EA;
+    --lift-row:      #0E7490;
+    --lift-core:     #BE185D;
 
-    /* Chart series — same hues, darkened so they read on a light surface. */
-    --series-1: #1f5fbf;
-    --series-2: #1d7a4f;
-    --series-3: #a35c10;
-    --series-4: #7b3f9e;
-    --series-5: #0f6e6e;
-    --series-6: #b03b3b;
+    --ok:  #15803D;
+    --red: #B91C1C;
+
+    --complete-border: #15803D;
+    --complete-text:   #14532D;
+    --complete-bg:     rgba(21,128,61,0.10);
+    --skip-border:     #B91C1C;
+    --skip-text:       #991B1B;
+    --skip-bg:         rgba(185,28,28,0.08);
+
+    --muscle-primary:   #6D28D9;
+    --muscle-secondary: #3730A3;
+    --muscle-body:      #D6D3DE;
+    --muscle-outline:   #9A94A8;
+    --equip-iron:       #6B7079;
+    --equip-plate:      #4B5058;
+
+    /* Legacy aliases that are literals rather than pointers in :root, so they
+       do not follow the ink scale on their own. --white keeps its role of
+       "strongest text", which on a light ground is the darkest value — an
+       active nav label was rendering pure white on white without this. */
+    --white:         #0A0A0D;
+    --elevated:      #ECECF0;
+    --border-strong: rgba(22,18,31,0.20);
 
     color-scheme: light;
   }
@@ -172,55 +186,50 @@
 
   /* ── Theme: Crimson ─────────────────────────────────────────────────── */
   [data-theme="crimson"] {
-    --bg:      #0a0a0a;
-    --surface: #130a0a;
-    --elevated:#1a0d0d;
-    --border:  #2d1515;
-    --theme-primary:       #991b1b;
-    --theme-secondary:     #7f1d1d;
-    --theme-glow:          rgba(153,27,27,0.06);
-    --theme-border-active: #dc2626;
-    --theme-text-active:   #fca5a5;
+    --bg: #0A0506;
+    --violet-100: #FCA5A5;
+    --violet-200: #F87171;
+    --violet-400: #DC2626;
+    --violet-600: #B91C1C;
+    --violet-700: #991B1B;
+    --violet-900: #7F1D1D;
+    color-scheme: dark;
   }
 
   /* ── Theme: Void Purple ─────────────────────────────────────────────── */
   [data-theme="void"] {
-    --bg:      #0a0a0a;
-    --surface: #0d0a13;
-    --elevated:#130f1a;
-    --border:  #2a1f3d;
-    --theme-primary:       #6b21a8;
-    --theme-secondary:     #581c87;
-    --theme-glow:          rgba(107,33,168,0.06);
-    --theme-border-active: #9333ea;
-    --theme-text-active:   #d8b4fe;
+    --bg: #08060B;
+    --violet-100: #D8B4FE;
+    --violet-200: #C084FC;
+    --violet-400: #9333EA;
+    --violet-600: #7E22CE;
+    --violet-700: #6B21A8;
+    --violet-900: #581C87;
+    color-scheme: dark;
   }
 
   /* ── Theme: Steel Blue ──────────────────────────────────────────────── */
   [data-theme="steel"] {
-    --bg:      #0a0a0a;
-    --surface: #0a0d13;
-    --elevated:#0d1119;
-    --border:  #1a2236;
-    --theme-primary:       #1e3a5f;
-    --theme-secondary:     #1e3a8a;
-    --theme-glow:          rgba(30,58,95,0.08);
-    --theme-border-active: #3b82f6;
-    --theme-text-active:   #93c5fd;
+    --bg: #050709;
+    --violet-100: #93C5FD;
+    --violet-200: #60A5FA;
+    --violet-400: #3B82F6;
+    --violet-600: #2563EB;
+    --violet-700: #1D4ED8;
+    --violet-900: #1E3A8A;
+    color-scheme: dark;
   }
 
   /* ── Theme: Ember (true dark orange — distinct from Crimson red) ───── */
   [data-theme="ember"] {
-    --bg:            #0a0a0a;
-    --surface:       #120b07;
-    --elevated:      #1a1009;
-    --border:        #2e1a0a;
-    --border-strong: #3d2210;
-    --theme-primary:       #c2410c;
-    --theme-secondary:     #9a3412;
-    --theme-glow:          rgba(194,65,12,0.07);
-    --theme-border-active: #f97316;
-    --theme-text-active:   #fdba74;
+    --bg: #0A0603;
+    --violet-100: #FDBA74;
+    --violet-200: #FB923C;
+    --violet-400: #F97316;
+    --violet-600: #EA580C;
+    --violet-700: #C2410C;
+    --violet-900: #7C2D12;
+    color-scheme: dark;
   }
 
   * {

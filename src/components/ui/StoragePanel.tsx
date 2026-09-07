@@ -70,16 +70,16 @@ export function StoragePanel() {
   return (
     <div className="space-y-3">
       {/* Summary row */}
-      <div className="flex items-center gap-3 p-3 bg-noir-elevated border border-noir-border rounded-[2px]">
-        <HardDrive size={14} className="text-noir-dim shrink-0" />
+      <div className="flex items-center gap-3 p-3 bg-white/[0.05] border border-[color:var(--hairline)] rounded-[var(--r-control)]">
+        <HardDrive size={14} className="text-[color:var(--ink-faint)] shrink-0" />
         <div className="flex-1 min-w-0">
-          <div className="text-[12px] text-noir-accent">
+          <div className="text-[12px] text-[color:var(--ink-2)]">
             {totalCount} cached image{totalCount !== 1 ? 's' : ''}
           </div>
-          <div className="text-[10px] text-noir-dim">{formatBytes(totalSize)} estimated</div>
+          <div className="text-[11px] text-[color:var(--ink-faint)]">{formatBytes(totalSize)} estimated</div>
         </div>
         {cleared && (
-          <div className="flex items-center gap-1 text-[10px] text-green-400">
+          <div className="flex items-center gap-1 text-[11px] text-green-400">
             <CheckCircle2 size={11} />
             <span>{cleared} cleared</span>
           </div>
@@ -92,16 +92,16 @@ export function StoragePanel() {
         if (!s) return null
         return (
           <div key={type} className="flex items-center gap-2 text-[12px]">
-            <ImageIcon size={11} className="text-noir-dim shrink-0" />
-            <span className="flex-1 text-noir-muted">{TYPE_LABELS[type]}</span>
-            <span className="text-noir-dim tabular-nums">{s.count}</span>
-            <span className="text-noir-dim tabular-nums w-16 text-right">{formatBytes(s.size)}</span>
+            <ImageIcon size={11} className="text-[color:var(--ink-faint)] shrink-0" />
+            <span className="flex-1 text-[color:var(--ink-dim)]">{TYPE_LABELS[type]}</span>
+            <span className="text-[color:var(--ink-faint)] tabular-nums">{s.count}</span>
+            <span className="text-[color:var(--ink-faint)] tabular-nums w-16 text-right">{formatBytes(s.size)}</span>
             <button
               onClick={() => clearByType(type)}
               disabled={clearing !== null}
               aria-label={`Clear ${TYPE_LABELS[type]} cache`}
               className={cn(
-                'p-1 text-noir-dim hover:text-noir-red transition-colors',
+                'p-1 text-[color:var(--ink-faint)] hover:text-noir-red transition-colors',
                 clearing !== null && 'opacity-40 pointer-events-none'
               )}>
               <Trash2 size={11} />
@@ -112,7 +112,7 @@ export function StoragePanel() {
 
       {/* Empty state */}
       {totalCount === 0 && (
-        <p className="text-[11px] text-noir-dim text-center py-2">
+        <p className="text-[11px] text-[color:var(--ink-faint)] text-center py-2">
           No cached images. Cache is populated when AI generation runs.
         </p>
       )}
@@ -132,7 +132,7 @@ export function StoragePanel() {
       )}
 
       {/* Future generation notice */}
-      <div className="text-[10px] text-noir-dim border border-dashed border-noir-border rounded-[2px] p-2.5 leading-relaxed">
+      <div className="text-[11px] text-[color:var(--ink-faint)] border border-dashed border-[color:var(--hairline)] rounded-[var(--r-control)] p-2.5 leading-relaxed">
         Images are generated via the Nanobanana service and stored locally for offline use.
         Clearing cache does not delete any session data.
       </div>

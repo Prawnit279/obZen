@@ -11,13 +11,18 @@ export interface ThemeMeta {
   textActive: string
 }
 
+/**
+ * Each theme is an accent family over the same near-black ground — the swatch
+ * shows the accent it actually applies, not a background sample. Daylight is
+ * the exception and restates the whole token set.
+ */
 export const THEMES: ThemeMeta[] = [
-  { id: 'noircut', name: 'Noircut',      dot: '#2a2a2a', borderActive: '#d4d4d4', textActive: '#ffffff' },
-  { id: 'light',   name: 'Daylight',     dot: '#f0f0f2', borderActive: '#1c1c21', textActive: '#0a0a0d' },
-  { id: 'crimson', name: 'Crimson',      dot: '#2d1515', borderActive: '#dc2626', textActive: '#fca5a5' },
-  { id: 'void',    name: 'Void Purple',  dot: '#2a1f3d', borderActive: '#9333ea', textActive: '#d8b4fe' },
-  { id: 'steel',   name: 'Steel Blue',   dot: '#1a2236', borderActive: '#3b82f6', textActive: '#93c5fd' },
-  { id: 'ember',   name: 'Ember',        dot: '#2e1a0a', borderActive: '#f97316', textActive: '#fdba74' },
+  { id: 'noircut', name: 'Violet',       dot: '#1A1226', borderActive: '#8B5CF6', textActive: '#C4B5FD' },
+  { id: 'light',   name: 'Daylight',     dot: '#F4F4F7', borderActive: '#7C3AED', textActive: '#16121F' },
+  { id: 'crimson', name: 'Crimson',      dot: '#1E0B0C', borderActive: '#DC2626', textActive: '#FCA5A5' },
+  { id: 'void',    name: 'Void Purple',  dot: '#150B1F', borderActive: '#9333EA', textActive: '#D8B4FE' },
+  { id: 'steel',   name: 'Steel Blue',   dot: '#0A111C', borderActive: '#3B82F6', textActive: '#93C5FD' },
+  { id: 'ember',   name: 'Ember',        dot: '#1C0E04', borderActive: '#F97316', textActive: '#FDBA74' },
 ]
 
 interface ThemeState {

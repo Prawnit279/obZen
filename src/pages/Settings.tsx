@@ -21,8 +21,8 @@ function formatBytes(b: number) {
 function ProfileRow({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex justify-between gap-4">
-      <span className="text-noir-dim shrink-0">{label}</span>
-      <span className="text-noir-accent text-right">{value}</span>
+      <span className="text-[color:var(--ink-dim)] shrink-0">{label}</span>
+      <span className="text-[color:var(--ink-2)] text-right">{value}</span>
     </div>
   )
 }
@@ -158,8 +158,10 @@ export default function Settings() {
   return (
     <div className="page-container space-y-4">
       <div className="pt-2">
-        <div className="text-[11px] uppercase tracking-widest text-noir-muted">Preferences</div>
-        <div className="text-[18px] uppercase tracking-wide text-noir-white">Settings</div>
+        <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-dim)]">Preferences</div>
+        <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
+          Settings
+        </h1>
       </div>
 
       <Card>
@@ -177,10 +179,10 @@ export default function Settings() {
               key={id}
               onClick={() => setActive(id)}
               className={cn(
-                'flex-1 py-2 rounded-[2px] text-[11px] uppercase tracking-widest transition-colors border',
+                'flex-1 py-2 rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-colors border',
                 id === activeId
-                  ? 'border-noir-accent text-noir-white bg-noir-elevated'
-                  : 'border-noir-border text-noir-dim hover:border-noir-strong hover:text-noir-muted'
+                  ? 'border-noir-accent text-[color:var(--ink)] bg-white/[0.05]'
+                  : 'border-[color:var(--hairline)] text-[color:var(--ink-faint)] hover:border-[color:var(--border-strong)] hover:text-[color:var(--ink-dim)]'
               )}
               aria-pressed={id === activeId}
             >
@@ -203,7 +205,7 @@ export default function Settings() {
           {SHOW_VEDIC && profile.mahadasha && <ProfileRow label="Mahadasha" value={profile.mahadasha} />}
           {SHOW_VEDIC && profile.atmakaraka && <ProfileRow label="Atmakaraka" value={profile.atmakaraka} />}
           {profile.body.goal && (
-            <p className="text-[12px] leading-relaxed pt-1" style={{ color: 'var(--muted)' }}>
+            <p className="text-[12px] leading-relaxed pt-1" style={{ color: 'var(--ink-dim)' }}>
               {profile.body.goal}
             </p>
           )}
@@ -247,16 +249,16 @@ export default function Settings() {
         <CardHeader label="Storage" />
         <div className="space-y-2 text-[12px]">
           <div className="flex justify-between">
-            <span className="text-noir-dim">Used</span>
-            <span className="text-noir-muted">{used !== null ? formatBytes(used) : '—'}</span>
+            <span className="text-[color:var(--ink-faint)]">Used</span>
+            <span className="text-[color:var(--ink-dim)]">{used !== null ? formatBytes(used) : '—'}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-noir-dim">Quota</span>
-            <span className="text-noir-muted">{quota !== null ? formatBytes(quota) : '—'}</span>
+            <span className="text-[color:var(--ink-faint)]">Quota</span>
+            <span className="text-[color:var(--ink-dim)]">{quota !== null ? formatBytes(quota) : '—'}</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-noir-dim">Persistent</span>
-            <span className={persisted ? 'text-green-400' : 'text-noir-muted'}>
+            <span className="text-[color:var(--ink-faint)]">Persistent</span>
+            <span className={persisted ? 'text-green-400' : 'text-[color:var(--ink-dim)]'}>
               {persisted === null ? '—' : persisted ? 'Yes' : 'No'}
             </span>
           </div>
@@ -267,14 +269,14 @@ export default function Settings() {
       <Card>
         <CardHeader label="Reassign Workouts" />
         <div className="space-y-2">
-          <p className="text-[12px] leading-relaxed" style={{ color: 'var(--muted)' }}>
+          <p className="text-[12px] leading-relaxed" style={{ color: 'var(--ink-dim)' }}>
             Moves every workout on <em>this device</em> from one profile to the other.
             Use it if sessions were logged under the wrong name — the app starts on{' '}
             {PROFILES[PROFILE_IDS[0]].name} until you switch.
           </p>
 
           <div className="flex items-center gap-2 pt-1">
-            <span className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>From</span>
+            <span className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>From</span>
             <div className="flex gap-1">
               {PROFILE_IDS.map(id => (
                 <button
@@ -284,10 +286,10 @@ export default function Settings() {
                     setReassignCount(null)
                   }}
                   className={cn(
-                    'px-2.5 py-1 rounded-[2px] text-[11px] uppercase tracking-widest transition-colors border',
+                    'px-2.5 py-1 rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-colors border',
                     id === reassignFrom
-                      ? 'border-noir-accent text-noir-white bg-noir-elevated'
-                      : 'border-noir-border text-noir-dim hover:text-noir-muted'
+                      ? 'border-noir-accent text-[color:var(--ink)] bg-white/[0.05]'
+                      : 'border-[color:var(--hairline)] text-[color:var(--ink-faint)] hover:text-[color:var(--ink-dim)]'
                   )}
                   aria-pressed={id === reassignFrom}
                 >
@@ -295,13 +297,13 @@ export default function Settings() {
                 </button>
               ))}
             </div>
-            <span className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
+            <span className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>
               → {PROFILES[reassignTo].name}
             </span>
           </div>
 
           {reassignCount !== null && (
-            <p className="text-[12px]" style={{ color: 'var(--muted)' }}>
+            <p className="text-[12px]" style={{ color: 'var(--ink-dim)' }}>
               {reassignCount === 0
                 ? `No workouts are filed under ${PROFILES[reassignFrom].name}.`
                 : `${reassignCount} workout${reassignCount === 1 ? '' : 's'} would move to ${PROFILES[reassignTo].name}.`}
@@ -337,10 +339,10 @@ export default function Settings() {
       <Card>
         <CardHeader label="Migration" />
         <div className="space-y-2">
-          <p className="text-[10px] leading-relaxed" style={{ color: 'var(--dim)' }}>
+          <p className="text-[11px] leading-relaxed" style={{ color: 'var(--ink-faint)' }}>
             Import historical workout data from{' '}
-            <span style={{ color: 'var(--muted)' }}>obZen_workout_import.json</span>.
-            Place the file in the <span style={{ color: 'var(--muted)' }}>/public</span> folder
+            <span style={{ color: 'var(--ink-dim)' }}>obZen_workout_import.json</span>.
+            Place the file in the <span style={{ color: 'var(--ink-dim)' }}>/public</span> folder
             before clicking. Safe to re-run — duplicate records are skipped.
           </p>
           <Button variant="ghost" fullWidth onClick={handleWorkoutMigration} disabled={migrating}>
@@ -361,16 +363,16 @@ export default function Settings() {
         <CardHeader label="App" />
         <div className="space-y-2 text-[12px]">
           <div className="flex justify-between">
-            <span className="text-noir-dim">Version</span>
-            <span className="text-noir-muted">1.0.0</span>
+            <span className="text-[color:var(--ink-faint)]">Version</span>
+            <span className="text-[color:var(--ink-dim)]">1.0.0</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-noir-dim">Storage</span>
-            <span className="text-noir-muted">IndexedDB (offline)</span>
+            <span className="text-[color:var(--ink-faint)]">Storage</span>
+            <span className="text-[color:var(--ink-dim)]">IndexedDB (offline)</span>
           </div>
           <div className="flex justify-between">
-            <span className="text-noir-dim">Mode</span>
-            <span className="text-noir-muted">PWA / Offline-first</span>
+            <span className="text-[color:var(--ink-faint)]">Mode</span>
+            <span className="text-[color:var(--ink-dim)]">PWA / Offline-first</span>
           </div>
         </div>
       </Card>
