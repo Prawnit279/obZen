@@ -13,7 +13,7 @@
  */
 
 import type { WorkoutDaySession, ExerciseSessionState, LoggedSet } from '@/db/dexie'
-import { trackingModeFor, bodyweightFactorFor, LIBRARY_BY_ID } from '@/data/obzen-program'
+import { trackingModeFor, bodyweightFactorFor, exerciseNameFor } from '@/data/obzen-program'
 import type { TrackingMode } from '@/data/obzen-program'
 
 const LB_PER_KG = 2.2046226218
@@ -143,7 +143,7 @@ export interface SbdTotal {
 export function sbdTotal(sessions: WorkoutDaySession[], competitionLiftIds: string[]): SbdTotal {
   const lifts = competitionLiftIds.map(exerciseId => ({
     exerciseId,
-    name: LIBRARY_BY_ID[exerciseId]?.name ?? exerciseId,
+    name: exerciseNameFor(exerciseId),
     e1rm: bestCurrentE1RM(sessions, exerciseId),
   }))
   return {
@@ -303,7 +303,7 @@ export function exercisePRs(
   exerciseId: string,
   bodyweightKg = 0
 ): ExercisePRs {
-  const name = LIBRARY_BY_ID[exerciseId]?.name ?? exerciseId
+  const name = exerciseNameFor(exerciseId)
   if (trackingModeFor(exerciseId) !== 'load') {
     return { exerciseId, name, byRep: [], bestE1RM: undefined }
   }

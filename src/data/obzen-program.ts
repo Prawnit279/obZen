@@ -349,14 +349,35 @@ export const COMPETITION_LIFT_IDS: string[] = EXERCISE_LIBRARY
   .filter(ex => ex.isCompetitionLift)
   .map(ex => toExerciseId(ex.name))
 
+/**
+ * Catalog entry for a logged exercise id, tolerating ids saved by older builds.
+ *
+ * `toExerciseId` strips punctuation, but sessions logged before it did still
+ * carry ids like `shoulder-press-(bar)`. Those resolve to nothing on an exact
+ * lookup, so the movement loses its name, muscle group and tracking mode and
+ * shows as a raw slug. Normalising the id the same way `toExerciseId` does
+ * recovers them without touching the stored data.
+ */
+export function libraryFor(exerciseId: string): LibraryExercise | undefined {
+  const exact = LIBRARY_BY_ID[exerciseId]
+  if (exact) return exact
+  const normalised = toExerciseId(exerciseId)
+  return normalised === exerciseId ? undefined : LIBRARY_BY_ID[normalised]
+}
+
+/** Display name for a logged exercise id, falling back to the id itself. */
+export function exerciseNameFor(exerciseId: string): string {
+  return libraryFor(exerciseId)?.name ?? exerciseId
+}
+
 /** Tracking mode for a logged exercise id (defaults to `load` for custom adds). */
 export function trackingModeFor(exerciseId: string): TrackingMode {
-  return LIBRARY_BY_ID[exerciseId]?.trackingMode ?? 'load'
+  return libraryFor(exerciseId)?.trackingMode ?? 'load'
 }
 
 /** Fraction of bodyweight a logged exercise loads (0 = external load only). */
 export function bodyweightFactorFor(exerciseId: string): number {
-  return LIBRARY_BY_ID[exerciseId]?.bodyweightFactor ?? 0
+  return libraryFor(exerciseId)?.bodyweightFactor ?? 0
 }
 
 /** Library names grouped by muscle — kept for consumers that filter by group. */

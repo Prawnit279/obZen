@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/db/dexie'
-import { LIBRARY_BY_ID } from '@/data/obzen-program'
+import { exerciseNameFor } from '@/data/obzen-program'
 import { belongsToProfile } from '@/lib/workoutSession'
 import { useProfileStore } from '@/store/useProfileStore'
 import { PROFILES } from '@/config/profiles'
@@ -124,7 +124,7 @@ export function ProgressOverloadChart() {
           <div key={ex} className="flex items-center gap-1">
             <div className="w-4 h-[2px]" style={{ background: LINE_COLORS[keyLiftIds.indexOf(ex)] }} />
             <span className="text-[8px] uppercase tracking-widest text-noir-dim">
-              {LIBRARY_BY_ID[ex]?.name ?? ex}
+              {exerciseNameFor(ex)}
             </span>
           </div>
         ))}

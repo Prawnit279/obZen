@@ -5,7 +5,7 @@ import { belongsToProfile, sessionHasActivity } from '@/lib/workoutSession'
 import { useProfileStore } from '@/store/useProfileStore'
 import { useProgressStore } from '@/store/useProgressStore'
 import { PROFILES } from '@/config/profiles'
-import { LIBRARY_BY_ID, EXERCISE_LIBRARY, toExerciseId, COMPETITION_LIFT_IDS } from '@/data/obzen-program'
+import { EXERCISE_LIBRARY, toExerciseId, COMPETITION_LIFT_IDS, libraryFor, exerciseNameFor } from '@/data/obzen-program'
 import {
   e1rmSeries, bestCurrentE1RM, sbdTotal, weeklyVolume, fillWeeks, recentPRs,
   dotsScore, strengthStandard, trackingSeries, weeklyRepVolume, delta, isoWeekKey, displayLb, kgToLb,
@@ -79,7 +79,7 @@ export function WorkoutProgress() {
   // ── Key lifts ──────────────────────────────────────────────────────────────
   const keyLifts = cfg.keyLiftIds.map(id => ({
     id,
-    name: LIBRARY_BY_ID[id]?.name ?? id,
+    name: exerciseNameFor(id),
     best: bestCurrentE1RM(mine, id, bodyweightKg),
     series: e1rmSeries(mine, id, bodyweightKg),
   }))
@@ -104,7 +104,7 @@ export function WorkoutProgress() {
   // ── Bodyweight-mode movements this profile has actually logged ─────────────
   const loggedIds = [...new Set(mine.flatMap(s => s.exercises.map(e => e.exerciseId)))]
   const bodyweightMovements = loggedIds
-    .map(id => ({ id, entry: LIBRARY_BY_ID[id] }))
+    .map(id => ({ id, entry: libraryFor(id) }))
     .filter(x => x.entry && x.entry.trackingMode !== 'load')
     .map(x => ({ id: x.id, entry: x.entry! }))
 

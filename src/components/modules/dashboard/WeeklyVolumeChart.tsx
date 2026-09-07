@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/db/dexie'
-import { EXERCISE_LIBRARY, LIBRARY_BY_ID } from '@/data/obzen-program'
+import { EXERCISE_LIBRARY, libraryFor } from '@/data/obzen-program'
 import type { MuscleGroup } from '@/data/obzen-program'
 import { belongsToProfile } from '@/lib/workoutSession'
 import { useProfileStore } from '@/store/useProfileStore'
@@ -59,7 +59,7 @@ export function WeeklyVolumeChart() {
     if (!byDay[session.date] || !belongsToProfile(session, activeId)) continue
     for (const ex of session.exercises) {
       const muscle: MuscleGroup =
-        LIBRARY_BY_ID[ex.exerciseId]?.muscle ??
+        libraryFor(ex.exerciseId)?.muscle ??
         (ex.name ? EXERCISE_MUSCLE[ex.name] : undefined) ??
         'core'
       // Shared with the Progress view so the two charts cannot drift: assistance

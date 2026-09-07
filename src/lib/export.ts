@@ -14,6 +14,8 @@
 
 import { type Table } from 'dexie'
 import { db } from '@/db/dexie'
+import { isRealSet } from '@/lib/progress'
+import { exerciseNameFor } from '@/data/obzen-program'
 import type { WorkoutDaySession } from '@/db/dexie'
 import { sessionProfile, sessionHasActivity } from '@/lib/workoutSession'
 
@@ -94,11 +96,27 @@ export async function exportAllDataAsJSON(): Promise<void> {
     db.meta.toArray(),
   ])
 
-  // ── Top exercises by frequency ───────────────────────────────────────────────
+  // ── Workout summary ──────────────────────────────────────────────────────────
+  // Read from `workoutDaySessions`, the table the app actually writes to.
+  // `workoutSessions` / `exerciseLogs` are the legacy pair and are empty on
+  // every current install, so summarising them reported "0 sessions, 0
+  // exercises" over a backup that in fact held months of training.
   const exerciseCount: Record<string, number> = {}
-  for (const log of exerciseLogs) {
-    exerciseCount[log.exerciseName] = (exerciseCount[log.exerciseName] ?? 0) + 1
+  const trainedDates: string[] = []
+  let loggedExerciseCount = 0
+
+  for (const session of workoutDaySessions) {
+    let sessionHasSets = false
+    for (const ex of session.exercises) {
+      if (!ex.sets.some(isRealSet)) continue
+      sessionHasSets = true
+      loggedExerciseCount += 1
+      const name = ex.name ?? exerciseNameFor(ex.exerciseId)
+      exerciseCount[name] = (exerciseCount[name] ?? 0) + 1
+    }
+    if (sessionHasSets) trainedDates.push(session.date)
   }
+
   const topExercises = Object.entries(exerciseCount)
     .sort((a, b) => b[1] - a[1])
     .slice(0, 5)
@@ -118,9 +136,9 @@ export async function exportAllDataAsJSON(): Promise<void> {
     },
     summary: {
       workout: {
-        totalSessions: workoutSessions.length,
-        totalExercisesLogged: exerciseLogs.length,
-        dateRange: dateRange(workoutSessions.map(s => s.date)),
+        totalSessions: trainedDates.length,
+        totalExercisesLogged: loggedExerciseCount,
+        dateRange: dateRange(trainedDates),
         topExercises,
       },
       drums: {

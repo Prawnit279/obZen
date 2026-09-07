@@ -4,7 +4,7 @@ import { guideFor, coreDetailFor, MUSCLE_LABEL } from '@/data/exercise-guides'
 import { MuscleFigure, MUSCLE_PRIMARY_COLOR, MUSCLE_SECONDARY_COLOR } from './MuscleFigure'
 import { ExerciseAnimation } from './ExerciseAnimation'
 import { motionFor } from '@/data/exercise-motions'
-import { LIBRARY_BY_ID, toExerciseId } from '@/data/obzen-program'
+import { libraryFor, toExerciseId } from '@/data/obzen-program'
 
 interface Props {
   exerciseId: string
@@ -44,7 +44,7 @@ export function ExerciseDetailSheet({
   loggedSetCount = 0, presentExerciseIds = [], onSwap, onClose,
 }: Props) {
   const guide = guideFor(exerciseId, muscle)
-  const swaps = LIBRARY_BY_ID[exerciseId]?.swaps ?? []
+  const swaps = libraryFor(exerciseId)?.swaps ?? []
   const motion = motionFor(exerciseId)
   const detail = coreDetailFor(exerciseId)
 
