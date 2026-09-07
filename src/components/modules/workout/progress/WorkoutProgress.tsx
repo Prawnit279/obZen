@@ -11,16 +11,22 @@ import {
   dotsScore, strengthStandard, trackingSeries, weeklyRepVolume, delta, isoWeekKey, displayLb, kgToLb,
 } from '@/lib/progress'
 import { todayISO } from '@/lib/utils'
-import { LineChart, BarChart, ChartEmpty } from './Charts'
+import { LineChart, BarChart, ChartEmpty, liftHue } from './Charts'
 import { ProgressionLadder } from './ProgressionLadder'
 import { BodyweightPanel } from './BodyweightPanel'
 
-const CARD = { background: 'var(--surface)', border: '1px solid var(--border)' } as const
+const CARD = { background: 'var(--card)', border: '1px solid var(--hairline)' } as const
 
 function Card({ label, children }: { label: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-[2px] p-4" style={CARD}>
-      <h3 className="text-[11px] uppercase tracking-widest mb-3" style={{ color: 'var(--muted)' }}>
+    <section
+      className="flex flex-col"
+      style={{ ...CARD, borderRadius: 'var(--r-card)', padding: '16px 18px', gap: 13 }}
+    >
+      <h3
+        className="uppercase"
+        style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+      >
         {label}
       </h3>
       {children}
@@ -28,15 +34,39 @@ function Card({ label, children }: { label: string; children: React.ReactNode })
   )
 }
 
-function Stat({ value, unit, label, sub }: { value: string; unit?: string; label: string; sub?: string }) {
+function Stat({ value, unit, label, sub, hero }: {
+  value: string; unit?: string; label: string; sub?: string; hero?: boolean
+}) {
   return (
-    <div className="rounded-[2px] p-3 flex-1 min-w-[100px]" style={CARD}>
-      <div className="flex items-baseline gap-1">
-        <span className="text-[22px] tabular-nums leading-none" style={{ color: 'var(--accent)' }}>{value}</span>
-        {unit && <span className="text-[12px]" style={{ color: 'var(--muted)' }}>{unit}</span>}
+    <div
+      className="flex-1 min-w-[104px] flex flex-col"
+      style={{
+        gap: 6, padding: '14px 16px',
+        border: '1px solid var(--hairline)',
+        borderRadius: 'var(--r-card)',
+        background: hero ? 'var(--card-accent)' : 'var(--card)',
+      }}
+    >
+      <span
+        className="uppercase"
+        style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+      >
+        {label}
+      </span>
+      <div className="flex items-baseline" style={{ gap: 5 }}>
+        <span
+          style={{
+            fontSize: hero ? 36 : 22, fontWeight: 700,
+            lineHeight: hero ? 0.9 : 1,
+            letterSpacing: hero ? '-0.03em' : '-0.02em',
+            color: 'var(--ink)', fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {value}
+        </span>
+        {unit && <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--ink-faint)' }}>{unit}</span>}
       </div>
-      <div className="text-[11px] uppercase tracking-widest mt-1.5" style={{ color: 'var(--muted)' }}>{label}</div>
-      {sub && <div className="text-[11px] mt-0.5" style={{ color: 'var(--dim)' }}>{sub}</div>}
+      {sub && <span style={{ fontSize: 11, color: 'var(--ink-faint)' }}>{sub}</span>}
     </div>
   )
 }
@@ -59,7 +89,7 @@ export function WorkoutProgress() {
   )
 
   if (!sessions) {
-    return <div className="py-10 text-center text-[13px]" style={{ color: 'var(--dim)' }}>Loading…</div>
+    return <div className="py-10 text-center" style={{ fontSize: 13, color: 'var(--ink-faint)' }}>Loading…</div>
   }
 
   // Everything below is computed from this profile's real training only.
@@ -67,9 +97,12 @@ export function WorkoutProgress() {
 
   if (mine.length === 0) {
     return (
-      <div className="rounded-[2px] p-6 text-center space-y-2" style={CARD}>
-        <p className="text-[15px]" style={{ color: 'var(--accent)' }}>No training logged yet</p>
-        <p className="text-[13px]" style={{ color: 'var(--muted)' }}>
+      <div
+        className="text-center space-y-2"
+        style={{ ...CARD, borderRadius: 'var(--r-card)', padding: 24 }}
+      >
+        <p style={{ fontSize: 15, color: 'var(--ink-2)' }}>No training logged yet</p>
+        <p style={{ fontSize: 13, color: 'var(--ink-dim)' }}>
           Log a few sessions and your strength trends, volume and PRs will appear here.
         </p>
       </div>
@@ -120,6 +153,7 @@ export function WorkoutProgress() {
         {cfg.showPowerlifting ? (
           <>
             <Stat
+              hero
               value={lb(total.totalKg)} unit="lb" label="SBD Total"
               sub={total.loggedCount < total.lifts.length
                 ? `${total.loggedCount} of ${total.lifts.length} lifts logged`
@@ -154,28 +188,46 @@ export function WorkoutProgress() {
         <Card label="Strength standards (est.)">
           <div className="space-y-3">
             {[...total.lifts.map(l => ({ key: l.exerciseId, name: l.name, value: l.e1rm })),
-              { key: 'total', name: 'Total', value: total.totalKg }].map(row => {
+              { key: 'total', name: 'Total', value: total.totalKg }].map((row, i) => {
               const std = strengthStandard(row.key, row.value, bodyweightKg, profile.sex!)
               if (!std) return null
               // Scale each row against its own Elite threshold, so a full bar
               // means Elite for that lift rather than for a male deadlift.
               const pct = Math.min(100, (std.ratio / std.eliteRatio) * 100)
+              // The total is the sum, not a lift — it takes the accent rather
+              // than borrowing another lift's hue.
+              const hue = row.key === 'total' ? 'var(--violet-200)' : liftHue(row.name, i)
               return (
-                <div key={row.key}>
-                  <div className="flex items-baseline justify-between text-[13px]">
-                    <span style={{ color: 'var(--accent)' }}>{row.name}</span>
-                    <span style={{ color: 'var(--muted)' }}>
+                <div key={row.key} className="flex flex-col" style={{ gap: 6 }}>
+                  <div className="flex items-baseline justify-between" style={{ fontSize: 13 }}>
+                    <span style={{ color: 'var(--ink-2)' }}>{row.name}</span>
+                    <span style={{ color: 'var(--ink-dim)' }}>
                       {std.band}
-                      <span className="ml-2 tabular-nums" style={{ color: 'var(--dim)' }}>
+                      <span
+                        className="ml-2"
+                        style={{ color: 'var(--ink-dim)', fontVariantNumeric: 'tabular-nums' }}
+                      >
                         {Math.round(std.ratio * 100) / 100}×BW
                       </span>
                     </span>
                   </div>
-                  <div className="h-[3px] mt-1.5 rounded-full" style={{ background: 'var(--elevated)' }}>
-                    <div className="h-full rounded-full" style={{ width: `${pct}%`, background: 'var(--muted)' }} />
+                  <div
+                    style={{
+                      height: 6, borderRadius: 'var(--r-bar)',
+                      background: 'rgba(255,255,255,0.06)', overflow: 'hidden',
+                    }}
+                  >
+                    <div
+                      style={{
+                        width: `${pct}%`, height: '100%',
+                        borderRadius: 'var(--r-bar)',
+                        background: hue,
+                        transition: 'width var(--t-base) var(--ease-out)',
+                      }}
+                    />
                   </div>
                   {std.toNextKg !== null && std.nextBand && (
-                    <div className="text-[11px] mt-1" style={{ color: 'var(--dim)' }}>
+                    <div style={{ fontSize: 11, color: 'var(--ink-faint)' }}>
                       {lb(std.toNextKg)} lb to {std.nextBand}
                     </div>
                   )}
@@ -183,7 +235,12 @@ export function WorkoutProgress() {
               )
             })}
           </div>
-          <p className="text-[11px] mt-3 pt-3" style={{ color: 'var(--dim)', borderTop: '1px solid var(--border)' }}>
+          <p
+            style={{
+              fontSize: 11, color: 'var(--ink-faint)',
+              paddingTop: 12, borderTop: '1px solid var(--hairline-soft)',
+            }}
+          >
             Bands and the DOTS score are reference estimates — worth checking against a
             source you trust before treating them as authoritative.
           </p>
@@ -207,15 +264,29 @@ export function WorkoutProgress() {
         ) : (
           <ul className="space-y-2">
             {prs.map(pr => (
-              <li key={pr.exerciseId} className="flex items-baseline justify-between gap-3">
-                <span className="text-[15px] truncate" style={{ color: 'var(--accent)' }}>{pr.name}</span>
-                <span className="text-[13px] tabular-nums shrink-0" style={{ color: 'var(--muted)' }}>
-                  {lb(pr.weightKg)} lb × {pr.reps}
-                  <span className="ml-2 text-[11px]" style={{ color: 'var(--dim)' }}>
-                    ~{lb(pr.e1rm)} est. 1RM
+              // Name and the lift itself lead; the estimate and date are
+              // secondary and sit under them. On one row at phone width the
+              // name was the part that got clipped, which is the wrong loser.
+              <li key={pr.exerciseId} className="flex flex-col" style={{ gap: 2 }}>
+                <div className="flex items-baseline justify-between gap-3">
+                  <span style={{ fontSize: 15, color: 'var(--ink-2)' }}>{pr.name}</span>
+                  <span
+                    className="shrink-0"
+                    style={{
+                      fontSize: 15, fontWeight: 700, color: 'var(--ink)',
+                      fontVariantNumeric: 'tabular-nums',
+                    }}
+                  >
+                    {lb(pr.weightKg)} lb × {pr.reps}
                   </span>
-                  <span className="ml-2 text-[11px]" style={{ color: 'var(--dim)' }}>{pr.date}</span>
-                </span>
+                </div>
+                <div
+                  className="flex items-baseline justify-between gap-3"
+                  style={{ fontSize: 11, color: 'var(--ink-faint)', fontVariantNumeric: 'tabular-nums' }}
+                >
+                  <span>~{lb(pr.e1rm)} est. 1RM</span>
+                  <span>{pr.date}</span>
+                </div>
               </li>
             ))}
           </ul>
@@ -239,12 +310,23 @@ export function WorkoutProgress() {
         return (
           <Card key={id} label={entry.name}>
             <div className="flex items-baseline gap-3 mb-3">
-              <span className="text-[22px] tabular-nums" style={{ color: 'var(--accent)' }}>
+              <span
+                style={{
+                  fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em',
+                  color: 'var(--ink)', fontVariantNumeric: 'tabular-nums',
+                }}
+              >
                 {Math.round(latest * 10) / 10}
               </span>
-              <span className="text-[12px]" style={{ color: 'var(--muted)' }}>{unit}</span>
+              <span style={{ fontSize: 13, color: 'var(--ink-faint)' }}>{unit}</span>
               {series.length > 1 && (
-                <span className="text-[12px]" style={{ color: improving ? 'var(--complete-text)' : 'var(--muted)' }}>
+                <span
+                  style={{
+                    fontSize: 13, fontWeight: 500,
+                    color: improving ? 'var(--ok)' : 'var(--ink-faint)',
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
                   {change > 0 ? '+' : ''}{Math.round(change * 10) / 10} {unit}
                   {entry.trackingMode === 'assisted' && ' assist'}
                 </span>
@@ -256,7 +338,10 @@ export function WorkoutProgress() {
             />
             {entry.trackingMode === 'bodyweight-reps' && (
               <div className="mt-3">
-                <div className="text-[11px] uppercase tracking-widest mb-1" style={{ color: 'var(--muted)' }}>
+                <div
+                  className="uppercase"
+                  style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)', marginBottom: 6 }}
+                >
                   Weekly rep volume
                 </div>
                 <BarChart
