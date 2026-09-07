@@ -2,6 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import {
   LayoutDashboard,
   Dumbbell,
+  TrendingUp,
   Music2,
   CalendarDays,
   UtensilsCrossed,
@@ -10,13 +11,18 @@ import {
 import { cn } from '@/lib/utils'
 import { SHOW_NUTRITION } from '@/config/features'
 
+/**
+ * One vocabulary, shared with the sidebar: a destination is called the same
+ * thing whatever the screen width.
+ */
 const PRIMARY_NAV = [
   { path: '/', label: 'Home', icon: LayoutDashboard },
   { path: '/workout', label: 'Train', icon: Dumbbell },
-  { path: '/drum', label: 'Drum', icon: Music2 },
+  { path: '/workout/progress', label: 'Progress', icon: TrendingUp },
+  { path: '/drum', label: 'Drums', icon: Music2 },
+  { path: '/calendar', label: 'Calendar', icon: CalendarDays },
   { path: '/nutrition', label: 'Food', icon: UtensilsCrossed },
   { path: '/more', label: 'More', icon: MoreHorizontal },
-  { path: '/calendar', label: 'Cal', icon: CalendarDays },
 ].filter(item => SHOW_NUTRITION || item.path !== '/nutrition')
 
 export function BottomNav() {
@@ -25,27 +31,45 @@ export function BottomNav() {
 
   return (
     <nav
-      className="fixed bottom-0 left-0 right-0 z-40 bg-noir-bg border-t border-noir-border md:hidden"
+      className="fixed bottom-0 left-0 right-0 z-40 md:hidden"
+      style={{
+        background: 'var(--bg)',
+        borderTop: '1px solid var(--hairline)',
+        paddingBottom: 'env(safe-area-inset-bottom)',
+      }}
       aria-label="Main navigation"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}
     >
       <div className="flex items-stretch">
         {PRIMARY_NAV.map(({ path, label, icon: Icon }) => {
-          const isActive = path === '/'
-            ? pathname === '/'
-            : pathname.startsWith(path)
+          // Exact match for Home, and for Progress — it lives under /workout,
+          // so a prefix test would light Train at the same time.
+          const isActive = path === '/' || path === '/workout/progress'
+            ? pathname === path
+            : path === '/workout'
+              ? pathname === '/workout'
+              : pathname.startsWith(path)
           return (
             <button
               key={path}
               onClick={() => navigate(path)}
               className={cn(
-                'flex-1 flex flex-col items-center justify-center gap-1 py-2.5 transition-colors',
-                isActive ? 'text-noir-white' : 'text-noir-dim hover:text-noir-muted'
+                'flex-1 flex flex-col items-center justify-center gap-1 py-2.5 transition-colors min-w-0',
+                isActive
+                  ? 'text-[color:var(--violet-100)]'
+                  : 'text-[color:var(--ink-faint)] hover:text-[color:var(--ink-dim)]'
               )}
               aria-current={isActive ? 'page' : undefined}
             >
               <Icon size={18} strokeWidth={isActive ? 2 : 1.5} />
-              <span className="text-[9px] uppercase tracking-widest">{label}</span>
+              <span
+                className="uppercase w-full text-center"
+                style={{
+                  fontSize: 11, letterSpacing: '0.04em',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                }}
+              >
+                {label}
+              </span>
             </button>
           )
         })}

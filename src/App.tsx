@@ -16,7 +16,7 @@ import SessionDetail from '@/pages/SessionDetail'
 import Progress from '@/pages/Progress'
 import Tools from '@/pages/Tools'
 import FiveThreeOneGuide from '@/pages/FiveThreeOneGuide'
-import { SHOW_NUTRITION, SHOW_VEDIC } from '@/config/features'
+import { SHOW_NUTRITION, SHOW_VEDIC, SHOW_YOGA } from '@/config/features'
 
 export default function App() {
   return (
@@ -29,7 +29,7 @@ export default function App() {
         <Route path="/workout/tools/guide" element={<FiveThreeOneGuide />} />
         <Route path="/workout/session/:id" element={<SessionDetail />} />
         <Route path="/drum" element={<DrumStudio />} />
-        <Route path="/yoga" element={<Yoga />} />
+        {SHOW_YOGA && <Route path="/yoga" element={<Yoga />} />}
         <Route path="/calendar" element={<Calendar />} />
         {SHOW_NUTRITION && <Route path="/nutrition" element={<Nutrition />} />}
         <Route path="/projects" element={<Projects />} />
