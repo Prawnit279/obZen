@@ -5,15 +5,19 @@ import { belongsToProfile, sessionHasActivity } from '@/lib/workoutSession'
 import { useProfileStore } from '@/store/useProfileStore'
 import { useProgressStore } from '@/store/useProgressStore'
 import { PROFILES } from '@/config/profiles'
-import { EXERCISE_LIBRARY, toExerciseId, COMPETITION_LIFT_IDS, libraryFor, exerciseNameFor } from '@/data/obzen-program'
+import {
+  EXERCISE_LIBRARY, toExerciseId, COMPETITION_LIFT_IDS, libraryFor, exerciseNameFor, getScheduledDay,
+} from '@/data/obzen-program'
 import {
   e1rmSeries, bestCurrentE1RM, sbdTotal, weeklyVolume, fillWeeks, recentPRs,
   dotsScore, strengthStandard, trackingSeries, weeklyRepVolume, delta, isoWeekKey, displayLb, kgToLb,
 } from '@/lib/progress'
 import { todayISO } from '@/lib/utils'
 import { LineChart, BarChart, ChartEmpty, liftHue } from './Charts'
-import { liftSignals, prFeed, sessionLoads, acwr, deloadAdvice } from '@/lib/progressTrends'
-import type { LiftSignal, Acwr, DeloadAdvice } from '@/lib/progressTrends'
+import {
+  liftSignals, prFeed, sessionLoads, acwr, deloadAdvice, adherence, liftBalance,
+} from '@/lib/progressTrends'
+import type { LiftSignal, Acwr, DeloadAdvice, Adherence, BalanceReport } from '@/lib/progressTrends'
 import { ProgressionLadder } from './ProgressionLadder'
 import { BodyweightPanel } from './BodyweightPanel'
 
@@ -238,6 +242,149 @@ function LoadCard({ load, deload, rated }: { load: Acwr; deload: DeloadAdvice; r
   )
 }
 
+const WEEKDAY_INITIALS = ['S', 'M', 'T', 'W', 'T', 'F', 'S']
+
+/** Each cell states its own meaning; colour alone never carries it. */
+const DAY_FILL: Record<string, string> = {
+  trained: 'var(--violet-400)',
+  missed:  'rgba(248,113,113,0.30)',
+  rest:    'rgba(255,255,255,0.05)',
+  future:  'transparent',
+}
+
+/**
+ * Planned training against what happened, eight weeks at a glance.
+ *
+ * A missed day is only a miss once it is in the past, and a session on a rest
+ * day is counted as extra rather than as being off-plan — doing more than
+ * planned should not read as a failure.
+ */
+function AdherenceCard({ data }: { data: Adherence }) {
+  const rate = data.planned > 0 ? Math.round((data.trained / data.planned) * 100) : null
+  return (
+    <Card label="Plan vs actual">
+      <div className="flex items-baseline" style={{ gap: 8 }}>
+        <span
+          style={{
+            fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em',
+            color: 'var(--ink)', fontVariantNumeric: 'tabular-nums',
+          }}
+        >
+          {rate === null ? '—' : `${rate}%`}
+        </span>
+        <span style={{ fontSize: 13, color: 'var(--ink-dim)' }}>
+          {rate === null
+            ? 'nothing scheduled yet'
+            : `${data.trained} of ${data.planned} planned sessions`}
+        </span>
+      </div>
+
+      <div className="flex flex-col" style={{ gap: 3 }}>
+        <div className="flex" style={{ gap: 3 }}>
+          {WEEKDAY_INITIALS.map((d, i) => (
+            <span
+              key={i}
+              className="flex-1 text-center uppercase"
+              style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.06em', color: 'var(--ink-faint)' }}
+            >
+              {d}
+            </span>
+          ))}
+        </div>
+        {data.weeks.map((week, w) => (
+          <div key={w} className="flex" style={{ gap: 3 }}>
+            {week.map(day => (
+              <span
+                key={day.date}
+                title={`${day.date} — ${day.state}`}
+                aria-label={`${day.date}, ${day.state}`}
+                className="flex-1"
+                style={{
+                  height: 14,
+                  borderRadius: 4,
+                  background: DAY_FILL[day.state],
+                  border: day.state === 'future' ? '1px solid var(--hairline-soft)' : 'none',
+                }}
+              />
+            ))}
+          </div>
+        ))}
+      </div>
+
+      <div className="flex flex-wrap" style={{ gap: '6px 14px' }}>
+        {(['trained', 'missed', 'rest'] as const).map(k => (
+          <span key={k} className="flex items-center" style={{ gap: 6 }}>
+            <span style={{ width: 10, height: 10, borderRadius: 3, background: DAY_FILL[k] }} />
+            <span className="capitalize" style={{ fontSize: 11, color: 'var(--ink-faint)' }}>{k}</span>
+          </span>
+        ))}
+        {data.extra > 0 && (
+          <span style={{ fontSize: 11, color: 'var(--ok)' }}>
+            +{data.extra} unplanned {data.extra === 1 ? 'session' : 'sessions'}
+          </span>
+        )}
+      </div>
+    </Card>
+  )
+}
+
+/**
+ * The three competition lifts against one another.
+ *
+ * The reference ratios vary genuinely between people — limb length, stance,
+ * training history — so a lagging lift is posed as a question rather than
+ * stated as a fault, and the caveat sits in the card.
+ */
+function BalanceCard({ report }: { report: BalanceReport }) {
+  return (
+    <Card label="Lift balance">
+      <div className="flex flex-col" style={{ gap: 10 }}>
+        {report.lifts.map(l => {
+          const pct = Math.min(100, (l.index / 1.2) * 100)
+          const behind = l.index < 1
+          return (
+            <div key={l.exerciseId} className="flex flex-col" style={{ gap: 5 }}>
+              <div className="flex items-baseline justify-between" style={{ fontSize: 13, gap: 12 }}>
+                <span style={{ color: 'var(--ink-2)' }}>{l.name}</span>
+                <span style={{ color: 'var(--ink-dim)', fontVariantNumeric: 'tabular-nums' }}>
+                  {l.ratio.toFixed(2)}× squat
+                  <span style={{ color: 'var(--ink-faint)' }}> vs {l.expected.toFixed(2)}</span>
+                </span>
+              </div>
+              <div style={{ height: 6, borderRadius: 'var(--r-bar)', background: 'rgba(255,255,255,0.06)' }}>
+                <div
+                  style={{
+                    width: `${pct}%`, height: '100%', borderRadius: 'var(--r-bar)',
+                    background: behind ? 'var(--lift-row)' : liftHue(l.name),
+                    transition: 'width var(--t-base) var(--ease-out)',
+                  }}
+                />
+              </div>
+            </div>
+          )
+        })}
+      </div>
+
+      {report.lagging && (
+        <p style={{ fontSize: 13, color: 'var(--ink-dim)' }}>
+          {report.lagging.name} is furthest behind the others. Worth asking whether
+          it needs more attention — or whether these ratios simply are not yours.
+        </p>
+      )}
+
+      <p
+        style={{
+          fontSize: 11, color: 'var(--ink-faint)',
+          paddingTop: 12, borderTop: '1px solid var(--hairline-soft)',
+        }}
+      >
+        Reference ratios only. They shift with limb length, stance and which lift
+        you have trained hardest, so read a gap as a question, not a fault.
+      </p>
+    </Card>
+  )
+}
+
 /** Internal maths is kg; the gym is in pounds, so display converts at the edge. */
 const lb = (kgValue: number) => displayLb(kgValue)
 /** Scores (DOTS/Wilks) are unitless — never convert them. */
@@ -311,6 +458,15 @@ export function WorkoutProgress() {
   const loads = sessionLoads(mine)
   const load = acwr(loads, todayISO())
   const deload = deloadAdvice(signals, load)
+
+  // Plan against actual, and how the three competition lifts sit relative to
+  // each other. Both read from what is already computed above.
+  const attendance = adherence(
+    mine,
+    date => getScheduledDay(activeId, date).kind === 'train',
+    todayISO(),
+  )
+  const balance = liftBalance(total.lifts)
 
   // ── Bodyweight-mode movements this profile has actually logged ─────────────
   const loggedIds = [...new Set(mine.flatMap(s => s.exercises.map(e => e.exerciseId)))]
@@ -442,6 +598,12 @@ export function WorkoutProgress() {
           unit="lb"
         />
       </Card>
+
+      {/* ── Plan vs actual ─────────────────────────────────────────────── */}
+      <AdherenceCard data={attendance} />
+
+      {/* ── How the lifts sit against each other ────────────────────────── */}
+      {cfg.showPowerlifting && balance.lifts.length > 0 && <BalanceCard report={balance} />}
 
       <Card label="Personal records">
         {prs.length === 0 ? (

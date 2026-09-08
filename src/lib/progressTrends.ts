@@ -354,3 +354,150 @@ export function deloadAdvice(signals: LiftSignal[], load: Acwr): DeloadAdvice {
 
   return { recommend: reasons.length >= 2, reasons }
 }
+
+// ── Adherence ────────────────────────────────────────────────────────────────
+
+export type DayState = 'trained' | 'missed' | 'rest' | 'future'
+
+export interface AdherenceDay {
+  date: string
+  /** 0 = Sunday, matching Date.getDay. */
+  weekday: number
+  state: DayState
+}
+
+export interface Adherence {
+  /** Oldest week first; each row is Sunday-to-Saturday. */
+  weeks: AdherenceDay[][]
+  /** Planned training days that were trained, over the whole window. */
+  trained: number
+  planned: number
+  /** Trained days that were not on the plan — credit, never a penalty. */
+  extra: number
+}
+
+function dateOnly(d: Date): string {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`
+}
+
+/**
+ * Planned against actual training, as a grid of weeks.
+ *
+ * A day is `missed` only when the plan called for training and none happened,
+ * and only in the past — an upcoming scheduled day is `future`, not a failure.
+ * Training on a rest day counts as `trained` and is reported separately as
+ * `extra`: doing more than planned should never read as being off-plan.
+ */
+export function adherence(
+  sessions: WorkoutDaySession[],
+  isScheduledTraining: (date: Date) => boolean,
+  todayISODate: string,
+  weeksBack = 8
+): Adherence {
+  const trainedDates = new Set(sessions.map(s => s.date))
+  const today = new Date(`${todayISODate}T12:00:00`)
+
+  // Start on the Sunday `weeksBack - 1` weeks before this one.
+  const start = new Date(today)
+  start.setDate(start.getDate() - today.getDay() - (weeksBack - 1) * 7)
+
+  const weeks: AdherenceDay[][] = []
+  let trained = 0
+  let planned = 0
+  let extra = 0
+
+  for (let w = 0; w < weeksBack; w++) {
+    const row: AdherenceDay[] = []
+    for (let d = 0; d < 7; d++) {
+      const cur = new Date(start)
+      cur.setDate(start.getDate() + w * 7 + d)
+      const iso = dateOnly(cur)
+      const didTrain = trainedDates.has(iso)
+      const scheduled = isScheduledTraining(cur)
+      const isFuture = iso > todayISODate
+
+      if (scheduled && !isFuture) planned += 1
+      if (didTrain) trained += scheduled ? 1 : 0
+      if (didTrain && !scheduled) extra += 1
+
+      const state: DayState =
+        didTrain ? 'trained'
+        : isFuture ? 'future'
+        : scheduled ? 'missed'
+        : 'rest'
+
+      row.push({ date: iso, weekday: cur.getDay(), state })
+    }
+    weeks.push(row)
+  }
+
+  return { weeks, trained, planned, extra }
+}
+
+// ── Lift balance ─────────────────────────────────────────────────────────────
+
+/**
+ * ⚠️ Reference ratios, not independently verified — and genuinely variable:
+ * they shift with limb length, stance, and which lift someone has trained
+ * hardest. Treat a lagging lift as a question worth asking, not a fault.
+ *
+ * Expressed against the squat, which is the usual anchor.
+ */
+export const LIFT_RATIOS: Record<string, number> = {
+  'barbell-squat': 1,
+  'bench-press': 0.75,
+  'deadlift': 1.2,
+}
+
+export interface LiftBalance {
+  exerciseId: string
+  name: string
+  e1rmKg: number
+  /** Actual multiple of the squat. */
+  ratio: number
+  /** What the reference set expects. */
+  expected: number
+  /** Actual over expected — below 1 means behind the others. */
+  index: number
+}
+
+export interface BalanceReport {
+  lifts: LiftBalance[]
+  /** The lift furthest behind, when one is meaningfully adrift. */
+  lagging: LiftBalance | null
+}
+
+/** How far a lift is behind the reference before it is worth naming. */
+export const LAGGING_THRESHOLD = 0.9
+
+/**
+ * Each competition lift against the reference ratios, anchored on the squat.
+ *
+ * Returns nothing useful until all three are logged — a ratio needs both terms,
+ * and calling a lift "lagging" because it has never been recorded would be
+ * wrong in a way the reader cannot see.
+ */
+export function liftBalance(
+  bests: { exerciseId: string; name: string; e1rm: number }[]
+): BalanceReport {
+  const squat = bests.find(b => b.exerciseId === 'barbell-squat')
+  if (!squat || squat.e1rm <= 0 || bests.some(b => b.e1rm <= 0)) {
+    return { lifts: [], lagging: null }
+  }
+
+  const lifts = bests
+    .filter(b => LIFT_RATIOS[b.exerciseId] !== undefined)
+    .map(b => {
+      const ratio = b.e1rm / squat.e1rm
+      const expected = LIFT_RATIOS[b.exerciseId]
+      return {
+        exerciseId: b.exerciseId, name: b.name, e1rmKg: b.e1rm,
+        ratio, expected, index: ratio / expected,
+      }
+    })
+
+  if (lifts.length < 3) return { lifts, lagging: null }
+
+  const worst = lifts.reduce((a, b) => (b.index < a.index ? b : a))
+  return { lifts, lagging: worst.index < LAGGING_THRESHOLD ? worst : null }
+}

@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest'
 import type { WorkoutDaySession, LoggedSet } from '@/db/dexie'
 import {
   e1rmTrend, weeksToGoal, stallCheck, prFeed, liftSignals,
-  sessionLoads, acwr, deloadAdvice,
-  STALL_WEEKS, TM_RESET_FRACTION, ACWR_BANDS,
+  sessionLoads, acwr, deloadAdvice, adherence, liftBalance,
+  STALL_WEEKS, TM_RESET_FRACTION, ACWR_BANDS, LAGGING_THRESHOLD,
 } from '@/lib/progressTrends'
 import type { E1RMPoint } from '@/lib/progress'
 
@@ -421,5 +421,117 @@ describe('deloadAdvice', () => {
 
   it('names the lift when only one has stalled', () => {
     expect(deloadAdvice(stalledLift, spike).reasons[0]).toMatch(/Deadlift/)
+  })
+})
+
+// ── Adherence ────────────────────────────────────────────────────────────────
+
+describe('adherence', () => {
+  // Mon/Wed/Fri planned, matching the shipped schedule shape.
+  const mwf = (d: Date) => [1, 3, 5].includes(d.getDay())
+  const TODAY = '2026-09-05' // a Saturday
+
+  it('lays the window out oldest week first, Sunday to Saturday', () => {
+    const a = adherence([], mwf, TODAY, 3)
+    expect(a.weeks).toHaveLength(3)
+    expect(a.weeks[0]).toHaveLength(7)
+    expect(a.weeks[0][0].weekday).toBe(0)
+    expect(a.weeks[0][6].weekday).toBe(6)
+    expect(a.weeks[0][0].date < a.weeks[2][0].date).toBe(true)
+  })
+
+  it('ends on the week containing today', () => {
+    const a = adherence([], mwf, TODAY, 2)
+    const lastWeek = a.weeks[a.weeks.length - 1]
+    expect(lastWeek.some(d => d.date === TODAY)).toBe(true)
+  })
+
+  it('marks a planned day that was trained', () => {
+    const a = adherence([session('2026-09-02', 'deadlift', [set(100, 5)])], mwf, TODAY, 1)
+    const wed = a.weeks[0].find(d => d.date === '2026-09-02')!
+    expect(wed.state).toBe('trained')
+    expect(a.trained).toBe(1)
+  })
+
+  it('marks a planned day in the past that was not trained', () => {
+    const a = adherence([], mwf, TODAY, 1)
+    expect(a.weeks[0].find(d => d.date === '2026-09-02')!.state).toBe('missed')
+  })
+
+  it('never calls an upcoming scheduled day missed', () => {
+    // Today is Saturday; the following Monday is planned but has not happened.
+    const a = adherence([], mwf, '2026-08-30', 1)
+    const monday = a.weeks[0].find(d => d.weekday === 1)!
+    expect(monday.date > '2026-08-30').toBe(true)
+    expect(monday.state).toBe('future')
+  })
+
+  it('counts an unplanned session as training, not as being off-plan', () => {
+    // Sunday is a rest day; training anyway is credit.
+    const a = adherence([session('2026-08-30', 'deadlift', [set(100, 5)])], mwf, TODAY, 2)
+    const sunday = a.weeks.flat().find(d => d.date === '2026-08-30')!
+    expect(sunday.state).toBe('trained')
+    expect(a.extra).toBe(1)
+    expect(a.trained).toBe(0)
+  })
+
+  it('counts planned days only up to today', () => {
+    // Window is one week, today is Wednesday: Mon and Wed are planned so far.
+    const a = adherence([], mwf, '2026-09-02', 1)
+    expect(a.planned).toBe(2)
+  })
+
+  it('leaves rest days as rest', () => {
+    const a = adherence([], mwf, TODAY, 1)
+    expect(a.weeks[0].find(d => d.weekday === 2)!.state).toBe('rest')
+  })
+})
+
+// ── Lift balance ─────────────────────────────────────────────────────────────
+
+describe('liftBalance', () => {
+  const at = (squat: number, bench: number, dead: number) => [
+    { exerciseId: 'barbell-squat', name: 'Barbell Squat', e1rm: squat },
+    { exerciseId: 'bench-press', name: 'Bench Press', e1rm: bench },
+    { exerciseId: 'deadlift', name: 'Deadlift', e1rm: dead },
+  ]
+
+  it('measures each lift against the squat', () => {
+    const { lifts } = liftBalance(at(100, 75, 120))
+    expect(lifts.find(l => l.exerciseId === 'bench-press')!.ratio).toBeCloseTo(0.75, 4)
+    expect(lifts.find(l => l.exerciseId === 'deadlift')!.ratio).toBeCloseTo(1.2, 4)
+  })
+
+  it('finds nothing lagging when the lifts match the reference', () => {
+    const { lagging } = liftBalance(at(100, 75, 120))
+    expect(lagging).toBeNull()
+  })
+
+  it('names the lift that is furthest behind', () => {
+    // Bench at 0.55 of squat against an expected 0.75.
+    const { lagging } = liftBalance(at(100, 55, 120))
+    expect(lagging!.exerciseId).toBe('bench-press')
+    expect(lagging!.index).toBeCloseTo(0.55 / 0.75, 4)
+  })
+
+  it('stays quiet when a lift is only slightly behind', () => {
+    // Within the threshold — normal variation, not a finding.
+    expect(liftBalance(at(100, 70, 120)).lagging).toBeNull()
+    expect(LAGGING_THRESHOLD).toBe(0.9)
+  })
+
+  it('says nothing until all three lifts are logged', () => {
+    // Calling a lift lagging when it has never been recorded would be wrong
+    // in a way the reader cannot see.
+    expect(liftBalance(at(100, 75, 0)).lifts).toEqual([])
+    expect(liftBalance(at(0, 75, 120)).lagging).toBeNull()
+  })
+
+  it('ignores lifts with no reference ratio', () => {
+    const { lifts } = liftBalance([
+      ...at(100, 75, 120),
+      { exerciseId: 'goblet-squat', name: 'Goblet Squat', e1rm: 40 },
+    ])
+    expect(lifts.map(l => l.exerciseId)).not.toContain('goblet-squat')
   })
 })
