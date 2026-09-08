@@ -179,6 +179,15 @@ export interface LoggedSet {
   reps: number
   unit: 'lbs' | 'kg'
   timestamp: string
+  /**
+   * Marked as an AMRAP — a set taken to as many reps as possible rather than a
+   * prescribed count. Its e1RM is the one worth trusting, so `lib/amrap.ts`
+   * reads these to advise on the next Training Max.
+   *
+   * Non-indexed, so this needs no schema version: Dexie only versions the
+   * indexes, and sets logged before this simply have no value.
+   */
+  isAmrap?: boolean
 }
 
 export interface ExerciseSessionState {

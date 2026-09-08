@@ -31,6 +31,10 @@ import { MUSCLE_LABEL } from '@/data/exercise-guides'
 import type { MuscleId } from '@/data/exercise-guides'
 import { RUDIMENT_NOTATION } from '@/data/rudiment-notation'
 import { PROFILES } from '@/config/profiles'
+import { AmrapCard } from '@/components/modules/workout/progress/AmrapCard'
+import { MuscleVolumeCard } from '@/components/modules/workout/progress/MuscleVolumeCard'
+import type { TmAdvice } from '@/lib/amrap'
+import { muscleReadings, TRACKED_MUSCLES } from '@/lib/muscleVolume'
 
 // ── fixtures ─────────────────────────────────────────────────────────────────
 
@@ -690,5 +694,85 @@ describe('NotationViewer — renders without crashing', () => {
       await waitFor(() => expect(container.querySelector('svg')).not.toBeNull(), { timeout: 4000 })
       unmount()
     }
+  })
+})
+
+// ── AmrapCard ────────────────────────────────────────────────────────────────
+
+describe('AmrapCard — renders without crashing', () => {
+  const advice: TmAdvice[] = [
+    {
+      exerciseId: 'barbell-squat',
+      set: { exerciseId: 'barbell-squat', dateISO: '2026-09-02', weightLb: 300, reps: 5, muscle: 'legs' },
+      e1rmLb: 350, impliedTmLb: 315, priorTmLb: 290,
+      incrementLb: 10, nextTmLb: 325, verdict: 'advance',
+      reason: 'This set supports a Training Max of 315 lb.',
+    },
+  ]
+
+  it('shows the next training max and the set behind it', () => {
+    render(<AmrapCard advice={advice} />)
+    expect(screen.getByText(/325 lb/)).toBeInTheDocument()
+    expect(screen.getByText(/300 lb × 5/)).toBeInTheDocument()
+  })
+
+  it('stays silent when nothing has been flagged as an AMRAP', () => {
+    const { container } = render(<AmrapCard advice={[]} />)
+    expect(container).toBeEmptyDOMElement()
+  })
+
+  it('mounts every verdict the library can produce', () => {
+    for (const verdict of ['advance', 'hold', 'reset'] as const) {
+      const { unmount } = render(<AmrapCard advice={[{ ...advice[0], verdict }]} />)
+      expect(screen.getByText(/next training max/i)).toBeInTheDocument()
+      unmount()
+    }
+  })
+
+  it('says where the comparison came from rather than implying a stored max', () => {
+    render(<AmrapCard advice={advice} />)
+    expect(screen.getByText(/stores no training max/i)).toBeInTheDocument()
+  })
+})
+
+// ── MuscleVolumeCard ─────────────────────────────────────────────────────────
+
+describe('MuscleVolumeCard — renders without crashing', () => {
+  it('mounts every band without emitting NaN geometry', () => {
+    const readings = muscleReadings(
+      [{
+        date: todayIso(), dayLabel: 'Day 1', profileId: 'pronit',
+        order: ['bench-press'],
+        exercises: [{
+          exerciseId: 'bench-press', status: 'complete', muscle: 'chest',
+          sets: [set(185, 8), set(185, 8), set(185, 8)],
+        }],
+      }],
+      todayIso()
+    )
+    const { container } = render(<MuscleVolumeCard readings={readings} />)
+
+    expect(screen.getByText(/sets per muscle/i)).toBeInTheDocument()
+    for (const value of numericAttributes(container)) {
+      expect(value).not.toMatch(/NaN/)
+    }
+  })
+
+  it('lists every tracked group, including ones with no sets this week', () => {
+    render(<MuscleVolumeCard readings={muscleReadings([], todayIso())} />)
+    for (const muscle of TRACKED_MUSCLES) {
+      expect(screen.getByText(new RegExp(`^${muscle}$`, 'i'))).toBeInTheDocument()
+    }
+  })
+
+  it('calls an untrained muscle none logged rather than in range', () => {
+    // Core's minimum is zero, so a naive band check would approve of skipping it.
+    render(<MuscleVolumeCard readings={muscleReadings([], todayIso())} />)
+    expect(screen.getAllByText(/none logged/i).length).toBe(TRACKED_MUSCLES.length)
+  })
+
+  it('names each landmark as a reference rather than a target', () => {
+    render(<MuscleVolumeCard readings={muscleReadings([], todayIso())} />)
+    expect(screen.getByText(/coaching heuristics rather than measured/i)).toBeInTheDocument()
   })
 })

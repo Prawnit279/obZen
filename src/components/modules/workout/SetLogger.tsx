@@ -16,10 +16,23 @@ interface SetRowProps {
   saved: boolean
 }
 
+/**
+ * Carry the AMRAP flag onto a set, leaving the key off entirely when it is not
+ * one — every stored row and every backup would otherwise gain a `false` that
+ * says nothing.
+ */
+function withAmrap(base: LoggedSet, isAmrap: boolean): LoggedSet {
+  if (isAmrap) return { ...base, isAmrap: true }
+  const next = { ...base }
+  delete next.isAmrap
+  return next
+}
+
 function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
   const [weight, setWeight] = useState(set.weight > 0 ? String(set.weight) : '')
   const [reps, setReps] = useState(set.reps > 0 ? String(set.reps) : '')
   const [unit, setUnit] = useState<'lbs' | 'kg'>(set.unit)
+  const [isAmrap, setIsAmrap] = useState(set.isAmrap === true)
   const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [showDelete, setShowDelete] = useState(false)
 
@@ -27,7 +40,8 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
     const w = parseFloat(weight)
     const r = parseInt(reps, 10)
     if (isNaN(w) || isNaN(r) || r <= 0) return
-    onSave({ ...set, weight: w, reps: r, unit, timestamp: new Date().toISOString() })
+    const saved: LoggedSet = { ...set, weight: w, reps: r, unit, timestamp: new Date().toISOString() }
+    onSave(withAmrap(saved, isAmrap))
   }
 
   const handlePressStart = () => {
@@ -95,7 +109,25 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
         }}
       />
 
-      <span className="shrink-0" style={{ fontSize: 11, color: 'var(--ink-faint)' }}>{units.countLabel}</span>
+      {/* The count label doubles as the AMRAP toggle: 5/3/1 writes an
+          as-many-reps-as-possible set as '5+', so the '+' is the notation
+          itself rather than another control competing for width. A timed hold
+          has no rep ceiling to probe, so it stays a plain label. */}
+      {units.isDuration ? (
+        <span className="shrink-0" style={{ fontSize: 11, color: 'var(--ink-faint)' }}>
+          {units.countLabel}
+        </span>
+      ) : (
+        <button
+          onClick={() => setIsAmrap(v => !v)}
+          aria-pressed={isAmrap}
+          aria-label={`Mark set ${set.setNumber} as AMRAP — as many reps as possible`}
+          className="shrink-0 transition-colors"
+          style={{ fontSize: 11, color: isAmrap ? 'var(--complete-text)' : 'var(--ink-faint)' }}
+        >
+          {units.countLabel}{isAmrap ? '+' : ''}
+        </button>
+      )}
 
       {/* Save or delete */}
       {showDelete ? (
@@ -178,6 +210,9 @@ export function SetLogger({ exerciseId, sets, onAddSet, onUpdateSet, onRemoveSet
         Log Today
         {units.isDuration && <span style={{ color: 'var(--ink-dim)' }}> · hold in seconds</span>}
         {units.isAssistance && <span style={{ color: 'var(--ink-dim)' }}> · assistance weight</span>}
+        {!units.isDuration && (
+          <span style={{ color: 'var(--ink-faint)' }}> · tap “{units.countLabel}” for an AMRAP</span>
+        )}
       </div>
 
       <div className="space-y-1">

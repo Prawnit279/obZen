@@ -583,6 +583,15 @@ export interface ProgressionSuggestion {
 const UPPER_BODY: ReadonlySet<string> = new Set(['back', 'chest', 'shoulders', 'arms'])
 
 /**
+ * Whether a movement's muscle group counts as upper body, which decides the
+ * size of every load jump the app suggests. One definition, because
+ * `lib/amrap.ts` has to answer the same question for 5/3/1's cycle increment.
+ */
+export function isUpperBodyMuscle(muscleGroup: string | undefined): boolean {
+  return muscleGroup !== undefined && UPPER_BODY.has(muscleGroup)
+}
+
+/**
  * Her plan's progression rule: add load once the top of the rep range is hit on
  * every working set, two sessions running — 5–10 lb lower body, 2.5–5 lb upper.
  * The conservative end of each range is used.
@@ -617,7 +626,7 @@ export function suggestProgression(
   }
   if (heaviest <= 0) return undefined
 
-  const incrementLb = muscleGroup && UPPER_BODY.has(muscleGroup) ? 2.5 : 5
+  const incrementLb = isUpperBodyMuscle(muscleGroup) ? 2.5 : 5
   return {
     currentKg: heaviest,
     nextKg: heaviest + lbToKg(incrementLb),

@@ -18,8 +18,12 @@ import { LineChart, BarChart, ChartEmpty, liftHue } from './Charts'
 import {
   liftSignals, prFeed, sessionLoads, acwr, deloadAdvice, adherence, liftBalance,
 } from '@/lib/progressTrends'
+import { tmAdvice } from '@/lib/amrap'
+import { muscleReadings } from '@/lib/muscleVolume'
 import type { LiftSignal, Acwr, DeloadAdvice, Adherence, BalanceReport } from '@/lib/progressTrends'
 import { ProgressionLadder } from './ProgressionLadder'
+import { AmrapCard } from './AmrapCard'
+import { MuscleVolumeCard } from './MuscleVolumeCard'
 import { BodyweightPanel } from './BodyweightPanel'
 
 const CARD = { background: 'var(--card)', border: '1px solid var(--hairline)' } as const
@@ -437,6 +441,14 @@ export function WorkoutProgress() {
   const load = acwr(loads, todayISO())
   const deload = deloadAdvice(signals, load)
 
+  // What the last all-out set on each key lift implies for the next cycle.
+  // Empty until sets are actually flagged as AMRAPs.
+  const amrap = tmAdvice(mine, cfg.keyLiftIds)
+
+  // Hard sets per muscle group for the current week. The counts are measured;
+  // the reference ranges they sit against are heuristics, and the card says so.
+  const muscles = muscleReadings(mine, todayISO())
+
   // Plan against actual, and how the three competition lifts sit relative to
   // each other. Both read from what is already computed above.
   const attendance = adherence(
@@ -501,6 +513,9 @@ export function WorkoutProgress() {
 
       {/* ── Load & recovery ────────────────────────────────────────────── */}
       <LoadCard load={load} deload={deload} rated={loads.filter(l => l.rpe !== null).length} />
+
+      {/* ── Next training max, off the last AMRAP ──────────────────────── */}
+      <AmrapCard advice={amrap} />
 
       {/* ── Standards (powerlifting) or bodyweight trend ───────────────── */}
       {cfg.showPowerlifting && profile.sex && (
@@ -569,6 +584,9 @@ export function WorkoutProgress() {
       {cfg.showBodyweightTrend && <BodyweightPanel profileId={activeId} />}
 
       {/* ── Weekly volume + PRs ────────────────────────────────────────── */}
+      {/* ── Sets per muscle ───────────────────────────────────────────── */}
+      <MuscleVolumeCard readings={muscles} />
+
       <Card label="Weekly volume (tonnage)">
         <BarChart
           data={fillWeeks(volume, todayISO(), 8)
