@@ -459,9 +459,9 @@ export function WorkoutProgress() {
     .filter(ex => loggedIds.includes(toExerciseId(ex.name)) || cfg.keyLiftIds.includes(toExerciseId(ex.name)))
 
   return (
-    <div className="space-y-4">
+    <div className="card-grid">
       {/* ── Stat row ───────────────────────────────────────────────────── */}
-      <div className="flex flex-wrap gap-2">
+      <div className="card-grid-full flex flex-wrap gap-2">
         {cfg.showPowerlifting ? (
           <>
             <Stat

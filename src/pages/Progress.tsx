@@ -10,7 +10,7 @@ export default function Progress() {
   const { activeId } = useProfileStore()
 
   return (
-    <div className="page-container space-y-4">
+    <div className="page-container wide space-y-4">
       <button
         onClick={() => navigate('/workout')}
         className="flex items-center gap-1.5 text-[12px] uppercase tracking-widest transition-opacity hover:opacity-70"

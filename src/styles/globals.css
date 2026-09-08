@@ -303,6 +303,51 @@
     padding-top: calc(1rem + env(safe-area-inset-top));
   }
 
+  /*
+   * A reading measure once there is room for one. Without this the column
+   * simply takes whatever the window gives it, so a card drawn for a 375px
+   * phone stretched past 1200px next to the sidebar.
+   *
+   * The scroll container stays full width — the *content* is what centres, so
+   * the scrollbar and the safe-area padding still sit where they belong.
+   */
+  @media (min-width: 768px) {
+    .page-container > * {
+      max-width: 46rem;
+      margin-inline: auto;
+    }
+    /* Dense screens get a wider measure. The cap always sits on the children,
+       never on the scroller: `.page-container` is a flex child, and an auto
+       inline margin there shrink-wraps it to its content instead of centring
+       a full-width column. */
+    .page-container.wide > * {
+      max-width: 70rem;
+    }
+  }
+
+  /*
+   * Card stack for the dense screens. One column until there is room for two,
+   * then a grid — `align-items: start` so a short card does not stretch to
+   * match a tall neighbour. Anything that should stay full width, like a stat
+   * row or a page header, takes `card-grid-full`.
+   */
+  .card-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  @media (min-width: 900px) {
+    .card-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      align-items: start;
+    }
+    .card-grid > .card-grid-full {
+      grid-column: 1 / -1;
+    }
+  }
+
 }
 
 /* Keyboard focus is never removed. Tailwind's preflight and the app's own

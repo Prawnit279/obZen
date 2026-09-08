@@ -156,226 +156,228 @@ export default function Settings() {
   }
 
   return (
-    <div className="page-container space-y-4">
-      <div className="pt-2">
-        <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-dim)]">Preferences</div>
-        <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
-          Settings
-        </h1>
-      </div>
-
-      <Card>
-        <CardHeader label="Appearance" />
-        <ThemeSwitcher />
-      </Card>
-
-      <Card>
-        <CardHeader label="Profile" />
-
-        {/* Profile switcher */}
-        <div className="flex gap-2 mb-3">
-          {PROFILE_IDS.map(id => (
-            <button
-              key={id}
-              onClick={() => setActive(id)}
-              className={cn(
-                'flex-1 py-2 rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-colors border',
-                id === activeId
-                  ? 'border-noir-accent text-[color:var(--ink)] bg-white/[0.05]'
-                  : 'border-[color:var(--hairline)] text-[color:var(--ink-faint)] hover:border-[color:var(--border-strong)] hover:text-[color:var(--ink-dim)]'
-              )}
-              aria-pressed={id === activeId}
-            >
-              {PROFILES[id].name}
-            </button>
-          ))}
+    <div className="page-container wide">
+      <div className="card-grid">
+        <div className="card-grid-full pt-2">
+          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-dim)]">Preferences</div>
+          <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
+            Settings
+          </h1>
         </div>
 
-        {/* Active profile details */}
-        <div className="space-y-2 text-[13px]">
-          <ProfileRow label="Name" value={profile.name} />
-          <ProfileRow label="Bodyweight" value={profile.body.bodyweight} />
-          {profile.program && <ProfileRow label="Program" value={profile.program} />}
-          {profile.body.bodyFat && <ProfileRow label="Body Fat" value={profile.body.bodyFat} />}
-          {profile.body.fatMass && <ProfileRow label="Fat Mass" value={profile.body.fatMass} />}
-          {profile.body.leanMass && <ProfileRow label="Lean Mass" value={profile.body.leanMass} />}
-          <ProfileRow label="Protein" value={`${profile.targets.proteinG} g/day`} />
-          {profile.targets.steps && <ProfileRow label="Steps" value={profile.targets.steps} />}
-          {profile.dosha && <ProfileRow label="Dosha" value={profile.dosha} />}
-          {SHOW_VEDIC && profile.mahadasha && <ProfileRow label="Mahadasha" value={profile.mahadasha} />}
-          {SHOW_VEDIC && profile.atmakaraka && <ProfileRow label="Atmakaraka" value={profile.atmakaraka} />}
-          {profile.body.goal && (
-            <p className="text-[12px] leading-relaxed pt-1" style={{ color: 'var(--ink-dim)' }}>
-              {profile.body.goal}
-            </p>
-          )}
-        </div>
-      </Card>
+        <Card>
+          <CardHeader label="Appearance" />
+          <ThemeSwitcher />
+        </Card>
 
-      <Card>
-        <CardHeader label="Data" />
-        <div className="space-y-2">
-          <Button variant="default" fullWidth onClick={handleExport} disabled={exporting}>
-            {exporting ? 'Exporting...' : exportDone ? '✓ Backup downloaded' : 'Export All Data (JSON)'}
-          </Button>
-          {/* Hidden file picker — triggered programmatically */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".json,application/json"
-            className="hidden"
-            onChange={handleFileChange}
-          />
-          <Button variant="ghost" fullWidth onClick={handleImportClick} disabled={importing}>
-            {importing ? 'Importing…' : 'Import Backup'}
-          </Button>
-          {importMsg && (
-            <p
-              className="text-[11px] text-center pt-1"
-              style={{ color: importMsg.ok ? 'var(--complete-text)' : 'var(--skip-text)' }}
-            >
-              {importMsg.text}
-            </p>
-          )}
-        </div>
-      </Card>
+        <Card>
+          <CardHeader label="Profile" />
 
-      <Card>
-        <CardHeader label="Image Cache" />
-        <StoragePanel />
-      </Card>
-
-      <Card>
-        <CardHeader label="Storage" />
-        <div className="space-y-2 text-[12px]">
-          <div className="flex justify-between">
-            <span className="text-[color:var(--ink-faint)]">Used</span>
-            <span className="text-[color:var(--ink-dim)]">{used !== null ? formatBytes(used) : '—'}</span>
+          {/* Profile switcher */}
+          <div className="flex gap-2 mb-3">
+            {PROFILE_IDS.map(id => (
+              <button
+                key={id}
+                onClick={() => setActive(id)}
+                className={cn(
+                  'flex-1 py-2 rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-colors border',
+                  id === activeId
+                    ? 'border-noir-accent text-[color:var(--ink)] bg-white/[0.05]'
+                    : 'border-[color:var(--hairline)] text-[color:var(--ink-faint)] hover:border-[color:var(--border-strong)] hover:text-[color:var(--ink-dim)]'
+                )}
+                aria-pressed={id === activeId}
+              >
+                {PROFILES[id].name}
+              </button>
+            ))}
           </div>
-          <div className="flex justify-between">
-            <span className="text-[color:var(--ink-faint)]">Quota</span>
-            <span className="text-[color:var(--ink-dim)]">{quota !== null ? formatBytes(quota) : '—'}</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-[color:var(--ink-faint)]">Persistent</span>
-            <span className={persisted ? 'text-green-400' : 'text-[color:var(--ink-dim)]'}>
-              {persisted === null ? '—' : persisted ? 'Yes' : 'No'}
-            </span>
-          </div>
-        </div>
-      </Card>
 
-      {/* ── Reassign workouts between profiles on this device ── */}
-      <Card>
-        <CardHeader label="Reassign Workouts" />
-        <div className="space-y-2">
-          <p className="text-[12px] leading-relaxed" style={{ color: 'var(--ink-dim)' }}>
-            Moves every workout on <em>this device</em> from one profile to the other.
-            Use it if sessions were logged under the wrong name — the app starts on{' '}
-            {PROFILES[PROFILE_IDS[0]].name} until you switch.
-          </p>
+          {/* Active profile details */}
+          <div className="space-y-2 text-[13px]">
+            <ProfileRow label="Name" value={profile.name} />
+            <ProfileRow label="Bodyweight" value={profile.body.bodyweight} />
+            {profile.program && <ProfileRow label="Program" value={profile.program} />}
+            {profile.body.bodyFat && <ProfileRow label="Body Fat" value={profile.body.bodyFat} />}
+            {profile.body.fatMass && <ProfileRow label="Fat Mass" value={profile.body.fatMass} />}
+            {profile.body.leanMass && <ProfileRow label="Lean Mass" value={profile.body.leanMass} />}
+            <ProfileRow label="Protein" value={`${profile.targets.proteinG} g/day`} />
+            {profile.targets.steps && <ProfileRow label="Steps" value={profile.targets.steps} />}
+            {profile.dosha && <ProfileRow label="Dosha" value={profile.dosha} />}
+            {SHOW_VEDIC && profile.mahadasha && <ProfileRow label="Mahadasha" value={profile.mahadasha} />}
+            {SHOW_VEDIC && profile.atmakaraka && <ProfileRow label="Atmakaraka" value={profile.atmakaraka} />}
+            {profile.body.goal && (
+              <p className="text-[12px] leading-relaxed pt-1" style={{ color: 'var(--ink-dim)' }}>
+                {profile.body.goal}
+              </p>
+            )}
+          </div>
+        </Card>
 
-          <div className="flex items-center gap-2 pt-1">
-            <span className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>From</span>
-            <div className="flex gap-1">
-              {PROFILE_IDS.map(id => (
-                <button
-                  key={id}
-                  onClick={() => {
-                    setReassignFrom(id)
-                    setReassignCount(null)
-                  }}
-                  className={cn(
-                    'px-2.5 py-1 rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-colors border',
-                    id === reassignFrom
-                      ? 'border-noir-accent text-[color:var(--ink)] bg-white/[0.05]'
-                      : 'border-[color:var(--hairline)] text-[color:var(--ink-faint)] hover:text-[color:var(--ink-dim)]'
-                  )}
-                  aria-pressed={id === reassignFrom}
-                >
-                  {PROFILES[id].name}
-                </button>
-              ))}
+        <Card>
+          <CardHeader label="Data" />
+          <div className="space-y-2">
+            <Button variant="default" fullWidth onClick={handleExport} disabled={exporting}>
+              {exporting ? 'Exporting...' : exportDone ? '✓ Backup downloaded' : 'Export All Data (JSON)'}
+            </Button>
+            {/* Hidden file picker — triggered programmatically */}
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".json,application/json"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+            <Button variant="ghost" fullWidth onClick={handleImportClick} disabled={importing}>
+              {importing ? 'Importing…' : 'Import Backup'}
+            </Button>
+            {importMsg && (
+              <p
+                className="text-[11px] text-center pt-1"
+                style={{ color: importMsg.ok ? 'var(--complete-text)' : 'var(--skip-text)' }}
+              >
+                {importMsg.text}
+              </p>
+            )}
+          </div>
+        </Card>
+
+        <Card>
+          <CardHeader label="Image Cache" />
+          <StoragePanel />
+        </Card>
+
+        <Card>
+          <CardHeader label="Storage" />
+          <div className="space-y-2 text-[12px]">
+            <div className="flex justify-between">
+              <span className="text-[color:var(--ink-faint)]">Used</span>
+              <span className="text-[color:var(--ink-dim)]">{used !== null ? formatBytes(used) : '—'}</span>
             </div>
-            <span className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>
-              → {PROFILES[reassignTo].name}
-            </span>
+            <div className="flex justify-between">
+              <span className="text-[color:var(--ink-faint)]">Quota</span>
+              <span className="text-[color:var(--ink-dim)]">{quota !== null ? formatBytes(quota) : '—'}</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-[color:var(--ink-faint)]">Persistent</span>
+              <span className={persisted ? 'text-green-400' : 'text-[color:var(--ink-dim)]'}>
+                {persisted === null ? '—' : persisted ? 'Yes' : 'No'}
+              </span>
+            </div>
           </div>
+        </Card>
 
-          {reassignCount !== null && (
-            <p className="text-[12px]" style={{ color: 'var(--ink-dim)' }}>
-              {reassignCount === 0
-                ? `No workouts are filed under ${PROFILES[reassignFrom].name}.`
-                : `${reassignCount} workout${reassignCount === 1 ? '' : 's'} would move to ${PROFILES[reassignTo].name}.`}
+        {/* ── Reassign workouts between profiles on this device ── */}
+        <Card>
+          <CardHeader label="Reassign Workouts" />
+          <div className="space-y-2">
+            <p className="text-[12px] leading-relaxed" style={{ color: 'var(--ink-dim)' }}>
+              Moves every workout on <em>this device</em> from one profile to the other.
+              Use it if sessions were logged under the wrong name — the app starts on{' '}
+              {PROFILES[PROFILE_IDS[0]].name} until you switch.
             </p>
-          )}
 
-          <div className="flex gap-2">
-            <Button variant="ghost" fullWidth onClick={handlePreviewReassign} disabled={reassigning}>
-              Check
+            <div className="flex items-center gap-2 pt-1">
+              <span className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>From</span>
+              <div className="flex gap-1">
+                {PROFILE_IDS.map(id => (
+                  <button
+                    key={id}
+                    onClick={() => {
+                      setReassignFrom(id)
+                      setReassignCount(null)
+                    }}
+                    className={cn(
+                      'px-2.5 py-1 rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-colors border',
+                      id === reassignFrom
+                        ? 'border-noir-accent text-[color:var(--ink)] bg-white/[0.05]'
+                        : 'border-[color:var(--hairline)] text-[color:var(--ink-faint)] hover:text-[color:var(--ink-dim)]'
+                    )}
+                    aria-pressed={id === reassignFrom}
+                  >
+                    {PROFILES[id].name}
+                  </button>
+                ))}
+              </div>
+              <span className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>
+                → {PROFILES[reassignTo].name}
+              </span>
+            </div>
+
+            {reassignCount !== null && (
+              <p className="text-[12px]" style={{ color: 'var(--ink-dim)' }}>
+                {reassignCount === 0
+                  ? `No workouts are filed under ${PROFILES[reassignFrom].name}.`
+                  : `${reassignCount} workout${reassignCount === 1 ? '' : 's'} would move to ${PROFILES[reassignTo].name}.`}
+              </p>
+            )}
+
+            <div className="flex gap-2">
+              <Button variant="ghost" fullWidth onClick={handlePreviewReassign} disabled={reassigning}>
+                Check
+              </Button>
+              <Button
+                variant="default"
+                fullWidth
+                onClick={handleReassign}
+                disabled={reassigning || !reassignCount}
+              >
+                {reassigning ? 'Moving…' : `Move to ${PROFILES[reassignTo].name}`}
+              </Button>
+            </div>
+
+            {reassignMsg && (
+              <p
+                className="text-[12px] text-center pt-1"
+                style={{ color: reassignMsg.ok ? 'var(--complete-text)' : 'var(--skip-text)' }}
+              >
+                {reassignMsg.text}
+              </p>
+            )}
+          </div>
+        </Card>
+
+        {/* ── One-time migration — remove this card after successful import ── */}
+        <Card>
+          <CardHeader label="Migration" />
+          <div className="space-y-2">
+            <p className="text-[11px] leading-relaxed" style={{ color: 'var(--ink-faint)' }}>
+              Import historical workout data from{' '}
+              <span style={{ color: 'var(--ink-dim)' }}>obZen_workout_import.json</span>.
+              Place the file in the <span style={{ color: 'var(--ink-dim)' }}>/public</span> folder
+              before clicking. Safe to re-run — duplicate records are skipped.
+            </p>
+            <Button variant="ghost" fullWidth onClick={handleWorkoutMigration} disabled={migrating}>
+              {migrating ? 'Importing…' : 'Import Historical Workout Data'}
             </Button>
-            <Button
-              variant="default"
-              fullWidth
-              onClick={handleReassign}
-              disabled={reassigning || !reassignCount}
-            >
-              {reassigning ? 'Moving…' : `Move to ${PROFILES[reassignTo].name}`}
-            </Button>
+            {migrateMsg && (
+              <p
+                className="text-[11px] text-center pt-1"
+                style={{ color: migrateMsg.ok ? 'var(--complete-text)' : 'var(--skip-text)' }}
+              >
+                {migrateMsg.text}
+              </p>
+            )}
           </div>
+        </Card>
 
-          {reassignMsg && (
-            <p
-              className="text-[12px] text-center pt-1"
-              style={{ color: reassignMsg.ok ? 'var(--complete-text)' : 'var(--skip-text)' }}
-            >
-              {reassignMsg.text}
-            </p>
-          )}
-        </div>
-      </Card>
-
-      {/* ── One-time migration — remove this card after successful import ── */}
-      <Card>
-        <CardHeader label="Migration" />
-        <div className="space-y-2">
-          <p className="text-[11px] leading-relaxed" style={{ color: 'var(--ink-faint)' }}>
-            Import historical workout data from{' '}
-            <span style={{ color: 'var(--ink-dim)' }}>obZen_workout_import.json</span>.
-            Place the file in the <span style={{ color: 'var(--ink-dim)' }}>/public</span> folder
-            before clicking. Safe to re-run — duplicate records are skipped.
-          </p>
-          <Button variant="ghost" fullWidth onClick={handleWorkoutMigration} disabled={migrating}>
-            {migrating ? 'Importing…' : 'Import Historical Workout Data'}
-          </Button>
-          {migrateMsg && (
-            <p
-              className="text-[11px] text-center pt-1"
-              style={{ color: migrateMsg.ok ? 'var(--complete-text)' : 'var(--skip-text)' }}
-            >
-              {migrateMsg.text}
-            </p>
-          )}
-        </div>
-      </Card>
-
-      <Card>
-        <CardHeader label="App" />
-        <div className="space-y-2 text-[12px]">
-          <div className="flex justify-between">
-            <span className="text-[color:var(--ink-faint)]">Version</span>
-            <span className="text-[color:var(--ink-dim)]">1.0.0</span>
+        <Card>
+          <CardHeader label="App" />
+          <div className="space-y-2 text-[12px]">
+            <div className="flex justify-between">
+              <span className="text-[color:var(--ink-faint)]">Version</span>
+              <span className="text-[color:var(--ink-dim)]">1.0.0</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-[color:var(--ink-faint)]">Storage</span>
+              <span className="text-[color:var(--ink-dim)]">IndexedDB (offline)</span>
+            </div>
+            <div className="flex justify-between">
+              <span className="text-[color:var(--ink-faint)]">Mode</span>
+              <span className="text-[color:var(--ink-dim)]">PWA / Offline-first</span>
+            </div>
           </div>
-          <div className="flex justify-between">
-            <span className="text-[color:var(--ink-faint)]">Storage</span>
-            <span className="text-[color:var(--ink-dim)]">IndexedDB (offline)</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-[color:var(--ink-faint)]">Mode</span>
-            <span className="text-[color:var(--ink-dim)]">PWA / Offline-first</span>
-          </div>
-        </div>
-      </Card>
+        </Card>
+      </div>
     </div>
   )
 }
