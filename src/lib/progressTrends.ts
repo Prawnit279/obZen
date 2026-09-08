@@ -223,3 +223,134 @@ export function liftSignals(
     }
   })
 }
+
+// ── Session load ─────────────────────────────────────────────────────────────
+
+export interface SessionLoad {
+  date: string
+  /** RPE × reps performed. Zero when the session was never rated. */
+  load: number
+  reps: number
+  rpe: number | null
+}
+
+/** Total reps actually performed across a session, all movements. */
+function sessionReps(session: WorkoutDaySession): number {
+  return session.exercises.reduce(
+    (n, ex) => n + realSets(ex).reduce((r, s) => r + s.reps, 0),
+    0
+  )
+}
+
+/**
+ * Session load, oldest first — the sRPE method: how hard it felt times how much
+ * was done.
+ *
+ * An unrated session contributes no load rather than an assumed one. Guessing a
+ * middle RPE would put invented numbers into the ratio below, which is the one
+ * place in the app that turns a number into a recommendation.
+ */
+export function sessionLoads(sessions: WorkoutDaySession[]): SessionLoad[] {
+  return [...sessions]
+    .sort((a, b) => a.date.localeCompare(b.date))
+    .map(s => {
+      const reps = sessionReps(s)
+      const rpe = typeof s.rpe === 'number' ? s.rpe : null
+      return { date: s.date, reps, rpe, load: rpe === null ? 0 : rpe * reps }
+    })
+}
+
+// ── Acute : chronic workload ─────────────────────────────────────────────────
+
+/**
+ * ⚠️ Reference bands, not independently verified. The 0.8–1.3 "sweet spot" and
+ * the 1.5 upper bound come from the sports-science literature on acute:chronic
+ * workload, which is itself contested — several later papers dispute the
+ * method. Treat the reading as a prompt to look at your week, not a verdict.
+ */
+export const ACWR_BANDS = { low: 0.8, high: 1.3, spike: 1.5 } as const
+
+export type AcwrVerdict = 'detraining' | 'steady' | 'elevated' | 'spike' | 'unknown'
+
+export interface Acwr {
+  /** Load over the last 7 days. */
+  acute: number
+  /** Average 7-day load over the last 28. */
+  chronic: number
+  ratio: number | null
+  verdict: AcwrVerdict
+  /** Rated sessions in the 28-day window — the ratio means little below a few. */
+  ratedSessions: number
+}
+
+/**
+ * Acute (7-day) load against chronic (28-day average) load.
+ *
+ * Returns `unknown` rather than a number when there is not enough rated
+ * training behind it: a ratio built on one session is arithmetic, not a signal.
+ */
+export function acwr(loads: SessionLoad[], todayISODate: string, minRated = 3): Acwr {
+  const today = Date.parse(`${todayISODate}T12:00:00`)
+  const withinDays = (d: string, days: number) =>
+    today - Date.parse(`${d}T12:00:00`) < days * 864e5 &&
+    Date.parse(`${d}T12:00:00`) <= today
+
+  const rated = loads.filter(l => l.rpe !== null)
+  const acute = rated.filter(l => withinDays(l.date, 7)).reduce((n, l) => n + l.load, 0)
+  const last28 = rated.filter(l => withinDays(l.date, 28))
+  const chronic = last28.reduce((n, l) => n + l.load, 0) / 4
+
+  if (last28.length < minRated || chronic === 0) {
+    return { acute, chronic, ratio: null, verdict: 'unknown', ratedSessions: last28.length }
+  }
+
+  const ratio = acute / chronic
+  const verdict: AcwrVerdict =
+    ratio < ACWR_BANDS.low ? 'detraining'
+    : ratio <= ACWR_BANDS.high ? 'steady'
+    : ratio < ACWR_BANDS.spike ? 'elevated'
+    : 'spike'
+
+  return { acute, chronic, ratio, verdict, ratedSessions: last28.length }
+}
+
+// ── Deload ───────────────────────────────────────────────────────────────────
+
+export interface DeloadAdvice {
+  recommend: boolean
+  /** Plain-language reasons, in the order they were found. */
+  reasons: string[]
+}
+
+/**
+ * Whether to suggest a lighter week, from the signals already computed.
+ *
+ * Deliberately conservative: one signal alone is noise, so two must agree
+ * before this recommends anything. A stalled lift plus a load spike is a case;
+ * either on its own is a week to watch.
+ */
+export function deloadAdvice(signals: LiftSignal[], load: Acwr): DeloadAdvice {
+  const reasons: string[] = []
+
+  const stalled = signals.filter(s => s.stall?.stalled)
+  if (stalled.length > 0) {
+    reasons.push(
+      stalled.length === 1
+        ? `${stalled[0].name} has not improved in ${Math.round(stalled[0].stall!.weeksSincePeak)} weeks`
+        : `${stalled.length} lifts have stopped improving`
+    )
+  }
+
+  if (load.verdict === 'spike') {
+    reasons.push(`This week's load is ${load.ratio!.toFixed(1)}× your recent average`)
+  } else if (load.verdict === 'elevated') {
+    reasons.push(`This week's load is running above your recent average`)
+  }
+
+  const falling = signals.filter(s => s.trend && s.trend.slopeKgPerWeek < 0)
+  if (falling.length >= 2) {
+    reasons.push(`${falling.length} lifts are trending down`)
+  }
+
+  return { recommend: reasons.length >= 2, reasons }
+}

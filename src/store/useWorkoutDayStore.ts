@@ -46,7 +46,9 @@ interface WorkoutDayState {
 
   loadSession: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', date?: string) => Promise<void>
   loadTemplate: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', date?: string) => Promise<void>
-  completeSession: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', date?: string) => Promise<void>
+  /** `rpe` is 1–10 and optional; omitting it completes without a rating. */
+  completeSession: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', date?: string, rpe?: number) => Promise<void>
+  setSessionRpe: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', rpe: number, date?: string) => Promise<void>
   updateExerciseStatus: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, status: ExerciseSessionState['status'], date?: string) => Promise<void>
   addLoggedSet: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, set: LoggedSet, date?: string) => Promise<void>
   updateLoggedSet: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, setIndex: number, set: LoggedSet, date?: string) => Promise<void>
@@ -170,14 +172,23 @@ export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => {
     },
 
     // Mark the day's workout complete (stamps completedAt for history/streaks).
-    completeSession: async (dayLabel, date = todayISO()) => {
+    completeSession: async (dayLabel, date = todayISO(), rpe) => {
       const profileId = activeProfile()
       const key = `${profileId}::${dayLabel}::${date}`
       await mutate(key, s => ({
         ...s,
         completedAt: new Date().toISOString(),
+        // Only written when given, so completing without rating leaves the
+        // field absent rather than storing a fabricated middle value.
+        ...(rpe === undefined ? {} : { rpe }),
         focus: s.focus ?? getProgram(profileId)[dayLabel]?.focus,
       }))
+    },
+
+    /** Rate a session after the fact, or correct a rating. */
+    setSessionRpe: async (dayLabel, rpe, date = todayISO()) => {
+      const key = `${activeProfile()}::${dayLabel}::${date}`
+      await mutate(key, s => ({ ...s, rpe }))
     },
 
     updateExerciseStatus: async (dayLabel, exerciseId, status, date = todayISO()) => {

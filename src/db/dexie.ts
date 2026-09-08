@@ -213,6 +213,12 @@ export interface WorkoutDaySession {
   order: string[] // exerciseId ordering
   /** Set when the user marks the day's workout complete. */
   completedAt?: string
+  /**
+   * Session RPE, 1–10 — how hard the whole session felt, recorded once when it
+   * is marked complete. Non-indexed, so this needs no schema version: Dexie
+   * only versions the indexes, and rows saved before this simply have no value.
+   */
+  rpe?: number
 }
 
 // --- Drum Library ---

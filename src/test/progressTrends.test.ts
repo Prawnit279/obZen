@@ -2,7 +2,8 @@ import { describe, it, expect } from 'vitest'
 import type { WorkoutDaySession, LoggedSet } from '@/db/dexie'
 import {
   e1rmTrend, weeksToGoal, stallCheck, prFeed, liftSignals,
-  STALL_WEEKS, TM_RESET_FRACTION,
+  sessionLoads, acwr, deloadAdvice,
+  STALL_WEEKS, TM_RESET_FRACTION, ACWR_BANDS,
 } from '@/lib/progressTrends'
 import type { E1RMPoint } from '@/lib/progress'
 
@@ -266,5 +267,159 @@ describe('liftSignals', () => {
     const [bench] = liftSignals(sessions, ['bench-press'])
     expect(bench.trend).toBeNull()
     expect(bench.stall).toBeNull()
+  })
+})
+
+// ── Session load ─────────────────────────────────────────────────────────────
+
+function rated(date: string, rpe: number | undefined, sets: LoggedSet[]): WorkoutDaySession {
+  const s = session(date, 'deadlift', sets)
+  return rpe === undefined ? s : { ...s, rpe }
+}
+
+describe('sessionLoads', () => {
+  it('multiplies how hard it felt by how much was done', () => {
+    const [load] = sessionLoads([rated('2026-08-01', 8, [set(100, 5), set(100, 5)])])
+    expect(load.reps).toBe(10)
+    expect(load.rpe).toBe(8)
+    expect(load.load).toBe(80)
+  })
+
+  it('gives an unrated session no load rather than an assumed one', () => {
+    // A guessed middle RPE would put invented numbers into the ratio.
+    const [load] = sessionLoads([rated('2026-08-01', undefined, [set(100, 5)])])
+    expect(load.rpe).toBeNull()
+    expect(load.load).toBe(0)
+    expect(load.reps).toBe(5)
+  })
+
+  it('counts reps across every movement in the session', () => {
+    const multi: WorkoutDaySession = {
+      date: '2026-08-01', dayLabel: 'Day 1', profileId: 'pronit', rpe: 5,
+      exercises: [
+        { exerciseId: 'deadlift', status: 'complete', sets: [set(100, 3)] },
+        { exerciseId: 'bench-press', status: 'complete', sets: [set(60, 7)] },
+      ],
+      order: ['deadlift', 'bench-press'],
+    }
+    expect(sessionLoads([multi])[0].load).toBe(5 * 10)
+  })
+
+  it('is oldest first', () => {
+    const loads = sessionLoads([
+      rated('2026-08-15', 7, [set(100, 5)]),
+      rated('2026-08-01', 7, [set(100, 5)]),
+    ])
+    expect(loads.map(l => l.date)).toEqual(['2026-08-01', '2026-08-15'])
+  })
+
+  it('ignores placeholder rows when counting reps', () => {
+    const placeholder: LoggedSet = { setNumber: 1, weight: 0, reps: 0, unit: 'kg', timestamp: '' }
+    expect(sessionLoads([rated('2026-08-01', 8, [placeholder])])[0].reps).toBe(0)
+  })
+})
+
+// ── ACWR ─────────────────────────────────────────────────────────────────────
+
+describe('acwr', () => {
+  /** Four weeks of identical sessions ending on `to`. */
+  function steadyWeeks(to: string, rpe: number, reps: number) {
+    const end = Date.parse(`${to}T12:00:00`)
+    return Array.from({ length: 4 }, (_, i) => {
+      const d = new Date(end - i * 7 * 864e5).toISOString().slice(0, 10)
+      return rated(d, rpe, [set(100, reps)])
+    })
+  }
+
+  it('reads about 1 when this week matches the recent average', () => {
+    const r = acwr(sessionLoads(steadyWeeks('2026-09-05', 7, 10)), '2026-09-05')
+    expect(r.ratio).toBeCloseTo(1, 4)
+    expect(r.verdict).toBe('steady')
+    expect(r.ratedSessions).toBe(4)
+  })
+
+  it('calls a doubled week a spike', () => {
+    const weeks = steadyWeeks('2026-09-05', 7, 10)
+    // Triple the most recent week's reps.
+    weeks[0] = rated('2026-09-05', 7, [set(100, 30)])
+    const r = acwr(sessionLoads(weeks), '2026-09-05')
+    expect(r.ratio).toBeGreaterThan(ACWR_BANDS.spike)
+    expect(r.verdict).toBe('spike')
+  })
+
+  it('calls a quiet week detraining', () => {
+    const weeks = steadyWeeks('2026-09-05', 7, 10)
+    weeks[0] = rated('2026-09-05', 7, [set(100, 1)])
+    const r = acwr(sessionLoads(weeks), '2026-09-05')
+    expect(r.ratio).toBeLessThan(ACWR_BANDS.low)
+    expect(r.verdict).toBe('detraining')
+  })
+
+  it('says unknown rather than guessing from too little training', () => {
+    // A ratio built on one session is arithmetic, not a signal.
+    const r = acwr(sessionLoads([rated('2026-09-05', 8, [set(100, 10)])]), '2026-09-05')
+    expect(r.ratio).toBeNull()
+    expect(r.verdict).toBe('unknown')
+    expect(r.ratedSessions).toBe(1)
+  })
+
+  it('says unknown when nothing in the window was rated', () => {
+    const unrated = Array.from({ length: 4 }, (_, i) =>
+      rated(new Date(Date.parse('2026-09-05T12:00:00') - i * 7 * 864e5).toISOString().slice(0, 10),
+        undefined, [set(100, 10)]))
+    const r = acwr(sessionLoads(unrated), '2026-09-05')
+    expect(r.verdict).toBe('unknown')
+    expect(r.ratedSessions).toBe(0)
+  })
+
+  it('ignores training older than the window', () => {
+    const old = rated('2025-01-01', 10, [set(100, 100)])
+    const recent = steadyWeeks('2026-09-05', 7, 10)
+    const r = acwr(sessionLoads([old, ...recent]), '2026-09-05')
+    expect(r.ratio).toBeCloseTo(1, 4)
+  })
+})
+
+// ── Deload ───────────────────────────────────────────────────────────────────
+
+describe('deloadAdvice', () => {
+  const stalledLift = liftSignals([
+    session('2026-08-01', 'deadlift', [set(140, 5)]),
+    session('2026-09-05', 'deadlift', [set(130, 5)]),
+  ], ['deadlift'])
+
+  const healthy = liftSignals([
+    session('2026-08-01', 'deadlift', [set(100, 5)]),
+    session('2026-08-08', 'deadlift', [set(110, 5)]),
+  ], ['deadlift'])
+
+  const spike = { acute: 900, chronic: 300, ratio: 3, verdict: 'spike' as const, ratedSessions: 5 }
+  const steady = { acute: 300, chronic: 300, ratio: 1, verdict: 'steady' as const, ratedSessions: 5 }
+  const unknown = { acute: 0, chronic: 0, ratio: null, verdict: 'unknown' as const, ratedSessions: 0 }
+
+  it('recommends when two signals agree', () => {
+    const advice = deloadAdvice(stalledLift, spike)
+    expect(advice.recommend).toBe(true)
+    expect(advice.reasons).toHaveLength(2)
+  })
+
+  it('holds back on a single signal', () => {
+    // One signal alone is noise.
+    expect(deloadAdvice(stalledLift, steady).recommend).toBe(false)
+    expect(deloadAdvice(healthy, spike).recommend).toBe(false)
+  })
+
+  it('says nothing when training is going well', () => {
+    const advice = deloadAdvice(healthy, steady)
+    expect(advice.recommend).toBe(false)
+    expect(advice.reasons).toEqual([])
+  })
+
+  it('does not treat an unknown ratio as a reason', () => {
+    expect(deloadAdvice(stalledLift, unknown).reasons).toHaveLength(1)
+  })
+
+  it('names the lift when only one has stalled', () => {
+    expect(deloadAdvice(stalledLift, spike).reasons[0]).toMatch(/Deadlift/)
   })
 })

@@ -72,6 +72,56 @@ function RestDayCard() {
   )
 }
 
+/**
+ * Session RPE, 1–10 — how hard the whole session felt.
+ *
+ * Unrated is a real state and stays available: an unrated session contributes
+ * no load rather than an assumed one, so there is nothing to gain by guessing.
+ */
+function RpeScale({ value, onChange }: { value?: number; onChange: (rpe: number) => void }) {
+  return (
+    <div className="flex flex-col" style={{ gap: 6 }}>
+      <div className="flex items-baseline justify-between">
+        <span
+          className="uppercase"
+          style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+        >
+          How hard was it?
+        </span>
+        <span style={{ fontSize: 11, color: 'var(--ink-faint)' }}>
+          {value === undefined ? 'Not rated' : `RPE ${value}`}
+        </span>
+      </div>
+      <div role="group" aria-label="Session RPE" className="flex" style={{ gap: 3 }}>
+        {Array.from({ length: 10 }, (_, i) => i + 1).map(n => {
+          const on = value === n
+          return (
+            <button
+              key={n}
+              onClick={() => onChange(n)}
+              aria-pressed={on}
+              aria-label={`RPE ${n} of 10`}
+              className="flex-1 transition-colors"
+              style={{
+                padding: '7px 0',
+                borderRadius: 'var(--r-control)',
+                fontSize: 11, fontWeight: 500,
+                fontVariantNumeric: 'tabular-nums',
+                border: `1px solid ${on ? 'rgba(167,139,250,0.45)' : 'var(--hairline)'}`,
+                background: on ? 'rgba(139,92,246,0.16)' : 'transparent',
+                color: on ? 'var(--ink)' : 'var(--ink-faint)',
+                cursor: 'pointer',
+              }}
+            >
+              {n}
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 // ---------------------------------------------------------------------------
 // Day view component
 // ---------------------------------------------------------------------------
@@ -89,6 +139,8 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
   const activeId = useProfileStore(s => s.activeId)
   const session = selectDaySession(store.sessions, dayLabel, sessionDate, activeId)
   const [showAddSheet, setShowAddSheet] = useState(false)
+  // Held until Complete is pressed, so rating and completing are one action.
+  const [pendingRpe, setPendingRpe] = useState<number | undefined>()
 
   // Load this profile's session for this day+date (reloads when any changes)
   useEffect(() => {
@@ -225,20 +277,33 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
       {/* Complete workout */}
       {orderedExercises.length > 0 && (
         session.completedAt ? (
-          <div
-            className="text-center text-[13px] uppercase tracking-widest py-2.5 rounded-[var(--r-control)]"
-            style={{ color: 'var(--complete-text)', border: '1px solid var(--complete-border)', background: 'rgba(22,101,52,0.08)' }}
-          >
-            ✓ Workout Complete
+          <div className="flex flex-col" style={{ gap: 10 }}>
+            <div
+              className="text-center text-[13px] uppercase tracking-widest py-2.5 rounded-[var(--r-control)]"
+              style={{ color: 'var(--complete-text)', border: '1px solid var(--complete-border)', background: 'var(--complete-bg)' }}
+            >
+              ✓ Workout Complete
+            </div>
+            {/* Rating stays editable afterwards — it is a judgement made at the
+                end of a session and often revised a minute later. */}
+            <RpeScale
+              value={session.rpe}
+              onChange={rpe => store.setSessionRpe(dayLabel, rpe, sessionDate)}
+            />
           </div>
         ) : (
-          <button
-            onClick={() => store.completeSession(dayLabel, sessionDate)}
-            className="w-full py-3 rounded-[var(--r-control)] text-[13px] uppercase tracking-widest transition-opacity hover:opacity-80"
-            style={{ border: '1px solid var(--complete-border)', color: 'var(--complete-text)' }}
-          >
-            Complete Workout
-          </button>
+          <div className="flex flex-col" style={{ gap: 10 }}>
+            {/* The pending choice has to be what renders, or tapping a number
+                selects nothing until the session is completed. */}
+            <RpeScale value={pendingRpe ?? session.rpe} onChange={setPendingRpe} />
+            <button
+              onClick={() => store.completeSession(dayLabel, sessionDate, pendingRpe)}
+              className="w-full py-3 rounded-[var(--r-control)] text-[13px] uppercase tracking-widest transition-opacity hover:opacity-80"
+              style={{ border: '1px solid var(--complete-border)', color: 'var(--complete-text)' }}
+            >
+              Complete Workout
+            </button>
+          </div>
         )
       )}
 
