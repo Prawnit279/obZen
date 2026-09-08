@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react'
 import { db } from '@/db/dexie'
 import type { ExerciseSessionState } from '@/db/dexie'
 import { formatDateFull } from '@/lib/utils'
-import { setWeightLb } from '@/lib/progress'
+import { loadedWeightLb } from '@/lib/progress'
 import { setUnitsFor, formatSet } from '@/lib/setUnits'
 import { isExerciseLogged } from '@/lib/workoutSession'
 
@@ -167,7 +167,7 @@ export default function SessionDetail() {
                           Set {s.setNumber}
                         </span>
                         <span className="font-mono tabular-nums" style={{ color: 'var(--ink)' }}>
-                          {formatSet(setUnitsFor(ex.exerciseId), setWeightLb(s), s.reps)}
+                          {formatSet(setUnitsFor(ex.exerciseId), loadedWeightLb(ex.exerciseId, s), s.reps)}
                         </span>
                       </div>
                     ))}

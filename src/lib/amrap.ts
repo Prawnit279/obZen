@@ -18,7 +18,7 @@
  */
 
 import type { WorkoutDaySession, LoggedSet, ExerciseSessionState } from '@/db/dexie'
-import { isRealSet, setWeightLb, isUpperBodyMuscle } from '@/lib/progress'
+import { isRealSet, setWeightLb, loadedWeightLb, isUpperBodyMuscle } from '@/lib/progress'
 import { epley1RM, roundTo5, trainingMax } from '@/lib/strengthTools'
 
 /** A Training Max is 90% of an estimated 1RM. */
@@ -94,7 +94,7 @@ export function latestAmrapSets(
           : [{
               exerciseId,
               dateISO: session.date,
-              weightLb: setWeightLb(best),
+              weightLb: loadedWeightLb(exerciseId, best),
               reps: best.reps,
               muscle: ex.muscle,
             }]
@@ -120,7 +120,7 @@ function priorTrainingMax(
       const ex = session.exercises.find(e => e.exerciseId === exerciseId)
       return ex ? ex.sets.filter(isRealSet) : []
     })
-    .reduce((max, s) => Math.max(max, epley1RM(setWeightLb(s), s.reps)), 0)
+    .reduce((max, s) => Math.max(max, epley1RM(loadedWeightLb(exerciseId, s), s.reps)), 0)
 
   return best > 0 ? trainingMax(best) : null
 }

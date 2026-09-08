@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/db/dexie'
-import { setWeightLb } from '@/lib/progress'
+import { loadedWeightLb } from '@/lib/progress'
 import { belongsToProfile } from '@/lib/workoutSession'
 import { useProfileStore } from '@/store/useProfileStore'
 
@@ -66,7 +66,7 @@ export function ExerciseHistory({ exerciseId, exerciseName }: Props) {
               </div>
               <div className="text-[11px]" style={{ color: 'var(--muted)' }}>
                 {entry.sets.map(s => (
-                  `Set ${s.setNumber}: ${s.weight > 0 ? Math.round(setWeightLb(s)) + 'lb' : '—'}×${s.reps}`
+                  `Set ${s.setNumber}: ${s.weight > 0 ? Math.round(loadedWeightLb(exerciseId, s)) + 'lb' : '—'}×${s.reps}`
                 )).join('  ')}
               </div>
             </div>

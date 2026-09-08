@@ -4,7 +4,7 @@ import { exerciseNameFor } from '@/data/obzen-program'
 import { belongsToProfile } from '@/lib/workoutSession'
 import { useProfileStore } from '@/store/useProfileStore'
 import { PROFILES } from '@/config/profiles'
-import { realSets, setWeightLb } from '@/lib/progress'
+import { realSets, loadedWeightLb } from '@/lib/progress'
 
 const LINE_COLORS = ['var(--series-1)', 'var(--series-2)', 'var(--series-3)']
 
@@ -27,7 +27,8 @@ export function ProgressOverloadChart() {
     if (!belongsToProfile(session, activeId)) continue
     for (const ex of session.exercises) {
       if (!keyLiftIds.includes(ex.exerciseId)) continue
-      const maxW = realSets(ex).reduce((acc, s) => Math.max(acc, setWeightLb(s)), 0)
+      const maxW = realSets(ex).reduce(
+        (acc, s) => Math.max(acc, loadedWeightLb(ex.exerciseId, s)), 0)
       if (maxW === 0) continue
       const prev = seriesMap[ex.exerciseId][session.date] ?? 0
       seriesMap[ex.exerciseId][session.date] = Math.max(prev, maxW)

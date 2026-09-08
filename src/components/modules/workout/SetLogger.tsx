@@ -3,6 +3,7 @@ import { Check, Plus, Trash2 } from 'lucide-react'
 import type { LoggedSet } from '@/db/dexie'
 import { cn } from '@/lib/utils'
 import { setUnitsFor } from '@/lib/setUnits'
+import { barWeightLbFor } from '@/lib/barWeight'
 import type { SetUnits } from '@/lib/setUnits'
 
 const MAX_SETS = 10
@@ -170,6 +171,10 @@ export function SetLogger({ exerciseId, sets, onAddSet, onUpdateSet, onRemoveSet
   // A plank logs seconds and an assisted pull-up logs assistance; the inputs
   // say so, because `lib/progress.ts` reads them that way.
   const units = setUnitsFor(exerciseId)
+  // Weight is logged as plates, so the header has to say so — otherwise the
+  // totals shown everywhere else look 45 lb heavier than what was typed, with
+  // nothing on this screen explaining why.
+  const barLb = barWeightLbFor(exerciseId)
 
   const handleSave = (index: number, set: LoggedSet) => {
     if (index < sets.length) {
@@ -210,6 +215,9 @@ export function SetLogger({ exerciseId, sets, onAddSet, onUpdateSet, onRemoveSet
         Log Today
         {units.isDuration && <span style={{ color: 'var(--ink-dim)' }}> · hold in seconds</span>}
         {units.isAssistance && <span style={{ color: 'var(--ink-dim)' }}> · assistance weight</span>}
+        {barLb > 0 && (
+          <span style={{ color: 'var(--ink-dim)' }}> · plates only, {barLb} lb bar added</span>
+        )}
         {!units.isDuration && (
           <span style={{ color: 'var(--ink-faint)' }}> · tap “{units.countLabel}” for an AMRAP</span>
         )}

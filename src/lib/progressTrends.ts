@@ -1,6 +1,6 @@
 import type { WorkoutDaySession } from '@/db/dexie'
 import { trackingModeFor, exerciseNameFor } from '@/data/obzen-program'
-import { e1rmSeries, realSets, toKg, bestE1RM } from '@/lib/progress'
+import { e1rmSeries, realSets, setLoadKg, bestE1RM } from '@/lib/progress'
 import type { E1RMPoint } from '@/lib/progress'
 
 /**
@@ -165,10 +165,10 @@ export function prFeed(sessions: WorkoutDaySession[], bodyweightKg = 0): PREvent
 
       if (isLoad) {
         const heaviest = sets.reduce(
-          (best, s) => (toKg(s.weight, s.unit) > toKg(best.weight, best.unit) ? s : best),
+          (best, s) => (setLoadKg(id, s) > setLoadKg(id, best) ? s : best),
           sets[0]
         )
-        const weightKg = toKg(heaviest.weight, heaviest.unit)
+        const weightKg = setLoadKg(id, heaviest)
         const prev = bestWeight.get(id)
         if (weightKg > 0 && (prev === undefined || weightKg > prev)) {
           events.push({

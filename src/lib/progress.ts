@@ -14,6 +14,7 @@
 
 import type { WorkoutDaySession, ExerciseSessionState, LoggedSet } from '@/db/dexie'
 import { trackingModeFor, bodyweightFactorFor, exerciseNameFor } from '@/data/obzen-program'
+import { barWeightLbFor } from '@/lib/barWeight'
 import type { TrackingMode } from '@/data/obzen-program'
 
 const LB_PER_KG = 2.2046226218
@@ -43,11 +44,40 @@ export function displayLb(kg: number, decimals = 0): string {
 }
 
 /**
- * A logged set's weight in pounds, whichever unit it was recorded in. Older
- * sets may be in kg; those are converted so history reads consistently.
+ * The load a set actually moved, in kilos: the plates that were logged, plus
+ * the bar they were on, plus whatever share of bodyweight the movement carries,
+ * less any assistance. Every weight the app reports comes through here, so the
+ * bar is added in exactly one place.
  */
+export function setLoadKg(exerciseId: string, s: LoggedSet, bodyweightKg = 0): number {
+  const logged = toKg(s.weight, s.unit)
+  // Portion of bodyweight this movement actually moves — 0 for barbell and
+  // machine work, ~1 for a pull-up, ~0.65 for a push-up.
+  const bodyweightLoad = bodyweightKg * bodyweightFactorFor(exerciseId)
+
+  // Assistance is subtracted from the bodyweight being moved, and an assisted
+  // movement hangs from a fixed bar rather than loading one.
+  if (trackingModeFor(exerciseId) === 'assisted') {
+    return Math.max(0, bodyweightLoad - logged)
+  }
+  return logged + lbToKg(barWeightLbFor(exerciseId)) + bodyweightLoad
+}
+
+/** A set's logged weight in pounds, before the bar is added back. */
 export function setWeightLb(s: LoggedSet): number {
   return s.unit === 'lbs' ? s.weight : kgToLb(s.weight)
+}
+
+/**
+ * What was on the bar, in pounds: the plates logged plus the bar itself.
+ *
+ * The display counterpart to `setLoadKg`, and deliberately not the same thing —
+ * bodyweight is left out, because a screen showing a set wants the weight that
+ * was loaded, not the lifter's contribution to it. Assistance-tracked movements
+ * carry no bar, so their assistance figure passes through unchanged.
+ */
+export function loadedWeightLb(exerciseId: string, s: LoggedSet): number {
+  return setWeightLb(s) + barWeightLbFor(exerciseId)
 }
 
 /** A set actually performed — placeholder rows from the logger are excluded. */
@@ -79,19 +109,8 @@ export function epley1RM(weightKg: number, reps: number, addedBodyweightKg = 0):
  * taking the max means warmups can never beat a true working set anyway.
  */
 export function bestE1RM(ex: ExerciseSessionState, bodyweightKg = 0): number {
-  const mode = trackingModeFor(ex.exerciseId)
-  // Portion of bodyweight this movement actually moves — 0 for barbell/machine
-  // work, ~1 for a pull-up, ~0.65 for a push-up.
-  const bodyweightLoad = bodyweightKg * bodyweightFactorFor(ex.exerciseId)
-
   return realSets(ex).reduce((best, s) => {
-    const logged = toKg(s.weight, s.unit)
-    // Assistance is subtracted from the bodyweight being moved; every other
-    // movement adds its external load on top.
-    const load = mode === 'assisted'
-      ? Math.max(0, bodyweightLoad - logged)
-      : logged + bodyweightLoad
-    const e1rm = epley1RM(load, s.reps)
+    const e1rm = epley1RM(setLoadKg(ex.exerciseId, s, bodyweightKg), s.reps)
     return e1rm > best ? e1rm : best
   }, 0)
 }
@@ -187,18 +206,12 @@ export function isoWeekKey(dateISO: string): string {
  * exactly as it was.
  */
 export function exerciseTonnage(ex: ExerciseSessionState, bodyweightKg = 0): number {
-  const mode = trackingModeFor(ex.exerciseId)
-  if (mode === 'timed') return 0
+  if (trackingModeFor(ex.exerciseId) === 'timed') return 0
 
-  const bodyweightLoad = bodyweightKg * bodyweightFactorFor(ex.exerciseId)
-
-  return realSets(ex).reduce((sum, s) => {
-    const logged = toKg(s.weight, s.unit)
-    const load = mode === 'assisted'
-      ? Math.max(0, bodyweightLoad - logged)
-      : logged + bodyweightLoad
-    return sum + load * s.reps
-  }, 0)
+  return realSets(ex).reduce(
+    (sum, s) => sum + setLoadKg(ex.exerciseId, s, bodyweightKg) * s.reps,
+    0
+  )
 }
 
 export interface WeeklyVolume {
@@ -317,7 +330,7 @@ export function exercisePRs(
 
     for (const s of realSets(ex)) {
       if (s.reps < 1 || s.reps > MAX_PR_REPS) continue
-      const weightKg = toKg(s.weight, s.unit)
+      const weightKg = setLoadKg(exerciseId, s)
       const current = byRep.get(s.reps)
       if (!current || weightKg > current.weightKg) {
         byRep.set(s.reps, { reps: s.reps, weightKg, date: session.date })
@@ -622,7 +635,7 @@ export function suggestProgression(
     const sets = realSets(ex)
     // Every working set must have reached the top of the range.
     if (!sets.every(s => s.reps >= top)) return undefined
-    heaviest = Math.max(heaviest, ...sets.map(s => toKg(s.weight, s.unit)))
+    heaviest = Math.max(heaviest, ...sets.map(s => setLoadKg(exerciseId, s)))
   }
   if (heaviest <= 0) return undefined
 

@@ -6,6 +6,11 @@ import {
   STALL_WEEKS, TM_RESET_FRACTION, ACWR_BANDS, LAGGING_THRESHOLD,
 } from '@/lib/progressTrends'
 import type { E1RMPoint } from '@/lib/progress'
+import { lbToKg } from '@/lib/progress'
+import { DEFAULT_BAR_LB } from '@/lib/barWeight'
+
+/** Deadlift is bar-loaded, so `set(100, 5)` is 100 in plates plus a bar. */
+const BAR = lbToKg(DEFAULT_BAR_LB)
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -154,7 +159,8 @@ describe('prFeed', () => {
       session('2026-08-15', 'deadlift', [set(120, 5)]),
     ])
     const weights = feed.filter(e => e.kind === 'weight')
-    expect(weights.map(e => e.valueKg)).toEqual([120, 110, 100])
+    weights.map(e => e.valueKg).forEach((v, i) =>
+      expect(v).toBeCloseTo([120, 110, 100][i] + BAR, 2))
   })
 
   it('is most recent first', () => {
@@ -171,8 +177,11 @@ describe('prFeed', () => {
       session('2026-08-08', 'deadlift', [set(110, 5)]),
     ])
     const weights = feed.filter(e => e.kind === 'weight')
-    expect(weights[0]).toMatchObject({ valueKg: 110, previousKg: 100, reps: 5 })
-    expect(weights[1]).toMatchObject({ valueKg: 100, previousKg: null })
+    expect(weights[0].reps).toBe(5)
+    expect(weights[0].valueKg).toBeCloseTo(110 + BAR, 2)
+    expect(weights[0].previousKg!).toBeCloseTo(100 + BAR, 2)
+    expect(weights[1].previousKg).toBeNull() // nothing to beat yet
+    expect(weights[1].valueKg).toBeCloseTo(100 + BAR, 2)
   })
 
   it('says nothing about a lift that never improved', () => {

@@ -7,6 +7,11 @@ import { belongsToProfile, sessionHasActivity } from '@/lib/workoutSession'
 import {
   bestCurrentE1RM, sbdTotal, weeklyVolume, recentPRs, exercisePRs, trackingSeries,
 } from '@/lib/progress'
+import { lbToKg } from '@/lib/progress'
+import { DEFAULT_BAR_LB } from '@/lib/barWeight'
+
+/** Squat and deadlift are bar-loaded, so each set carries a bar over its plates. */
+const BAR = lbToKg(DEFAULT_BAR_LB)
 
 /**
  * End-to-end coverage for the Progress view's data path: sessions go into
@@ -96,28 +101,29 @@ describe('progress data path — a seeded session reaches every metric', () => {
 
   it('feeds e1RM', async () => {
     const mine = await loadFor('pronit')
-    // best of 100×5 (116.7) and 120×3 (132)
-    expect(bestCurrentE1RM(mine, 'barbell-squat')).toBeCloseTo(132, 1)
+    // With the bar: 120.4×5 gives 140.5, 140.4×3 gives 154.5 — the triple wins.
+    expect(bestCurrentE1RM(mine, 'barbell-squat')).toBeCloseTo((120 + BAR) * 1.1, 1)
   })
 
   it('feeds the SBD total and counts only logged lifts', async () => {
     const total = sbdTotal(await loadFor('pronit'), ['barbell-squat', 'bench-press', 'deadlift'])
     expect(total.loggedCount).toBe(2) // bench had only a placeholder row
-    expect(total.totalKg).toBeCloseTo(132 + 150, 1)
+    expect(total.totalKg).toBeCloseTo((120 + BAR) * 1.1 + (150 + BAR), 1)
   })
 
   it('feeds weekly volume, ignoring placeholder sets', async () => {
     const weeks = weeklyVolume(await loadFor('pronit'))
     expect(weeks).toHaveLength(1)
     // squat 100×5 + 120×3 = 860, deadlift 150×1 = 150
-    expect(weeks[0].tonnageKg).toBeCloseTo(1010, 1)
+    expect(weeks[0].tonnageKg).toBeCloseTo(
+      (100 + BAR) * 5 + (120 + BAR) * 3 + (150 + BAR), 1)
     expect(weeks[0].sets).toBe(3) // placeholder not counted
   })
 
   it('feeds PR detection', async () => {
     const mine = await loadFor('pronit')
     const prs = exercisePRs(mine, 'barbell-squat')
-    expect(prs.byRep.find(p => p.reps === 3)?.weightKg).toBeCloseTo(120, 1)
+    expect(prs.byRep.find(p => p.reps === 3)?.weightKg).toBeCloseTo(120 + BAR, 1)
     expect(prs.bestE1RM?.date).toBe('2026-08-10')
 
     const all = recentPRs(mine)
@@ -141,7 +147,7 @@ describe('progress data path — a seeded session reaches every metric', () => {
       order: ['deadlift'],
     })
     // 220.462 lbs == 100 kg, so the 150 kg single stays the best.
-    expect(bestCurrentE1RM(await loadFor('pronit'), 'deadlift')).toBeCloseTo(150, 1)
+    expect(bestCurrentE1RM(await loadFor('pronit'), 'deadlift')).toBeCloseTo(150 + BAR, 1)
   })
 })
 

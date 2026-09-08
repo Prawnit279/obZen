@@ -3,9 +3,20 @@ import type { WorkoutDaySession, LoggedSet } from '@/db/dexie'
 import {
   toKg, isRealSet, epley1RM, bestE1RM, e1rmSeries, bestCurrentE1RM, sbdTotal, recentPRs,
   isoWeekKey, exerciseTonnage, weeklyVolume, fillWeeks, exercisePRs,
-  dotsScore, strengthStandard, trackingSeries, weeklyRepVolume, delta, suggestProgression, topOfRepRange, kgToLb,
+  dotsScore, strengthStandard, trackingSeries, weeklyRepVolume, delta, suggestProgression, topOfRepRange, kgToLb, lbToKg,
 } from '@/lib/progress'
 import { COMPETITION_LIFT_IDS } from '@/data/obzen-program'
+import { DEFAULT_BAR_LB } from '@/lib/barWeight'
+
+/**
+ * Sets are logged as plates, so every bar-loaded fixture below moves the number
+ * in `set(...)` plus a bar. Deadlift and Barbell Squat are bar-loaded; push-ups,
+ * hollow-body holds and machine work are not.
+ */
+const BAR = lbToKg(DEFAULT_BAR_LB)
+
+/** Epley, for expectations that have to account for the bar under the reps. */
+const e1rm = (loadKg: number, reps: number) => loadKg * (1 + reps / 30)
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -52,7 +63,7 @@ describe('placeholder set filtering', () => {
   })
   it('keeps placeholders out of tonnage', () => {
     const ex = { exerciseId: 'deadlift', status: 'complete' as const, sets: [set(100, 5), placeholder] }
-    expect(exerciseTonnage(ex)).toBe(500)
+    expect(exerciseTonnage(ex)).toBeCloseTo((100 + BAR) * 5, 2)
   })
   it('keeps placeholders out of e1RM', () => {
     const ex = { exerciseId: 'deadlift', status: 'complete' as const, sets: [placeholder] }
@@ -83,14 +94,15 @@ describe('bestE1RM', () => {
   it('takes the best set, not the last', () => {
     const ex = {
       exerciseId: 'deadlift', status: 'complete' as const,
-      sets: [set(100, 5), set(140, 1), set(60, 10)], // 116.7 / 140 / 80
+      // With the bar: 140.5 / 160.4 / 107.2 — the heavy single still wins.
+      sets: [set(100, 5), set(140, 1), set(60, 10)],
     }
-    expect(bestE1RM(ex)).toBeCloseTo(140, 2)
+    expect(bestE1RM(ex)).toBeCloseTo(140 + BAR, 2)
   })
 
   it('ignores bodyweight for pure external-load lifts', () => {
     const ex = { exerciseId: 'deadlift', status: 'complete' as const, sets: [set(140, 1)] }
-    expect(bestE1RM(ex, 75)).toBeCloseTo(140, 2)
+    expect(bestE1RM(ex, 75)).toBeCloseTo(140 + BAR, 2)
   })
 
   it('adds full bodyweight to a weighted pull-up', () => {
@@ -138,7 +150,7 @@ describe('e1rmSeries + bestCurrentE1RM', () => {
     expect(e1rmSeries(sessions, 'bench-press')).toHaveLength(0)
   })
   it('rolls up to the all-time best', () => {
-    expect(bestCurrentE1RM(sessions, 'deadlift')).toBeCloseTo(140, 2)
+    expect(bestCurrentE1RM(sessions, 'deadlift')).toBeCloseTo(e1rm(120 + BAR, 5), 2)
   })
   it('returns 0 for a never-logged lift', () => {
     expect(bestCurrentE1RM(sessions, 'bench-press')).toBe(0)
@@ -154,7 +166,7 @@ describe('sbdTotal', () => {
       session('2026-08-02', 'deadlift', [set(140, 1)]),
     ]
     const total = sbdTotal(sessions, ids)
-    expect(total.totalKg).toBeCloseTo(240, 2)
+    expect(total.totalKg).toBeCloseTo(240 + 2 * BAR, 2) // a bar on each of the two
     expect(total.loggedCount).toBe(2) // bench not yet logged
     expect(total.lifts).toHaveLength(3)
   })
@@ -210,7 +222,7 @@ describe('exerciseTonnage — scores the load actually moved', () => {
 
   it('counts a barbell lift as weight × reps', () => {
     const ex = session('2026-08-10', 'deadlift', [set(100, 5), set(100, 5)]).exercises[0]
-    expect(exerciseTonnage(ex, BW)).toBeCloseTo(1000, 2)
+    expect(exerciseTonnage(ex, BW)).toBeCloseTo((100 + BAR) * 10, 2)
   })
 
   it('subtracts assistance instead of adding it', () => {
@@ -254,12 +266,12 @@ describe('exerciseTonnage — scores the load actually moved', () => {
 describe('weeklyVolume', () => {
   it('sums tonnage and sets per week', () => {
     const sessions = [
-      session('2026-08-10', 'deadlift', [set(100, 5), set(100, 5)]), // 1000 kg, 2 sets
-      session('2026-08-12', 'deadlift', [set(50, 10)]),              //  500 kg, 1 set
+      session('2026-08-10', 'deadlift', [set(100, 5), set(100, 5)]), // 2 sets
+      session('2026-08-12', 'deadlift', [set(50, 10)]),              // 1 set
     ]
     const weeks = weeklyVolume(sessions)
     expect(weeks).toHaveLength(1)
-    expect(weeks[0].tonnageKg).toBeCloseTo(1500, 2)
+    expect(weeks[0].tonnageKg).toBeCloseTo((100 + BAR) * 10 + (50 + BAR) * 10, 2)
     expect(weeks[0].sets).toBe(3)
   })
   it('splits across ISO weeks, oldest first', () => {
@@ -302,7 +314,9 @@ describe('fillWeeks — a layoff reads as a gap, not as training', () => {
 
     const filled = fillWeeks(volume, '2026-08-31', 4)
     expect(filled).toHaveLength(4)
-    expect(filled.map(v => v.tonnageKg)).toEqual([500, 0, 0, 500])
+    const week = (100 + BAR) * 5
+    filled.map(v => v.tonnageKg).forEach((t, i) =>
+      expect(t).toBeCloseTo(i === 0 || i === 3 ? week : 0, 2))
     expect(filled[0].week).toBe(isoWeekKey('2026-08-10'))
     expect(filled[3].week).toBe(isoWeekKey('2026-08-31'))
   })
@@ -330,12 +344,12 @@ describe('exercisePRs', () => {
   it('keeps the heaviest weight at each rep count with its date', () => {
     const prs = exercisePRs(sessions, 'deadlift')
     const five = prs.byRep.find(p => p.reps === 5)
-    expect(five?.weightKg).toBeCloseTo(110, 2)
+    expect(five?.weightKg).toBeCloseTo(110 + BAR, 2)
     expect(five?.date).toBe('2026-08-08')
   })
   it('records the all-time e1RM PR and when it happened', () => {
     const prs = exercisePRs(sessions, 'deadlift')
-    expect(prs.bestE1RM?.e1rm).toBeCloseTo(150, 2)
+    expect(prs.bestE1RM?.e1rm).toBeCloseTo(150 + BAR, 2)
     expect(prs.bestE1RM?.date).toBe('2026-08-08')
   })
   it('ignores rep counts above 12', () => {
@@ -462,7 +476,7 @@ describe('trackingSeries', () => {
   })
   it('load mode falls back to e1RM', () => {
     const sessions = [session('2026-08-01', 'deadlift', [set(100, 1)])]
-    expect(trackingSeries(sessions, 'deadlift')[0].value).toBeCloseTo(100, 2)
+    expect(trackingSeries(sessions, 'deadlift')[0].value).toBeCloseTo(100 + BAR, 2)
   })
 })
 
