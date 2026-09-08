@@ -25,3 +25,10 @@ public/drum-import/*.pdf
 # Personal workout exports (not project source)
 noircut_workout_log_week1.pdf
 obZen_Workout_Log_Consolidated.md
+
+# Design source assets — 38MB of .ai/.eps/zip. Binaries never shrink a repo
+# once committed, since every version is kept forever.
+Design/
+
+# Personal data exports (training history backups)
+Data history/
