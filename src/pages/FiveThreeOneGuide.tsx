@@ -1,13 +1,13 @@
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft } from 'lucide-react'
 
-const CARD = { background: 'var(--surface)', border: '1px solid var(--border)' } as const
+const CARD = { background: 'var(--card)', border: '1px solid var(--border)' } as const
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <section className="rounded-[2px] p-4" style={CARD}>
-      <h2 className="text-[15px]" style={{ color: 'var(--accent)' }}>{title}</h2>
-      <div className="text-[13px] leading-relaxed mt-2 space-y-2" style={{ color: 'var(--muted)' }}>
+    <section className="rounded-[var(--r-control)] p-4" style={CARD}>
+      <h2 style={{ fontSize: 18, fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--ink)' }}>{title}</h2>
+      <div className="text-[13px] leading-relaxed mt-2 space-y-2" style={{ color: 'var(--ink-dim)' }}>
         {children}
       </div>
     </section>
@@ -26,14 +26,16 @@ export default function FiveThreeOneGuide() {
       <button
         onClick={() => navigate(-1)}
         className="flex items-center gap-1.5 text-[12px] uppercase tracking-widest transition-opacity hover:opacity-70"
-        style={{ color: 'var(--muted)' }}
+        style={{ color: 'var(--ink-dim)' }}
       >
         <ArrowLeft size={14} /> Back
       </button>
 
       <div className="pt-1">
-        <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Reference</div>
-        <h1 className="text-[20px] uppercase tracking-wide" style={{ color: 'var(--accent)' }}>5/3/1 Guide</h1>
+        <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-dim)' }}>Reference</div>
+        <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
+          5/3/1 Guide
+        </h1>
       </div>
 
       <Section title="Training Max">
@@ -48,9 +50,9 @@ export default function FiveThreeOneGuide() {
       <Section title="The 3-week wave">
         <p>Each week is three working sets at rising intensity, off the Training Max:</p>
         <ul className="list-disc pl-5 space-y-1">
-          <li><span style={{ color: 'var(--accent)' }}>Week 1 — 5s:</span> 65% / 75% / 85%, for 5/5/5+ reps</li>
-          <li><span style={{ color: 'var(--accent)' }}>Week 2 — 3s:</span> 70% / 80% / 90%, for 3/3/3+ reps</li>
-          <li><span style={{ color: 'var(--accent)' }}>Week 3 — 5/3/1:</span> 75% / 85% / 95%, for 5/3/1+ reps</li>
+          <li><span style={{ color: 'var(--ink)' }}>Week 1 — 5s:</span> 65% / 75% / 85%, for 5/5/5+ reps</li>
+          <li><span style={{ color: 'var(--ink)' }}>Week 2 — 3s:</span> 70% / 80% / 90%, for 3/3/3+ reps</li>
+          <li><span style={{ color: 'var(--ink)' }}>Week 3 — 5/3/1:</span> 75% / 85% / 95%, for 5/3/1+ reps</li>
         </ul>
         <p>The percentage climbs and the reps drop, so the bar always feels heavy without being maxed out.</p>
       </Section>
@@ -67,8 +69,8 @@ export default function FiveThreeOneGuide() {
       <Section title="Cycle progression">
         <p>
           After a full 3-week wave (and deload, if you took one), the Training Max goes up for the next
-          cycle — typically <span style={{ color: 'var(--accent)' }}>+5 lb</span> on upper-body lifts and{' '}
-          <span style={{ color: 'var(--accent)' }}>+10 lb</span> on lower-body lifts. Small, steady increases are
+          cycle — typically <span style={{ color: 'var(--ink)' }}>+5 lb</span> on upper-body lifts and{' '}
+          <span style={{ color: 'var(--ink)' }}>+10 lb</span> on lower-body lifts. Small, steady increases are
           the point — 5/3/1 is built for consistency over months, not a fast ramp.
         </p>
       </Section>

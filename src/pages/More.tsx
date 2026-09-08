@@ -20,20 +20,33 @@ export default function More() {
   return (
     <div className="page-container space-y-2">
       <div className="pt-2">
-        <div className="text-[11px] uppercase tracking-widest text-noir-muted">All Modules</div>
-        <div className="text-[18px] uppercase tracking-wide text-noir-white">More</div>
+        <div
+          className="uppercase"
+          style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+        >
+          All Modules
+        </div>
+        <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
+          More
+        </h1>
       </div>
 
       {MORE_ITEMS.map(({ path, label, sub, icon: Icon }) => (
         <button
           key={path}
           onClick={() => navigate(path)}
-          className="w-full flex items-center gap-4 p-4 border border-noir-border rounded-[2px] bg-noir-surface hover:border-noir-strong hover:bg-noir-elevated transition-colors text-left"
+          className="w-full flex items-center gap-4 text-left transition-colors"
+          style={{
+            padding: 16,
+            borderRadius: 'var(--r-card)',
+            border: '1px solid var(--hairline)',
+            background: 'var(--card)',
+          }}
         >
-          <Icon size={18} className="text-noir-dim shrink-0" strokeWidth={1.5} />
+          <Icon size={18} style={{ color: 'var(--ink-faint)' }} className="shrink-0" strokeWidth={1.5} />
           <div>
-            <div className="text-[13px] text-noir-accent">{label}</div>
-            <div className="text-[11px] text-noir-dim">{sub}</div>
+            <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--ink)' }}>{label}</div>
+            <div style={{ fontSize: 13, color: 'var(--ink-dim)' }}>{sub}</div>
           </div>
         </button>
       ))}

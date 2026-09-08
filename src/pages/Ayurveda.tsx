@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { SegmentedPill } from '@/components/ui/SegmentedPill'
 import { PITTA_PROFILE, PITTA_DINACHARYA, PITTA_REMEDIES } from '@/data/ayurveda'
 import { useAyurvedaStore } from '@/store/useAyurvedaStore'
 import { Card, CardHeader } from '@/components/ui/Card'
@@ -14,24 +15,23 @@ export default function Ayurveda() {
   return (
     <div className="page-container space-y-4">
       <div className="pt-2">
-        <div className="text-[11px] uppercase tracking-widest text-noir-muted">Pitta Dosha</div>
-        <div className="text-[18px] uppercase tracking-wide text-noir-white">Ayurveda</div>
+        <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-dim)]">Pitta Dosha</div>
+        <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
+          Ayurveda
+        </h1>
       </div>
 
-      <div className="flex border border-noir-border rounded-[2px] overflow-hidden">
-        {(['routine', 'profile', 'remedies'] as Tab[]).map(t => (
-          <button
-            key={t}
-            onClick={() => setTab(t)}
-            className={cn(
-              'flex-1 py-2 text-[10px] uppercase tracking-widest transition-colors border-r border-noir-border last:border-r-0',
-              tab === t ? 'bg-noir-elevated text-noir-white' : 'text-noir-dim hover:text-noir-muted hover:bg-noir-elevated/30'
-            )}
-          >
-            {t}
-          </button>
-        ))}
-      </div>
+      <SegmentedPill
+        label="Ayurveda section"
+        value={tab}
+        onChange={setTab}
+        grow
+        options={[
+          { value: 'routine' as Tab, label: 'Routine' },
+          { value: 'profile' as Tab, label: 'Profile' },
+          { value: 'remedies' as Tab, label: 'Remedies' },
+        ]}
+      />
 
       {tab === 'routine' && <RoutineTab />}
       {tab === 'profile' && <ProfileTab />}
@@ -67,7 +67,7 @@ function RoutineTab() {
       <Card>
         <CardHeader
           label="Morning Practices"
-          action={<span className="text-[11px] text-noir-muted">{morningDone}/{morningTotal}</span>}
+          action={<span className="text-[11px] text-[color:var(--ink-dim)]">{morningDone}/{morningTotal}</span>}
         />
         <div className="space-y-2">
           {PITTA_DINACHARYA.morningPractices.map(practice => {
@@ -78,14 +78,14 @@ function RoutineTab() {
                 onClick={() => toggleRoutineItem(practice.id)}
                 className="w-full flex items-start gap-3 py-1.5 text-left transition-colors group"
               >
-                <div className={cn('mt-0.5 shrink-0 transition-colors', done ? 'text-noir-accent' : 'text-noir-dim group-hover:text-noir-muted')}>
+                <div className={cn('mt-0.5 shrink-0 transition-colors', done ? 'text-[color:var(--ink-2)]' : 'text-[color:var(--ink-faint)] group-hover:text-[color:var(--ink-dim)]')}>
                   {done ? <CheckSquare size={14} /> : <Square size={14} />}
                 </div>
                 <div>
-                  <div className={cn('text-[12px] transition-colors', done ? 'text-noir-muted line-through' : 'text-noir-accent')}>
+                  <div className={cn('text-[12px] transition-colors', done ? 'text-[color:var(--ink-dim)] line-through' : 'text-[color:var(--ink-2)]')}>
                     {practice.label}
                   </div>
-                  <div className="text-[11px] text-noir-dim">{practice.note}</div>
+                  <div className="text-[11px] text-[color:var(--ink-faint)]">{practice.note}</div>
                 </div>
               </button>
             )
@@ -96,7 +96,7 @@ function RoutineTab() {
       <Card>
         <CardHeader
           label="Evening Practices"
-          action={<span className="text-[11px] text-noir-muted">{eveningDone}/{eveningTotal}</span>}
+          action={<span className="text-[11px] text-[color:var(--ink-dim)]">{eveningDone}/{eveningTotal}</span>}
         />
         <div className="space-y-2">
           {PITTA_DINACHARYA.eveningPractices.map(practice => {
@@ -107,14 +107,14 @@ function RoutineTab() {
                 onClick={() => toggleRoutineItem(practice.id)}
                 className="w-full flex items-start gap-3 py-1.5 text-left transition-colors group"
               >
-                <div className={cn('mt-0.5 shrink-0 transition-colors', done ? 'text-noir-accent' : 'text-noir-dim group-hover:text-noir-muted')}>
+                <div className={cn('mt-0.5 shrink-0 transition-colors', done ? 'text-[color:var(--ink-2)]' : 'text-[color:var(--ink-faint)] group-hover:text-[color:var(--ink-dim)]')}>
                   {done ? <CheckSquare size={14} /> : <Square size={14} />}
                 </div>
                 <div>
-                  <div className={cn('text-[12px] transition-colors', done ? 'text-noir-muted line-through' : 'text-noir-accent')}>
+                  <div className={cn('text-[12px] transition-colors', done ? 'text-[color:var(--ink-dim)] line-through' : 'text-[color:var(--ink-2)]')}>
                     {practice.label}
                   </div>
-                  <div className="text-[11px] text-noir-dim">{practice.note}</div>
+                  <div className="text-[11px] text-[color:var(--ink-faint)]">{practice.note}</div>
                 </div>
               </button>
             )
@@ -130,12 +130,12 @@ function ProfileTab() {
     <div className="space-y-4">
       <Card>
         <CardHeader label="Pitta Dosha" />
-        <div className="text-[11px] uppercase tracking-widest text-noir-dim mb-3">{PITTA_PROFILE.elements}</div>
+        <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-3">{PITTA_PROFILE.elements}</div>
         <div>
-          <div className="text-[10px] uppercase tracking-widest text-noir-dim mb-2">Qualities</div>
+          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-2">Qualities</div>
           <div className="flex flex-wrap gap-1.5">
             {PITTA_PROFILE.qualities.map(q => (
-              <span key={q} className="text-[11px] border border-noir-border rounded-[2px] px-2 py-0.5 text-noir-muted">
+              <span key={q} className="text-[11px] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-2 py-0.5 text-[color:var(--ink-dim)]">
                 {q}
               </span>
             ))}
@@ -147,8 +147,8 @@ function ProfileTab() {
         <CardHeader label="When Balanced" />
         <ul className="space-y-1.5">
           {PITTA_PROFILE.balancedSigns.map(sign => (
-            <li key={sign} className="text-[12px] text-noir-muted flex gap-2">
-              <span className="text-noir-dim">·</span>{sign}
+            <li key={sign} className="text-[12px] text-[color:var(--ink-dim)] flex gap-2">
+              <span className="text-[color:var(--ink-faint)]">·</span>{sign}
             </li>
           ))}
         </ul>
@@ -158,7 +158,7 @@ function ProfileTab() {
         <CardHeader label="When Imbalanced" />
         <ul className="space-y-1.5">
           {PITTA_PROFILE.imbalancedSigns.map(sign => (
-            <li key={sign} className="text-[12px] text-noir-red flex gap-2">
+            <li key={sign} className="text-[12px] text-[color:var(--red)] flex gap-2">
               <span>·</span>{sign}
             </li>
           ))}
@@ -169,16 +169,16 @@ function ProfileTab() {
         <CardHeader label="Daily Timing" />
         <div className="space-y-2">
           <div>
-            <span className="text-[10px] uppercase tracking-widest text-noir-dim">Pitta Peak Hours</span>
-            <div className="text-[13px] text-noir-accent mt-0.5">{PITTA_PROFILE.pittaTime}</div>
+            <span className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)]">Pitta Peak Hours</span>
+            <div className="text-[13px] text-[color:var(--ink-2)] mt-0.5">{PITTA_PROFILE.pittaTime}</div>
           </div>
           <div>
-            <span className="text-[10px] uppercase tracking-widest text-noir-dim">Best Exercise Time</span>
-            <div className="text-[13px] text-noir-accent mt-0.5">{PITTA_PROFILE.bestExerciseTime}</div>
+            <span className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)]">Best Exercise Time</span>
+            <div className="text-[13px] text-[color:var(--ink-2)] mt-0.5">{PITTA_PROFILE.bestExerciseTime}</div>
           </div>
           <div>
-            <span className="text-[10px] uppercase tracking-widest text-noir-dim">High Risk Season</span>
-            <div className="text-[13px] text-noir-accent mt-0.5">{PITTA_PROFILE.season}</div>
+            <span className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)]">High Risk Season</span>
+            <div className="text-[13px] text-[color:var(--ink-2)] mt-0.5">{PITTA_PROFILE.season}</div>
           </div>
         </div>
       </Card>
@@ -197,34 +197,34 @@ function RemediesTab() {
             onClick={() => setExpanded(expanded === remedy.condition ? null : remedy.condition)}
             className="w-full text-left p-4 flex items-center justify-between"
           >
-            <span className="text-[13px] text-noir-accent">{remedy.condition}</span>
-            {expanded === remedy.condition ? <ChevronDown size={14} className="text-noir-dim" /> : <ChevronRight size={14} className="text-noir-dim" />}
+            <span className="text-[13px] text-[color:var(--ink-2)]">{remedy.condition}</span>
+            {expanded === remedy.condition ? <ChevronDown size={14} className="text-[color:var(--ink-faint)]" /> : <ChevronRight size={14} className="text-[color:var(--ink-faint)]" />}
           </button>
           {expanded === remedy.condition && (
-            <div className="px-4 pb-4 space-y-3 border-t border-noir-border pt-3">
+            <div className="px-4 pb-4 space-y-3 border-t border-[color:var(--hairline)] pt-3">
               <div>
-                <div className="text-[10px] uppercase tracking-widest text-noir-dim mb-2">Remedies</div>
+                <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-2">Remedies</div>
                 <ul className="space-y-1">
                   {remedy.remedies.map((r, j) => (
-                    <li key={j} className="text-[12px] text-noir-muted flex gap-2">
-                      <span className="text-noir-dim shrink-0">·</span>{r}
+                    <li key={j} className="text-[12px] text-[color:var(--ink-dim)] flex gap-2">
+                      <span className="text-[color:var(--ink-faint)] shrink-0">·</span>{r}
                     </li>
                   ))}
                 </ul>
               </div>
               <div>
-                <div className="text-[10px] uppercase tracking-widest text-noir-dim mb-1.5">Herbs</div>
+                <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-1.5">Herbs</div>
                 <div className="flex flex-wrap gap-1.5">
                   {remedy.herbs.map(h => (
-                    <span key={h} className="text-[11px] border border-noir-border rounded-[2px] px-2 py-0.5 text-noir-muted">
+                    <span key={h} className="text-[11px] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-2 py-0.5 text-[color:var(--ink-dim)]">
                       {h}
                     </span>
                   ))}
                 </div>
               </div>
               <div>
-                <div className="text-[10px] uppercase tracking-widest text-noir-dim mb-1">Lifestyle</div>
-                <p className="text-[12px] text-noir-muted">{remedy.lifestyle}</p>
+                <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-1">Lifestyle</div>
+                <p className="text-[12px] text-[color:var(--ink-dim)]">{remedy.lifestyle}</p>
               </div>
             </div>
           )}
