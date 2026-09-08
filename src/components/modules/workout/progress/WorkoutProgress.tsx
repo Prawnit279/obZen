@@ -12,6 +12,8 @@ import {
 } from '@/lib/progress'
 import { todayISO } from '@/lib/utils'
 import { LineChart, BarChart, ChartEmpty, liftHue } from './Charts'
+import { liftSignals, prFeed } from '@/lib/progressTrends'
+import type { LiftSignal } from '@/lib/progressTrends'
 import { ProgressionLadder } from './ProgressionLadder'
 import { BodyweightPanel } from './BodyweightPanel'
 
@@ -68,6 +70,88 @@ function Stat({ value, unit, label, sub, hero }: {
       </div>
       {sub && <span style={{ fontSize: 11, color: 'var(--ink-faint)' }}>{sub}</span>}
     </div>
+  )
+}
+
+/**
+ * Rate of change per key lift, under the trend chart.
+ *
+ * A chart shows the shape; this says how fast. A lift with one session has no
+ * direction yet and says so rather than showing a zero, which would read as
+ * "not moving" instead of "not enough data".
+ */
+function TrendRates({ signals }: { signals: LiftSignal[] }) {
+  if (signals.length === 0) return null
+  return (
+    <div className="flex flex-col" style={{ gap: 6 }}>
+      {signals.map(sig => {
+        const rate = sig.trend ? kgToLb(sig.trend.slopeKgPerWeek) : null
+        const rising = (rate ?? 0) > 0.05
+        const falling = (rate ?? 0) < -0.05
+        return (
+          <div key={sig.exerciseId} className="flex items-baseline justify-between" style={{ gap: 12 }}>
+            <span style={{ fontSize: 13, color: 'var(--ink-dim)' }}>{sig.name}</span>
+            {rate === null ? (
+              <span style={{ fontSize: 11, color: 'var(--ink-ghost)' }}>not enough sessions</span>
+            ) : (
+              <span
+                style={{
+                  fontSize: 13, fontWeight: 700, fontVariantNumeric: 'tabular-nums',
+                  color: rising ? 'var(--ok)' : falling ? 'var(--red)' : 'var(--ink-faint)',
+                }}
+              >
+                {rate > 0 ? '+' : ''}{Math.round(rate * 10) / 10} lb/week
+              </span>
+            )}
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
+/**
+ * Lifts that are being trained but not improving.
+ *
+ * Measured from a lift's best session to its most recent one, so a deliberate
+ * break never reads as a stall. The suggested training max is 90% of the peak,
+ * which is what 5/3/1 does when a lift stops moving.
+ */
+function StallCard({ signals }: { signals: LiftSignal[] }) {
+  return (
+    <section
+      className="flex flex-col"
+      style={{
+        ...CARD, borderRadius: 'var(--r-card)', padding: '16px 18px', gap: 13,
+        border: '1px solid rgba(167,139,250,0.30)',
+        background: 'var(--card-accent)',
+      }}
+    >
+      <h3
+        className="uppercase"
+        style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--violet-100)' }}
+      >
+        Not moving
+      </h3>
+      <div className="flex flex-col" style={{ gap: 12 }}>
+        {signals.map(sig => (
+          <div key={sig.exerciseId} className="flex flex-col" style={{ gap: 2 }}>
+            <div className="flex items-baseline justify-between" style={{ gap: 12 }}>
+              <span style={{ fontSize: 15, color: 'var(--ink)' }}>{sig.name}</span>
+              <span
+                style={{ fontSize: 13, color: 'var(--ink-dim)', fontVariantNumeric: 'tabular-nums' }}
+              >
+                {Math.round(sig.stall!.weeksSincePeak)} weeks
+              </span>
+            </div>
+            <span style={{ fontSize: 11, color: 'var(--ink-faint)' }}>
+              Best {lb(sig.stall!.peakKg)} lb on {sig.stall!.peakDate}. Consider resetting
+              the training max to {lb(sig.stall!.resetToKg)} lb.
+            </span>
+          </div>
+        ))}
+      </div>
+    </section>
   )
 }
 
@@ -134,6 +218,11 @@ export function WorkoutProgress() {
   const thisWeekVolume = volume.find(v => v.week === thisWeekKey)?.tonnageKg ?? 0
   const prs = recentPRs(mine, bodyweightKg).slice(0, 6)
 
+  // Direction and staleness per key lift, and the record breaks behind them.
+  const signals = liftSignals(mine, cfg.keyLiftIds, bodyweightKg)
+  const stalled = signals.filter(s => s.stall?.stalled)
+  const feed = prFeed(mine, bodyweightKg).slice(0, 8)
+
   // ── Bodyweight-mode movements this profile has actually logged ─────────────
   const loggedIds = [...new Set(mine.flatMap(s => s.exercises.map(e => e.exerciseId)))]
   const bodyweightMovements = loggedIds
@@ -181,7 +270,11 @@ export function WorkoutProgress() {
             .map(l => ({ label: l.name, points: l.series.map(p => ({ date: p.date, value: kgToLb(p.e1rm) })) }))}
           yLabel="Estimated 1RM in pounds"
         />
+        <TrendRates signals={signals} />
       </Card>
+
+      {/* ── Lifts that have stopped moving ─────────────────────────────── */}
+      {stalled.length > 0 && <StallCard signals={stalled} />}
 
       {/* ── Standards (powerlifting) or bodyweight trend ───────────────── */}
       {cfg.showPowerlifting && profile.sex && (
@@ -292,6 +385,40 @@ export function WorkoutProgress() {
           </ul>
         )}
       </Card>
+
+      {/* ── Records as they were set ───────────────────────────────────── */}
+      {feed.length > 0 && (
+        <Card label="Recent breaks">
+          <ul className="space-y-2.5">
+            {feed.map((ev, i) => (
+              <li key={`${ev.exerciseId}-${ev.date}-${ev.kind}-${i}`} className="flex items-baseline justify-between gap-3">
+                <span className="min-w-0" style={{ fontSize: 13, color: 'var(--ink-2)' }}>
+                  {ev.name}
+                  {/* A qualifier on the name, so it sits at the label size
+                      rather than inheriting body and reading as equal weight. */}
+                  <span style={{ fontSize: 11, color: 'var(--ink-faint)' }}>
+                    {ev.kind === 'e1rm' ? ' · est. 1RM' : ''}
+                  </span>
+                </span>
+                <span
+                  className="shrink-0 flex items-baseline"
+                  style={{ gap: 8, fontVariantNumeric: 'tabular-nums' }}
+                >
+                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--ok)' }}>
+                    {lb(ev.valueKg)} lb{ev.reps ? ` × ${ev.reps}` : ''}
+                  </span>
+                  {/* What it beat — a record means little without the number
+                      it replaced. */}
+                  <span style={{ fontSize: 11, color: 'var(--ink-faint)' }}>
+                    {ev.previousKg === null ? 'first' : `from ${lb(ev.previousKg)}`}
+                  </span>
+                  <span style={{ fontSize: 11, color: 'var(--ink-ghost)' }}>{ev.date.slice(5)}</span>
+                </span>
+              </li>
+            ))}
+          </ul>
+        </Card>
+      )}
 
       {/* ── Bodyweight-mode cards ──────────────────────────────────────── */}
       {bodyweightMovements.map(({ id, entry }) => {
