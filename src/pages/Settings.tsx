@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Card, CardHeader } from '@/components/ui/Card'
 import { Button } from '@/components/ui/Button'
 import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher'
@@ -44,6 +45,7 @@ function useStorageEstimate() {
 }
 
 export default function Settings() {
+  const navigate = useNavigate()
   const { used, quota, persisted } = useStorageEstimate()
   const { activeId, setActive } = useProfileStore()
   const profile = PROFILES[activeId]
@@ -229,6 +231,12 @@ export default function Settings() {
             />
             <Button variant="ghost" fullWidth onClick={handleImportClick} disabled={importing}>
               {importing ? 'Importing…' : 'Import Backup'}
+            </Button>
+            {/* The JSON backup is for restoring; a printed sheet is for reading
+                and keeping. Progress is the page worth putting on paper, so the
+                print control lives there rather than being duplicated here. */}
+            <Button variant="ghost" fullWidth onClick={() => navigate('/workout/progress')}>
+              Print a progress sheet
             </Button>
             {importMsg && (
               <p

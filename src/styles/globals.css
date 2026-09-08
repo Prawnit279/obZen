@@ -375,3 +375,117 @@
    <animate> element computes to none while the animation keeps running. The
    elements are left out in JS instead — see hooks/useReducedMotion.ts. The
    CSS-animated yoga figures do honour their own reduced-motion rules. */
+
+/* ── Print ───────────────────────────────────────────────────────────────────
+   Paper is the export path for a training summary: the browser's own
+   "Save as PDF" produces a real, selectable-text PDF, so the app needs a
+   layout rather than a PDF library.
+
+   The screen palette is light ink on a dark ground, which prints as a solid
+   black page. Rather than restyle each component, the ink and surface tokens
+   are redefined here and every surface that follows them flips with it. */
+@media print {
+  :root,
+  :root[data-theme='light'],
+  :root[data-theme='crimson'],
+  :root[data-theme='void'],
+  :root[data-theme='steel'],
+  :root[data-theme='ember'] {
+    --ink:        #000000;
+    --ink-2:      #1A1A1A;
+    --ink-dim:    #3A3A3A;
+    --ink-faint:  #555555;
+    --ink-off:    #666666;
+    --ink-ghost:  #777777;
+
+    --card:          #FFFFFF;
+    --card-accent:   #FFFFFF;
+    --hairline:      #BBBBBB;
+    --hairline-soft: #DDDDDD;
+    --border:        #BBBBBB;
+    --border-strong: #999999;
+
+    /* The accent still has to read as one colour against white. */
+    --violet-100: #4C1D95;
+    --violet-200: #5B21B6;
+    --violet-400: #6D28D9;
+
+    /* The page and the shell behind it. */
+    --bg:       #FFFFFF;
+    --surface:  #FFFFFF;
+    --elevated: #FFFFFF;
+
+    /* Lift hues and state colours: the same values the Daylight theme uses,
+       because they were already chosen to hold against white. */
+    --lift-squat:    #6D28D9;
+    --lift-deadlift: #3730A3;
+    --lift-bench:    #9333EA;
+    --lift-row:      #0E7490;
+    --lift-core:     #BE185D;
+
+    --ok:  #15803D;
+    --red: #B91C1C;
+
+    --complete-border: #15803D;
+    --complete-text:   #14532D;
+    --complete-bg:     rgba(21,128,61,0.10);
+    --skip-border:     #B91C1C;
+    --skip-text:       #7F1D1D;
+    --skip-bg:         rgba(185,28,28,0.08);
+
+    /* Text sitting on an accent fill still needs to be legible once that fill
+       stops being painted. */
+    --theme-text-active: #FFFFFF;
+  }
+
+  html, body, #root, #root > * {
+    background: #FFFFFF !important;
+    color: #000000 !important;
+  }
+
+  /* Bars and chart fills carry meaning, so they have to survive the browser's
+     default of dropping backgrounds. */
+  * {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Navigation and anything marked as on-screen chrome. */
+  nav,
+  aside,
+  .print-hide {
+    display: none !important;
+  }
+
+  .print-only {
+    display: block !important;
+  }
+
+  /* Paper sets its own measure, so the on-screen cap comes off, and the
+     two-column grid collapses rather than fighting the page width. */
+  .page-container > *,
+  .page-container.wide > * {
+    max-width: none !important;
+    margin-inline: 0 !important;
+  }
+
+  .card-grid {
+    display: block !important;
+  }
+
+  .card-grid > * + * {
+    margin-top: 12px;
+  }
+
+  /* A card is one unit — split across a page break it loses its label. */
+  section,
+  .card-grid > * {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+/* Rendered on paper only — see the print block above. */
+.print-only {
+  display: none;
+}
