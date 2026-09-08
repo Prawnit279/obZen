@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { X, Search, Plus } from 'lucide-react'
+import { Sheet } from '@/components/ui/Sheet'
+import { Search, Plus } from 'lucide-react'
 import { getProgram, EXERCISE_LIBRARY, formatTarget, toExerciseId } from '@/data/obzen-program'
 import { useProfileStore } from '@/store/useProfileStore'
 import type { MuscleGroup } from '@/data/obzen-program'
@@ -257,65 +258,26 @@ export function AddExerciseSheet({ currentDay, existingIds, onAdd, onClose }: Pr
     { key: 'custom', label: 'Custom' },
   ]
 
-  return (
-    <div
-      className="fixed inset-0 z-50 flex flex-col justify-end"
-      style={{ background: 'rgba(6,5,10,0.68)' }}
-    >
-      <div
-        className="flex flex-col max-h-[80vh]"
+  const tabStrip = (
+  <div className="flex shrink-0" style={{ borderBottom: '1px solid var(--hairline)' }}>
+    {TABS.map(t => (
+      <button
+        key={t.key}
+        onClick={() => setTab(t.key)}
+        className="flex-1 py-2.5 text-[11px] uppercase tracking-widest transition-colors"
         style={{
-          borderRadius: '26px 26px 0 0',
-          borderTop: '1px solid rgba(167,139,250,0.22)',
-          background: 'linear-gradient(170deg, #191428 0%, #0D0B14 100%)',
-          boxShadow: '0 -20px 60px rgba(0,0,0,0.6)',
+          color: tab === t.key ? 'var(--ink)' : 'var(--ink-faint)',
+          borderBottom: tab === t.key ? '2px solid var(--violet-400)' : '2px solid transparent',
         }}
       >
-        {/* Grab handle — the affordance that says this panel is a sheet. */}
-        <div
-          aria-hidden="true"
-          style={{
-            width: 38, height: 4, borderRadius: 2, margin: '10px auto 2px',
-            background: 'rgba(255,255,255,0.18)', flexShrink: 0,
-          }}
-        />
+        {t.label}
+      </button>
+    ))}
+  </div>
+  )
 
-        {/* Header */}
-        <div
-          className="flex items-center justify-between px-4 py-3 shrink-0"
-          style={{ borderBottom: '1px solid var(--hairline)' }}
-        >
-          <span className="text-[12px] uppercase tracking-widest" style={{ color: 'var(--ink)' }}>
-            Add Exercise
-          </span>
-          <button
-            onClick={onClose}
-            className="transition-opacity hover:opacity-60"
-            aria-label="Close sheet"
-          >
-            <X size={16} style={{ color: 'var(--ink-faint)' }} />
-          </button>
-        </div>
-
-        {/* Tabs */}
-        <div className="flex shrink-0" style={{ borderBottom: '1px solid var(--hairline)' }}>
-          {TABS.map(t => (
-            <button
-              key={t.key}
-              onClick={() => setTab(t.key)}
-              className="flex-1 py-2.5 text-[10px] uppercase tracking-widest transition-colors"
-              style={{
-                color: tab === t.key ? 'var(--ink)' : 'var(--ink-faint)',
-                borderBottom: tab === t.key ? '1px solid #d4d4d4' : 'none',
-              }}
-            >
-              {t.label}
-            </button>
-          ))}
-        </div>
-
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto p-4">
+  return (
+    <Sheet title="Add Exercise" onClose={onClose} maxHeight="80vh" pinned={tabStrip}>
           {tab === 'other' && (
             <OtherDaysTab currentDay={currentDay} existingIds={existingIds} onAdd={handleAdd} />
           )}
@@ -325,8 +287,6 @@ export function AddExerciseSheet({ currentDay, existingIds, onAdd, onClose }: Pr
           {tab === 'custom' && (
             <CustomTab onAdd={handleAdd} />
           )}
-        </div>
-      </div>
-    </div>
+    </Sheet>
   )
 }

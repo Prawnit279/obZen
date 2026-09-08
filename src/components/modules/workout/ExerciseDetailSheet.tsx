@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { X, Repeat } from 'lucide-react'
+import { Sheet } from '@/components/ui/Sheet'
+import { Repeat } from 'lucide-react'
 import { guideFor, coreDetailFor, MUSCLE_LABEL } from '@/data/exercise-guides'
 import { MuscleFigure, MUSCLE_PRIMARY_COLOR, MUSCLE_SECONDARY_COLOR } from './MuscleFigure'
 import { ExerciseAnimation } from './ExerciseAnimation'
@@ -61,46 +62,8 @@ export function ExerciseDetailSheet({
   }
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex flex-col justify-end"
-      style={{ background: 'rgba(6,5,10,0.68)' }}
-    >
-      <div
-        className="flex flex-col max-h-[88vh]"
-        style={{
-          borderRadius: '26px 26px 0 0',
-          borderTop: '1px solid rgba(167,139,250,0.22)',
-          background: 'linear-gradient(170deg, #191428 0%, #0D0B14 100%)',
-          boxShadow: '0 -20px 60px rgba(0,0,0,0.6)',
-        }}
-      >
-        {/* Grab handle — the affordance that says this panel is a sheet. */}
-        <div
-          aria-hidden="true"
-          style={{
-            width: 38, height: 4, borderRadius: 2, margin: '10px auto 2px',
-            background: 'rgba(255,255,255,0.18)', flexShrink: 0,
-          }}
-        />
-
-        <header
-          className="flex items-start justify-between gap-3 px-4 py-3 shrink-0"
-          style={{ borderBottom: '1px solid var(--hairline)' }}
-        >
-          <div className="min-w-0">
-            <h2 className="text-[16px]" style={{ color: 'var(--ink)' }}>{name}</h2>
-            {target && (
-              <p className="text-[11px] uppercase tracking-widest mt-0.5" style={{ color: 'var(--ink-dim)' }}>
-                {target}
-              </p>
-            )}
-          </div>
-          <button onClick={onClose} aria-label="Close">
-            <X size={18} style={{ color: 'var(--ink-faint)' }} />
-          </button>
-        </header>
-
-        <div className="flex-1 overflow-y-auto p-4 space-y-5">
+    <Sheet title={name} subtitle={target} onClose={onClose} noPadding>
+      <div className="p-4 space-y-5">
           {/* The movement itself */}
           {motion && <ExerciseAnimation motion={motion} label={name} />}
 
@@ -280,9 +243,8 @@ export function ExerciseDetailSheet({
               No guide for this movement yet.
             </p>
           )}
-        </div>
       </div>
-    </div>
+    </Sheet>
   )
 }
 

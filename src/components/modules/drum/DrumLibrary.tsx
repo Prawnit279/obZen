@@ -1,4 +1,5 @@
 import { useState, useRef, useCallback, useEffect } from 'react'
+import { Sheet } from '@/components/ui/Sheet'
 import { useLiveQuery } from 'dexie-react-hooks'
 import {
   FileText, Plus, Search, X, ChevronDown, ChevronUp,
@@ -275,17 +276,8 @@ function AddBookSheet({ onClose, onSaved }: AddBookSheetProps) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end" style={{ background: 'rgba(0,0,0,0.7)' }}>
-      <div className="rounded-t-[26px] flex flex-col max-h-[85vh]" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-          <span className="text-[12px] uppercase tracking-widest" style={{ color: 'var(--ink)' }}>
-            Add Book — {step === 'upload' ? '1/3 Upload' : step === 'metadata' ? '2/3 Details' : '3/3 Confirm'}
-          </span>
-          <button onClick={onClose} aria-label="Close"><X size={16} style={{ color: 'var(--ink-faint)' }} /></button>
-        </div>
-
-        <div className="flex-1 overflow-y-auto p-4 space-y-4">
+    <Sheet title={`Add Book — ${step === 'upload' ? '1/3 Upload' : step === 'metadata' ? '2/3 Details' : '3/3 Confirm'}`} onClose={onClose} maxHeight="85vh" noPadding>
+      <div className="p-4 space-y-4">
           {/* Step 1: Upload */}
           {step === 'upload' && (
             <div
@@ -388,9 +380,8 @@ function AddBookSheet({ onClose, onSaved }: AddBookSheetProps) {
               </div>
             </div>
           )}
-        </div>
       </div>
-    </div>
+    </Sheet>
   )
 }
 

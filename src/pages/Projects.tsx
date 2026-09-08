@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Sheet } from '@/components/ui/Sheet'
 import { useLiveQuery } from 'dexie-react-hooks'
 import {
   DndContext, closestCenter, PointerSensor, useSensor, useSensors,
@@ -10,7 +11,7 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { db } from '@/db/dexie'
 import type { Board, Task } from '@/db/dexie'
-import { Plus, X, ChevronLeft, GripVertical, Trash2 } from 'lucide-react'
+import { Plus, ChevronLeft, GripVertical, Trash2 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 type Status = Task['status']
@@ -40,13 +41,8 @@ function NewBoardSheet({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end" style={{ background: 'rgba(0,0,0,0.7)' }}>
-      <div className="rounded-t-[4px]" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-        <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-          <span className="text-[12px] uppercase tracking-widest" style={{ color: 'var(--accent)' }}>New Board</span>
-          <button onClick={onClose} aria-label="Close"><X size={16} style={{ color: 'var(--dim)' }} /></button>
-        </div>
-        <div className="p-4 space-y-3">
+    <Sheet title="New Board" onClose={onClose} noPadding>
+      <div className="p-4 space-y-3">
           <div>
             <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Board Name *</label>
             <input className="input w-full" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Q2 Work, Album Project..." autoFocus />
@@ -68,9 +64,8 @@ function NewBoardSheet({ onClose }: { onClose: () => void }) {
             style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}>
             {saving ? 'Creating...' : 'Create Board'}
           </button>
-        </div>
       </div>
-    </div>
+    </Sheet>
   )
 }
 
@@ -94,13 +89,8 @@ function NewTaskSheet({ boardId, onClose }: { boardId: number; onClose: () => vo
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end" style={{ background: 'rgba(0,0,0,0.7)' }}>
-      <div className="rounded-t-[4px]" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-        <div className="flex items-center justify-between px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-          <span className="text-[12px] uppercase tracking-widest" style={{ color: 'var(--accent)' }}>New Task</span>
-          <button onClick={onClose} aria-label="Close"><X size={16} style={{ color: 'var(--dim)' }} /></button>
-        </div>
-        <div className="p-4 space-y-3">
+    <Sheet title="New Task" onClose={onClose} noPadding>
+      <div className="p-4 space-y-3">
           <div>
             <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Task *</label>
             <input className="input w-full" value={title} onChange={e => setTitle(e.target.value)} placeholder="What needs to be done?" autoFocus />
@@ -132,9 +122,8 @@ function NewTaskSheet({ boardId, onClose }: { boardId: number; onClose: () => vo
             style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}>
             {saving ? 'Adding...' : 'Add Task'}
           </button>
-        </div>
       </div>
-    </div>
+    </Sheet>
   )
 }
 

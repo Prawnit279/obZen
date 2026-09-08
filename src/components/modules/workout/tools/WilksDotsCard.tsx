@@ -2,7 +2,9 @@ import { useState, useMemo } from 'react'
 import { dotsScore, wilksScore, kgToLb, lbToKg } from '@/lib/progress'
 import { PROFILES } from '@/config/profiles'
 import { useProfileStore } from '@/store/useProfileStore'
-import { ToolCard, NumberField, SegmentedToggle, AwaitingInput } from './ToolCard'
+import { ToolCard, NumberField, AwaitingInput } from './ToolCard'
+import { SegmentedPill } from '@/components/ui/SegmentedPill'
+
 
 /** Bodyweight + sex + total → Wilks and DOTS side by side, both "(est.)". */
 export function WilksDotsCard() {
@@ -31,7 +33,7 @@ export function WilksDotsCard() {
   return (
     <ToolCard label="Wilks & DOTS" sub="Bodyweight-adjusted score for a total or a single lift.">
       <div className="space-y-3">
-        <SegmentedToggle
+        <SegmentedPill
           label="Coefficient set"
           value={sex}
           onChange={setSex}

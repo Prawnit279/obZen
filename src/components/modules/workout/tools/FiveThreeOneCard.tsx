@@ -3,7 +3,9 @@ import { useNavigate } from 'react-router-dom'
 import { HelpCircle } from 'lucide-react'
 import { trainingMax, fiveThreeOneWave, jokerSets, bbbSet } from '@/lib/strengthTools'
 import type { WaveWeek, BBBPercent } from '@/lib/strengthTools'
-import { ToolCard, NumberField, TextField, SegmentedToggle, AwaitingInput } from './ToolCard'
+import { ToolCard, NumberField, TextField, AwaitingInput } from './ToolCard'
+import { SegmentedPill } from '@/components/ui/SegmentedPill'
+
 
 const WEEK_OPTIONS: { value: WaveWeek; label: string }[] = [
   { value: 1, label: 'Week 1' },
@@ -59,7 +61,7 @@ export function FiveThreeOneCard() {
 
           {/* Wave */}
           <div>
-            <SegmentedToggle label="Wave week" value={week} onChange={setWeek} options={WEEK_OPTIONS} />
+            <SegmentedPill label="Wave week" value={week} onChange={setWeek} options={WEEK_OPTIONS} />
             <div className="grid grid-cols-3 gap-1.5 mt-2">
               {wave.map((set, i) => (
                 <div key={i} className="text-center rounded-[var(--r-control)] py-2" style={{ background: 'rgba(255,255,255,0.05)' }}>
@@ -95,7 +97,7 @@ export function FiveThreeOneCard() {
               <div className="text-[11px] uppercase tracking-widest mb-1.5" style={{ color: 'var(--ink-dim)' }}>
                 Boring But Big — 5×10
               </div>
-              <SegmentedToggle
+              <SegmentedPill
                 label="Boring But Big percentage of training max"
                 value={bbbPct} onChange={setBbbPct} options={BBB_OPTIONS}
               />

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Sheet } from '@/components/ui/Sheet'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/db/dexie'
 import type { Meeting, ActionItem } from '@/db/dexie'
@@ -34,13 +35,8 @@ function AddMeetingSheet({ onClose }: { onClose: () => void }) {
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-end" style={{ background: 'rgba(0,0,0,0.7)' }}>
-      <div className="rounded-t-[4px] flex flex-col max-h-[90vh]" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
-        <div className="flex items-center justify-between px-4 py-3 shrink-0" style={{ borderBottom: '1px solid var(--border)' }}>
-          <span className="text-[12px] uppercase tracking-widest" style={{ color: 'var(--accent)' }}>New Meeting</span>
-          <button onClick={onClose} aria-label="Close"><X size={16} style={{ color: 'var(--dim)' }} /></button>
-        </div>
-        <div className="flex-1 overflow-y-auto p-4 space-y-3">
+    <Sheet title="New Meeting" onClose={onClose} maxHeight="90vh" noPadding>
+      <div className="p-4 space-y-3">
           <div>
             <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Title *</label>
             <input className="input w-full" value={title} onChange={e => setTitle(e.target.value)} placeholder="Meeting title" autoFocus />
@@ -82,9 +78,8 @@ function AddMeetingSheet({ onClose }: { onClose: () => void }) {
             style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}>
             {saving ? 'Saving...' : 'Save Meeting'}
           </button>
-        </div>
       </div>
-    </div>
+    </Sheet>
   )
 }
 
