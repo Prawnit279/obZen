@@ -54,7 +54,7 @@ export function ProgressionLadder({ profileId, exerciseId, name, path, assistanc
                 aria-label={`Set current rung to ${rung}`}
               >
                 <span className="flex items-center gap-1">
-                  {done && <Check size={10} style={{ color: 'var(--complete-text)' }} aria-hidden="true" />}
+                  {done && <Check size={12} style={{ color: 'var(--complete-text)' }} aria-hidden="true" />}
                   <span
                     className="text-[10px] uppercase tracking-widest truncate"
                     style={{ color: isCurrent ? 'var(--ink)' : done ? 'var(--complete-text)' : 'var(--ink-faint)' }}

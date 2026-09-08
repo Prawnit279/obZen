@@ -6,6 +6,12 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
   /** The one card that leads a screen. Takes the violet-cast surface. */
   elevated?: boolean
   noPadding?: boolean
+  /**
+   * Section label. Supplying one renders the heading and makes the card a
+   * `<section>`, since a titled region is one; without it the card stays a
+   * plain `<div>` grouping.
+   */
+  label?: string
 }
 
 /**
@@ -13,9 +19,10 @@ interface CardProps extends HTMLAttributes<HTMLDivElement> {
  * border, never from a drop shadow — the accent variant is reserved for the
  * single card that leads a screen, so it keeps meaning something.
  */
-export function Card({ children, elevated, noPadding, className, style, ...props }: CardProps) {
+export function Card({ children, elevated, noPadding, label, className, style, ...props }: CardProps) {
+  const Tag = label ? 'section' : 'div'
   return (
-    <div
+    <Tag
       className={cn('flex flex-col', className)}
       style={{
         border: '1px solid var(--hairline)',
@@ -27,8 +34,16 @@ export function Card({ children, elevated, noPadding, className, style, ...props
       }}
       {...props}
     >
+      {label && (
+        <h3
+          className="uppercase"
+          style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+        >
+          {label}
+        </h3>
+      )}
       {children}
-    </div>
+    </Tag>
   )
 }
 

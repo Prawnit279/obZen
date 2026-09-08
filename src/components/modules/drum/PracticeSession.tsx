@@ -101,7 +101,7 @@ export function PracticeSession({ currentBpm, onComplete }: Props) {
           </div>
         </div>
         <Button variant="ghost" fullWidth onClick={handleStop}>
-          <Square size={13} className="inline mr-1.5" />
+          <Square size={14} className="inline mr-1.5" />
           Stop Session
         </Button>
       </div>

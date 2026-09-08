@@ -13,6 +13,7 @@ import {
   dotsScore, strengthStandard, trackingSeries, weeklyRepVolume, delta, isoWeekKey, displayLb, kgToLb,
 } from '@/lib/progress'
 import { todayISO } from '@/lib/utils'
+import { Card } from '@/components/ui/Card'
 import { LineChart, BarChart, ChartEmpty, liftHue } from './Charts'
 import {
   liftSignals, prFeed, sessionLoads, acwr, deloadAdvice, adherence, liftBalance,
@@ -23,22 +24,6 @@ import { BodyweightPanel } from './BodyweightPanel'
 
 const CARD = { background: 'var(--card)', border: '1px solid var(--hairline)' } as const
 
-function Card({ label, children }: { label: string; children: React.ReactNode }) {
-  return (
-    <section
-      className="flex flex-col"
-      style={{ ...CARD, borderRadius: 'var(--r-card)', padding: '16px 18px', gap: 13 }}
-    >
-      <h3
-        className="uppercase"
-        style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
-      >
-        {label}
-      </h3>
-      {children}
-    </section>
-  )
-}
 
 function Stat({ value, unit, label, sub, hero }: {
   value: string; unit?: string; label: string; sub?: string; hero?: boolean
@@ -123,14 +108,7 @@ function TrendRates({ signals }: { signals: LiftSignal[] }) {
  */
 function StallCard({ signals }: { signals: LiftSignal[] }) {
   return (
-    <section
-      className="flex flex-col"
-      style={{
-        ...CARD, borderRadius: 'var(--r-card)', padding: '16px 18px', gap: 13,
-        border: '1px solid rgba(167,139,250,0.30)',
-        background: 'var(--card-accent)',
-      }}
-    >
+    <Card elevated style={{ border: '1px solid rgba(167,139,250,0.30)' }}>
       <h3
         className="uppercase"
         style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--violet-100)' }}
@@ -155,7 +133,7 @@ function StallCard({ signals }: { signals: LiftSignal[] }) {
           </div>
         ))}
       </div>
-    </section>
+    </Card>
   )
 }
 

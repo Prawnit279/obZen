@@ -80,7 +80,7 @@ export function StoragePanel() {
         </div>
         {cleared && (
           <div className="flex items-center gap-1 text-[11px] text-green-400">
-            <CheckCircle2 size={11} />
+            <CheckCircle2 size={12} />
             <span>{cleared} cleared</span>
           </div>
         )}
@@ -92,7 +92,7 @@ export function StoragePanel() {
         if (!s) return null
         return (
           <div key={type} className="flex items-center gap-2 text-[12px]">
-            <ImageIcon size={11} className="text-[color:var(--ink-faint)] shrink-0" />
+            <ImageIcon size={12} className="text-[color:var(--ink-faint)] shrink-0" />
             <span className="flex-1 text-[color:var(--ink-dim)]">{TYPE_LABELS[type]}</span>
             <span className="text-[color:var(--ink-faint)] tabular-nums">{s.count}</span>
             <span className="text-[color:var(--ink-faint)] tabular-nums w-16 text-right">{formatBytes(s.size)}</span>
@@ -104,7 +104,7 @@ export function StoragePanel() {
                 'p-1 text-[color:var(--ink-faint)] hover:text-noir-red transition-colors',
                 clearing !== null && 'opacity-40 pointer-events-none'
               )}>
-              <Trash2 size={11} />
+              <Trash2 size={12} />
             </button>
           </div>
         )

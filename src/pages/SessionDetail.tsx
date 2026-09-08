@@ -174,7 +174,7 @@ export default function SessionDetail() {
                   </div>
                 ) : (
                   ex.status !== 'skipped' && (
-                    <div className="mt-2 text-[12px]" style={{ color: 'var(--ink-faint)' }}>No sets logged.</div>
+                    <div className="mt-2 text-[12px]" style={{ color: 'var(--ink-faint)' }}>No sets logged for this exercise.</div>
                   )
                 )}
 

@@ -120,7 +120,7 @@ export function WeekStrip() {
                   {session.completedAt && <span style={{ color: 'var(--complete-text)' }}> · complete</span>}
                 </div>
               </div>
-              <ChevronRight size={15} style={{ color: 'var(--dim)' }} className="shrink-0" />
+              <ChevronRight size={14} style={{ color: 'var(--dim)' }} className="shrink-0" />
             </button>
           )
         })}

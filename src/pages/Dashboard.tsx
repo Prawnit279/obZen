@@ -241,7 +241,7 @@ export default function Dashboard() {
             color: 'var(--ink-faint)',
           }}
         >
-          <Plus size={13} />
+          <Plus size={14} />
           Log today's check-in
         </button>
       ) : (

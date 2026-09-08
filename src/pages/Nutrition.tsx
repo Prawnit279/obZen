@@ -279,7 +279,7 @@ function AddMealSheet({ date, isTrainingDay, savedMeals, initialMealType, onClos
                     Add
                   </button>
                   <button onClick={() => db.savedMeals.delete(meal.id!)} aria-label="Delete saved meal">
-                    <Trash2 size={11} style={{ color: 'var(--dim)' }} />
+                    <Trash2 size={12} style={{ color: 'var(--dim)' }} />
                   </button>
                 </div>
               </div>
@@ -318,7 +318,7 @@ function MealSection({ type, entries, logId, allEntries, onAdd }: MealSectionPro
           className="flex items-center gap-1 text-[9px] uppercase tracking-widest px-2 py-1 rounded-[2px]"
           style={{ border: '1px solid #1a1a1a', color: 'var(--dim)' }}
         >
-          <Plus size={9} /> Add
+          <Plus size={12} /> Add
         </button>
       </div>
       {entries.length === 0 ? (
@@ -348,7 +348,7 @@ function MealSection({ type, entries, logId, allEntries, onAdd }: MealSectionPro
                   aria-label="Remove entry"
                   className="shrink-0"
                 >
-                  <Trash2 size={11} style={{ color: 'var(--dim)' }} />
+                  <Trash2 size={12} style={{ color: 'var(--dim)' }} />
                 </button>
               )}
             </div>

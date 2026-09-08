@@ -63,7 +63,7 @@ function AddMeetingSheet({ onClose }: { onClose: () => void }) {
                 {agenda.map((item, i) => (
                   <li key={i} className="flex items-center justify-between gap-2 text-[11px]" style={{ color: 'var(--muted)' }}>
                     <span>· {item}</span>
-                    <button onClick={() => setAgenda(a => a.filter((_, j) => j !== i))}><X size={10} style={{ color: 'var(--dim)' }} /></button>
+                    <button onClick={() => setAgenda(a => a.filter((_, j) => j !== i))}><X size={12} style={{ color: 'var(--dim)' }} /></button>
                   </li>
                 ))}
               </ul>
@@ -160,7 +160,7 @@ function MeetingCard({ meeting }: { meeting: Meeting }) {
             {expanded ? <ChevronUp size={14} style={{ color: 'var(--dim)' }} /> : <ChevronDown size={14} style={{ color: 'var(--dim)' }} />}
           </button>
           <button onClick={() => db.meetings.delete(meeting.id!)} aria-label="Delete">
-            <Trash2 size={13} style={{ color: 'var(--dim)' }} />
+            <Trash2 size={14} style={{ color: 'var(--dim)' }} />
           </button>
         </div>
       </div>
@@ -184,7 +184,7 @@ function MeetingCard({ meeting }: { meeting: Meeting }) {
               <button onClick={() => setShowAddAction(s => !s)}
                 className="flex items-center gap-1 text-[9px] uppercase tracking-widest px-2 py-0.5 rounded-[2px]"
                 style={{ border: '1px solid var(--border)', color: 'var(--dim)' }}>
-                <Plus size={9} /> Add
+                <Plus size={12} /> Add
               </button>
             </div>
             {showAddAction && <AddActionForm meetingId={meeting.id!} onClose={() => setShowAddAction(false)} />}
@@ -203,7 +203,7 @@ function MeetingCard({ meeting }: { meeting: Meeting }) {
                   {a.owner && <span className="text-[10px]" style={{ color: 'var(--dim)' }}>{a.owner}</span>}
                   {a.dueDate && <span className="text-[10px]" style={{ color: overdue ? 'var(--skip-text)' : 'var(--dim)' }}>{a.dueDate}</span>}
                   <button onClick={() => db.actionItems.delete(a.id!)} aria-label="Delete action">
-                    <X size={10} style={{ color: 'var(--dim)' }} />
+                    <X size={12} style={{ color: 'var(--dim)' }} />
                   </button>
                 </div>
               )
@@ -246,7 +246,7 @@ function ActionsTab() {
         </div>
         {a.owner && <span className="text-[10px]" style={{ color: 'var(--dim)' }}>{a.owner}</span>}
         {a.dueDate && <span className="text-[10px]" style={{ color: overdue ? 'var(--skip-text)' : 'var(--dim)' }}>{a.dueDate}</span>}
-        <button onClick={() => db.actionItems.delete(a.id!)} aria-label="Delete"><X size={10} style={{ color: 'var(--dim)' }} /></button>
+        <button onClick={() => db.actionItems.delete(a.id!)} aria-label="Delete"><X size={12} style={{ color: 'var(--dim)' }} /></button>
       </div>
     )
   }

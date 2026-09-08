@@ -115,7 +115,7 @@ function MetronomeTab() {
         </div>
 
         <div className="flex items-center justify-center gap-3 mt-4">
-          <button onClick={() => setBpm(bpm - 5)} className="p-3 border border-[color:var(--hairline)] rounded-[var(--r-control)] text-[color:var(--ink-dim)] hover:border-[color:var(--border-strong)] hover:text-[color:var(--ink-2)] transition-colors"><Minus size={16} /></button>
+          <button onClick={() => setBpm(bpm - 5)} className="p-3 border border-[color:var(--hairline)] rounded-[var(--r-control)] text-[color:var(--ink-dim)] hover:border-[color:var(--border-strong)] hover:text-[color:var(--ink-2)] transition-colors"><Minus size={14} /></button>
           <div className="flex gap-1.5">
             {[-1, 1].map(d => (
               <button key={d} onClick={() => setBpm(bpm + d)} className="px-3 py-2 border border-[color:var(--hairline)] rounded-[var(--r-control)] text-[11px] text-[color:var(--ink-dim)] hover:border-[color:var(--border-strong)] hover:text-[color:var(--ink-2)] transition-colors">
@@ -123,7 +123,7 @@ function MetronomeTab() {
               </button>
             ))}
           </div>
-          <button onClick={() => setBpm(bpm + 5)} className="p-3 border border-[color:var(--hairline)] rounded-[var(--r-control)] text-[color:var(--ink-dim)] hover:border-[color:var(--border-strong)] hover:text-[color:var(--ink-2)] transition-colors"><Plus size={16} /></button>
+          <button onClick={() => setBpm(bpm + 5)} className="p-3 border border-[color:var(--hairline)] rounded-[var(--r-control)] text-[color:var(--ink-dim)] hover:border-[color:var(--border-strong)] hover:text-[color:var(--ink-2)] transition-colors"><Plus size={14} /></button>
         </div>
 
         <div className="mt-4 px-1">
@@ -316,7 +316,7 @@ function LessonsTab() {
                           onClick={() => setUploadModal({ lessonId: lesson.id, title: lesson.concept })}
                           className="p-1 text-[color:var(--ink-faint)] hover:text-[color:var(--ink-dim)] transition-colors"
                           title="Add notation from PDF or text">
-                          <Upload size={11} />
+                          <Upload size={12} />
                         </button>
                       </div>
                     </div>
@@ -384,7 +384,7 @@ function SongsTab() {
           ))}
         </div>
         <Button variant="ghost" onClick={() => { setEditing(undefined); setModalOpen(true) }}>
-          <Plus size={13} className="inline mr-1" />Add
+          <Plus size={14} className="inline mr-1" />Add
         </Button>
       </div>
 

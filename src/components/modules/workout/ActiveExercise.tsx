@@ -108,14 +108,14 @@ export function ActiveExercise({ log, forearmFatigue, onChange, onSkip, isActive
               onClick={() => setShowSwap(s => !s)}
               className="flex items-center gap-1.5 px-2.5 py-1.5 border border-noir-border rounded-[2px] text-[10px] uppercase tracking-widest text-noir-dim hover:border-noir-strong hover:text-noir-muted transition-colors"
             >
-              <RefreshCw size={11} />
+              <RefreshCw size={12} />
               Swap
             </button>
             <button
               onClick={onSkip}
               className="flex items-center gap-1.5 px-2.5 py-1.5 border border-noir-border rounded-[2px] text-[10px] uppercase tracking-widest text-noir-dim hover:border-noir-strong hover:text-noir-muted transition-colors"
             >
-              <SkipForward size={11} />
+              <SkipForward size={12} />
               Skip
             </button>
             <button
@@ -127,7 +127,7 @@ export function ActiveExercise({ log, forearmFatigue, onChange, onSkip, isActive
                   : 'border-noir-border text-noir-dim hover:border-noir-red hover:text-noir-red'
               )}
             >
-              <Flag size={11} />
+              <Flag size={12} />
               Injury
             </button>
           </div>

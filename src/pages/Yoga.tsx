@@ -217,7 +217,7 @@ function PosesTab({ onPlay }: { onPlay: (poses: YogaPose[], name: string) => voi
             : 'border-noir-border text-noir-dim hover:border-noir-strong'
         )}
       >
-        <Drum size={10} />
+        <Drum size={12} />
         Drumming Recovery Only
       </button>
 
@@ -297,7 +297,7 @@ function PosesTab({ onPlay }: { onPlay: (poses: YogaPose[], name: string) => voi
                   onClick={() => onPlay([pose], pose.name)}
                   className="w-full flex items-center justify-center gap-2 py-2 border border-noir-border rounded-[2px] text-[10px] uppercase tracking-widest text-noir-muted hover:border-noir-strong hover:text-noir-accent transition-colors"
                 >
-                  <Play size={11} />
+                  <Play size={12} />
                   Start Timer
                 </button>
               </div>
@@ -431,7 +431,7 @@ function BreathingTab() {
                   onClick={() => setTimer(technique)}
                   className="w-full flex items-center justify-center gap-2 py-2 border border-noir-border rounded-[2px] text-[10px] uppercase tracking-widest text-noir-muted hover:border-noir-strong hover:text-noir-accent transition-colors"
                 >
-                  <Timer size={11} />
+                  <Timer size={12} />
                   Start Timer
                 </button>
               </div>
@@ -443,7 +443,7 @@ function BreathingTab() {
       {/* Drummer's breath note */}
       <div className="p-3 border border-yellow-700/30 rounded-[2px] bg-yellow-900/5 space-y-1">
         <div className="flex items-center gap-2">
-          <Drum size={10} className="text-yellow-700 shrink-0" />
+          <Drum size={12} className="text-yellow-700 shrink-0" />
           <span className="text-[9px] uppercase tracking-widest text-yellow-700">Drummer's Breath Guide</span>
         </div>
         <p className="text-[11px] text-noir-dim leading-relaxed">

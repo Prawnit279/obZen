@@ -151,7 +151,7 @@ export function ExerciseCard({
                       color: 'var(--violet-100)', border: '1px solid rgba(167,139,250,0.35)',
                     }}
                   >
-                    <Zap size={10} />
+                    <Zap size={12} />
                     Drummer
                   </span>
                 )}
@@ -202,7 +202,7 @@ export function ExerciseCard({
                 aria-label={`How to perform ${displayName}`}
                 title="How to perform it · muscles worked · swaps"
               >
-                <BookOpen size={16} />
+                <BookOpen size={14} />
               </button>
               <button
                 onClick={() => setShowHistory(h => !h)}
@@ -210,7 +210,7 @@ export function ExerciseCard({
                 style={{ color: 'var(--muted)' }}
                 aria-label={showHistory ? 'Hide history' : 'Show history'}
               >
-                {showHistory ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
+                {showHistory ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
               </button>
               <button
                 onClick={() => setConfirmRemove(true)}
@@ -218,7 +218,7 @@ export function ExerciseCard({
                 style={{ color: 'var(--muted)' }}
                 aria-label={`Remove ${displayName} from this day`}
               >
-                <Trash2 size={15} />
+                <Trash2 size={14} />
               </button>
             </div>
           </div>

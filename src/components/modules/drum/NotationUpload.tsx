@@ -76,7 +76,7 @@ export function NotationUpload({ lessonId, onSaved }: Props) {
   if (saved) {
     return (
       <div className="flex items-center gap-2 py-2 text-[11px] text-[color:var(--ink-2)]">
-        <CheckCircle size={13} />
+        <CheckCircle size={14} />
         Notation saved.
       </div>
     )
@@ -126,7 +126,7 @@ export function NotationUpload({ lessonId, onSaved }: Props) {
           Most drum notation books use image-based PDFs. Copy any R/L sticking patterns you see and enter them below.
         </div>
         <Button variant="ghost" fullWidth onClick={() => setMode('text')}>
-          <Type size={13} className="inline mr-1.5" />
+          <Type size={14} className="inline mr-1.5" />
           Enter sticking pattern manually
         </Button>
         <Button variant="ghost" onClick={() => setMode('choose')}>Back</Button>
@@ -167,7 +167,7 @@ export function NotationUpload({ lessonId, onSaved }: Props) {
             onClick={() => handleParseText(manualText)}
             disabled={!manualText.trim()}
           >
-            <FileText size={13} className="inline mr-1.5" />
+            <FileText size={14} className="inline mr-1.5" />
             Preview
           </Button>
         </div>

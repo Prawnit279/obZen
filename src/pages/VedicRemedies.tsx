@@ -88,7 +88,7 @@ function PracticeLog() {
         <button onClick={() => setShowForm(s => !s)}
           className="flex items-center gap-1 px-2.5 py-1 rounded-[2px] text-[9px] uppercase tracking-widest"
           style={{ border: '1px solid var(--border)', color: 'var(--dim)' }}>
-          <Plus size={9} /> Add
+          <Plus size={12} /> Add
         </button>
       </div>
       {showForm && <AddLogForm onClose={() => setShowForm(false)} />}

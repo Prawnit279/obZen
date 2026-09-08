@@ -161,7 +161,7 @@ function SortableTask({ task }: { task: Task }) {
           →
         </button>
         <button onClick={() => db.tasks.delete(task.id!)} aria-label="Delete task">
-          <Trash2 size={11} style={{ color: 'var(--dim)' }} />
+          <Trash2 size={12} style={{ color: 'var(--dim)' }} />
         </button>
       </div>
     </div>
@@ -274,7 +274,7 @@ function BoardCard({ board, onClick }: { board: Board; onClick: () => void }) {
         <span className="text-[10px]" style={{ color: total === 0 ? 'var(--dim)' : 'var(--dim)' }}>{countLabel}</span>
         <button onClick={e => { e.stopPropagation(); db.boards.delete(board.id!) }}
           aria-label="Delete board" className="p-1">
-          <Trash2 size={13} style={{ color: 'var(--dim)' }} />
+          <Trash2 size={14} style={{ color: 'var(--dim)' }} />
         </button>
       </div>
     </button>

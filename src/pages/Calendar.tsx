@@ -189,7 +189,7 @@ function DaySheet({ date, events, onOpenWorkout, onClose, onAdd }: DaySheetProps
       noPadding
       action={
         <button onClick={onAdd} aria-label="Add event">
-          <Plus size={16} style={{ color: 'var(--ink-dim)' }} />
+          <Plus size={14} style={{ color: 'var(--ink-dim)' }} />
         </button>
       }
     >
@@ -229,7 +229,7 @@ function DaySheet({ date, events, onOpenWorkout, onClose, onAdd }: DaySheetProps
                 </div>
               </div>
               <button onClick={() => handleDelete(ev.id!)} aria-label="Delete event" className="shrink-0 mt-0.5">
-                <Trash2 size={13} style={{ color: 'var(--ink-faint)' }} className="hover:text-red-400 transition-colors" />
+                <Trash2 size={14} style={{ color: 'var(--ink-faint)' }} className="hover:text-red-400 transition-colors" />
               </button>
             </div>
           ))}
@@ -264,13 +264,13 @@ function WeekView({ selectedDate, setSelectedDate, onAdd }: WeekViewProps) {
       {/* Week nav */}
       <div className="flex items-center justify-between">
         <button onClick={() => setSelectedDate(addDays(weekStart, -7))} className="p-1.5 text-[color:var(--ink-faint)] hover:text-[color:var(--ink-dim)] transition-colors">
-          <ChevronLeft size={16} />
+          <ChevronLeft size={14} />
         </button>
         <span className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)]">
           {days[0].slice(5)} – {days[6].slice(5)}
         </span>
         <button onClick={() => setSelectedDate(addDays(weekStart, 7))} className="p-1.5 text-[color:var(--ink-faint)] hover:text-[color:var(--ink-dim)] transition-colors">
-          <ChevronRight size={16} />
+          <ChevronRight size={14} />
         </button>
       </div>
 
@@ -358,13 +358,13 @@ function DayView({ selectedDate, setSelectedDate, onAdd }: DayViewProps) {
       {/* Day nav */}
       <div className="flex items-center justify-between">
         <button onClick={() => setSelectedDate(addDays(selectedDate, -1))} className="p-1.5 text-[color:var(--ink-faint)] hover:text-[color:var(--ink-dim)] transition-colors">
-          <ChevronLeft size={16} />
+          <ChevronLeft size={14} />
         </button>
         <button onClick={() => setSelectedDate(today)} className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] hover:text-[color:var(--ink-2)] transition-colors">
           {label}
         </button>
         <button onClick={() => setSelectedDate(addDays(selectedDate, 1))} className="p-1.5 text-[color:var(--ink-faint)] hover:text-[color:var(--ink-dim)] transition-colors">
-          <ChevronRight size={16} />
+          <ChevronRight size={14} />
         </button>
       </div>
 
@@ -390,7 +390,7 @@ function DayView({ selectedDate, setSelectedDate, onAdd }: DayViewProps) {
                 <p className="text-[11px] uppercase tracking-widest mt-0.5" style={{ color: 'var(--ink-faint)' }}>{ev.category}</p>
               </div>
               <button onClick={() => db.calendarEvents.delete(ev.id!)} aria-label="Delete event" className="shrink-0 mt-0.5">
-                <Trash2 size={13} style={{ color: 'var(--ink-faint)' }} />
+                <Trash2 size={14} style={{ color: 'var(--ink-faint)' }} />
               </button>
             </div>
           ))
@@ -498,7 +498,7 @@ export default function Calendar() {
         <>
           <div className="flex items-center justify-between">
             <button onClick={prevMonth} className="p-1.5 text-[color:var(--ink-faint)] hover:text-[color:var(--ink-dim)] transition-colors">
-              <ChevronLeft size={16} />
+              <ChevronLeft size={14} />
             </button>
             <div
               className="uppercase"
@@ -507,7 +507,7 @@ export default function Calendar() {
               {MONTHS[month]} {year}
             </div>
             <button onClick={nextMonth} className="p-1.5 text-[color:var(--ink-faint)] hover:text-[color:var(--ink-dim)] transition-colors">
-              <ChevronRight size={16} />
+              <ChevronRight size={14} />
             </button>
           </div>
 

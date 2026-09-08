@@ -105,7 +105,7 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
           style={{ color: 'var(--skip-text)' }}
           aria-label="Delete set"
         >
-          <Trash2 size={13} />
+          <Trash2 size={14} />
         </button>
       ) : (
         <button
@@ -117,7 +117,7 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
           style={{ color: saved ? 'var(--complete-text)' : 'var(--ink-dim)' }}
           aria-label={saved ? 'Set saved' : 'Save set'}
         >
-          {saved ? <Check size={13} /> : <Plus size={13} />}
+          {saved ? <Check size={14} /> : <Plus size={14} />}
         </button>
       )}
     </div>
@@ -199,7 +199,7 @@ export function SetLogger({ exerciseId, sets, onAddSet, onUpdateSet, onRemoveSet
           className="mt-2 flex items-center gap-1.5 text-[11px] uppercase tracking-widest transition-opacity hover:opacity-70"
           style={{ color: 'var(--ink-faint)' }}
         >
-          <Plus size={11} />
+          <Plus size={12} />
           Add Set
         </button>
       )}

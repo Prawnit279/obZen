@@ -200,7 +200,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
           className="flex items-start gap-2 p-3 rounded-[var(--r-control)]"
           style={{ border: '1px solid rgba(127,29,29,0.4)' }}
         >
-          <AlertTriangle size={13} style={{ color: 'var(--red)', marginTop: 1 }} className="shrink-0" />
+          <AlertTriangle size={14} style={{ color: 'var(--red)', marginTop: 1 }} className="shrink-0" />
           <span className="text-[11px]" style={{ color: 'var(--ink-dim)' }}>
             Low readiness — consider reducing volume or choosing a rest day.
           </span>
@@ -211,7 +211,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
           className="flex items-start gap-2 p-3 rounded-[var(--r-control)]"
           style={{ border: '1px solid rgba(161,98,7,0.4)' }}
         >
-          <Zap size={13} style={{ color: '#ca8a04', marginTop: 1 }} className="shrink-0" />
+          <Zap size={14} style={{ color: '#ca8a04', marginTop: 1 }} className="shrink-0" />
           <span className="text-[11px]" style={{ color: 'var(--ink-dim)' }}>
             Forearm fatigue active — pull-heavy exercises flagged.
           </span>
@@ -270,7 +270,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
         className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[var(--r-control)] text-[12px] uppercase tracking-widest transition-opacity hover:opacity-70"
         style={{ border: '1px dashed var(--border)', color: 'var(--ink-dim)' }}
       >
-        <Plus size={13} />
+        <Plus size={14} />
         Add Exercise
       </button>
 

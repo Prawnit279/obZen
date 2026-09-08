@@ -55,7 +55,7 @@ export function WorkoutHistory() {
                 {session.completedAt && <span style={{ color: 'var(--complete-text)' }}> · complete</span>}
               </div>
             </div>
-            <ChevronRight size={16} style={{ color: 'var(--ink-faint)' }} className="shrink-0" />
+            <ChevronRight size={14} style={{ color: 'var(--ink-faint)' }} className="shrink-0" />
           </button>
         )
       })}

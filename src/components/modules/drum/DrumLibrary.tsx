@@ -423,7 +423,7 @@ function BookCard({ book, onOpen, onDelete }: BookCardProps) {
     <div className="rounded-[var(--r-control)] p-4" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
       <div className="flex items-start justify-between gap-2">
         <div className="flex items-start gap-3 flex-1 min-w-0">
-          <FileText size={16} style={{ color: 'var(--ink-faint)', flexShrink: 0, marginTop: 2 }} />
+          <FileText size={14} style={{ color: 'var(--ink-faint)', flexShrink: 0, marginTop: 2 }} />
           <div className="flex-1 min-w-0">
             <p className="text-[13px] truncate" style={{ color: 'var(--ink)' }}>{book.title}</p>
             {book.author && <p className="text-[11px]" style={{ color: 'var(--ink-faint)' }}>{book.author}</p>}
@@ -646,7 +646,7 @@ export function DrumLibrary() {
           className="flex items-center gap-1 px-3 py-1.5 rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-opacity hover:opacity-70"
           style={{ border: '1px solid var(--border)', color: 'var(--ink-faint)' }}
         >
-          Filter {showFilters ? <ChevronUp size={10} /> : <ChevronDown size={10} />}
+          Filter {showFilters ? <ChevronUp size={12} /> : <ChevronDown size={12} />}
         </button>
       </div>
 
