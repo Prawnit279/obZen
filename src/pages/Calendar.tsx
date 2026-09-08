@@ -22,7 +22,6 @@ const CATEGORIES: { value: Category; label: string }[] = [
   { value: 'meeting',   label: 'Meeting' },
   { value: 'workout',   label: 'Workout' },
   { value: 'drum',      label: 'Drum' },
-  { value: 'yoga',      label: 'Yoga' },
   { value: 'jam',       label: 'Jam' },
   { value: 'ayurveda',  label: 'Ayurveda' },
 ]
@@ -39,6 +38,8 @@ const CATEGORY_COLOR: Record<Category, string> = {
   meeting:   'var(--lift-row)',
   workout:   'var(--ok)',
   drum:      'var(--lift-core)',
+  // Not offered when creating an event — Yoga is disabled — but events saved
+  // before that still carry it, so the colour has to stay resolvable.
   yoga:      'var(--lift-squat)',
   jam:       'var(--lift-bench)',
   ayurveda:  'var(--lift-deadlift)',

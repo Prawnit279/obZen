@@ -61,13 +61,12 @@ function RestDayCard() {
       style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
     >
       <div className="text-[14px]" style={{ color: 'var(--ink)' }}>Rest Day</div>
-      <div className="text-[12px]" style={{ color: 'var(--ink-dim)' }}>Yoga or light recovery only.</div>
+      <div className="text-[12px]" style={{ color: 'var(--ink-dim)' }}>Light recovery only.</div>
       <div
         className="text-[11px] pl-3 text-left max-w-xs mx-auto mt-3"
         style={{ color: 'var(--ink-faint)', borderLeft: '1px solid var(--border-strong)' }}
       >
-        Pitta: recovery is productive. Avoid overtraining urge.
-        Cool yoga session favored.
+        Pitta: recovery is productive. Avoid the urge to overtrain.
       </div>
     </div>
   )

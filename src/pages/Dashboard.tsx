@@ -188,7 +188,7 @@ export default function Dashboard() {
                 <div style={{ fontSize: 13, color: 'var(--ink-dim)' }}>
                   {checkIn?.soreness === 'high' && 'High soreness. '}
                   {checkIn && checkIn.energy <= 2 && 'Low energy. '}
-                  Consider yoga or rest only today.
+                  Consider rest only today.
                 </div>
               </div>
             </div>
