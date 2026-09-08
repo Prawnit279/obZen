@@ -11,7 +11,18 @@ export default defineConfig({
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],
-      exclude: ['node_modules/', 'src/test/', 'src/data/', '*.config.*'],
+      // `dist/` and `scripts/` are not source: counting the built bundles as
+      // uncovered files put the headline figure at 19% while `src/lib` was
+      // near 70%, which made the number useless as a gate.
+      exclude: [
+        'node_modules/',
+        'dist/',
+        'scripts/',
+        'src/test/',
+        'src/data/',
+        'src/vite-env.d.ts',
+        '*.config.*',
+      ],
     },
   },
   resolve: {
