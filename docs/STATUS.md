@@ -40,8 +40,10 @@ These are settled. Re-opening one is a deliberate choice, not a default.
 
 1. **`workoutDaySessions` is the single source of truth for workouts.**
    The legacy `workoutSessions` / `exerciseLogs` tables still exist but are
-   written *only* by the import utility, never by normal use — the old writer
-   path (`src/lib/workout.ts` + `ActiveSession.tsx`) is dead code. History
+   written *only* by the import utility, never by normal use, and read only by
+   the Dashboard streak. The old writer path — `src/lib/workout.ts`,
+   `ActiveSession.tsx`, `ActiveExercise.tsx` and `SetRow.tsx` — was deleted;
+   the tables stayed, because backup and import still carry them. History
    reading the wrong table was the original "empty History" bug.
 
 2. **The exercise library is static TypeScript, not a Dexie table.**

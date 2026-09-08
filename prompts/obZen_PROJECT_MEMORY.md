@@ -19,7 +19,7 @@ _Authoritative status: 2026-08-09. Supersedes the 2026-07-17 version._
 | Coaching cues | none | All 19 exercises, verbatim from her PDF |
 
 ## Key architecture decisions (do NOT re-derive)
-- **`workoutDaySessions` is the single source of truth for workouts.** Legacy `workoutSessions` / `exerciseLogs` are written only by the import utility, never in normal use. Old writer path (`src/lib/workout.ts` + `ActiveSession.tsx`) is dead code. Reading the wrong table was the original "empty History" bug.
+- **`workoutDaySessions` is the single source of truth for workouts.** Legacy `workoutSessions` / `exerciseLogs` are written only by the import utility, never in normal use. Old writer path (`src/lib/workout.ts`, `ActiveSession.tsx`, `ActiveExercise.tsx`, `SetRow.tsx`) was deleted; the tables stayed, since backup/import still carry them and the Dashboard streak reads them. Reading the wrong table was the original "empty History" bug.
 - **Exercise library is static TypeScript, not a Dexie table** — `src/data/obzen-program.ts` holds both profiles' programs, the derived deduped library, and the weekly schedules.
 - **Dexie still at v4 — no migration ever run.** All fields added this session (`profileId`, `focus`, `completedAt`, `cue`, `coached`, `name`, `muscle`, `target`) are non-indexed, so no version bump needed. Any change to an **indexed** field requires a version bump + explicit user sign-off.
 - **Sessions persist lazily** — opening/tabbing a day writes nothing; a row is created on first real mutation (guarded against double-insert). Fixed empty-session pollution.
