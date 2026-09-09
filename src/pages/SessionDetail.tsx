@@ -1,5 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { useParams, useNavigate } from 'react-router-dom'
+import { useGoBack } from '@/hooks/useGoBack'
 import { ArrowLeft } from 'lucide-react'
 import { db } from '@/db/dexie'
 import type { ExerciseSessionState } from '@/db/dexie'
@@ -21,6 +22,7 @@ function displayName(ex: ExerciseSessionState): string {
 export default function SessionDetail() {
   const { id } = useParams<{ id: string }>()
   const navigate = useNavigate()
+  const goBack = useGoBack('/workout?tab=history')
   const sessionId = Number(id)
 
   const session = useLiveQuery(
@@ -30,7 +32,7 @@ export default function SessionDetail() {
 
   const back = (
     <button
-      onClick={() => navigate(-1)}
+      onClick={goBack}
       className="flex items-center gap-1.5 text-[12px] uppercase tracking-widest transition-opacity hover:opacity-70"
       style={{ color: 'var(--ink-dim)' }}
     >

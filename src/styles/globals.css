@@ -292,6 +292,21 @@
   .input:focus { border-color: rgba(167,139,250,0.45); }
   .input::placeholder { color: var(--ink-faint); }
 
+  /*
+   * Every other input's placeholder, which until now inherited the browser's
+   * default grey — a fixed colour that ignores the theme and, worse, sits close
+   * enough to real text that a hint reads as a value. The Wilks card showed the
+   * cost: bodyweight prefilled from the profile next to an empty total showing
+   * "900", both looking equally entered, above a line saying to enter a total.
+   *
+   * `--ink-ghost` is the token for exactly this — marks a slot, never text.
+   */
+  input::placeholder,
+  textarea::placeholder {
+    color: var(--ink-ghost);
+    opacity: 1; /* Firefox dims placeholders by default; the token already is dim. */
+  }
+
   .page-container {
     @apply flex-1 overflow-y-auto px-4 pb-24 md:pb-4;
     /* Without this a flex:1 column will not shrink below its content, so an

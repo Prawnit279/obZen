@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useGoBack } from '@/hooks/useGoBack'
 import { ArrowLeft, Printer } from 'lucide-react'
 import { useProfileName } from '@/store/useProfileSettingsStore'
 import { WorkoutProgress } from '@/components/modules/workout/progress/WorkoutProgress'
@@ -12,17 +12,17 @@ function printedOn(): string {
 
 /** Deep-linkable Progress view — the same panel the Train tab renders. */
 export default function Progress() {
-  const navigate = useNavigate()
+  const goBack = useGoBack('/workout')
   const name = useProfileName()
 
   return (
     <div className="page-container wide space-y-4">
       <button
-        onClick={() => navigate('/workout')}
+        onClick={goBack}
         className="print-hide flex items-center gap-1.5 text-[12px] uppercase tracking-widest transition-opacity hover:opacity-70"
         style={{ color: 'var(--muted)' }}
       >
-        <ArrowLeft size={14} /> Train
+        <ArrowLeft size={14} /> Back
       </button>
 
       <div className="flex items-end justify-between gap-3 pt-1">

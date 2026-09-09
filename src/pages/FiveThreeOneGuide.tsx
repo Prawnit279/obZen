@@ -1,4 +1,4 @@
-import { useNavigate } from 'react-router-dom'
+import { useGoBack } from '@/hooks/useGoBack'
 import { ArrowLeft } from 'lucide-react'
 
 const CARD = { background: 'var(--card)', border: '1px solid var(--border)' } as const
@@ -19,12 +19,12 @@ function Section({ title, children }: { title: string; children: React.ReactNode
  * what the Tools calculators compute; it does not drive any logging.
  */
 export default function FiveThreeOneGuide() {
-  const navigate = useNavigate()
+  const goBack = useGoBack('/workout/tools')
 
   return (
     <div className="page-container space-y-4">
       <button
-        onClick={() => navigate(-1)}
+        onClick={goBack}
         className="flex items-center gap-1.5 text-[12px] uppercase tracking-widest transition-opacity hover:opacity-70"
         style={{ color: 'var(--ink-dim)' }}
       >

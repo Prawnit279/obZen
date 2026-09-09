@@ -37,6 +37,7 @@ export function WilksDotsCard() {
           label="Coefficient set"
           value={sex}
           onChange={setSex}
+          grow
           options={[{ value: 'male', label: 'Male coefficients' }, { value: 'female', label: 'Female coefficients' }]}
         />
         <div className="grid grid-cols-2 gap-3">

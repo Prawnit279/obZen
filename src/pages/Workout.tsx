@@ -323,13 +323,35 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
 // Main page
 // ---------------------------------------------------------------------------
 
+const TABS: Tab[] = ['program', 'history', 'tools']
+
 export default function Workout() {
-  const [tab, setTab] = useState<Tab>('program')
   // "Edit sets for this day" in a past session links here with the date and day,
   // so editing a finished workout lands on the right session.
-  const [searchParams] = useSearchParams()
+  const [searchParams, setSearchParams] = useSearchParams()
   const linkedDate = searchParams.get('date')
   const linkedDay = searchParams.get('day') as DayLabel | null
+
+  /**
+   * The open tab lives in the URL, not in component state.
+   *
+   * Opening a logged day pushes /workout/session/:id, and coming back from it
+   * returns to /workout. When the tab was local state that meant landing on
+   * Program every time, however you got here — the back button looked broken
+   * while doing exactly what it was asked. In the URL, the tab comes back with
+   * the history entry, and a particular tab can be linked to.
+   */
+  const tabParam = searchParams.get('tab') as Tab | null
+  const tab: Tab = tabParam && TABS.includes(tabParam) ? tabParam : 'program'
+
+  const setTab = (next: Tab) => {
+    const params = new URLSearchParams(searchParams)
+    // Program is the default, so it stays out of the URL rather than making
+    // every visit to Train carry a query string.
+    if (next === 'program') params.delete('tab')
+    else params.set('tab', next)
+    setSearchParams(params, { replace: true })
+  }
 
   const [selectedDay, setSelectedDay] = useState<DayLabel | 'Rest'>(
     linkedDay && DAYS.includes(linkedDay) ? linkedDay : 'Day 1'
