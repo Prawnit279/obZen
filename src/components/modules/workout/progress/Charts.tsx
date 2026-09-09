@@ -28,7 +28,6 @@ const MB = 22
 
 const GRID = 'var(--hairline-soft)'
 const TICK = 'var(--ink-faint)'
-const LANE_DIVIDER = 'rgba(255,255,255,0.04)'
 
 /** Dash patterns cycle so overlaid series stay distinguishable without colour. */
 export const SERIES_DASHES = ['none', '5 3', '2 3', '8 3 2 3']
@@ -147,7 +146,7 @@ export function LineChart({ series, goal, yLabel }: LineChartProps) {
   if (withData.length === 0) return <ChartEmpty text="No data logged yet." />
   return withData.length === 1
     ? <AreaChart series={withData[0]} goal={goal} yLabel={yLabel} />
-    : <LaneChart series={withData} yLabel={yLabel} />
+    : <MultiLineChart series={withData} yLabel={yLabel} />
 }
 
 // ── Area chart — one series, the form that carries a screen ──────────────────
@@ -226,79 +225,69 @@ function AreaChart({
 
 // ── Lane chart — several lifts, each normalised to its own range ─────────────
 
-function LaneChart({ series, yLabel }: { series: LineSeries[]; yLabel?: string }) {
-  const nameH = 13          // the row carrying the lift's name and its change
-  const plotH = 30          // the drawing itself
-  const laneH = nameH + plotH + 7
-  const height = laneH * series.length + MB
+/**
+ * Every lift on one shared axis, distinguished by colour and dash.
+ *
+ * This replaced a per-lift lane chart. Lanes let a light movement and a heavy
+ * one both fill their own strip, which reads well until you try to compare
+ * them — the shapes are drawn to different scales, so a lift that gained ten
+ * pounds looks exactly like one that gained a hundred.
+ *
+ * One axis costs something and it is worth being honest about it: lifts far
+ * apart in absolute weight sit far apart vertically, so a light movement's
+ * progress is compressed. What you get back is that every line is directly
+ * comparable and the y-axis means one thing, which is what a reader assumes a
+ * chart does anyway.
+ */
+function MultiLineChart({ series, yLabel }: { series: LineSeries[]; yLabel?: string }) {
+  const height = 168
+  const legendGap = 26              // room under the plot for dates
+  const plotBottom = height - legendGap
 
   const dates = [...new Set(series.flatMap(s => s.points.map(p => p.date)))].sort()
+  const values = series.flatMap(s => s.points.map(p => p.value))
+
+  // Pad the range so the top and bottom lines are not drawn on the frame.
+  const rawMin = Math.min(...values)
+  const rawMax = Math.max(...values)
+  const pad = rawMax === rawMin ? Math.max(1, rawMax * 0.1) : (rawMax - rawMin) * 0.12
+  const min = Math.max(0, rawMin - pad)
+  const max = rawMax + pad
+
   const x = (date: string) =>
     dates.length === 1 ? ML : ML + (dates.indexOf(date) / (dates.length - 1)) * (W - ML - MR)
+  const y = (v: number) => MT + (1 - (v - min) / (max - min)) * (plotBottom - MT)
 
-  const lanes = series.map((s, i) => {
+  const lines = series.map((s, i) => {
+    const pts = s.points.map(p => [x(p.date), y(p.value)] as [number, number])
     const vals = s.points.map(p => p.value)
-    const min = Math.min(...vals)
-    const max = Math.max(...vals)
-    const span = max - min || 1
-    const top = i * laneH
-    const plotTop = top + nameH
-    const plotBot = plotTop + plotH
-
-    // A single session has no range to scale against, so it sits mid-lane
-    // rather than being pinned to a floor that means nothing.
-    const single = s.points.length === 1
-    const pts = s.points.map(p => [
-      x(p.date),
-      single ? plotTop + plotH / 2 : plotBot - ((p.value - min) / span) * plotH,
-    ] as [number, number])
-
     return {
       label: s.label,
       hue: liftHue(s.label, i),
       dash: SERIES_DASHES[i % SERIES_DASHES.length],
-      d: single ? '' : monotoneCubic(pts),
+      d: monotoneCubic(pts),
       end: pts[pts.length - 1],
-      single,
-      min, max,
-      plotTop, plotBot,
-      divider: top + laneH,
-      nameY: top + 9,
-      /** Only meaningful once there are two sessions to compare. */
-      delta: single ? null : vals[vals.length - 1] - vals[0],
+      latest: vals[vals.length - 1],
+      single: s.points.length === 1,
+      delta: s.points.length > 1 ? vals[vals.length - 1] - vals[0] : null,
     }
   })
 
   return (
     <div>
-      <svg viewBox={`0 0 ${W} ${height}`} className="w-full" role="img" aria-label={yLabel ?? 'Trend per lift'}>
-        {lanes.map((l, i) => (
+      <svg viewBox={`0 0 ${W} ${height}`} className="w-full" role="img" aria-label={yLabel ?? 'Estimated 1RM per lift'}>
+        {/* Shared gridlines — one scale, so these mean the same for every lift. */}
+        {niceTicks(min, max).map(t => (
+          <g key={t}>
+            <line x1={ML} y1={y(t)} x2={W - MR} y2={y(t)} stroke={GRID} strokeWidth="0.5" />
+            <text x={ML - 4} y={y(t) + 3} textAnchor="end" fontSize="9" fill={TICK}>{fmt(t)}</text>
+          </g>
+        ))}
+
+        {lines.map(l => (
           <g key={l.label}>
-            {i > 0 && (
-              <line x1={0} y1={l.nameY - 9} x2={W - MR} y2={l.nameY - 9}
-                    stroke={LANE_DIVIDER} strokeWidth="1" />
-            )}
-
-            {/* Name and change, so a lane says what it is without a legend. */}
-            <text x={0} y={l.nameY} fontSize="9.5" fill={l.hue}>{l.label}</text>
-            <text x={W - MR} y={l.nameY} textAnchor="end" fontSize="9.5" fill={TICK}>
-              {l.delta === null
-                ? 'one session'
-                : `${l.delta > 0 ? '+' : ''}${fmt(l.delta)} lb`}
-            </text>
-
-            {/* The lane's own scale. Each lane is normalised to its own range,
-                which is only honest if the range is written down. */}
-            <text x={ML - 4} y={l.plotTop + 4} textAnchor="end" fontSize="8.5" fill={TICK}>
-              {fmt(l.max)}
-            </text>
-            {!l.single && l.max !== l.min && (
-              <text x={ML - 4} y={l.plotBot} textAnchor="end" fontSize="8.5" fill={TICK}>
-                {fmt(l.min)}
-              </text>
-            )}
-
-            {l.d && (
+            {/* A lift with one session has no line to draw, only a point. */}
+            {!l.single && (
               <path
                 d={l.d} fill="none" stroke={l.hue} strokeWidth="1.9"
                 strokeDasharray={l.dash} strokeLinecap="round" strokeLinejoin="round"
@@ -308,13 +297,38 @@ function LaneChart({ series, yLabel }: { series: LineSeries[]; yLabel?: string }
           </g>
         ))}
 
-        <text x={0} y={height - 6} fontSize="9.5" fill={TICK}>{dates[0]?.slice(5)}</text>
+        <text x={ML} y={height - 8} fontSize="9.5" fill={TICK}>{dates[0]?.slice(5)}</text>
         {dates.length > 1 && (
-          <text x={W - MR} y={height - 6} textAnchor="end" fontSize="9.5" fill={TICK}>
+          <text x={W - MR} y={height - 8} textAnchor="end" fontSize="9.5" fill={TICK}>
             {dates[dates.length - 1].slice(5)}
           </text>
         )}
       </svg>
+
+      {/* Key — colour and dash together, so nothing rests on colour alone. */}
+      <div className="flex flex-wrap" style={{ gap: '6px 14px', marginTop: 8 }}>
+        {lines.map(l => (
+          <span key={l.label} className="flex items-baseline" style={{ gap: 6 }}>
+            <svg width="16" height="6" aria-hidden="true" style={{ alignSelf: 'center' }}>
+              <line x1="0" y1="3" x2="16" y2="3" stroke={l.hue} strokeWidth="1.9" strokeDasharray={l.dash} />
+            </svg>
+            <span style={{ fontSize: 11.5, color: 'var(--ink-dim)' }}>{l.label}</span>
+            <span
+              style={{
+                fontSize: 11.5, fontWeight: 700, color: l.hue,
+                fontVariantNumeric: 'tabular-nums',
+              }}
+            >
+              {fmt(l.latest)}
+            </span>
+            <span style={{ fontSize: 11, color: 'var(--ink-faint)' }}>
+              {l.delta === null
+                ? 'one session'
+                : `${l.delta > 0 ? '+' : ''}${fmt(l.delta)}`}
+            </span>
+          </span>
+        ))}
+      </div>
     </div>
   )
 }

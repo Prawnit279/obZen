@@ -96,15 +96,35 @@ describe('LineChart — several lifts', () => {
     }
   })
 
-  it('states each lane’s range, so the vertical scale can be read', () => {
-    // Without this the lanes are unlabelled and self-normalised: a lift that
-    // moved 10 lb draws the same shape as one that moved 100.
-    render(<LineChart series={[squat, deadlift]} />)
+  it('draws one axis that spans every lift', () => {
+    const { container } = render(<LineChart series={[squat, deadlift]} />)
+    const ticks = [...container.querySelectorAll('text')]
+      .map(t => Number(t.textContent))
+      .filter(n => Number.isFinite(n) && n > 100)
 
-    expect(screen.getByText('250')).toBeInTheDocument()  // squat max
-    expect(screen.getByText('215')).toBeInTheDocument()  // squat min
-    expect(screen.getByText('320')).toBeInTheDocument()  // deadlift max
-    expect(screen.getByText('275')).toBeInTheDocument()  // deadlift min
+    // The axis has to reach past the lowest and highest value on the chart —
+    // squat bottoms at 215, deadlift tops at 320 — or a line leaves the plot.
+    expect(Math.min(...ticks)).toBeLessThanOrEqual(215)
+    expect(Math.max(...ticks)).toBeGreaterThanOrEqual(320)
+  })
+
+  it('puts the same weight at the same height for every lift', () => {
+    // The whole point of one axis. Two lifts that reach 300 must sit level;
+    // under the old per-lift lanes they did not, which made the shapes
+    // impossible to compare.
+    const a = { label: 'Barbell Squat', points: [{ date: '2026-05-11', value: 200 }, { date: '2026-09-06', value: 300 }] }
+    const b = { label: 'Deadlift', points: [{ date: '2026-05-11', value: 300 }, { date: '2026-09-06', value: 400 }] }
+    const { container } = render(<LineChart series={[a, b]} />)
+
+    const [squatPath, deadPath] = [...container.querySelectorAll('path')]
+      .map(p => p.getAttribute('d') ?? '')
+      .filter(d => d.includes('C'))
+
+    const endY = (d: string) => pathYs(d)[pathYs(d).length - 1]
+    const startY = (d: string) => pathYs(d)[0]
+
+    // Squat ends at 300; deadlift starts at 300.
+    expect(endY(squatPath)).toBeCloseTo(startY(deadPath), 1)
   })
 
   it('reports a single session as its value, not as a change of zero', () => {
@@ -118,8 +138,8 @@ describe('LineChart — several lifts', () => {
 
   it('shows the change for lifts that have one', () => {
     render(<LineChart series={[squat, deadlift]} />)
-    expect(screen.getByText('+25 lb')).toBeInTheDocument()  // squat 225 → 250
-    expect(screen.getByText('+45 lb')).toBeInTheDocument()  // deadlift 275 → 320
+    expect(screen.getByText('+25')).toBeInTheDocument()  // squat 225 → 250
+    expect(screen.getByText('+45')).toBeInTheDocument()  // deadlift 275 → 320
   })
 
   it('draws a line per lift, and no empty path for the lift that has none', () => {
@@ -143,20 +163,16 @@ describe('LineChart — several lifts', () => {
     })
   })
 
-  it('keeps every lane’s drawing inside its own lane', () => {
-    // Overshoot used to let one lift's curve bleed into the lane below it.
+  it('keeps every line inside the plot area', () => {
     const { container } = render(<LineChart series={[squat, deadlift]} />)
-    const paths = [...container.querySelectorAll('path')]
+    const ys = [...container.querySelectorAll('path')]
       .map(p => p.getAttribute('d') ?? '')
       .filter(d => d.includes('C'))
+      .flatMap(pathYs)
 
-    const bands = paths.map(d => {
-      const ys = pathYs(d)
-      return { lo: Math.min(...ys), hi: Math.max(...ys) }
-    }).sort((a, b) => a.lo - b.lo)
-
-    expect(bands).toHaveLength(2)
-    expect(bands[0].hi).toBeLessThan(bands[1].lo) // no overlap between lanes
+    // MT (10) to the plot floor. Overshoot here would draw outside the frame.
+    expect(Math.min(...ys)).toBeGreaterThanOrEqual(10)
+    expect(Math.max(...ys)).toBeLessThanOrEqual(142)
   })
 
   it('falls back to an empty state when nothing has points', () => {
