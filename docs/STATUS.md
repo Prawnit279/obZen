@@ -17,22 +17,33 @@ Single-device, no backend, no accounts.
 
 ## Current shape
 
-**Navigation:** Home / Train / Drum / Cal / More. (Food is hidden — see
-[Hidden, not deleted](#hidden-not-deleted).)
+**Navigation:** Home / Train / Progress / Drums / Calendar / More. (Food and
+Yoga are hidden — see [Hidden, not deleted](#hidden-not-deleted).)
 
-**Two profiles**, switched from the Home header (`Pronit` | `Aishwarya`,
-persisted in `localStorage`, defaults to Pronit). The active profile drives the
-training program, the weekly schedule, and which workout history is shown.
+**One profile.** The app used to carry two named people with switchers on Home,
+Train and Settings; all three are gone, and there is no way to change who you
+are. `ProfileId` is the single-member union `'pronit'`.
 
-This is **not authentication** — it is a view switch over one shared device
-database. Anyone using the device can switch to either profile. Real separation
-would need a backend with accounts.
+That id string is not a display value — it is what logged sessions are stamped
+with, and the prefix under which bodyweight entries and progression ladder rungs
+sit in `localStorage`. It stays fixed so none of that is orphaned.
 
-| | Pronit | Aishwarya |
-|---|---|---|
-| Program | 3-day split (Pull/Legs/Arms, Zercher/Quad/Shoulders, Posterior/Delts) | Phase 1 · Weeks 1–4 · Glutes, Core & Strength |
-| Schedule | Rolling pattern (rest Sun/Thu) | Fixed Mon/Wed/Fri, walks Tue/Thu, rest Sat/Sun |
-| Coaching cues | — | All 19 exercises, verbatim from her Phase 1 plan |
+Sessions stamped with the retired second profile remain in the database and in
+JSON backups. `belongsToProfile` no longer matches them, so they neither display
+nor count anywhere. There is **no in-app path back to them** — recovering that
+history would mean a code change or reading the backup by hand.
+
+Her *program* is still in `obzen-program.ts`, no longer selectable but still
+feeding `EXERCISE_LIBRARY`: fifteen movements exist only there (assisted
+pull-ups and dips, barbell back squat, Bulgarian split squat, face pulls,
+hollow body holds, walking lunges among them), so removing it would strip them
+from the exercise picker.
+
+| | Current |
+|---|---|
+| Program | 3-day split (Pull/Legs/Arms, Zercher/Quad/Shoulders, Posterior/Delts) |
+| Schedule | Rolling pattern (rest Sun/Thu). Note this marks five training days a week while the Train header counts against `/3` — a known mismatch, left as is. |
+| Progress panels | Powerlifting framing: SBD total, DOTS, strength standards |
 
 ## Architecture decisions
 

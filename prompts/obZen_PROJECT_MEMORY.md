@@ -9,14 +9,16 @@ _Authoritative status: 2026-08-09. Supersedes the 2026-07-17 version._
 - Last known good: HEAD `7d54baf6`, tree clean, in sync with origin/main, deployed green. Gates: tsc clean · 80/80 tests (vitest + fake-indexeddb) · prod build passes.
 
 ## Current shape
-- **Nav:** Home / Train / Drum / Cal / More. (Food/Nutrition hidden via flag.)
-- **Two profiles**, toggled from Home header (Pronit | Aishwarya), persisted in localStorage, defaults to Pronit. Profile drives training program, weekly schedule, and workout history. **Not auth** — a view switch over one shared device DB.
+- **Nav:** Home / Train / Progress / Drums / Calendar / More. (Food/Nutrition and Yoga hidden via flags.)
+- **One profile.** The switchers on Home, Train and Settings are gone; `ProfileId` is the single-member union `'pronit'`. The id string is a storage key (session stamps, bodyweight log, ladder rungs), not a display value, so it stays fixed.
+- Sessions stamped with the retired second profile stay in the DB and in backups but no longer match `belongsToProfile`, so they neither display nor count. No in-app path back to them.
+- `AISHWARYA_PROGRAM` is retained as an `EXERCISE_LIBRARY` source only — 15 movements exist nowhere else.
 
-| | Pronit | Aishwarya |
-|---|---|---|
-| Program | Original 3-day split (Pull/Legs/Arms, Zercher/Quad/Shoulders, Posterior/Delts) | Phase 1 · Weeks 1–4 · Glutes, Core & Strength |
-| Schedule | Rolling (rest Sun/Thu) | Fixed Mon/Wed/Fri, walks Tue/Thu, rest Sat/Sun |
-| Coaching cues | none | All 19 exercises, verbatim from her PDF |
+| | Current |
+|---|---|
+| Program | 3-day split (Pull/Legs/Arms, Zercher/Quad/Shoulders, Posterior/Delts) |
+| Schedule | Rolling (rest Sun/Thu) — five training days vs the Train header's `/3`, known mismatch |
+| Progress panels | SBD total, DOTS, strength standards |
 
 ## Key architecture decisions (do NOT re-derive)
 - **`workoutDaySessions` is the single source of truth for workouts.** Legacy `workoutSessions` / `exerciseLogs` are written only by the import utility, never in normal use. Old writer path (`src/lib/workout.ts`, `ActiveSession.tsx`, `ActiveExercise.tsx`, `SetRow.tsx`) was deleted; the tables stayed, since backup/import still carry them and the Dashboard streak reads them. Reading the wrong table was the original "empty History" bug.
@@ -27,7 +29,7 @@ _Authoritative status: 2026-08-09. Supersedes the 2026-07-17 version._
 
 ## Files that matter
 - `src/config/features.ts` — `SHOW_NUTRITION=false`, `SHOW_VEDIC=false` (reversible hides)
-- `src/config/profiles.ts` — Pronit + Aishwarya metadata, body comp, targets
+- `src/config/profiles.ts` — the single profile: metadata, body comp, targets
 - `src/data/obzen-program.ts` — both programs, exercise library, SCHEDULES, cues
 - `src/lib/workoutSession.ts` — sessionHasActivity / loggedExercises / profile attribution
 - `src/store/useWorkoutDayStore.ts` — lazy-persist store, keyed `${profile}::${day}::${date}`
@@ -61,7 +63,7 @@ Designed with Pronit, mockups approved, captured in the build prompt **`obZen_pr
 - `trackingMode` per exercise (`load`/`assisted`/`bodyweight-reps`/`timed`) + `isCompetitionLift` + `progressionPath` → fields in static TS `obzen-program.ts`, not Dexie.
 - Bodyweight modes: assisted → assistance→0; bodyweight-reps → max reps + weekly volume; timed → best hold seconds; weighted-BW → BW+added effective load + % of BW.
 - Progression ladder per movement (Negatives→Band→Machine→Bodyweight→Weighted); current rung user-set, per-profile, stored via localStorage-store pattern (no Dexie table).
-- Profile-aware: Pronit = powerlifting panels (SBD/Wilks/standards); Aishwarya = e1RM trend for her key lifts + volume + bodyweight trend (no SBD/Wilks). Per-profile config object.
+- Panels are driven by the profile's `progress` config object: powerlifting framing (SBD/Wilks/standards) plus e1RM trend, volume and PRs.
 - Needs a bodyweight log (reuse `checkIns` if present, else localStorage; new Dexie table only with sign-off).
 
 **Strength tools — Lab area (`/workout/tools`), calculators + guide ONLY (user chose this; NO program engine, does not touch logged program):**
