@@ -3,7 +3,8 @@ import { barWeightLbFor, isBarLoaded, DEFAULT_BAR_LB } from '@/lib/barWeight'
 import { EXERCISE_MOTIONS } from '@/data/exercise-motions'
 import { trackingModeFor } from '@/data/obzen-program'
 import {
-  bestE1RM, exerciseTonnage, loadedWeightLb, setWeightLb, setLoadKg, lbToKg,
+  bestE1RM, exerciseTonnage, loadedWeightLb, loadedWeightKg,
+  setWeightLb, setLoadKg, lbToKg, kgToLb,
 } from '@/lib/progress'
 
 describe('barWeightLbFor', () => {
@@ -109,5 +110,35 @@ describe('the bar reaches every metric', () => {
     const assistedAndBarLoaded = Object.keys(EXERCISE_MOTIONS)
       .filter(id => trackingModeFor(id) === 'assisted' && isBarLoaded(id))
     expect(assistedAndBarLoaded).toEqual([])
+  })
+})
+
+// ── Bodyweight belongs in strength, not in a record row ──────────────────────
+
+describe('loadedWeightKg vs setLoadKg', () => {
+  const pullup = {
+    exerciseId: 'weighted-pull-ups', status: 'complete' as const,
+    sets: [{ setNumber: 1, weight: 25, reps: 5, unit: 'lbs' as const, timestamp: '2026-08-01T10:00:00.000Z' }],
+  }
+  const BW_KG = 80
+
+  it('keeps bodyweight out of what was hung off the belt', () => {
+    // The PR card renders this as "25 lb × 5". Folding in 80 kg of lifter would
+    // make the row read 201 lb — true of the load, useless as a record you can
+    // reproduce.
+    expect(kgToLb(loadedWeightKg('weighted-pull-ups', pullup.sets[0]))).toBeCloseTo(25, 1)
+  })
+
+  it('puts bodyweight into the strength estimate on the same set', () => {
+    // Adjacent on the card, and deliberately different: an estimated 1RM for a
+    // pull-up is meaningless without the body it lifted.
+    const e1rm = bestE1RM(pullup, BW_KG)
+    expect(kgToLb(e1rm)).toBeGreaterThan(200)
+  })
+
+  it('still adds the bar where there is one', () => {
+    const set = { setNumber: 1, weight: 225, reps: 5, unit: 'lbs' as const, timestamp: '2026-08-01T10:00:00.000Z' }
+    expect(kgToLb(loadedWeightKg('barbell-squat', set))).toBeCloseTo(270, 1)
+    expect(kgToLb(loadedWeightKg('leg-press', set))).toBeCloseTo(225, 1)
   })
 })

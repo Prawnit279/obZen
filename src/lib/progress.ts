@@ -46,8 +46,13 @@ export function displayLb(kg: number, decimals = 0): string {
 /**
  * The load a set actually moved, in kilos: the plates that were logged, plus
  * the bar they were on, plus whatever share of bodyweight the movement carries,
- * less any assistance. Every weight the app reports comes through here, so the
- * bar is added in exactly one place.
+ * less any assistance.
+ *
+ * `bodyweightKg` defaults to 0, which is a real choice rather than a
+ * convenience: callers reporting *what to load* — a rep-max record, a
+ * progression target — want the weight on the bar, not the lifter on top of it.
+ * Callers reporting *strength* pass the real bodyweight. Use `loadedWeightKg`
+ * when you mean the former, so the intent is visible at the call site.
  */
 export function setLoadKg(exerciseId: string, s: LoggedSet, bodyweightKg = 0): number {
   const logged = toKg(s.weight, s.unit)
@@ -78,6 +83,17 @@ export function setWeightLb(s: LoggedSet): number {
  */
 export function loadedWeightLb(exerciseId: string, s: LoggedSet): number {
   return setWeightLb(s) + barWeightLbFor(exerciseId)
+}
+
+/**
+ * What was on the bar, in kilos: plates plus the bar, never bodyweight.
+ *
+ * The kilo twin of `loadedWeightLb`, for the internal maths. A weighted pull-up
+ * PR reads "25 lb × 5" because that is what you hang off the belt; folding in
+ * bodyweight would make the row unreproducible.
+ */
+export function loadedWeightKg(exerciseId: string, s: LoggedSet): number {
+  return toKg(s.weight, s.unit) + lbToKg(barWeightLbFor(exerciseId))
 }
 
 /** A set actually performed — placeholder rows from the logger are excluded. */
@@ -330,7 +346,7 @@ export function exercisePRs(
 
     for (const s of realSets(ex)) {
       if (s.reps < 1 || s.reps > MAX_PR_REPS) continue
-      const weightKg = setLoadKg(exerciseId, s)
+      const weightKg = loadedWeightKg(exerciseId, s)
       const current = byRep.get(s.reps)
       if (!current || weightKg > current.weightKg) {
         byRep.set(s.reps, { reps: s.reps, weightKg, date: session.date })
@@ -635,6 +651,9 @@ export function suggestProgression(
     const sets = realSets(ex)
     // Every working set must have reached the top of the range.
     if (!sets.every(s => s.reps >= top)) return undefined
+    // `setLoadKg` rather than the raw weight, so an assisted movement scores 0
+    // here and drops out below. Suggesting "add 5 lb" to an assistance figure
+    // would have been advice to make the lift easier.
     heaviest = Math.max(heaviest, ...sets.map(s => setLoadKg(exerciseId, s)))
   }
   if (heaviest <= 0) return undefined

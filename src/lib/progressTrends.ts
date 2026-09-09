@@ -1,6 +1,6 @@
 import type { WorkoutDaySession } from '@/db/dexie'
 import { trackingModeFor, exerciseNameFor } from '@/data/obzen-program'
-import { e1rmSeries, realSets, setLoadKg, bestE1RM } from '@/lib/progress'
+import { e1rmSeries, realSets, loadedWeightKg, bestE1RM } from '@/lib/progress'
 import type { E1RMPoint } from '@/lib/progress'
 
 /**
@@ -164,11 +164,13 @@ export function prFeed(sessions: WorkoutDaySession[], bodyweightKg = 0): PREvent
       const isLoad = trackingModeFor(id) === 'load'
 
       if (isLoad) {
+        // A weight record is what went on the bar, so bodyweight stays out —
+        // see `loadedWeightKg`. The e1RM event below does include it.
         const heaviest = sets.reduce(
-          (best, s) => (setLoadKg(id, s) > setLoadKg(id, best) ? s : best),
+          (best, s) => (loadedWeightKg(id, s) > loadedWeightKg(id, best) ? s : best),
           sets[0]
         )
-        const weightKg = setLoadKg(id, heaviest)
+        const weightKg = loadedWeightKg(id, heaviest)
         const prev = bestWeight.get(id)
         if (weightKg > 0 && (prev === undefined || weightKg > prev)) {
           events.push({

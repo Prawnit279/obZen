@@ -125,43 +125,53 @@ function priorTrainingMax(
   return best > 0 ? trainingMax(best) : null
 }
 
-function verdictFor(impliedTm: number, priorTm: number | null): TmVerdict {
-  if (priorTm === null || impliedTm >= priorTm) return 'advance'
-  return impliedTm >= priorTm * RESET_BAND ? 'hold' : 'reset'
+/**
+ * The verdict, carrying the prior Training Max where one exists.
+ *
+ * `hold` and `reset` are only reachable with something earlier to compare
+ * against, and saying so in the type means `nextTmFor` can read that number
+ * without a non-null assertion standing in for an invariant kept elsewhere.
+ */
+type Reading =
+  | { verdict: 'advance'; priorTmLb: number | null }
+  | { verdict: 'hold' | 'reset'; priorTmLb: number }
+
+function readingFor(impliedTmLb: number, priorTmLb: number | null): Reading {
+  if (priorTmLb === null || impliedTmLb >= priorTmLb) {
+    return { verdict: 'advance', priorTmLb }
+  }
+  return impliedTmLb >= priorTmLb * RESET_BAND
+    ? { verdict: 'hold', priorTmLb }
+    : { verdict: 'reset', priorTmLb }
 }
 
-function reasonFor(verdict: TmVerdict, impliedTm: number, priorTm: number | null): string {
-  if (priorTm === null) {
+function reasonFor(verdict: TmVerdict, impliedTmLb: number, priorTmLb: number | null): string {
+  if (priorTmLb === null) {
     return 'First AMRAP on record, so this sets the baseline rather than testing one.'
   }
-  const pct = Math.round((impliedTm / priorTm) * 100)
+  const pct = Math.round((impliedTmLb / priorTmLb) * 100)
   switch (verdict) {
     case 'advance':
-      return `This set supports a Training Max of ${impliedTm} lb, at or above the ${priorTm} lb your best session implies.`
+      return `This set supports a Training Max of ${impliedTmLb} lb, at or above the ${priorTmLb} lb your best session implies.`
     case 'hold':
-      return `This set implies ${impliedTm} lb — ${pct}% of the ${priorTm} lb your best session supports. Worth repeating the weight before adding to it.`
+      return `This set implies ${impliedTmLb} lb — ${pct}% of the ${priorTmLb} lb your best session supports. Worth repeating the weight before adding to it.`
     case 'reset':
-      return `This set implies ${impliedTm} lb — ${pct}% of the ${priorTm} lb your best session supports. 5/3/1 would drop back and build again.`
+      return `This set implies ${impliedTmLb} lb — ${pct}% of the ${priorTmLb} lb your best session supports. 5/3/1 would drop back and build again.`
   }
 }
 
-function nextTmFor(
-  verdict: TmVerdict,
-  impliedTm: number,
-  priorTm: number | null,
-  incrementLb: number
-): number {
-  switch (verdict) {
+function nextTmFor(reading: Reading, impliedTmLb: number, incrementLb: number): number {
+  switch (reading.verdict) {
     // Nothing earlier to beat, or the lift is keeping up: take the cycle jump
     // from whichever Training Max is higher.
     case 'advance':
-      return Math.max(impliedTm, priorTm ?? 0) + incrementLb
+      return Math.max(impliedTmLb, reading.priorTmLb ?? 0) + incrementLb
     // A bad day, not a stall — run the same weight again.
     case 'hold':
-      return priorTm!
+      return reading.priorTmLb
     // The book's reset: back to 90% and rebuild.
     case 'reset':
-      return roundTo5(priorTm! * RESET_BAND)
+      return roundTo5(reading.priorTmLb * RESET_BAND)
   }
 }
 
@@ -178,7 +188,7 @@ export function tmAdvice(
     const impliedTmLb = trainingMax(epley1RM(set.weightLb, set.reps))
     const priorTmLb = priorTrainingMax(sessions, set.exerciseId, set.dateISO)
     const incrementLb = isUpperBodyMuscle(set.muscle) ? UPPER_INCREMENT_LB : LOWER_INCREMENT_LB
-    const verdict = verdictFor(impliedTmLb, priorTmLb)
+    const reading = readingFor(impliedTmLb, priorTmLb)
 
     return {
       exerciseId: set.exerciseId,
@@ -187,9 +197,9 @@ export function tmAdvice(
       impliedTmLb,
       priorTmLb,
       incrementLb,
-      nextTmLb: nextTmFor(verdict, impliedTmLb, priorTmLb, incrementLb),
-      verdict,
-      reason: reasonFor(verdict, impliedTmLb, priorTmLb),
+      nextTmLb: nextTmFor(reading, impliedTmLb, incrementLb),
+      verdict: reading.verdict,
+      reason: reasonFor(reading.verdict, impliedTmLb, priorTmLb),
     }
   })
 }
