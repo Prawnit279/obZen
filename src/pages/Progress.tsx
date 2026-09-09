@@ -1,7 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { ArrowLeft, Printer } from 'lucide-react'
-import { PROFILES } from '@/config/profiles'
-import { useProfileStore } from '@/store/useProfileStore'
+import { useProfileName } from '@/store/useProfileSettingsStore'
 import { WorkoutProgress } from '@/components/modules/workout/progress/WorkoutProgress'
 
 /** Long-form date for the printed masthead, e.g. '8 September 2026'. */
@@ -14,7 +13,7 @@ function printedOn(): string {
 /** Deep-linkable Progress view — the same panel the Train tab renders. */
 export default function Progress() {
   const navigate = useNavigate()
-  const { activeId } = useProfileStore()
+  const name = useProfileName()
 
   return (
     <div className="page-container wide space-y-4">
@@ -29,7 +28,7 @@ export default function Progress() {
       <div className="flex items-end justify-between gap-3 pt-1">
         <div>
           <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--muted)' }}>
-            {PROFILES[activeId].name}
+            {name}
           </div>
           <h1 className="text-[20px] uppercase tracking-wide" style={{ color: 'var(--accent)' }}>
             Progress
@@ -54,7 +53,7 @@ export default function Progress() {
           obZen — training log
         </div>
         <div style={{ fontSize: 12 }}>
-          {PROFILES[activeId].name} · printed {printedOn()}
+          {name} · printed {printedOn()}
         </div>
       </div>
 

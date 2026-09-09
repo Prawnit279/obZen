@@ -10,7 +10,10 @@ import { previewStranded, adoptStrandedSessions } from '@/utils/adoptSessions'
 import type { AdoptPreview } from '@/utils/adoptSessions'
 import { SHOW_VEDIC } from '@/config/features'
 import { PROFILES } from '@/config/profiles'
+import { SegmentedPill } from '@/components/ui/SegmentedPill'
 import { useProfileStore } from '@/store/useProfileStore'
+import { useProfileSettingsStore } from '@/store/useProfileSettingsStore'
+import { DOSHAS, guidanceFor } from '@/data/doshas'
 
 function formatBytes(b: number) {
   if (b < 1024) return `${b} B`
@@ -47,6 +50,8 @@ export default function Settings() {
   const navigate = useNavigate()
   const { used, quota, persisted } = useStorageEstimate()
   const { activeId } = useProfileStore()
+  const { name, dosha, setName, setDosha } = useProfileSettingsStore()
+  const guidance = guidanceFor(dosha)
   const profile = PROFILES[activeId]
 
   const [exporting, setExporting]   = useState(false)
@@ -161,9 +166,47 @@ export default function Settings() {
         <Card>
           <CardHeader label="Profile" />
 
+          {/* The two fields that describe the person rather than the plan. */}
+          <div className="space-y-3 pb-1">
+            <div>
+              <label
+                htmlFor="profile-name"
+                className="block text-[11px] uppercase tracking-widest pb-1.5"
+                style={{ color: 'var(--ink-faint)' }}
+              >
+                Name
+              </label>
+              <input
+                id="profile-name"
+                value={name}
+                onChange={e => setName(e.target.value)}
+                placeholder={profile.name}
+                className="w-full rounded-[var(--r-control)] border bg-transparent text-[14px] focus:outline-none transition-colors"
+                style={{ color: 'var(--ink)', borderColor: 'var(--hairline)', padding: '8px 10px' }}
+              />
+            </div>
+
+            <div>
+              <SegmentedPill
+                label="Ayurvedic type"
+                value={dosha}
+                onChange={setDosha}
+                grow
+                options={DOSHAS.map(d => ({ value: d, label: d }))}
+              />
+              <p className="text-[12px] leading-relaxed pt-2" style={{ color: 'var(--ink-dim)' }}>
+                {guidance.elements} · {guidance.qualities.slice(0, 3).join(', ')}.
+                {' '}{guidance.principle}
+              </p>
+              <p className="text-[11px] leading-relaxed pt-1.5" style={{ color: 'var(--ink-ghost)' }}>
+                A traditional framework, not medical advice. It shapes the tips
+                the app offers, nothing it calculates.
+              </p>
+            </div>
+          </div>
+
           {/* Active profile details */}
           <div className="space-y-2 text-[13px]">
-            <ProfileRow label="Name" value={profile.name} />
             <ProfileRow label="Bodyweight" value={profile.body.bodyweight} />
             {profile.program && <ProfileRow label="Program" value={profile.program} />}
             {profile.body.bodyFat && <ProfileRow label="Body Fat" value={profile.body.bodyFat} />}
@@ -171,7 +214,6 @@ export default function Settings() {
             {profile.body.leanMass && <ProfileRow label="Lean Mass" value={profile.body.leanMass} />}
             <ProfileRow label="Protein" value={`${profile.targets.proteinG} g/day`} />
             {profile.targets.steps && <ProfileRow label="Steps" value={profile.targets.steps} />}
-            {profile.dosha && <ProfileRow label="Dosha" value={profile.dosha} />}
             {SHOW_VEDIC && profile.mahadasha && <ProfileRow label="Mahadasha" value={profile.mahadasha} />}
             {SHOW_VEDIC && profile.atmakaraka && <ProfileRow label="Atmakaraka" value={profile.atmakaraka} />}
             {profile.body.goal && (

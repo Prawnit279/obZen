@@ -10,11 +10,11 @@ import {
   todayISO, formatDateLong, dayOfWeek, getPlanetaryDay,
   getMoonPhaseName, isPittaSeasonPeak, isSaturday,
 } from '@/lib/utils'
-import { DAILY_AYURVEDA_TIPS } from '@/data/ayurveda'
 import { VEDIC_REMEDIES } from '@/data/vedic-remedies'
 import { getProgram, getScheduledDay } from '@/data/obzen-program'
 import { SHOW_NUTRITION, SHOW_VEDIC, SHOW_ASTROLOGY } from '@/config/features'
-import { PROFILES } from '@/config/profiles'
+import { useProfileName } from '@/store/useProfileSettingsStore'
+import { DoshaTip } from '@/components/modules/dashboard/DoshaTip'
 import { useProfileStore } from '@/store/useProfileStore'
 import { Card, CardHeader } from '@/components/ui/Card'
 import { SegmentedPill } from '@/components/ui/SegmentedPill'
@@ -30,11 +30,6 @@ import { useNavigate } from 'react-router-dom'
 import { Zap, AlertTriangle, Flame, Plus, Edit2 } from 'lucide-react'
 
 type DashTab = 'today' | 'weekly'
-
-function getDailyTip(): string {
-  const day = new Date().getDate()
-  return DAILY_AYURVEDA_TIPS[day % DAILY_AYURVEDA_TIPS.length]
-}
 
 function getDailyRemedy() {
   const day = new Date().getDate()
@@ -57,6 +52,7 @@ export default function Dashboard() {
   const [checkInOpen, setCheckInOpen] = useState(false)
   const [dashTab, setDashTab] = useState<DashTab>('today')
   const { activeId } = useProfileStore()
+  const profileName = useProfileName()
 
   useEffect(() => { checkAndReset(today) }, [checkAndReset, today])
 
@@ -94,7 +90,6 @@ export default function Dashboard() {
   }, [todayCompleted])
 
   const planetaryDay = getPlanetaryDay()
-  const dailyTip = getDailyTip()
   const dailyRemedy = getDailyRemedy()
   const { label: programDayLabel, isRest } = getProgramDay(activeId)
   const program = isRest ? null : getProgram(activeId)[programDayLabel]
@@ -129,7 +124,7 @@ export default function Dashboard() {
             {formatDateLong(new Date())}
           </h1>
           <div style={{ fontSize: 13, color: 'var(--ink-dim)', marginTop: 2 }}>
-            {PROFILES[activeId].name}'s day
+            {profileName}'s day
           </div>
           <div className="flex items-center gap-3 mt-1 flex-wrap">
             {SHOW_ASTROLOGY && (
@@ -338,10 +333,7 @@ export default function Dashboard() {
         )}
 
         {/* Ayurveda tip */}
-        <Card>
-          <CardHeader label="Ayurveda · Today" />
-          <p style={{ fontSize: 13, lineHeight: 1.55, color: 'var(--ink-dim)' }}>{dailyTip}</p>
-        </Card>
+        <DoshaTip />
 
         {/* Vedic remedy */}
         {SHOW_VEDIC && (

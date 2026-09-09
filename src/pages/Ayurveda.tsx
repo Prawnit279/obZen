@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { SegmentedPill } from '@/components/ui/SegmentedPill'
-import { PITTA_PROFILE, PITTA_DINACHARYA, PITTA_REMEDIES } from '@/data/ayurveda'
+import { PITTA_DINACHARYA, PITTA_REMEDIES } from '@/data/ayurveda'
+import { DoshaGuidanceCard } from '@/components/modules/ayurveda/DoshaGuidanceCard'
 import { useAyurvedaStore } from '@/store/useAyurvedaStore'
 import { Card, CardHeader } from '@/components/ui/Card'
 import { cn } from '@/lib/utils'
@@ -125,63 +126,14 @@ function RoutineTab() {
   )
 }
 
+/**
+ * The dosha profile, following whichever type is set rather than the Pitta this
+ * screen used to assume for everyone.
+ */
 function ProfileTab() {
   return (
     <div className="space-y-4">
-      <Card>
-        <CardHeader label="Pitta Dosha" />
-        <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-3">{PITTA_PROFILE.elements}</div>
-        <div>
-          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-2">Qualities</div>
-          <div className="flex flex-wrap gap-1.5">
-            {PITTA_PROFILE.qualities.map(q => (
-              <span key={q} className="text-[11px] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-2 py-0.5 text-[color:var(--ink-dim)]">
-                {q}
-              </span>
-            ))}
-          </div>
-        </div>
-      </Card>
-
-      <Card>
-        <CardHeader label="When Balanced" />
-        <ul className="space-y-1.5">
-          {PITTA_PROFILE.balancedSigns.map(sign => (
-            <li key={sign} className="text-[12px] text-[color:var(--ink-dim)] flex gap-2">
-              <span className="text-[color:var(--ink-faint)]">·</span>{sign}
-            </li>
-          ))}
-        </ul>
-      </Card>
-
-      <Card>
-        <CardHeader label="When Imbalanced" />
-        <ul className="space-y-1.5">
-          {PITTA_PROFILE.imbalancedSigns.map(sign => (
-            <li key={sign} className="text-[12px] text-[color:var(--red)] flex gap-2">
-              <span>·</span>{sign}
-            </li>
-          ))}
-        </ul>
-      </Card>
-
-      <Card>
-        <CardHeader label="Daily Timing" />
-        <div className="space-y-2">
-          <div>
-            <span className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)]">Pitta Peak Hours</span>
-            <div className="text-[13px] text-[color:var(--ink-2)] mt-0.5">{PITTA_PROFILE.pittaTime}</div>
-          </div>
-          <div>
-            <span className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)]">Best Exercise Time</span>
-            <div className="text-[13px] text-[color:var(--ink-2)] mt-0.5">{PITTA_PROFILE.bestExerciseTime}</div>
-          </div>
-          <div>
-            <span className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)]">High Risk Season</span>
-            <div className="text-[13px] text-[color:var(--ink-2)] mt-0.5">{PITTA_PROFILE.season}</div>
-          </div>
-        </div>
-      </Card>
+      <DoshaGuidanceCard />
     </div>
   )
 }
