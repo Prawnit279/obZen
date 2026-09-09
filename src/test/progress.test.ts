@@ -558,6 +558,23 @@ describe('suggestProgression — her plan\'s add-load rule', () => {
     expect(kgToLb(s!.nextKg - s!.currentKg)).toBeCloseTo(2.5, 1)
   })
 
+  it('counts the bar when suggesting the next load on a barbell lift', () => {
+    // Every other case here uses a machine, so the bar term went unexercised —
+    // a regression would have made the prompt read 45 lb light on every
+    // barbell lift, presented as a recommendation.
+    const onBar = (date: string) => session(date, 'barbell-squat', [set(100, 10)])
+    const s = suggestProgression([onBar('2026-08-05'), onBar('2026-08-08')], 'barbell-squat', '10', 'legs')!
+    expect(kgToLb(s.currentKg)).toBeCloseTo(kgToLb(100) + 45, 1)
+  })
+
+  it('offers nothing for an assisted movement', () => {
+    // Assistance counts down, so "add 5 lb" would be advice to make the lift
+    // easier. Scoring it as load leaves nothing to suggest.
+    const assisted = (date: string) => session(date, 'assisted-pull-up', [set(20, 10)])
+    expect(suggestProgression([assisted('2026-08-05'), assisted('2026-08-08')], 'assisted-pull-up', '10', 'back'))
+      .toBeUndefined()
+  })
+
   it('does not apply to timed holds', () => {
     expect(topOfRepRange('20–30s')).toBeUndefined()
   })
