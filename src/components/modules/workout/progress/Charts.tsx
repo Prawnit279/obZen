@@ -74,19 +74,55 @@ function fmt(n: number): string {
   return Math.abs(n) >= 100 ? String(Math.round(n)) : String(Math.round(n * 10) / 10)
 }
 
-/** Catmull–Rom through the points, emitted as cubic béziers. */
-function catmullRom(pts: [number, number][]): string {
-  if (pts.length === 0) return ''
-  if (pts.length === 1) return `M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`
-  let d = `M${pts[0][0].toFixed(1)},${pts[0][1].toFixed(1)}`
-  for (let i = 0; i < pts.length - 1; i++) {
-    const p0 = pts[i - 1] || pts[i]
-    const p1 = pts[i]
-    const p2 = pts[i + 1]
-    const p3 = pts[i + 2] || p2
-    d += ` C${(p1[0] + (p2[0] - p0[0]) / 6).toFixed(1)},${(p1[1] + (p2[1] - p0[1]) / 6).toFixed(1)}`
-       + ` ${(p2[0] - (p3[0] - p1[0]) / 6).toFixed(1)},${(p2[1] - (p3[1] - p1[1]) / 6).toFixed(1)}`
-       + ` ${p2[0].toFixed(1)},${p2[1].toFixed(1)}`
+/**
+ * Monotone cubic (Fritsch–Carlson) through the points, as béziers.
+ *
+ * Catmull–Rom was here first and overshot: its control points reach past the
+ * values either side of a turn, so a squat that went 235 → 215 → 240 was drawn
+ * dipping below 215 and cresting above 240. On a lane normalised to its own
+ * range that invented visible troughs which never happened.
+ *
+ * This interpolation cannot do that. Tangents are flattened to zero at every
+ * local extreme, so the curve stays within the data it was given — the line is
+ * still smooth, but every bend in it corresponds to a session.
+ */
+export function monotoneCubic(pts: [number, number][]): string {
+  // Points sharing an x would divide by a zero-length run; the first wins.
+  const p = pts.filter((pt, i) => i === 0 || pt[0] !== pts[i - 1][0])
+
+  if (p.length === 0) return ''
+  const at = (i: number) => `${p[i][0].toFixed(1)},${p[i][1].toFixed(1)}`
+  if (p.length === 1) return `M${at(0)}`
+
+  const n = p.length
+  const dx: number[] = []
+  const slope: number[] = []
+  for (let i = 0; i < n - 1; i++) {
+    dx[i] = p[i + 1][0] - p[i][0]
+    slope[i] = (p[i + 1][1] - p[i][1]) / dx[i]
+  }
+
+  // Tangent at each point: zero wherever the direction turns, so the curve
+  // cannot overshoot; the weighted harmonic mean of the neighbours otherwise.
+  const t: number[] = [slope[0]]
+  for (let i = 1; i < n - 1; i++) {
+    if (slope[i - 1] * slope[i] <= 0) {
+      t[i] = 0
+    } else {
+      const w1 = 2 * dx[i] + dx[i - 1]
+      const w2 = dx[i] + 2 * dx[i - 1]
+      t[i] = (w1 + w2) / (w1 / slope[i - 1] + w2 / slope[i])
+    }
+  }
+  t[n - 1] = slope[n - 2]
+
+  let d = `M${at(0)}`
+  for (let i = 0; i < n - 1; i++) {
+    const c1y = p[i][1] + (t[i] * dx[i]) / 3
+    const c2y = p[i + 1][1] - (t[i + 1] * dx[i]) / 3
+    d += ` C${(p[i][0] + dx[i] / 3).toFixed(1)},${c1y.toFixed(1)}`
+       + ` ${(p[i + 1][0] - dx[i] / 3).toFixed(1)},${c2y.toFixed(1)}`
+       + ` ${at(i + 1)}`
   }
   return d
 }
@@ -132,7 +168,7 @@ function AreaChart({
   const y = (v: number) => MT + (1 - (v - min) / (max - min)) * (H - MT - MB)
 
   const pts = series.points.map((p, i) => [x(i), y(p.value)] as [number, number])
-  const line = catmullRom(pts)
+  const line = monotoneCubic(pts)
   const baseline = MT + (H - MT - MB)
   const fill = `${line} L${x(n - 1).toFixed(1)},${baseline} L${x(0).toFixed(1)},${baseline} Z`
   const last = pts[pts.length - 1]
@@ -191,8 +227,9 @@ function AreaChart({
 // ── Lane chart — several lifts, each normalised to its own range ─────────────
 
 function LaneChart({ series, yLabel }: { series: LineSeries[]; yLabel?: string }) {
-  const laneH = 34
-  const inset = 3
+  const nameH = 13          // the row carrying the lift's name and its change
+  const plotH = 30          // the drawing itself
+  const laneH = nameH + plotH + 7
   const height = laneH * series.length + MB
 
   const dates = [...new Set(series.flatMap(s => s.points.map(p => p.date)))].sort()
@@ -202,63 +239,82 @@ function LaneChart({ series, yLabel }: { series: LineSeries[]; yLabel?: string }
   const lanes = series.map((s, i) => {
     const vals = s.points.map(p => p.value)
     const min = Math.min(...vals)
-    const span = Math.max(...vals) - min || 1
+    const max = Math.max(...vals)
+    const span = max - min || 1
     const top = i * laneH
+    const plotTop = top + nameH
+    const plotBot = plotTop + plotH
+
+    // A single session has no range to scale against, so it sits mid-lane
+    // rather than being pinned to a floor that means nothing.
+    const single = s.points.length === 1
     const pts = s.points.map(p => [
       x(p.date),
-      top + laneH - inset - ((p.value - min) / span) * (laneH - inset * 2),
+      single ? plotTop + plotH / 2 : plotBot - ((p.value - min) / span) * plotH,
     ] as [number, number])
+
     return {
       label: s.label,
       hue: liftHue(s.label, i),
       dash: SERIES_DASHES[i % SERIES_DASHES.length],
-      d: catmullRom(pts),
+      d: single ? '' : monotoneCubic(pts),
       end: pts[pts.length - 1],
+      single,
+      min, max,
+      plotTop, plotBot,
       divider: top + laneH,
-      delta: (s.points[s.points.length - 1]?.value ?? 0) - (s.points[0]?.value ?? 0),
+      nameY: top + 9,
+      /** Only meaningful once there are two sessions to compare. */
+      delta: single ? null : vals[vals.length - 1] - vals[0],
     }
   })
 
   return (
     <div>
       <svg viewBox={`0 0 ${W} ${height}`} className="w-full" role="img" aria-label={yLabel ?? 'Trend per lift'}>
-        {lanes.map(l => (
+        {lanes.map((l, i) => (
           <g key={l.label}>
-            <line x1={ML} y1={l.divider} x2={W - MR} y2={l.divider} stroke={LANE_DIVIDER} strokeWidth="1" />
-            <path
-              d={l.d} fill="none" stroke={l.hue} strokeWidth="1.9"
-              strokeDasharray={l.dash} strokeLinecap="round"
-            />
+            {i > 0 && (
+              <line x1={0} y1={l.nameY - 9} x2={W - MR} y2={l.nameY - 9}
+                    stroke={LANE_DIVIDER} strokeWidth="1" />
+            )}
+
+            {/* Name and change, so a lane says what it is without a legend. */}
+            <text x={0} y={l.nameY} fontSize="9.5" fill={l.hue}>{l.label}</text>
+            <text x={W - MR} y={l.nameY} textAnchor="end" fontSize="9.5" fill={TICK}>
+              {l.delta === null
+                ? 'one session'
+                : `${l.delta > 0 ? '+' : ''}${fmt(l.delta)} lb`}
+            </text>
+
+            {/* The lane's own scale. Each lane is normalised to its own range,
+                which is only honest if the range is written down. */}
+            <text x={ML - 4} y={l.plotTop + 4} textAnchor="end" fontSize="8.5" fill={TICK}>
+              {fmt(l.max)}
+            </text>
+            {!l.single && l.max !== l.min && (
+              <text x={ML - 4} y={l.plotBot} textAnchor="end" fontSize="8.5" fill={TICK}>
+                {fmt(l.min)}
+              </text>
+            )}
+
+            {l.d && (
+              <path
+                d={l.d} fill="none" stroke={l.hue} strokeWidth="1.9"
+                strokeDasharray={l.dash} strokeLinecap="round" strokeLinejoin="round"
+              />
+            )}
             {l.end && <circle cx={l.end[0]} cy={l.end[1]} r="2.8" fill={l.hue} />}
           </g>
         ))}
-        <text x={ML} y={height - 6} fontSize="10" fill={TICK}>{dates[0]?.slice(5)}</text>
+
+        <text x={0} y={height - 6} fontSize="9.5" fill={TICK}>{dates[0]?.slice(5)}</text>
         {dates.length > 1 && (
-          <text x={W - MR} y={height - 6} textAnchor="end" fontSize="10" fill={TICK}>
+          <text x={W - MR} y={height - 6} textAnchor="end" fontSize="9.5" fill={TICK}>
             {dates[dates.length - 1].slice(5)}
           </text>
         )}
       </svg>
-
-      {/* Legend — a lift keeps its hue here too, and carries its own delta. */}
-      <div className="flex flex-wrap" style={{ gap: '8px 16px', marginTop: 6 }}>
-        {lanes.map(l => (
-          <span key={l.label} className="flex items-center" style={{ gap: 6 }}>
-            <svg width="16" height="6" aria-hidden="true">
-              <line x1="0" y1="3" x2="16" y2="3" stroke={l.hue} strokeWidth="1.9" strokeDasharray={l.dash} />
-            </svg>
-            <span style={{ fontSize: 11, color: 'var(--ink-dim)' }}>{l.label}</span>
-            <span
-              style={{
-                fontSize: 11, fontWeight: 700, color: l.hue,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {l.delta > 0 ? '+' : ''}{fmt(l.delta)}
-            </span>
-          </span>
-        ))}
-      </div>
     </div>
   )
 }
