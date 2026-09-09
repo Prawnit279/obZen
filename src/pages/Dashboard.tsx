@@ -14,7 +14,7 @@ import { DAILY_AYURVEDA_TIPS } from '@/data/ayurveda'
 import { VEDIC_REMEDIES } from '@/data/vedic-remedies'
 import { getProgram, getScheduledDay } from '@/data/obzen-program'
 import { SHOW_NUTRITION, SHOW_VEDIC, SHOW_ASTROLOGY } from '@/config/features'
-import { PROFILES, PROFILE_IDS } from '@/config/profiles'
+import { PROFILES } from '@/config/profiles'
 import { useProfileStore } from '@/store/useProfileStore'
 import { Card, CardHeader } from '@/components/ui/Card'
 import { SegmentedPill } from '@/components/ui/SegmentedPill'
@@ -56,7 +56,7 @@ export default function Dashboard() {
   const { isTrainingDay } = useNutritionStore()
   const [checkInOpen, setCheckInOpen] = useState(false)
   const [dashTab, setDashTab] = useState<DashTab>('today')
-  const { activeId, setActive } = useProfileStore()
+  const { activeId } = useProfileStore()
 
   useEffect(() => { checkAndReset(today) }, [checkAndReset, today])
 
@@ -118,13 +118,6 @@ export default function Dashboard() {
             >
               {dayOfWeek()}
             </span>
-            {/* Profile switcher */}
-            <SegmentedPill
-              label="Active profile"
-              value={activeId}
-              onChange={setActive}
-              options={PROFILE_IDS.map(id => ({ value: id, label: PROFILES[id].name }))}
-            />
           </div>
           <h1
             className="mt-1"

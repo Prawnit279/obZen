@@ -5,7 +5,6 @@ import { Plus, AlertTriangle, Zap } from 'lucide-react'
 import { getProgram, EXERCISE_LIBRARY, toExerciseId, PULL_HEAVY_EXERCISES, FOREARM_LOAD_EXERCISES } from '@/data/obzen-program'
 import type { ProgramExercise } from '@/data/obzen-program'
 import { useProfileStore } from '@/store/useProfileStore'
-import { PROFILES, PROFILE_IDS } from '@/config/profiles'
 import { belongsToProfile } from '@/lib/workoutSession'
 import { suggestProgression } from '@/lib/progress'
 import type { ProgressionSuggestion } from '@/lib/progress'
@@ -338,7 +337,6 @@ export default function Workout() {
   // Which date is being logged — today unless the user backdates a session.
   const [sessionDate, setSessionDate] = useState<string>(linkedDate ?? TODAY)
   const activeProfileId = useProfileStore(s => s.activeId)
-  const setActiveProfile = useProfileStore(s => s.setActive)
 
   const todayCheckIn = useLiveQuery(
     () => db.checkIns.where('date').equals(TODAY).first(),
@@ -379,15 +377,7 @@ export default function Workout() {
             Workout
           </h1>
         </div>
-        {/* Whose session this is. Switchable here so a workout can't be logged
-            under the wrong profile without it being visible. */}
         <div className="flex flex-col items-end gap-1 shrink-0">
-          <SegmentedPill
-            label="Log as"
-            value={activeProfileId}
-            onChange={setActiveProfile}
-            options={PROFILE_IDS.map(id => ({ value: id, label: PROFILES[id].name }))}
-          />
           <div style={{ fontSize: 11, color: 'var(--ink-faint)', fontVariantNumeric: 'tabular-nums' }}>
             {weekSessions ?? 0}/3 this week
           </div>

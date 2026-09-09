@@ -81,22 +81,10 @@ describe('WorkoutProgress — renders without crashing', () => {
     expect(screen.getByText(/strength standards/i)).toBeInTheDocument()
   })
 
-  it('hides powerlifting panels for Aishwarya and shows her bodyweight trend', async () => {
-    useProfileStore.setState({ activeId: 'aishwarya' })
-    await seedSession('aishwarya', '2026-08-10')
-    renderView(<WorkoutProgress />)
-    await waitForData()
-
-    expect(screen.queryByText(/sbd total/i)).not.toBeInTheDocument()
-    expect(screen.queryByText(/dots \(est\.\)/i)).not.toBeInTheDocument()
-    // Her panel set leads with bodyweight tracking instead.
-    expect(screen.getByLabelText(/today's bodyweight/i)).toBeInTheDocument()
-  })
-
-  it('shows only the active profile\'s training', async () => {
-    await seedSession('pronit', '2026-08-10')
-    // Aishwarya has nothing logged, so her view must stay empty.
-    useProfileStore.setState({ activeId: 'aishwarya' })
+  it('ignores sessions stamped with a profile that is not the active one', async () => {
+    // This is what keeps the retired second profile's history out of the view:
+    // her rows are still in the database, and nothing matches them.
+    await seedSession('someone-else', '2026-08-10')
     renderView(<WorkoutProgress />)
 
     expect(await screen.findByText(/no training logged yet/i)).toBeInTheDocument()

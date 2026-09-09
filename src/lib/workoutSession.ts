@@ -1,13 +1,12 @@
 import type { WorkoutDaySession, ExerciseSessionState } from '@/db/dexie'
 
 /**
- * Sessions logged before profiles existed carry no profileId. The app was
- * single-user up to that point and all of that history is Pronit's, so
- * unstamped rows are attributed to him.
+ * Sessions logged before profiles existed carry no profileId, and resolve to
+ * the one profile that remains.
  *
- * This only affects rows with no profileId, which by definition predate the
- * profile feature — a device that started using the app after profiles shipped
- * has none, so nothing is ever misattributed on a new user's device.
+ * This filter is also what retires the app's former second profile: those rows
+ * are stamped with an id nothing matches any more, so they stay in the database
+ * and in backups while being invisible to every read path.
  */
 export const LEGACY_PROFILE_ID = 'pronit'
 

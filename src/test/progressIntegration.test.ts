@@ -151,17 +151,20 @@ describe('progress data path — a seeded session reaches every metric', () => {
   })
 })
 
-describe('progress store — ladder rungs are per profile', () => {
-  it('keeps rungs separate for the two profiles', () => {
+describe('progress store — rungs and bodyweight are namespaced', () => {
+  it('keeps rungs under separate keys per namespace', () => {
+    // Only one profile writes these now, but the prefix is baked into every
+    // key already in localStorage — if it stopped separating, existing rungs
+    // would be read back under the wrong exercise.
     const { setRung, getRung } = useProgressStore.getState()
     setRung('pronit', 'assisted-pull-up', 3)
-    setRung('aishwarya', 'assisted-pull-up', 1)
+    setRung('other-namespace', 'assisted-pull-up', 1)
     expect(useProgressStore.getState().getRung('pronit', 'assisted-pull-up')).toBe(3)
-    expect(useProgressStore.getState().getRung('aishwarya', 'assisted-pull-up')).toBe(1)
+    expect(useProgressStore.getState().getRung('other-namespace', 'assisted-pull-up')).toBe(1)
     expect(getRung('pronit', 'never-set')).toBe(0)
   })
 
-  it('logs bodyweight per profile, one entry per date', () => {
+  it('logs bodyweight under its namespace, one entry per date', () => {
     const { logBodyweight } = useProgressStore.getState()
     logBodyweight('pronit', '2026-08-10', 75)
     logBodyweight('pronit', '2026-08-10', 74.5) // same day overwrites
@@ -170,6 +173,6 @@ describe('progress store — ladder rungs are per profile', () => {
     expect(entries).toHaveLength(2)
     expect(entries[0].kg).toBe(74.5)
     expect(useProgressStore.getState().latestBodyweight('pronit')).toBe(74)
-    expect(useProgressStore.getState().latestBodyweight('aishwarya')).toBeUndefined()
+    expect(useProgressStore.getState().latestBodyweight('other-namespace')).toBeUndefined()
   })
 })

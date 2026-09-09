@@ -443,19 +443,19 @@ describe('ProgressOverloadChart — renders without crashing', () => {
     expect(await screen.findByText(/log workouts to see overload progress/i)).toBeInTheDocument()
   })
 
-  it('charts each profile’s own key lifts', async () => {
-    useProfileStore.setState({ activeId: 'aishwarya' })
-    const [firstLift] = PROFILES.aishwarya.progress.keyLiftIds
-    await seedSession('aishwarya', '2026-08-10', [
-      { exerciseId: firstLift, name: 'Hip Thrust Machine', muscle: 'legs', weight: 135, reps: 12 },
+  it('charts the profile’s configured key lifts and nothing else', async () => {
+    const [firstLift] = PROFILES.pronit.progress.keyLiftIds
+    await seedSession('pronit', '2026-08-10', [
+      { exerciseId: firstLift, name: 'Barbell Squat', muscle: 'legs', weight: 225, reps: 5 },
+      // Logged, but not a key lift — it must stay out of the legend.
+      { exerciseId: 'leg-press', name: 'Leg Press', muscle: 'legs', weight: 300, reps: 10 },
     ])
 
     render(<ProgressOverloadChart />)
     await screen.findByText(/progressive overload/i)
 
-    // Her legend leads with her own lifts, not the powerlifting three.
-    expect(screen.getByText(/hip thrust machine/i)).toBeInTheDocument()
-    expect(screen.queryByText(/bench press/i)).not.toBeInTheDocument()
+    expect(screen.getByText(/barbell squat/i)).toBeInTheDocument()
+    expect(screen.queryByText(/leg press/i)).not.toBeInTheDocument()
   })
 
   it('skips sets that were never performed', async () => {

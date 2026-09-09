@@ -53,6 +53,14 @@ export function toExerciseId(name: string): string {
  * Aishwarya — Phase 1 (Weeks 1–4): Glutes, Core & Strength.
  * Sets/reps/rest style with swap options per movement.
  */
+/**
+ * No longer a selectable program — kept because `EXERCISE_LIBRARY` is built
+ * from both templates, and fifteen movements appear only here: assisted
+ * pull-ups and dips, barbell back squat, Bulgarian split squat, face pulls,
+ * hollow body holds, walking lunges and the rest. Dropping it would remove
+ * them from the exercise picker and leave any already-logged sets pointing at
+ * an id the library no longer knows.
+ */
 export const AISHWARYA_PROGRAM: Record<string, ProgramDay> = {
   'Day 1': {
     focus: 'Glutes & Hamstrings',
@@ -141,43 +149,29 @@ export const PRONIT_PROGRAM: Record<string, ProgramDay> = {
   },
 }
 
-/** Day templates per profile — the Home switcher selects which set is active. */
-export const PROGRAMS_BY_PROFILE: Record<string, Record<string, ProgramDay>> = {
-  pronit: PRONIT_PROGRAM,
-  aishwarya: AISHWARYA_PROGRAM,
-}
-
-export function getProgram(profileId: string): Record<string, ProgramDay> {
-  return PROGRAMS_BY_PROFILE[profileId] ?? PRONIT_PROGRAM
+/**
+ * The day templates. There is one profile now, so this always returns the same
+ * set — the parameter is kept because the signature is threaded through the
+ * session store and the screens, and because sessions are still stamped with a
+ * profile id.
+ */
+export function getProgram(_profileId?: string): Record<string, ProgramDay> {
+  return PRONIT_PROGRAM
 }
 
 /**
- * Fixed weekly schedules, indexed by JS getDay() (0 = Sunday). Aishwarya's
- * follows "THE WEEK" from her Phase 1 plan: train Mon/Wed/Fri with walks on
- * the days between. Profiles without a schedule fall back to the rolling
- * pattern below.
+ * What is scheduled on `date`: rest on Sunday and Thursday, otherwise rotate
+ * through the program days.
+ *
+ * The per-profile schedule table went with the second profile. Note this
+ * rotation marks five training days a week while the Train header still counts
+ * against three — a pre-existing mismatch, left as it was rather than changed
+ * silently here.
  */
-export const SCHEDULES: Record<string, ScheduleEntry[]> = {
-  aishwarya: [
-    { kind: 'off',   label: 'Rest' },                 // Sun
-    { kind: 'train', dayLabel: 'Day 1' },             // Mon
-    { kind: 'off',   label: 'Walk 25–30 min' },       // Tue
-    { kind: 'train', dayLabel: 'Day 2' },             // Wed
-    { kind: 'off',   label: 'Walk 25–30 min' },       // Thu
-    { kind: 'train', dayLabel: 'Day 3' },             // Fri
-    { kind: 'off',   label: 'Rest or easy walk' },    // Sat
-  ],
-}
-
-/** What the given profile is scheduled to do on `date`. */
-export function getScheduledDay(profileId: string, date = new Date()): ScheduleEntry {
+export function getScheduledDay(_profileId?: string, date = new Date()): ScheduleEntry {
   const weekday = date.getDay()
-  const schedule = SCHEDULES[profileId]
-  if (schedule) return schedule[weekday]
-
-  // Default (Pronit): rest Sunday and Thursday, otherwise rotate the days.
   if (weekday === 0 || weekday === 4) return { kind: 'off', label: 'Rest Day' }
-  const days = Object.keys(getProgram(profileId))
+  const days = Object.keys(PRONIT_PROGRAM)
   return { kind: 'train', dayLabel: days[weekday % days.length] }
 }
 

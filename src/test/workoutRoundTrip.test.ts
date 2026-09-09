@@ -19,7 +19,7 @@ beforeEach(async () => {
   await resetDb()
   // Reset the zustand singletons so cached sessions/profile don't leak.
   useWorkoutDayStore.setState({ sessions: {}, loading: false })
-  useProfileStore.setState({ activeId: 'aishwarya' })
+  useProfileStore.setState({ activeId: 'pronit' })
 })
 
 function makeSet(weight: number): LoggedSet {
@@ -34,7 +34,7 @@ describe('workout save → history round-trip', () => {
     // 1. A day starts empty and is NOT written to the DB until something is
     //    logged — just opening/tabbing a day must not create a row.
     await store.loadSession('Day 1')
-    const key = `aishwarya::Day 1::${today}`
+    const key = `pronit::Day 1::${today}`
     expect(useWorkoutDayStore.getState().sessions[key]?.exercises).toHaveLength(0)
     expect(
       await db.workoutDaySessions.where('date').equals(today).filter(s => s.dayLabel === 'Day 1').first()
@@ -44,8 +44,8 @@ describe('workout save → history round-trip', () => {
     await store.loadTemplate('Day 1')
     let session = (await db.workoutDaySessions.where('date').equals(today).filter(s => s.dayLabel === 'Day 1').first())!
     expect(session).toBeTruthy()
-    expect(session.exercises.length).toBe(6)
-    expect(session.focus).toBe('Glutes & Hamstrings')
+    expect(session.exercises.length).toBe(10)
+    expect(session.focus).toBe('Pull / Legs / Arms')
 
     // 3. Log a weight, complete an exercise, complete the workout.
     const firstEx = session.exercises[0]
@@ -56,7 +56,7 @@ describe('workout save → history round-trip', () => {
     // 4. Everything persisted: name, weight, unit, completedAt.
     session = (await db.workoutDaySessions.get(session.id!))!
     const savedEx = session.exercises.find(e => e.exerciseId === firstEx.exerciseId)!
-    expect(savedEx.name).toBe('Hip Thrust Machine')
+    expect(savedEx.name).toBe('Leg Press')
     expect(savedEx.sets[0].weight).toBe(60)
     expect(savedEx.sets[0].unit).toBe('kg')
     expect(session.completedAt).toBeTruthy()
@@ -111,7 +111,7 @@ describe('workout save → history round-trip', () => {
     await store.loadTemplate('Day 2')
     const s1 = (await db.workoutDaySessions.where('date').equals(today).filter(s => s.dayLabel === 'Day 2').first())!
     const count1 = s1.exercises.length
-    expect(count1).toBe(7)
+    expect(count1).toBe(10)
 
     // Log a weight, then re-load the template.
     await store.addLoggedSet('Day 2', s1.exercises[0].exerciseId, makeSet(20))
@@ -122,33 +122,35 @@ describe('workout save → history round-trip', () => {
     expect(s2.exercises[0].sets[0].weight).toBe(20)   // logged data preserved
   })
 
-  it('keeps each profile on its own program and history', async () => {
+  it('loads the profile’s own program and leaves foreign rows alone', async () => {
     // Read fresh state per call — the store object is a snapshot.
     const store = () => useWorkoutDayStore.getState()
 
-    // Pronit's Day 1 is his own split, not Aishwarya's.
-    useProfileStore.setState({ activeId: 'pronit' })
-    await store().loadSession('Day 1')
-    await store().loadTemplate('Day 1')
-    const pronitDay = (await db.workoutDaySessions.where('dayLabel').equals('Day 1').first())!
-    expect(pronitDay.focus).toBe('Pull / Legs / Arms')
-    expect(pronitDay.exercises.some(e => e.name === 'Weighted Pull-ups')).toBe(true)
-    expect(pronitDay.profileId).toBe('pronit')
+    // A Day 1 belonging to the retired second profile, on the same date. Rows
+    // like this are still in real databases, so they have to sit inert rather
+    // than collide with or leak into the one profile that remains.
+    await db.workoutDaySessions.add({
+      date: todayISO(), dayLabel: 'Day 1', profileId: 'retired-profile',
+      focus: 'Glutes & Hamstrings',
+      exercises: [{ exerciseId: 'hip-thrust-machine', name: 'Hip Thrust Machine', status: 'complete', sets: [] }],
+      order: ['hip-thrust-machine'],
+    })
 
-    // Aishwarya's Day 1 on the same date is a separate row with her program.
-    useProfileStore.setState({ activeId: 'aishwarya' })
     await store().loadSession('Day 1')
     await store().loadTemplate('Day 1')
+
     const rows = await db.workoutDaySessions.where('dayLabel').equals('Day 1').toArray()
-    expect(rows).toHaveLength(2)
+    expect(rows).toHaveLength(2) // the foreign row was not overwritten
 
-    const hers = rows.find(r => r.profileId === 'aishwarya')!
-    expect(hers.focus).toBe('Glutes & Hamstrings')
-    expect(hers.exercises.some(e => e.name === 'Hip Thrust Machine')).toBe(true)
+    const mine = rows.filter(r => belongsToProfile(r, 'pronit'))
+    expect(mine).toHaveLength(1)
+    expect(mine[0].focus).toBe('Pull / Legs / Arms')
+    expect(mine[0].exercises.some(e => e.name === 'Weighted Pull-ups')).toBe(true)
 
-    // Each profile's history shows only their own session.
-    expect(rows.filter(r => belongsToProfile(r, 'pronit'))).toHaveLength(1)
-    expect(rows.filter(r => belongsToProfile(r, 'aishwarya'))).toHaveLength(1)
+    // And the foreign row is untouched and invisible to the active profile.
+    const foreign = rows.find(r => r.profileId === 'retired-profile')!
+    expect(foreign.focus).toBe('Glutes & Hamstrings')
+    expect(belongsToProfile(foreign, 'pronit')).toBe(false)
   })
 
   it('removes an exercise from the day, with its logged sets', async () => {

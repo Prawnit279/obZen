@@ -1,10 +1,8 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-import type { ProfileId } from '@/config/profiles'
 
 /**
- * Mutable, per-profile progress state that has no home in the static program
- * data: which rung of a progression ladder the user is currently on, and a
+ * Mutable progress state that has no home in the static program data: which rung of a progression ladder the user is currently on, and a
  * bodyweight log (needed for DOTS and for weighted-bodyweight effective load).
  *
  * Deliberately localStorage rather than Dexie — both are small, low-frequency,
@@ -18,8 +16,15 @@ export interface BodyweightEntry {
   kg: number
 }
 
-/** Ladder rungs are keyed by profile + exercise so the two profiles differ. */
-function rungKey(profileId: ProfileId, exerciseId: string): string {
+/**
+ * Rungs and bodyweight are namespaced by profile id.
+ *
+ * There is one profile now, so the prefix no longer separates anybody — but it
+ * is baked into every key already in localStorage, and dropping it would orphan
+ * the lot. Typed as a plain string rather than `ProfileId` because that is what
+ * it is: a stored key prefix, not a choice of who you are.
+ */
+function rungKey(profileId: string, exerciseId: string): string {
   return `${profileId}::${exerciseId}`
 }
 
@@ -29,13 +34,13 @@ interface ProgressState {
   /** Bodyweight entries per profile, kept sorted oldest first. */
   bodyweight: Record<string, BodyweightEntry[]>
 
-  getRung: (profileId: ProfileId, exerciseId: string) => number
-  setRung: (profileId: ProfileId, exerciseId: string, rung: number) => void
-  logBodyweight: (profileId: ProfileId, date: string, kg: number) => void
-  removeBodyweight: (profileId: ProfileId, date: string) => void
-  getBodyweight: (profileId: ProfileId) => BodyweightEntry[]
+  getRung: (profileId: string, exerciseId: string) => number
+  setRung: (profileId: string, exerciseId: string, rung: number) => void
+  logBodyweight: (profileId: string, date: string, kg: number) => void
+  removeBodyweight: (profileId: string, date: string) => void
+  getBodyweight: (profileId: string) => BodyweightEntry[]
   /** Most recent logged bodyweight, or undefined when nothing is logged. */
-  latestBodyweight: (profileId: ProfileId) => number | undefined
+  latestBodyweight: (profileId: string) => number | undefined
 }
 
 export const useProgressStore = create<ProgressState>()(

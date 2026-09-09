@@ -213,8 +213,15 @@ export interface WorkoutDaySession {
   id?: number
   date: string
   dayLabel: 'Day 1' | 'Day 2' | 'Day 3'
-  /** Whose workout this is ('pronit' | 'aishwarya'). Rows saved before profiles
-   *  existed have no value and are treated as Aishwarya's. */
+  /**
+   * Which profile logged this. There is one profile now, so new rows are always
+   * stamped with it; rows carrying the retired second profile's id stay in the
+   * database and in backups but no longer match anything, so they neither
+   * display nor count.
+   *
+   * Rows saved before profiles existed have no value at all and resolve to the
+   * one profile via `LEGACY_PROFILE_ID`.
+   */
   profileId?: string
   /** Muscle-focus label, e.g. 'Glutes & Hamstrings' — persisted for history/detail. */
   focus?: string

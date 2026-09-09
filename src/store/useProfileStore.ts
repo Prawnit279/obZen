@@ -1,31 +1,20 @@
 import { create } from 'zustand'
+import { PROFILE_ID } from '@/config/profiles'
 import type { ProfileId } from '@/config/profiles'
 
-const STORAGE_KEY = 'obzen-active-profile'
-
-function loadActiveId(): ProfileId {
-  try {
-    const stored = localStorage.getItem(STORAGE_KEY)
-    if (stored === 'pronit' || stored === 'aishwarya') return stored
-  } catch {
-    // localStorage unavailable — fall through to default
-  }
-  return 'pronit'
-}
-
+/**
+ * The active profile — now a constant, since there is only one.
+ *
+ * The store survives the removal of the switcher rather than being deleted so
+ * that the fourteen screens reading `activeId` keep a single, obvious place to
+ * get it from. There is no setter: nothing can change who you are, and the
+ * stale `obzen-active-profile` key left in localStorage by older builds is
+ * simply ignored rather than read back.
+ */
 interface ProfileState {
   activeId: ProfileId
-  setActive: (id: ProfileId) => void
 }
 
-export const useProfileStore = create<ProfileState>(set => ({
-  activeId: loadActiveId(),
-  setActive: (id: ProfileId) => {
-    try {
-      localStorage.setItem(STORAGE_KEY, id)
-    } catch {
-      // best-effort persistence
-    }
-    set({ activeId: id })
-  },
+export const useProfileStore = create<ProfileState>(() => ({
+  activeId: PROFILE_ID,
 }))

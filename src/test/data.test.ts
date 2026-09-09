@@ -54,21 +54,20 @@ describe('Obzen Program', () => {
     expect(PRONIT_PROGRAM['Day 1'].focus).not.toBe(AISHWARYA_PROGRAM['Day 1'].focus)
   })
 
-  it('schedules Aishwarya Mon/Wed/Fri with walks between', () => {
-    // 2026-08-10 is a Monday; step through that week.
+  it('rests Sunday and Thursday, and rotates the days otherwise', () => {
+    // The fixed per-profile schedule table went with the second profile; this
+    // rotation is what everyone gets now. 2026-08-10 is a Monday.
     const monday = new Date(2026, 7, 10)
     const at = (offset: number) => {
       const d = new Date(monday)
       d.setDate(monday.getDate() + offset)
-      return getScheduledDay('aishwarya', d)
+      return getScheduledDay(undefined, d)
     }
-    expect(at(0)).toEqual({ kind: 'train', dayLabel: 'Day 1' })   // Mon
-    expect(at(1).kind).toBe('off')                                 // Tue — walk
-    expect(at(2)).toEqual({ kind: 'train', dayLabel: 'Day 2' })   // Wed
-    expect(at(3).kind).toBe('off')                                 // Thu — walk
-    expect(at(4)).toEqual({ kind: 'train', dayLabel: 'Day 3' })   // Fri
-    expect(at(5).kind).toBe('off')                                 // Sat
     expect(at(6).kind).toBe('off')                                 // Sun
+    expect(at(3).kind).toBe('off')                                 // Thu
+    for (const day of [0, 1, 2, 4, 5]) {
+      expect(at(day).kind).toBe('train')
+    }
   })
 
   it('gives every Aishwarya exercise a coaching cue', () => {

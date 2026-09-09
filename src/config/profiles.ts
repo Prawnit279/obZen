@@ -1,9 +1,20 @@
 /**
- * Static profiles for the app. obZen is single-dataset (workout history and all
- * Dexie data are shared per-device), so these drive *display only* — the profile
- * switcher changes whose details and targets are shown, not which data is stored.
+ * The app's single profile — its details, targets, and which Progress panels it
+ * shows.
+ *
+ * obZen used to carry two named people with a switcher between them. That is
+ * gone: there is one profile now, and no way to change who you are.
+ *
+ * The id string stays `'pronit'` deliberately. It is not a display value — it
+ * is the key logged sessions are stamped with, and the prefix under which
+ * bodyweight entries and progression ladder rungs are stored. Changing it would
+ * orphan all of that, so it stays as the stable internal identifier while the
+ * *concept* of choosing a profile disappears.
+ *
+ * Sessions stamped with the old second profile remain in the database and in
+ * backups, but nothing matches them any more, so they neither display nor count.
  */
-export type ProfileId = 'pronit' | 'aishwarya'
+export type ProfileId = 'pronit'
 
 export interface MacroTargets {
   /** Protein target as written, e.g. '150' or '110–130' (grams/day). */
@@ -69,26 +80,9 @@ export const PROFILES: Record<ProfileId, Profile> = {
     mahadasha: 'Rahu (~2030)',
     atmakaraka: 'Saturn',
   },
-  aishwarya: {
-    id: 'aishwarya',
-    name: 'Aishwarya',
-    program: 'Phase 1 · Weeks 1–4 · Glutes, Core & Strength',
-    body: {
-      bodyweight: '155 lb (70 kg)',
-      bodyweightKg: 70,
-      fatMass: '49.1 lb',
-      leanMass: '106 lb',
-      bodyFat: '31.7%',
-      goal: 'Build glutes, lose waist fat, keep lean mass — target −17.4 lb fat, retest wk 12',
-    },
-    targets: { proteinG: '110–130', steps: '8–9k / day' },
-    progress: {
-      // Phase 1 is glutes/core/fat-loss — powerlifting framing does not apply.
-      keyLiftIds: ['hip-thrust-machine', 'romanian-deadlift', 'barbell-back-squat'],
-      showPowerlifting: false,
-      showBodyweightTrend: true,
-    },
-  },
 }
 
-export const PROFILE_IDS: ProfileId[] = ['pronit', 'aishwarya']
+export const PROFILE_IDS: ProfileId[] = ['pronit']
+
+/** The one profile. Prefer this over indexing `PROFILES` by a variable. */
+export const PROFILE_ID: ProfileId = 'pronit'
