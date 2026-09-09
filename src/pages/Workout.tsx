@@ -17,7 +17,6 @@ import { SortableExerciseList } from '@/components/modules/workout/SortableExerc
 import { AddExerciseSheet } from '@/components/modules/workout/AddExerciseSheet'
 import { WorkoutHistory } from '@/components/modules/workout/WorkoutHistory'
 import { SegmentedPill } from '@/components/ui/SegmentedPill'
-import { WorkoutProgress } from '@/components/modules/workout/progress/WorkoutProgress'
 import { StrengthTools } from '@/components/modules/workout/tools/StrengthTools'
 
 // ---------------------------------------------------------------------------
@@ -25,7 +24,8 @@ import { StrengthTools } from '@/components/modules/workout/tools/StrengthTools'
 // ---------------------------------------------------------------------------
 
 type DayLabel = 'Day 1' | 'Day 2' | 'Day 3'
-type Tab = 'program' | 'history' | 'progress' | 'tools'
+/** Progress is its own top-level section, so Train does not repeat it here. */
+type Tab = 'program' | 'history' | 'tools'
 
 const DAYS: DayLabel[] = ['Day 1', 'Day 2', 'Day 3']
 const TODAY = todayISO()
@@ -393,14 +393,11 @@ export default function Workout() {
         options={[
           { value: 'program' as Tab, label: 'Program' },
           { value: 'history' as Tab, label: 'History' },
-          { value: 'progress' as Tab, label: 'Progress' },
           { value: 'tools' as Tab, label: 'Tools' },
         ]}
       />
 
       {tab === 'history' && <WorkoutHistory />}
-
-      {tab === 'progress' && <WorkoutProgress />}
 
       {tab === 'tools' && <StrengthTools />}
 
