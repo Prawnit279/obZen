@@ -147,13 +147,23 @@ describe('importAllDataFromJSON — workout session merge', () => {
     expect(await db.workoutDaySessions.count()).toBe(1)
   })
 
-  it('keeps two profiles separate on the same date and day', async () => {
-    await db.workoutDaySessions.add(daySession({ id: undefined }) as never)
+  it('adopts a foreign-profile session rather than storing it invisibly', async () => {
+    // This used to keep the two apart, back when the app had two profiles. It
+    // now has one, so a row stamped with any other id would import cleanly and
+    // then never appear on a single screen — which is precisely the "the app
+    // does not read my imported data" failure this replaced.
     await importAllDataFromJSON(backupWith([daySession({ id: 5, profileId: 'aishwarya' })]))
 
     const rows = await db.workoutDaySessions.toArray()
-    expect(rows).toHaveLength(2)
-    expect(rows.map(r => r.profileId).sort()).toEqual(['aishwarya', 'pronit'])
+    expect(rows).toHaveLength(1)
+    expect(rows[0].profileId).toBe('pronit')
+    expect(rows[0].exercises[0].sets[0].weight).toBe(100) // training carried over
+  })
+
+  it('merges an adopted session into the same day it already has', async () => {
+    await db.workoutDaySessions.add(daySession({ id: undefined }) as never)
+    await importAllDataFromJSON(backupWith([daySession({ id: 5, profileId: 'aishwarya' })]))
+    expect(await db.workoutDaySessions.count()).toBe(1)
   })
 
   it('fills in a local placeholder that has no logged work', async () => {

@@ -6,6 +6,8 @@ import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher'
 import { StoragePanel } from '@/components/ui/StoragePanel'
 import { exportAllDataAsJSON, importAllDataFromJSON } from '@/lib/export'
 import { importWorkoutData } from '@/utils/importWorkoutData'
+import { previewStranded, adoptStrandedSessions } from '@/utils/adoptSessions'
+import type { AdoptPreview } from '@/utils/adoptSessions'
 import { SHOW_VEDIC } from '@/config/features'
 import { PROFILES } from '@/config/profiles'
 import { useProfileStore } from '@/store/useProfileStore'
@@ -57,6 +59,29 @@ export default function Settings() {
   const [migrating, setMigrating]   = useState(false)
   const [migrateMsg, setMigrateMsg] = useState<{ ok: boolean; text: string } | null>(null)
 
+
+  // Workouts stored under a profile the app no longer has — from an older
+  // build, or a backup restored before imports adopted automatically.
+  const [stranded, setStranded] = useState<AdoptPreview | null>(null)
+  const [adopting, setAdopting] = useState(false)
+
+  useEffect(() => { previewStranded().then(setStranded).catch(() => setStranded(null)) }, [])
+
+  const handleAdopt = async () => {
+    setAdopting(true)
+    try {
+      const moved = await adoptStrandedSessions()
+      setStranded(await previewStranded())
+      setImportMsg({
+        ok: true,
+        text: `✓ ${moved} workout${moved === 1 ? '' : 's'} added to your history.`,
+      })
+    } catch (err) {
+      setImportMsg({ ok: false, text: err instanceof Error ? err.message : 'Could not add them.' })
+    } finally {
+      setAdopting(false)
+    }
+  }
 
   const handleExport = async () => {
     setExporting(true)
@@ -174,6 +199,22 @@ export default function Settings() {
             <Button variant="ghost" fullWidth onClick={handleImportClick} disabled={importing}>
               {importing ? 'Importing…' : 'Import Backup'}
             </Button>
+            {/* Only shown when there is something to recover — an empty state
+                here would be a permanent question about a problem nobody has. */}
+            {stranded && stranded.count > 0 && (
+              <div className="pt-1">
+                <p className="text-[12px] leading-relaxed pb-2" style={{ color: 'var(--ink-dim)' }}>
+                  {stranded.count} workout{stranded.count === 1 ? '' : 's'}
+                  {stranded.range && ` from ${stranded.range.from} to ${stranded.range.to}`}
+                  {' '}are stored on this device under an older profile, so nothing
+                  shows them. Add them to your history to see them in Progress.
+                </p>
+                <Button variant="default" fullWidth onClick={handleAdopt} disabled={adopting}>
+                  {adopting ? 'Adding…' : `Add ${stranded.count} hidden workout${stranded.count === 1 ? '' : 's'}`}
+                </Button>
+              </div>
+            )}
+
             {/* The JSON backup is for restoring; a printed sheet is for reading
                 and keeping. Progress is the page worth putting on paper, so the
                 print control lives there rather than being duplicated here. */}

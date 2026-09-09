@@ -18,6 +18,7 @@ import { isRealSet } from '@/lib/progress'
 import { exerciseNameFor } from '@/data/obzen-program'
 import type { WorkoutDaySession } from '@/db/dexie'
 import { sessionProfile, sessionHasActivity } from '@/lib/workoutSession'
+import { PROFILE_ID } from '@/config/profiles'
 
 function getDeviceId(): string {
   const key = 'obzen-device-id'
@@ -355,9 +356,23 @@ export async function importAllDataFromJSON(file: File): Promise<ImportResult> {
    * they are new so Dexie assigns a fresh one. A local session that already
    * has logged work is never replaced.
    */
+  /**
+   * Restamp an incoming session as this device's own.
+   *
+   * The app is one profile per device, so a backup is a record of *this*
+   * training wherever it is loaded. Without this, a file written by a build
+   * that stamped a different profile id imports successfully — the rows land in
+   * the table and the count goes up — and then never appears anywhere, because
+   * `belongsToProfile` matches none of them. That looked exactly like a broken
+   * importer while the importer was working perfectly.
+   */
+  function adopt(s: WorkoutDaySession): WorkoutDaySession {
+    return s.profileId === PROFILE_ID ? s : { ...s, profileId: PROFILE_ID }
+  }
+
   async function mergeDaySessions(rows: unknown[] | undefined): Promise<void> {
     if (!rows || rows.length === 0) return
-    const incoming = rows as WorkoutDaySession[]
+    const incoming = (rows as WorkoutDaySession[]).map(adopt)
     const local = await db.workoutDaySessions.toArray()
 
     const keyOf = (s: WorkoutDaySession) => `${sessionProfile(s)}::${s.date}::${s.dayLabel}`
