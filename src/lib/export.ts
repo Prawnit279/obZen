@@ -10,6 +10,10 @@
  * devices assign ids independently and matching on id would clobber unrelated
  * sessions when swapping backups between phones.
  * drumPDFs and cachedImages are skipped (binary / hollow metadata).
+ *
+ * Both directions also carry a `personal` section — weigh-ins, weight goal,
+ * name, dosha, ladder rungs — which live in localStorage rather than a table.
+ * See `lib/personalBackup.ts`.
  */
 
 import { type Table } from 'dexie'
@@ -18,6 +22,7 @@ import { isRealSet } from '@/lib/progress'
 import { exerciseNameFor } from '@/data/obzen-program'
 import type { WorkoutDaySession } from '@/db/dexie'
 import { sessionProfile, sessionHasActivity } from '@/lib/workoutSession'
+import { collectPersonal, validatePersonal, restorePersonal } from '@/lib/personalBackup'
 import { PROFILE_ID } from '@/config/profiles'
 
 function getDeviceId(): string {
@@ -214,6 +219,7 @@ export async function exportAllDataAsJSON(): Promise<void> {
         })),
         meta,
       },
+      personal: collectPersonal(),
     },
   }
 
@@ -335,6 +341,9 @@ export async function importAllDataFromJSON(file: File): Promise<ImportResult> {
   // Structural validation — throws with a descriptive path on the first bad node.
   const data = raw.data
   validateBackupData(data)
+  // Checked before anything is written: this half has no transaction to roll
+  // back, so a bad section has to reject the file while it is still untouched.
+  const personal = data.personal === undefined ? undefined : validatePersonal(data.personal)
 
   // ── Helper ──────────────────────────────────────────────────────────────────
   let total = 0
@@ -444,6 +453,9 @@ export async function importAllDataFromJSON(file: File): Promise<ImportResult> {
     // drumPDFs and cachedImages intentionally skipped — see JSDoc above
   })
 
+  // After the database commits, so a failed import leaves these untouched too.
+  if (personal) total += restorePersonal(personal)
+
   return { totalRecords: total, exportDate: metadata.exportDate }
 }
 
@@ -459,4 +471,6 @@ interface BackupData {
   ayurveda?:  { logs?: unknown[] }
   vedic?:     { logs?: unknown[] }
   app?:       { checkIns?: unknown[]; progressPhotos?: unknown[]; meta?: unknown[] }
+  /** Validated separately by `validatePersonal` — not a set of table rows. */
+  personal?:  unknown
 }
