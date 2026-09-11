@@ -44,8 +44,6 @@ export interface ProgressConfig {
   keyLiftIds: string[]
   /** Show SBD total, DOTS and powerlifting strength standards. */
   showPowerlifting: boolean
-  /** Show a bodyweight trend line (fat-loss oriented goals). */
-  showBodyweightTrend: boolean
 }
 
 export interface Profile {
@@ -75,7 +73,6 @@ export const PROFILES: Record<ProfileId, Profile> = {
     progress: {
       keyLiftIds: ['barbell-squat', 'bench-press', 'deadlift'],
       showPowerlifting: true,
-      showBodyweightTrend: false,
     },
     mahadasha: 'Rahu (~2030)',
     atmakaraka: 'Saturn',

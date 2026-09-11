@@ -5,6 +5,10 @@ import { todayISO } from '@/lib/utils'
 import { Modal } from '@/components/ui/Modal'
 import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
+import { useProfileStore } from '@/store/useProfileStore'
+import { useProgressStore } from '@/store/useProgressStore'
+import { parseWeighInLb, WEIGH_IN_LB } from '@/lib/bodyweight'
+import { kgToLb } from '@/lib/progress'
 
 interface Props {
   open: boolean
@@ -23,7 +27,23 @@ export function CheckInModal({ open, existing, onClose, onSaved }: Props) {
   const [notes, setNotes] = useState(existing?.notes ?? '')
   const [saving, setSaving] = useState(false)
 
+  // Weight lives with the bodyweight log, not on the check-in row, so the
+  // Progress trend and this field can never disagree about what you weighed.
+  const activeId = useProfileStore(s => s.activeId)
+  const logBodyweight = useProgressStore(s => s.logBodyweight)
+  const todays = useProgressStore(s => s.bodyweight[activeId]?.find(e => e.date === todayISO()))
+  const [weight, setWeight] = useState(todays ? String(Math.round(kgToLb(todays.kg) * 10) / 10) : '')
+  const [weightError, setWeightError] = useState<string | null>(null)
+
   const handleSave = async () => {
+    // An unreadable weight stops the save rather than being dropped quietly —
+    // otherwise the check-in would close looking saved while the weigh-in was lost.
+    const typed = weight.trim()
+    const kg = typed === '' ? null : parseWeighInLb(typed)
+    if (typed !== '' && kg === null) {
+      setWeightError(`Enter a weight between ${WEIGH_IN_LB.min} and ${WEIGH_IN_LB.max} lb, or leave it blank.`)
+      return
+    }
     setSaving(true)
     const data: Omit<CheckIn, 'id'> = {
       date: todayISO(),
@@ -34,6 +54,7 @@ export function CheckInModal({ open, existing, onClose, onSaved }: Props) {
       notes: notes || undefined,
     }
     await saveCheckIn(data)
+    if (kg !== null) logBodyweight(activeId, todayISO(), kg)
     onSaved(data as CheckIn)
     setSaving(false)
     onClose()
@@ -106,6 +127,30 @@ export function CheckInModal({ open, existing, onClose, onSaved }: Props) {
               </button>
             ))}
           </div>
+        </div>
+
+        {/* Weight */}
+        <div>
+          <div className="text-[10px] uppercase tracking-widest text-noir-muted mb-2">
+            Weight <span className="text-noir-dim">— optional, lb</span>
+          </div>
+          <input
+            type="number"
+            inputMode="decimal"
+            step="0.1"
+            value={weight}
+            onChange={e => { setWeight(e.target.value); setWeightError(null) }}
+            placeholder="This morning's weight"
+            aria-label="This morning's bodyweight in pounds"
+            aria-invalid={weightError !== null}
+            aria-describedby={weightError ? 'checkin-weight-error' : undefined}
+            className="w-full bg-noir-bg border border-noir-border rounded-[2px] px-3 py-2 text-[13px] text-noir-accent placeholder:text-noir-dim focus:outline-none focus:border-noir-strong"
+          />
+          {weightError && (
+            <p id="checkin-weight-error" role="alert" className="text-[11px] mt-1.5" style={{ color: 'var(--red)' }}>
+              {weightError}
+            </p>
+          )}
         </div>
 
         {/* Notes */}

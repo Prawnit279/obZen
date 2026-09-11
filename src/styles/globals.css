@@ -30,6 +30,10 @@
     --violet-600: #6D28D9;
     --violet-700: #5B21B6;   /* primary gradient end */
     --violet-900: #4C1D95;   /* deep end of card + tab gradients */
+    /* Text on the accent gradient. White in every theme: each theme remaps the
+       violet scale but always to a saturated accent, so the gradient is dark
+       enough for it. Not `--white`, which is near-black in Daylight. */
+    --on-accent: #FFFFFF;
 
     /* ink — body copy sits at --ink-dim or lighter; --ink-off is for 10–11px
        labels only; --ink-ghost marks future/untracked slots and is never text
@@ -51,6 +55,8 @@
     /* semantic */
     --ok:  #86EFAC;
     --red: #F87171;
+    /* Worth a look, not a fault — between --ok and --red. */
+    --caution: #FCD34D;
 
     /* geometry */
     --r-card:    22px;
@@ -151,8 +157,13 @@
     --lift-row:      #0E7490;
     --lift-core:     #BE185D;
 
-    --ok:  #15803D;
+    /* Status text sits on cards, and a Daylight card is a translucent dark wash
+       over the page — a shade darker than the page itself. Green-700 and
+       amber-700 cleared AA against white but fell to 4.2:1 on a card, so
+       these are the 800 steps: about 5.9:1 on the card surface. */
+    --ok:  #166534;
     --red: #B91C1C;
+    --caution: #92400E;
 
     --complete-border: #15803D;
     --complete-text:   #14532D;
@@ -438,8 +449,9 @@
     --lift-row:      #0E7490;
     --lift-core:     #BE185D;
 
-    --ok:  #15803D;
+    --ok:  #166534;
     --red: #B91C1C;
+    --caution: #92400E;
 
     --complete-border: #15803D;
     --complete-text:   #14532D;

@@ -28,7 +28,7 @@ import { BalanceCard } from './BalanceCard'
 import { ProgressionLadder } from './ProgressionLadder'
 import { AmrapCard } from './AmrapCard'
 import { MuscleVolumeCard } from './MuscleVolumeCard'
-import { BodyweightPanel } from './BodyweightPanel'
+import { WeightCheckCard } from './WeightCheckCard'
 
 const CARD = { background: 'var(--card)', border: '1px solid var(--hairline)' } as const
 
@@ -56,16 +56,29 @@ export function WorkoutProgress() {
   // Everything below is computed from this profile's real training only.
   const mine = sessions.filter(s => belongsToProfile(s, activeId) && sessionHasActivity(s))
 
+  const weightCard = (
+    <WeightCheckCard
+      profileId={activeId}
+      sessions={mine}
+      keyLiftIds={cfg.keyLiftIds}
+      fallbackKg={profile.body.bodyweightKg}
+    />
+  )
+
   if (mine.length === 0) {
+    // Weight tracking does not wait for a first workout, so its card stays.
     return (
-      <div
-        className="text-center space-y-2"
-        style={{ ...CARD, borderRadius: 'var(--r-card)', padding: 24 }}
-      >
-        <p style={{ fontSize: 15, color: 'var(--ink-2)' }}>No training logged yet</p>
-        <p style={{ fontSize: 13, color: 'var(--ink-dim)' }}>
-          Log a few sessions and your strength trends, volume and PRs will appear here.
-        </p>
+      <div className="card-grid">
+        <div
+          className="text-center space-y-2"
+          style={{ ...CARD, borderRadius: 'var(--r-card)', padding: 24 }}
+        >
+          <p style={{ fontSize: 15, color: 'var(--ink-2)' }}>No training logged yet</p>
+          <p style={{ fontSize: 13, color: 'var(--ink-dim)' }}>
+            Log a few sessions and your strength trends, volume and PRs will appear here.
+          </p>
+        </div>
+        {weightCard}
       </div>
     )
   }
@@ -246,7 +259,7 @@ export function WorkoutProgress() {
         </Card>
       )}
 
-      {cfg.showBodyweightTrend && <BodyweightPanel profileId={activeId} />}
+      {weightCard}
 
       {/* ── Weekly volume + PRs ────────────────────────────────────────── */}
       {/* ── Sets per muscle ───────────────────────────────────────────── */}
