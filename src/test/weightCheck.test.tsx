@@ -5,6 +5,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
 import { render, screen, cleanup, within, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { MemoryRouter } from 'react-router-dom'
 import { db } from '@/db/dexie'
 import type { WorkoutDaySession } from '@/db/dexie'
 import { WeightCheckCard } from '@/components/modules/workout/progress/WeightCheckCard'
@@ -344,7 +345,12 @@ describe('on the Progress screen', () => {
     // Progress used to return early on an empty history. A weight-only user —
     // or anyone on day one — would never have seen the card.
     const { WorkoutProgress } = await import('@/components/modules/workout/progress/WorkoutProgress')
-    render(<WorkoutProgress />)
+    // Progress keeps its open view in the URL, so it needs a router around it.
+    render(
+      <MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+        <WorkoutProgress />
+      </MemoryRouter>
+    )
 
     expect(await screen.findByText(/no training logged yet/i)).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /weight check/i })).toBeInTheDocument()

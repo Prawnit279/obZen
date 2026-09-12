@@ -357,6 +357,15 @@
    * match a tall neighbour. Anything that should stay full width, like a stat
    * row or a page header, takes `card-grid-full`.
    */
+  /*
+   * A closed Progress view. Hidden on screen only — the Print button prints
+   * the whole page, so the rule is scoped away from print rather than undone
+   * inside it.
+   */
+  @media not print {
+    .progress-panel[data-open='false'] { display: none; }
+  }
+
   .card-grid {
     display: flex;
     flex-direction: column;

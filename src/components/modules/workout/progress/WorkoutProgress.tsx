@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/db/dexie'
 import type { WorkoutDaySession } from '@/db/dexie'
@@ -14,6 +16,7 @@ import {
 } from '@/lib/progress'
 import { todayISO } from '@/lib/utils'
 import { Card } from '@/components/ui/Card'
+import { SegmentedPill } from '@/components/ui/SegmentedPill'
 import { LineChart, BarChart, ChartEmpty, liftHue } from './Charts'
 import {
   liftSignals, prFeed, sessionLoads, acwr, deloadAdvice, adherence, liftBalance,
@@ -32,12 +35,60 @@ import { WeightCheckCard } from './WeightCheckCard'
 
 const CARD = { background: 'var(--card)', border: '1px solid var(--hairline)' } as const
 
+/**
+ * Progress is three readings of the same training, not one long list.
+ *
+ * Stacked, the screen ran to nearly six phone screens, and recovery sat below
+ * every strength card. Split, each view is one or two.
+ */
+type ProgressView = 'strength' | 'body' | 'workload'
+
+const PROGRESS_VIEWS: { value: ProgressView; label: string }[] = [
+  { value: 'strength', label: 'Strength' },
+  { value: 'body', label: 'Body' },
+  { value: 'workload', label: 'Workload' },
+]
+
+/**
+ * One view's cards.
+ *
+ * Closed views stay mounted and are hidden in CSS rather than unmounted: the
+ * Print button prints the screen, and a sheet carrying a third of the training
+ * would be worse than a long page. The hiding rule is scoped away from print.
+ */
+function Panel({ view, open, children }: {
+  view: ProgressView
+  open: ProgressView
+  children: ReactNode
+}) {
+  return (
+    <div className="progress-panel card-grid" data-open={view === open}>
+      {children}
+    </div>
+  )
+}
+
 /** Internal maths is kg; the gym is in pounds, so display converts at the edge. */
 const lb = (kgValue: number) => displayLb(kgValue)
 /** Scores (DOTS/Wilks) are unitless — never convert them. */
 const score = (n: number) => `${Math.round(n * 10) / 10}`
 
 export function WorkoutProgress() {
+  // The open view lives in the URL, so a reload, a share and the back button
+  // all land where you were rather than on the default.
+  const [searchParams, setSearchParams] = useSearchParams()
+  const viewParam = searchParams.get('view') as ProgressView | null
+  const view: ProgressView = PROGRESS_VIEWS.some(v => v.value === viewParam)
+    ? viewParam!
+    : 'strength'
+
+  const setView = (next: ProgressView) => {
+    const params = new URLSearchParams(searchParams)
+    if (next === 'strength') params.delete('view')   // the default stays out
+    else params.set('view', next)
+    setSearchParams(params, { replace: true })
+  }
+
   const { activeId } = useProfileStore()
   const profile = PROFILES[activeId]
   const cfg = profile.progress
@@ -149,7 +200,7 @@ export function WorkoutProgress() {
     .filter(ex => loggedIds.includes(toExerciseId(ex.name)) || cfg.keyLiftIds.includes(toExerciseId(ex.name)))
 
   return (
-    <div className="card-grid">
+    <div className="space-y-4">
       {/* ── Stat row ───────────────────────────────────────────────────── */}
       <div className="card-grid-full flex flex-wrap gap-2">
         {cfg.showPowerlifting ? (
@@ -175,6 +226,18 @@ export function WorkoutProgress() {
         />
       </div>
 
+      {/* The summary stays put; the tabs divide the detail beneath it. Stacked,
+          this screen ran to nearly six phone screens on a 375px display. */}
+      <SegmentedPill
+        className="print-hide"
+        label="Progress view"
+        value={view}
+        onChange={setView}
+        grow
+        options={PROGRESS_VIEWS}
+      />
+
+      <Panel view="strength" open={view}>
       {/* ── e1RM trend ─────────────────────────────────────────────────── */}
       <Card label="Estimated 1RM trend">
         <LineChart
@@ -188,9 +251,6 @@ export function WorkoutProgress() {
 
       {/* ── Lifts that have stopped moving ─────────────────────────────── */}
       {stalled.length > 0 && <StallCard signals={stalled} />}
-
-      {/* ── Load & recovery ────────────────────────────────────────────── */}
-      <LoadCard load={load} deload={deload} rated={loads.filter(l => l.rpe !== null).length} />
 
       {/* ── Next training max, off the last AMRAP ──────────────────────── */}
       <AmrapCard advice={amrap} />
@@ -258,23 +318,6 @@ export function WorkoutProgress() {
           </p>
         </Card>
       )}
-
-      {weightCard}
-
-      {/* ── Weekly volume + PRs ────────────────────────────────────────── */}
-      {/* ── Sets per muscle ───────────────────────────────────────────── */}
-      <MuscleVolumeCard readings={muscles} />
-
-      <Card label="Weekly volume (tonnage)">
-        <BarChart
-          data={fillWeeks(volume, todayISO(), 8)
-            .map(v => ({ label: v.week.slice(-3), value: kgToLb(v.tonnageKg) }))}
-          unit="lb"
-        />
-      </Card>
-
-      {/* ── Plan vs actual ─────────────────────────────────────────────── */}
-      <AdherenceCard data={attendance} />
 
       {/* ── How the lifts sit against each other ────────────────────────── */}
       {cfg.showPowerlifting && balance.lifts.length > 0 && <BalanceCard report={balance} />}
@@ -425,6 +468,30 @@ export function WorkoutProgress() {
           }
         />
       ))}
+      </Panel>
+
+      <Panel view="body" open={view}>
+        {weightCard}
+      </Panel>
+
+      <Panel view="workload" open={view}>
+      {/* ── Load & recovery ────────────────────────────────────────────── */}
+      <LoadCard load={load} deload={deload} rated={loads.filter(l => l.rpe !== null).length} />
+
+      {/* ── Sets per muscle ───────────────────────────────────────────── */}
+      <MuscleVolumeCard readings={muscles} />
+
+      <Card label="Weekly volume (tonnage)">
+        <BarChart
+          data={fillWeeks(volume, todayISO(), 8)
+            .map(v => ({ label: v.week.slice(-3), value: kgToLb(v.tonnageKg) }))}
+          unit="lb"
+        />
+      </Card>
+
+      {/* ── Plan vs actual ─────────────────────────────────────────────── */}
+      <AdherenceCard data={attendance} />
+      </Panel>
     </div>
   )
 }

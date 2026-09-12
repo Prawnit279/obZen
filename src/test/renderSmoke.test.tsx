@@ -8,7 +8,8 @@
  * mounting each view under real data catches that whole class of bug.
  */
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest'
-import { render, screen, cleanup } from '@testing-library/react'
+import { render, screen, cleanup, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { MemoryRouter } from 'react-router-dom'
 import type { ReactElement } from 'react'
 import { db } from '@/db/dexie'
@@ -96,6 +97,43 @@ describe('WorkoutProgress — renders without crashing', () => {
     await waitForData()
 
     expect(container.querySelectorAll('svg[viewBox]').length).toBeGreaterThan(0)
+  })
+})
+
+describe('WorkoutProgress — the three views', () => {
+  it('opens on Strength, with the other two closed but still mounted', async () => {
+    await seedSession('pronit', '2026-08-10')
+    const { container } = renderView(<WorkoutProgress />)
+    await waitForData()
+
+    const panels = [...container.querySelectorAll('.progress-panel')]
+    expect(panels).toHaveLength(3)
+    expect(panels.filter(p => p.getAttribute('data-open') === 'true')).toHaveLength(1)
+  })
+
+  it('keeps every closed view in the document, so printing gets the whole screen', async () => {
+    // The Print button prints the page. Unmounting the closed views would have
+    // quietly reduced a printed sheet to whichever tab happened to be open.
+    await seedSession('pronit', '2026-08-10')
+    const { container } = renderView(<WorkoutProgress />)
+    await waitForData()
+
+    const closed = [...container.querySelectorAll('.progress-panel[data-open="false"]')]
+    expect(closed).toHaveLength(2)
+    expect(closed.every(p => p.children.length > 0)).toBe(true)
+  })
+
+  it('moves the open view when another tab is pressed', async () => {
+    const user = userEvent.setup()
+    await seedSession('pronit', '2026-08-10')
+    const { container } = renderView(<WorkoutProgress />)
+    await waitForData()
+
+    await user.click(screen.getByRole('button', { name: 'Workload' }))
+
+    const open = container.querySelector('.progress-panel[data-open="true"]')!
+    expect(within(open as HTMLElement).getByText(/plan vs actual/i)).toBeInTheDocument()
+    expect(within(open as HTMLElement).queryByText(/personal records/i)).not.toBeInTheDocument()
   })
 })
 
