@@ -1,6 +1,6 @@
 import { create } from 'zustand'
 import { db } from '@/db/dexie'
-import type { WorkoutDaySession, ExerciseSessionState, LoggedSet } from '@/db/dexie'
+import type { WorkoutDaySession, ExerciseSessionState, LoggedSet, DayLabel } from '@/db/dexie'
 import { todayISO } from '@/lib/utils'
 import { getProgram, formatTarget, toExerciseId, LIBRARY_BY_ID } from '@/data/obzen-program'
 import { useProfileStore } from '@/store/useProfileStore'
@@ -17,7 +17,7 @@ function activeProfile(): string {
 
 /** Build session-state rows from a day template (name/muscle/target persisted). */
 function buildTemplateExercises(
-  dayLabel: 'Day 1' | 'Day 2' | 'Day 3',
+  dayLabel: DayLabel,
   profileId: string
 ): ExerciseSessionState[] {
   const program = getProgram(profileId)[dayLabel]
@@ -44,21 +44,21 @@ interface WorkoutDayState {
   sessions: Record<string, WorkoutDaySession>
   loading: boolean
 
-  loadSession: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', date?: string) => Promise<void>
-  loadTemplate: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', date?: string) => Promise<void>
+  loadSession: (dayLabel: DayLabel, date?: string) => Promise<void>
+  loadTemplate: (dayLabel: DayLabel, date?: string) => Promise<void>
   /** `rpe` is 1–10 and optional; omitting it completes without a rating. */
-  completeSession: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', date?: string, rpe?: number) => Promise<void>
-  setSessionRpe: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', rpe: number, date?: string) => Promise<void>
-  updateExerciseStatus: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, status: ExerciseSessionState['status'], date?: string) => Promise<void>
-  addLoggedSet: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, set: LoggedSet, date?: string) => Promise<void>
-  updateLoggedSet: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, setIndex: number, set: LoggedSet, date?: string) => Promise<void>
-  removeLoggedSet: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, setIndex: number, date?: string) => Promise<void>
-  reorderExercises: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', newOrder: string[], date?: string) => Promise<void>
-  addExercise: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exercise: ExerciseSessionState, date?: string) => Promise<void>
-  removeExercise: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, date?: string) => Promise<void>
-  swapExercise: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, toName: string, date?: string) => Promise<void>
-  setExerciseNote: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, note: string, date?: string) => Promise<void>
-  updateExerciseUnit: (dayLabel: 'Day 1' | 'Day 2' | 'Day 3', exerciseId: string, unit: 'lbs' | 'kg', date?: string) => Promise<void>
+  completeSession: (dayLabel: DayLabel, date?: string, rpe?: number) => Promise<void>
+  setSessionRpe: (dayLabel: DayLabel, rpe: number, date?: string) => Promise<void>
+  updateExerciseStatus: (dayLabel: DayLabel, exerciseId: string, status: ExerciseSessionState['status'], date?: string) => Promise<void>
+  addLoggedSet: (dayLabel: DayLabel, exerciseId: string, set: LoggedSet, date?: string) => Promise<void>
+  updateLoggedSet: (dayLabel: DayLabel, exerciseId: string, setIndex: number, set: LoggedSet, date?: string) => Promise<void>
+  removeLoggedSet: (dayLabel: DayLabel, exerciseId: string, setIndex: number, date?: string) => Promise<void>
+  reorderExercises: (dayLabel: DayLabel, newOrder: string[], date?: string) => Promise<void>
+  addExercise: (dayLabel: DayLabel, exercise: ExerciseSessionState, date?: string) => Promise<void>
+  removeExercise: (dayLabel: DayLabel, exerciseId: string, date?: string) => Promise<void>
+  swapExercise: (dayLabel: DayLabel, exerciseId: string, toName: string, date?: string) => Promise<void>
+  setExerciseNote: (dayLabel: DayLabel, exerciseId: string, note: string, date?: string) => Promise<void>
+  updateExerciseUnit: (dayLabel: DayLabel, exerciseId: string, unit: 'lbs' | 'kg', date?: string) => Promise<void>
 }
 
 // ---------------------------------------------------------------------------
@@ -311,7 +311,7 @@ export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => {
 
 export function selectDaySession(
   sessions: Record<string, WorkoutDaySession>,
-  dayLabel: 'Day 1' | 'Day 2' | 'Day 3',
+  dayLabel: DayLabel,
   date = todayISO(),
   profileId = useProfileStore.getState().activeId
 ): WorkoutDaySession | undefined {

@@ -4,7 +4,7 @@ import { Search, Plus } from 'lucide-react'
 import { getProgram, EXERCISE_LIBRARY, formatTarget, toExerciseId } from '@/data/obzen-program'
 import { useProfileStore } from '@/store/useProfileStore'
 import type { MuscleGroup } from '@/data/obzen-program'
-import type { ExerciseSessionState } from '@/db/dexie'
+import type { ExerciseSessionState, DayLabel } from '@/db/dexie'
 import { cn } from '@/lib/utils'
 
 type Tab = 'other' | 'library' | 'custom'
@@ -12,7 +12,7 @@ type Tab = 'other' | 'library' | 'custom'
 const MUSCLE_GROUPS: MuscleGroup[] = ['legs', 'back', 'shoulders', 'arms', 'chest', 'core']
 
 interface Props {
-  currentDay: 'Day 1' | 'Day 2' | 'Day 3'
+  currentDay: DayLabel
   existingIds: string[]
   onAdd: (exercise: ExerciseSessionState) => void
   onClose: () => void
@@ -42,7 +42,7 @@ function OtherDaysTab({
   currentDay,
   existingIds,
   onAdd,
-}: { currentDay: 'Day 1' | 'Day 2' | 'Day 3'; existingIds: string[]; onAdd: (ex: ExerciseSessionState) => void }) {
+}: { currentDay: DayLabel; existingIds: string[]; onAdd: (ex: ExerciseSessionState) => void }) {
   const activeId = useProfileStore(s => s.activeId)
   const otherDays = (['Day 1', 'Day 2', 'Day 3'] as const).filter(d => d !== currentDay)
 

@@ -4,6 +4,8 @@ import { PROFILES, PROFILE_ID } from '@/config/profiles'
 import { DOSHAS } from '@/data/doshas'
 import type { Dosha } from '@/data/doshas'
 import { isWeightGoal } from '@/lib/bodyweight'
+import { isTrainingDays, DEFAULT_TRAINING_DAYS } from '@/lib/trainingWeek'
+import type { TrainingDays } from '@/lib/trainingWeek'
 import type { WeightGoal } from '@/lib/bodyweight'
 
 /**
@@ -33,6 +35,7 @@ export const PROFILE_SETTINGS_DEFAULTS = {
   name: PROFILES[PROFILE_ID].name,
   dosha: (PROFILES[PROFILE_ID].dosha ?? 'Pitta') as Dosha,
   weightGoal: null as WeightGoal | null,
+  trainingDays: DEFAULT_TRAINING_DAYS as TrainingDays,
 }
 
 interface ProfileSettingsState {
@@ -40,9 +43,12 @@ interface ProfileSettingsState {
   dosha: Dosha
   /** Null until the person has said what they are aiming for. */
   weightGoal: WeightGoal | null
+  /** How many days a week the plan calls for. Decides the slots Train shows. */
+  trainingDays: TrainingDays
   setName: (name: string) => void
   setDosha: (dosha: Dosha) => void
   setWeightGoal: (goal: WeightGoal | null) => void
+  setTrainingDays: (days: TrainingDays) => void
   reset: () => void
 }
 
@@ -56,6 +62,7 @@ export const useProfileSettingsStore = create<ProfileSettingsState>()(
         set({ name: name.trim().length > 0 ? name : PROFILE_SETTINGS_DEFAULTS.name }),
       setDosha: (dosha: Dosha) => set({ dosha }),
       setWeightGoal: (weightGoal: WeightGoal | null) => set({ weightGoal }),
+      setTrainingDays: (trainingDays: TrainingDays) => set({ trainingDays }),
       reset: () => set({ ...PROFILE_SETTINGS_DEFAULTS }),
     }),
     {
@@ -78,6 +85,9 @@ export const useProfileSettingsStore = create<ProfileSettingsState>()(
             : current.name,
           dosha: DOSHAS.includes(saved.dosha as Dosha) ? (saved.dosha as Dosha) : current.dosha,
           weightGoal: isWeightGoal(saved.weightGoal) ? saved.weightGoal : null,
+          trainingDays: isTrainingDays(saved.trainingDays)
+            ? saved.trainingDays
+            : current.trainingDays,
         }
       },
     }

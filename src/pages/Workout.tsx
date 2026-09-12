@@ -9,6 +9,10 @@ import { belongsToProfile } from '@/lib/workoutSession'
 import { suggestProgression } from '@/lib/progress'
 import type { ProgressionSuggestion } from '@/lib/progress'
 import { db } from '@/db/dexie'
+import { isoWeekKey } from '@/lib/progress'
+import { trainedDates } from '@/lib/trainingWeek'
+import { useProfileSettingsStore } from '@/store/useProfileSettingsStore'
+import type { DayLabel } from '@/db/dexie'
 import { todayISO } from '@/lib/utils'
 import { useWorkoutDayStore, selectDaySession, selectOrderedExercises } from '@/store/useWorkoutDayStore'
 import type { ExerciseSessionState } from '@/db/dexie'
@@ -23,11 +27,21 @@ import { StrengthTools } from '@/components/modules/workout/tools/StrengthTools'
 // Constants
 // ---------------------------------------------------------------------------
 
-type DayLabel = 'Day 1' | 'Day 2' | 'Day 3'
+
 /** Progress is its own top-level section, so Train does not repeat it here. */
 type Tab = 'program' | 'history' | 'tools'
 
-const DAYS: DayLabel[] = ['Day 1', 'Day 2', 'Day 3']
+const ALL_DAYS: DayLabel[] = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6']
+
+/**
+ * The day slots for a plan of `count` days.
+ *
+ * Never fewer than the days already trained this week: a setting must not be
+ * the reason a logged session has nowhere to appear.
+ */
+function daysFor(count: number, trainedThisWeek: number): DayLabel[] {
+  return ALL_DAYS.slice(0, Math.min(ALL_DAYS.length, Math.max(count, trainedThisWeek)))
+}
 const TODAY = todayISO()
 
 /**
@@ -41,7 +55,7 @@ function buildProgramMap(profileId: string): Record<string, ProgramExercise> {
     map[toExerciseId(ex.name)] = ex
   }
   const program = getProgram(profileId)
-  for (const day of DAYS) {
+  for (const day of Object.keys(program)) {
     for (const ex of program[day]?.exercises ?? []) {
       map[toExerciseId(ex.name)] = ex
     }
@@ -354,11 +368,22 @@ export default function Workout() {
   }
 
   const [selectedDay, setSelectedDay] = useState<DayLabel | 'Rest'>(
-    linkedDay && DAYS.includes(linkedDay) ? linkedDay : 'Day 1'
+    linkedDay && ALL_DAYS.includes(linkedDay) ? linkedDay : 'Day 1'
   )
   // Which date is being logged — today unless the user backdates a session.
   const [sessionDate, setSessionDate] = useState<string>(linkedDate ?? TODAY)
   const activeProfileId = useProfileStore(s => s.activeId)
+  const trainingDays = useProfileSettingsStore(s => s.trainingDays)
+
+  // This week's sessions, so the day slots can never be fewer than the days
+  // actually trained.
+  const thisWeek = useLiveQuery(
+    () => db.workoutDaySessions
+      .filter(s => belongsToProfile(s, activeProfileId) && isoWeekKey(s.date) === isoWeekKey(TODAY))
+      .toArray(),
+    [activeProfileId]
+  )
+  const days = daysFor(trainingDays, trainedDates(thisWeek ?? [], isoWeekKey(TODAY)).length)
 
   const todayCheckIn = useLiveQuery(
     () => db.checkIns.where('date').equals(TODAY).first(),
@@ -401,7 +426,7 @@ export default function Workout() {
         </div>
         <div className="flex flex-col items-end gap-1 shrink-0">
           <div style={{ fontSize: 11, color: 'var(--ink-faint)', fontVariantNumeric: 'tabular-nums' }}>
-            {weekSessions ?? 0}/3 this week
+            {weekSessions ?? 0}/{trainingDays} this week
           </div>
         </div>
       </div>
@@ -427,7 +452,7 @@ export default function Workout() {
         <>
           {/* Day selector */}
           <div className="flex gap-2">
-            {DAYS.map(day => (
+            {days.map(day => (
               <button
                 key={day}
                 onClick={() => setSelectedDay(day)}

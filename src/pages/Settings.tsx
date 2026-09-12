@@ -14,6 +14,7 @@ import { SegmentedPill } from '@/components/ui/SegmentedPill'
 import { useProfileStore } from '@/store/useProfileStore'
 import { useProfileSettingsStore } from '@/store/useProfileSettingsStore'
 import { DOSHAS, guidanceFor } from '@/data/doshas'
+import { TRAINING_DAY_CHOICES } from '@/lib/trainingWeek'
 
 function formatBytes(b: number) {
   if (b < 1024) return `${b} B`
@@ -50,7 +51,7 @@ export default function Settings() {
   const navigate = useNavigate()
   const { used, quota, persisted } = useStorageEstimate()
   const { activeId } = useProfileStore()
-  const { name, dosha, setName, setDosha } = useProfileSettingsStore()
+  const { name, dosha, trainingDays, setName, setDosha, setTrainingDays } = useProfileSettingsStore()
   const guidance = guidanceFor(dosha)
   const profile = PROFILES[activeId]
 
@@ -201,6 +202,24 @@ export default function Settings() {
               <p className="text-[11px] leading-relaxed pt-1.5" style={{ color: 'var(--ink-ghost)' }}>
                 A traditional framework, not medical advice. It shapes the tips
                 the app offers, nothing it calculates.
+              </p>
+            </div>
+
+            <div>
+              <SegmentedPill
+                label="Training days a week"
+                value={trainingDays}
+                onChange={setTrainingDays}
+                grow
+                options={TRAINING_DAY_CHOICES.map(n => ({ value: n, label: String(n) }))}
+              />
+              <p className="text-[12px] leading-relaxed pt-2" style={{ color: 'var(--ink-dim)' }}>
+                Days a week the plan asks for. Train shows this many, and the
+                week counts against it.
+              </p>
+              <p className="text-[11px] leading-relaxed pt-1.5" style={{ color: 'var(--ink-ghost)' }}>
+                Train more than you planned and the week simply grows — lowering
+                this never hides a session you already logged.
               </p>
             </div>
           </div>

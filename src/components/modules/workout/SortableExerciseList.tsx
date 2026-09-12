@@ -13,7 +13,7 @@ import {
   verticalListSortingStrategy,
   arrayMove,
 } from '@dnd-kit/sortable'
-import type { ExerciseSessionState, LoggedSet } from '@/db/dexie'
+import type { ExerciseSessionState, LoggedSet, DayLabel } from '@/db/dexie'
 import type { ProgressionSuggestion } from '@/lib/progress'
 import type { ProgramExercise } from '@/data/obzen-program'
 import { ExerciseCard } from './ExerciseCard'
@@ -22,7 +22,7 @@ interface Props {
   exercises: ExerciseSessionState[]
   programMap: Record<string, ProgramExercise>
   forearmFatigue: boolean
-  dayLabel: 'Day 1' | 'Day 2' | 'Day 3'
+  dayLabel: DayLabel
   onReorder: (newOrder: string[]) => void
   onStatusChange: (exerciseId: string, status: ExerciseSessionState['status']) => void
   onAddSet: (exerciseId: string, set: LoggedSet) => void

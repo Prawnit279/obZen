@@ -206,13 +206,26 @@ export interface ExerciseSessionState {
   status: 'pending' | 'complete' | 'skipped'
   sets: LoggedSet[]
   note?: string
-  addedFrom?: 'Day 1' | 'Day 2' | 'Day 3' | 'library' | 'custom'
+  addedFrom?: DayLabel | 'library' | 'custom'
 }
+
+/**
+ * Which training day of its week a session is — a position, not a template name.
+ *
+ * Six because the plan can ask for up to six days. Declared once here rather
+ * than repeated at every signature that takes one, which is how it came to be
+ * three in twenty places.
+ *
+ * Stored for history and for the index; the number shown on screen is derived
+ * from the date by `trainingWeek.ts`, so backdating a session renumbers its
+ * week rather than leaving two sessions both claiming to be Day 2.
+ */
+export type DayLabel = 'Day 1' | 'Day 2' | 'Day 3' | 'Day 4' | 'Day 5' | 'Day 6'
 
 export interface WorkoutDaySession {
   id?: number
   date: string
-  dayLabel: 'Day 1' | 'Day 2' | 'Day 3'
+  dayLabel: DayLabel
   /**
    * Which profile logged this. There is one profile now, so new rows are always
    * stamped with it; rows carrying the retired second profile's id stay in the

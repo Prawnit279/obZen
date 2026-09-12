@@ -3,7 +3,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { ChevronDown, ChevronUp, GripVertical, Zap, Trash2, BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { ExerciseSessionState, LoggedSet } from '@/db/dexie'
+import type { ExerciseSessionState, LoggedSet, DayLabel } from '@/db/dexie'
 import type { ProgramExercise } from '@/data/obzen-program'
 import { PULL_HEAVY_EXERCISES, FOREARM_LOAD_EXERCISES } from '@/data/obzen-program'
 import { ExerciseHistory } from './ExerciseHistory'
@@ -28,7 +28,7 @@ interface Props {
   exerciseState: ExerciseSessionState
   programExercise?: ProgramExercise
   forearmFatigue: boolean
-  dayLabel: 'Day 1' | 'Day 2' | 'Day 3'
+  dayLabel: DayLabel
   onStatusChange: (status: ExerciseSessionState['status']) => void
   onAddSet: (set: LoggedSet) => void
   onUpdateSet: (index: number, set: LoggedSet) => void
