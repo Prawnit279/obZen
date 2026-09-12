@@ -1,105 +1,114 @@
 # obZen — Build Status
-Last updated: 2026-05-02 | SHA: cfcf2d16
+Last updated: 2026-09-12 | SHA: 83cdc141
+
+Local-first training and drum-practice PWA. One profile, one device, no
+account, no server. Everything lives in IndexedDB and localStorage, and a JSON
+backup is the only way data leaves the phone.
 
 ---
 
-## ✅ Completed
+## Shape of the app
+
+**Navigation:** Home · Train · Progress · Drums · Calendar · More.
+
+**One profile.** The two-person switcher is gone. The id string `'pronit'`
+survives as an internal key — sessions are stamped with it, and the bodyweight
+log and ladder rungs are prefixed by it — but there is no way to change who you
+are. Name, Ayurvedic type and training days are editable in Settings; key lifts
+and which Progress panels appear stay in `config/profiles.ts` as programme data.
+
+**Feature flags** (`config/features.ts`), all currently off: Nutrition, Yoga,
+Vedic, Astrology. Yoga's screens and data are still in the tree — its programme
+is also the source of fifteen library exercises, so it cannot simply be deleted.
+
+---
+
+## Built
 
 ### Infrastructure
-- Vite + React 18 + TypeScript (strict)
-- Tailwind + Noircut design system (6 themes, localStorage persist)
-- Dexie.js v4 schema — 24 tables, all defined
-- React Router v6 with AppShell layout
+- Vite 5 + React 18 + TypeScript strict, Tailwind + CSS custom properties
+- Dexie v4 — 24 tables, schema version 4. Non-indexed fields (`rpe`, `isAmrap`)
+  were added without a version bump; only indexes are versioned.
+- 6 themes (violet default, plus Daylight, crimson, void, steel, ember)
 - PWA: service worker, manifest, offline-first
-- GitHub Pages deploy via GitHub Actions
-- Vitest — 44 passing unit tests
+- GitHub Pages deploy on every push to main, with the tests gating it
+- **669 tests**, `src/lib` at 85% of statements
 
-### Dashboard
-- Daily check-in modal (mood, energy, soreness, forearm fatigue)
-- Weekly volume chart
-- Progressive overload chart
-- Macro compliance chart
-- Drum practice pie chart
+### Train
+- 2–6 day week, set in Settings. Day N is the week's Nth logged session, and
+  the number is derived from the date every time — backdating a session
+  renumbers the week rather than leaving two claiming the same number. The
+  stored `dayLabel` is an opaque key, not the number on screen.
+- Three day templates (Pull/Legs/Arms, Zercher/Quad/Shoulders, Posterior/Delts)
+  load as a starting point; slots beyond them start empty.
+- Set-by-set logging, drag-to-reorder, swap, add from a 95-exercise library
+- Session RPE, and a per-set AMRAP flag that drives the 5/3/1 training max
+- Tabs: Program · History · Tools. The open tab lives in the URL.
 
-### Workout
-- Full session logging (set-by-set: weight, reps, warmup)
-- 3-day program (Push / Pull / Legs)
-- 50+ exercise library
-- Drag-to-reorder exercises within session
-- Add exercises from library mid-session
-- Progressive overload tracking + session history
+### Progress
+Three views, in the URL as `?view=`: **Strength · Body · Workload**. Closed
+views stay mounted and are hidden only on screen, so Print still captures the
+whole page.
 
-### Drum Studio
-- Practice session timer with focus area tagging
-- 39 PAS rudiments with notation viewer
-- Song library CRUD (status: learning / ready / performed)
-- Jam session scheduler
-- Drum book library — 11 books pre-seeded on first load (meta guard)
-- PDF upload + viewer (page nav, invert mode)
-- navigator.storage.persist()
+- **Lift trend** — Est. 1RM, top set, ×BW, or % change; 8 weeks / 6 months /
+  all; one lift or every lift
+- SBD total, DOTS, strength standards, PRs, recent breaks, lift balance
+- **Weight check** — weigh-in log, smoothed trend, read against a goal you set,
+  and strength against bodyweight
+- Load & recovery (ACWR), sets per muscle against MEV/MAV/MRV, weekly tonnage,
+  plan vs actual, progression ladders
+- Print to PDF through the browser's own dialog
 
-### Yoga
-- 30-day challenge tracker
-- 38 animated pose SVGs (line/circle elements — rewrite pending)
-- Breathing timer (box, 4-7-8, etc.)
-- Custom sequence builder + timed player
+### Everything else
+Drums (timer, 39 rudiments, songs, jams, book library, PDF viewer), Calendar,
+Meetings, Projects kanban, Settings (themes, profile, storage, backup).
 
-### Ayurveda
-- Pitta dosha profile
-- Daily dinacharya checklist (morning + evening)
-- Auto-reset per day, history persisted to Dexie (ayurvedaLogs)
-- Seasonal remedies (static)
-
-### Vedic Remedies
-- Planetary remedy log
-- Mantra tracking with count
-
-### Calendar
-- Monthly grid with event dots
-- Day detail sheet (view + add from same sheet)
-- Add event: title, date, time, category, notes
-- Full Dexie CRUD
-
-### Meetings
-- Meeting log: title, date, time, agenda, notes
-- Status cycling: open → in-progress → done
-- Full Dexie CRUD
-
-### Projects (Kanban)
-- Board creation (work / creative / personal / courses)
-- Tasks: Todo / In Progress / Done columns
-- Priority (low / medium / high), due dates, notes
-- Drag-and-drop via @dnd-kit
-
-### Settings
-- 6-theme switcher
-- User profile (Ayurvedic + astrological)
-- Live storage usage (used / quota / persisted)
-- Image cache management
+### Data
+- **JSON export and import** — every table plus weigh-ins, goal, name and
+  dosha. Import validates the whole file before writing anything, merges day
+  sessions on profile+date+day, and fills gaps in personal settings without
+  overwriting what is already there.
+- Imported workouts are adopted into this device's profile.
 
 ---
 
-## ❌ Remaining
+## Known and deliberate
 
-### Deferred — agreed to skip for now
-- Yoga pose animation rewrite (Axis-Master rect-limb SVGs, 38 poses)
-- Streaks (daily/weekly habit streaks across modules)
-- Focus timer (Pomodoro-style)
-- Weekly review screen
-- Global search
-- Data export (JSON backup)
-- Progress photos
-- Analytics (decided: external tool)
+- **The bar counts.** Sets are logged as plates; 45 lb is added wherever load is
+  computed, for 17 bar-loaded lifts. Stored values are never rewritten, so it
+  cannot be applied twice.
+- **Bodyweight is in strength, not in records.** A weighted pull-up PR reads
+  "25 lb × 5" — what went on the belt — while its estimated 1RM includes the
+  lifter.
+- **Silence over invention.** ×BW with no weigh-in, ACWR under three rated
+  sessions, a trend under two points: each says so rather than showing a number.
+- Retired second-profile sessions stay in the database and in backups, matched
+  by nothing, so they neither display nor count.
 
-### Partially built — UI incomplete
+---
+
+## Remaining
+
+### Untested
+`axis-master.ts` (169 lines) and `metronome.ts` have no tests. `src/pages` sits
+at 0% — several findings from the last review land there.
+
+### Partially built
 | Area | What's missing |
 |---|---|
-| Nutrition | Meal logging, saved meals, daily log history (schema exists, UI is stub) |
-| Meetings | Action items UI (table exists in Dexie, not surfaced) |
-| Calendar | Week / day view (tabs exist, only month view renders) |
-| Projects | Live task count on board list cards (shows 0) |
-| Vedic | Needs refinement / fuller logging UI |
+| Nutrition | Meal logging UI is a stub; flag-hidden |
+| Meetings | Action items table exists in Dexie, not surfaced |
+| Calendar | Week / day tabs exist, only month renders |
+| Projects | Board cards show a task count of 0 |
 
-### Infrastructure
-- SSH key auth (currently using token per push)
-- Native iOS App Store (needs Capacitor wrapper)
+### Deferred
+Yoga pose animation rewrite, streaks, focus timer, weekly review, global search,
+progress photos, analytics (external tool).
+
+### Traps worth knowing
+- `exercise-motions-data.ts` type-imports from `exercise-motions.ts`, which
+  value-imports the data back. Safe only because that import is `import type`.
+- `epley1RM` exists twice with different units — `progress.ts` in kg,
+  `strengthTools.ts` in lb. Correct today, easy to import the wrong one.
+- Tools has both a route and a Train tab, the same duplication the Progress tab
+  had before it was removed.
