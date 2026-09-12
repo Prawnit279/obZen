@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import type { ReactNode } from 'react'
 import { useSearchParams } from 'react-router-dom'
 import { useLiveQuery } from 'dexie-react-hooks'
@@ -6,6 +7,7 @@ import type { WorkoutDaySession } from '@/db/dexie'
 import { belongsToProfile, sessionHasActivity } from '@/lib/workoutSession'
 import { useProfileStore } from '@/store/useProfileStore'
 import { useProgressStore } from '@/store/useProgressStore'
+import { weightTrend } from '@/lib/bodyweight'
 import { PROFILES } from '@/config/profiles'
 import {
   EXERCISE_LIBRARY, toExerciseId, COMPETITION_LIFT_IDS, libraryFor, exerciseNameFor, getScheduledDay,
@@ -17,6 +19,7 @@ import {
 import { todayISO } from '@/lib/utils'
 import { Card } from '@/components/ui/Card'
 import { SegmentedPill } from '@/components/ui/SegmentedPill'
+import { LiftTrendCard } from './LiftTrendCard'
 import { LineChart, BarChart, ChartEmpty, liftHue } from './Charts'
 import {
   liftSignals, prFeed, sessionLoads, acwr, deloadAdvice, adherence, liftBalance,
@@ -24,7 +27,7 @@ import {
 import { tmAdvice } from '@/lib/amrap'
 import { muscleReadings } from '@/lib/muscleVolume'
 import { Stat } from './Stat'
-import { TrendRates, StallCard } from './TrendCards'
+import { StallCard } from './TrendCards'
 import { LoadCard } from './LoadCard'
 import { AdherenceCard } from './AdherenceCard'
 import { BalanceCard } from './BalanceCard'
@@ -32,6 +35,9 @@ import { ProgressionLadder } from './ProgressionLadder'
 import { AmrapCard } from './AmrapCard'
 import { MuscleVolumeCard } from './MuscleVolumeCard'
 import { WeightCheckCard } from './WeightCheckCard'
+
+/** Shared so the store selector returns a stable reference when empty. */
+const NO_WEIGH_INS: never[] = []
 
 const CARD = { background: 'var(--card)', border: '1px solid var(--hairline)' } as const
 
@@ -94,6 +100,9 @@ export function WorkoutProgress() {
   const cfg = profile.progress
   const latestBodyweight = useProgressStore(s => s.latestBodyweight)
   const bodyweightKg = latestBodyweight(activeId) ?? profile.body.bodyweightKg ?? 0
+  // The smoothed weigh-in history, so a lift can be read per pound of lifter.
+  const weighIns = useProgressStore(s => s.bodyweight[activeId] ?? NO_WEIGH_INS)
+  const bodyTrend = useMemo(() => weightTrend(weighIns), [weighIns])
 
   const sessions = useLiveQuery<WorkoutDaySession[]>(
     () => db.workoutDaySessions.orderBy('date').toArray(),
@@ -238,16 +247,14 @@ export function WorkoutProgress() {
       />
 
       <Panel view="strength" open={view}>
-      {/* ── e1RM trend ─────────────────────────────────────────────────── */}
-      <Card label="Estimated 1RM trend">
-        <LineChart
-          series={keyLifts
-            .filter(l => l.series.length > 0)
-            .map(l => ({ label: l.name, points: l.series.map(p => ({ date: p.date, value: kgToLb(p.e1rm) })) }))}
-          yLabel="Estimated 1RM in pounds"
-        />
-        <TrendRates signals={signals} />
-      </Card>
+      {/* ── Lift trend, however you want to read it ────────────────────── */}
+      <LiftTrendCard
+        sessions={mine}
+        lifts={keyLifts.map(l => ({ id: l.id, name: l.name }))}
+        trend={bodyTrend}
+        signals={signals}
+        todayISO={todayISO()}
+      />
 
       {/* ── Lifts that have stopped moving ─────────────────────────────── */}
       {stalled.length > 0 && <StallCard signals={stalled} />}

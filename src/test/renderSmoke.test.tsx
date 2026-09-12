@@ -50,7 +50,7 @@ async function seedSession(profileId: string, date: string) {
 
 /** useLiveQuery resolves asynchronously — wait for the view to leave "Loading…". */
 async function waitForData() {
-  await screen.findByText(/estimated 1rm trend|no training logged yet/i, {}, { timeout: 3000 })
+  await screen.findByText(/lift trend|no training logged yet/i, {}, { timeout: 3000 })
 }
 
 beforeEach(async () => {
