@@ -11,15 +11,18 @@ import { WeightCheckCard } from '@/components/modules/workout/progress/WeightChe
 import { WeightGoalPicker } from '@/components/modules/workout/progress/WeightGoalPicker'
 import { CheckInModal } from '@/components/modules/dashboard/CheckInModal'
 import { useProgressStore } from '@/store/useProgressStore'
-import { useProfileSettingsStore } from '@/store/useProfileSettingsStore'
+import { useProfileSettingsStore, PROFILE_SETTINGS_DEFAULTS } from '@/store/useProfileSettingsStore'
 import { PROFILE_ID } from '@/config/profiles'
 import { lbToKg, kgToLb } from '@/lib/progress'
 import { todayISO } from '@/lib/utils'
 import type { WeightGoal } from '@/lib/bodyweight'
 
+/** The real store action, so a test that replaces it cannot leak into the next. */
+const REAL_LOG_BODYWEIGHT = useProgressStore.getState().logBodyweight
+
 beforeEach(async () => {
   localStorage.clear()
-  useProgressStore.setState({ rungs: {}, bodyweight: {} })
+  useProgressStore.setState({ rungs: {}, bodyweight: {}, logBodyweight: REAL_LOG_BODYWEIGHT })
   useProfileSettingsStore.getState().reset()
   await db.delete()
   await db.open()
@@ -345,5 +348,89 @@ describe('on the Progress screen', () => {
 
     expect(await screen.findByText(/no training logged yet/i)).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: /weight check/i })).toBeInTheDocument()
+  })
+})
+
+// ── What comes back out of storage ───────────────────────────────────────────
+
+describe('the stored goal', () => {
+  async function rehydrateWith(state: unknown) {
+    localStorage.setItem('obzen-profile-settings', JSON.stringify({ state, version: 0 }))
+    await useProfileSettingsStore.persist.rehydrate()
+  }
+
+  it('keeps a goal the app could have written', async () => {
+    await rehydrateWith({ name: 'Sam', dosha: 'Vata', weightGoal: { direction: 'lose', pace: 'steady' } })
+    expect(useProfileSettingsStore.getState().weightGoal).toEqual({ direction: 'lose', pace: 'steady' })
+  })
+
+  it('drops a goal it could not have, instead of carrying it into the maths', async () => {
+    // `readWeight` indexes the pace bands by direction and pace; a half-formed
+    // goal would throw there rather than simply reading oddly.
+    await rehydrateWith({ name: 'Sam', weightGoal: { direction: 'gain' } })
+    const s = useProfileSettingsStore.getState()
+    expect(s.weightGoal).toBeNull()
+    expect(s.name).toBe('Sam')   // the rest of the settings still come back
+  })
+
+  it('falls back on a dosha or a blank name that storage should not contain', async () => {
+    await rehydrateWith({ name: '   ', dosha: 'Fire', weightGoal: null })
+    const s = useProfileSettingsStore.getState()
+    expect(s.name).toBe(PROFILE_SETTINGS_DEFAULTS.name)
+    expect(s.dosha).toBe(PROFILE_SETTINGS_DEFAULTS.dosha)
+  })
+})
+
+// ── When a write fails ───────────────────────────────────────────────────────
+
+describe('storage failures are reported, not swallowed', () => {
+  /** Replace the store's writer with one that refuses, as a full quota would. */
+  function breakLogging() {
+    useProgressStore.setState({
+      logBodyweight: () => { throw new Error('QuotaExceededError') },
+    })
+  }
+
+  it('says so when a weigh-in cannot be saved from Progress', async () => {
+    const user = userEvent.setup()
+    breakLogging()
+    card()
+    await user.type(screen.getByLabelText(/today's bodyweight in pounds/i), '166')
+    await user.click(screen.getByRole('button', { name: /^log$/i }))
+
+    expect(screen.getByRole('alert')).toHaveTextContent(/could not save that weigh-in/i)
+  })
+
+  it('does not report a check-in as saved when the database refused it', async () => {
+    const user = userEvent.setup()
+    await db.close()   // every Dexie write from here on rejects
+    render(<CheckInModal open onClose={vi.fn()} onSaved={vi.fn()} />)
+    await user.click(screen.getByRole('button', { name: /save check-in/i }))
+
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(/nothing was recorded/i))
+    // And the button comes back, rather than reading "Saving…" for good.
+    expect(screen.getByRole('button', { name: /save check-in/i })).toBeEnabled()
+    await db.open()
+  })
+
+  it('says the check-in saved but the weight did not, when only the weight fails', async () => {
+    const user = userEvent.setup()
+    breakLogging()
+    render(<CheckInModal open onClose={vi.fn()} onSaved={vi.fn()} />)
+    await user.type(screen.getByLabelText(/this morning's bodyweight/i), '166')
+    await user.click(screen.getByRole('button', { name: /save check-in/i }))
+
+    await waitFor(() => expect(screen.getByRole('alert')).toHaveTextContent(/check-in saved, but the weight/i))
+    expect(await db.checkIns.count()).toBe(1)   // the half that worked is not undone
+  })
+})
+
+describe('after a failure test has run', () => {
+  it('still logs normally, because the store action was restored', async () => {
+    const user = userEvent.setup()
+    card()
+    await user.type(screen.getByLabelText(/today's bodyweight in pounds/i), '164')
+    await user.click(screen.getByRole('button', { name: /^log$/i }))
+    expect(useProgressStore.getState().getBodyweight(PROFILE_ID)).toHaveLength(1)
   })
 })

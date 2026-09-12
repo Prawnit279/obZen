@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/Button'
 import { cn } from '@/lib/utils'
 import { useProfileStore } from '@/store/useProfileStore'
 import { useProgressStore } from '@/store/useProgressStore'
-import { parseWeighInLb, WEIGH_IN_LB } from '@/lib/bodyweight'
+import { parseLbToKg, WEIGH_IN_LB } from '@/lib/bodyweight'
 import { kgToLb } from '@/lib/progress'
 
 interface Props {
@@ -34,17 +34,19 @@ export function CheckInModal({ open, existing, onClose, onSaved }: Props) {
   const todays = useProgressStore(s => s.bodyweight[activeId]?.find(e => e.date === todayISO()))
   const [weight, setWeight] = useState(todays ? String(Math.round(kgToLb(todays.kg) * 10) / 10) : '')
   const [weightError, setWeightError] = useState<string | null>(null)
+  const [saveError, setSaveError] = useState<string | null>(null)
 
   const handleSave = async () => {
     // An unreadable weight stops the save rather than being dropped quietly —
     // otherwise the check-in would close looking saved while the weigh-in was lost.
     const typed = weight.trim()
-    const kg = typed === '' ? null : parseWeighInLb(typed)
+    const kg = typed === '' ? null : parseLbToKg(typed)
     if (typed !== '' && kg === null) {
       setWeightError(`Enter a weight between ${WEIGH_IN_LB.min} and ${WEIGH_IN_LB.max} lb, or leave it blank.`)
       return
     }
     setSaving(true)
+    setSaveError(null)
     const data: Omit<CheckIn, 'id'> = {
       date: todayISO(),
       mood,
@@ -53,8 +55,29 @@ export function CheckInModal({ open, existing, onClose, onSaved }: Props) {
       forearmFatigue,
       notes: notes || undefined,
     }
-    await saveCheckIn(data)
-    if (kg !== null) logBodyweight(activeId, todayISO(), kg)
+
+    // Two writes to two stores with no shared transaction, so they are reported
+    // separately. Left unguarded, a failure here left the button on "Saving…"
+    // for good with nothing said, and the weight could vanish while the
+    // check-in saved.
+    try {
+      await saveCheckIn(data)
+    } catch {
+      setSaveError('Could not save your check-in. Nothing was recorded — try again.')
+      setSaving(false)
+      return
+    }
+
+    if (kg !== null) {
+      try {
+        logBodyweight(activeId, todayISO(), kg)
+      } catch {
+        setSaveError('Check-in saved, but the weight could not be stored. You can log it from Progress.')
+        setSaving(false)
+        return
+      }
+    }
+
     onSaved(data as CheckIn)
     setSaving(false)
     onClose()
@@ -165,9 +188,14 @@ export function CheckInModal({ open, existing, onClose, onSaved }: Props) {
           />
         </div>
 
-        <Button variant="primary" fullWidth onClick={handleSave} disabled={saving}>
-          {saving ? 'Saving…' : 'Save Check-in'}
-        </Button>
+        <div className="space-y-2">
+          {saveError && (
+            <p role="alert" className="text-[12px]" style={{ color: 'var(--red)' }}>{saveError}</p>
+          )}
+          <Button variant="primary" fullWidth onClick={handleSave} disabled={saving}>
+            {saving ? 'Saving…' : 'Save Check-in'}
+          </Button>
+        </div>
       </div>
     </Modal>
   )

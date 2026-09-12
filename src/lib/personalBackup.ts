@@ -16,7 +16,7 @@ import { DOSHAS } from '@/data/doshas'
 import type { Dosha } from '@/data/doshas'
 import { useProgressStore } from '@/store/useProgressStore'
 import { useProfileSettingsStore, PROFILE_SETTINGS_DEFAULTS } from '@/store/useProfileSettingsStore'
-import { WEIGH_IN_LB } from '@/lib/bodyweight'
+import { WEIGH_IN_LB, isWeightGoal } from '@/lib/bodyweight'
 import type { WeighIn, WeightGoal } from '@/lib/bodyweight'
 import { lbToKg } from '@/lib/progress'
 
@@ -36,6 +36,20 @@ const MAX_RUNG = 50
 const MAX_NAME = 60
 const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/
 
+/**
+ * A date that both looks right and exists.
+ *
+ * `Date.parse` is not a calendar check: it rolls 2026-02-30 forward to March 2
+ * rather than rejecting it. The row would then be stored as the February string
+ * it claims to be, sorted as February, and have its day gaps measured as March.
+ * Round-tripping the parsed date catches exactly that.
+ */
+function isCalendarDate(date: string): boolean {
+  if (!ISO_DATE.test(date)) return false
+  const parsed = new Date(`${date}T00:00:00Z`)
+  return !Number.isNaN(parsed.getTime()) && parsed.toISOString().slice(0, 10) === date
+}
+
 // ── Collect ──────────────────────────────────────────────────────────────────
 
 export function collectPersonal(): PersonalSection {
@@ -52,13 +66,6 @@ export function collectPersonal(): PersonalSection {
 
 function isPlainObject(v: unknown): v is Record<string, unknown> {
   return typeof v === 'object' && v !== null && !Array.isArray(v)
-}
-
-function isWeightGoal(v: unknown): v is WeightGoal {
-  if (!isPlainObject(v)) return false
-  if (v.direction === 'maintain') return true
-  return (v.direction === 'gain' || v.direction === 'lose')
-    && (v.pace === 'gentle' || v.pace === 'steady')
 }
 
 /**
@@ -78,18 +85,24 @@ export function validatePersonal(raw: unknown): PersonalSection {
     if (!Array.isArray(raw.bodyweight)) throw new Error('"personal.bodyweight" must be an array.')
     const minKg = lbToKg(WEIGH_IN_LB.min)
     const maxKg = lbToKg(WEIGH_IN_LB.max)
-    out.bodyweight = raw.bodyweight.map((row: unknown, i: number) => {
+    const rows = raw.bodyweight.map((row: unknown, i: number) => {
       const at = `personal.bodyweight[${i}]`
       if (!isPlainObject(row)) throw new Error(`"${at}" must be an object.`)
       const { date, kg } = row
-      if (typeof date !== 'string' || !ISO_DATE.test(date) || Number.isNaN(Date.parse(date))) {
-        throw new Error(`"${at}.date" must be a date like 2026-09-10.`)
+      if (typeof date !== 'string' || !isCalendarDate(date)) {
+        throw new Error(`"${at}.date" must be a real date like 2026-09-10.`)
       }
       if (typeof kg !== 'number' || !Number.isFinite(kg) || kg < minKg || kg > maxKg) {
         throw new Error(`"${at}.kg" must be a bodyweight between ${WEIGH_IN_LB.min} and ${WEIGH_IN_LB.max} lb.`)
       }
       return { date, kg }
     })
+    // A file can carry the same day twice — two exports concatenated by hand,
+    // say. On the device, logging a day again overwrites it, so the later row
+    // wins here too rather than the log gaining a duplicate it cannot get any
+    // other way.
+    const byDate = new Map(rows.map(r => [r.date, r]))
+    out.bodyweight = [...byDate.values()].sort((a, b) => a.date.localeCompare(b.date))
   }
 
   if (raw.ladderRungs !== undefined) {

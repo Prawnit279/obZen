@@ -12,7 +12,7 @@
  * pounds at the edge.
  */
 import type { WorkoutDaySession } from '@/db/dexie'
-import { e1rmSeries, kgToLb, lbToKg } from '@/lib/progress'
+import { bestE1RM, kgToLb, lbToKg } from '@/lib/progress'
 import { exerciseNameFor } from '@/data/obzen-program'
 
 export interface WeighIn {
@@ -45,8 +45,14 @@ const EPS = 1e-9
  */
 export const WEIGH_IN_LB = { min: 50, max: 700 } as const
 
-/** A typed weigh-in in pounds, returned in kilos, or null if it is not plausible. */
-export function parseWeighInLb(text: string): number | null {
+/**
+ * A weigh-in typed in pounds, returned in kilos — or null if it is not a
+ * plausible bodyweight.
+ *
+ * Named for both units on purpose. `parseLbToKg` read as though it returned
+ * pounds, which nothing in the type system would have contradicted.
+ */
+export function parseLbToKg(text: string): number | null {
   const trimmed = text.trim()
   if (trimmed === '') return null
   const lb = Number(trimmed)
@@ -198,6 +204,22 @@ const TONE: Record<WeightStatus, WeightTone> = {
   'wrong-way': 'off',
 }
 
+/**
+ * Whether an unknown value is a goal this app could have written.
+ *
+ * Lives here with the type because more than one boundary needs it: the backup
+ * importer checks a file, and the settings store checks what comes back out of
+ * localStorage. `readWeight` indexes `PACE_BANDS` by both fields, so a goal
+ * that only looks right would throw rather than degrade.
+ */
+export function isWeightGoal(value: unknown): value is WeightGoal {
+  if (typeof value !== 'object' || value === null) return false
+  const goal = value as { direction?: unknown; pace?: unknown }
+  if (goal.direction === 'maintain') return true
+  return (goal.direction === 'gain' || goal.direction === 'lose')
+    && (goal.pace === 'gentle' || goal.pace === 'steady')
+}
+
 /** The goal as a lifter would name it. */
 export function paceLabel(goal: WeightGoal): string {
   if (goal.direction === 'maintain') return 'Maintain'
@@ -308,7 +330,18 @@ export function strengthVsBodyweight(
   }
 
   const rows = liftIds.flatMap(id => {
-    const points = e1rmSeries(sessions, id, toPt.trendKg).filter(p => p.date <= toPt.date)
+    // Each session is priced at the bodyweight of its own day, not today's. For
+    // a lift that carries the lifter, using one weight for the whole window
+    // would rewrite the earlier figure to match the later one.
+    const points = sessions
+      .filter(s => s.date <= toPt.date)
+      .flatMap(s => {
+        const ex = s.exercises.find(e => e.exerciseId === id)
+        if (!ex) return []
+        const e1rm = bestE1RM(ex, trendAt(s.date))
+        return e1rm > 0 ? [{ date: s.date, e1rm }] : []
+      })
+      .sort((a, b) => a.date.localeCompare(b.date))
     if (points.length < 2) return []
 
     const before = points.filter(p => p.date <= fromPt.date)

@@ -98,6 +98,35 @@ describe('validatePersonal', () => {
     expect(() => validatePersonal({ profile: { name: '   ' } })).toThrow(/name/)
   })
 
+  it('rejects a date that never existed, however well shaped', () => {
+    // `Date.parse` does not reject these — it rolls 2026-02-30 forward to
+    // 2026-03-02. The row would then sort as February and compute its day gaps
+    // as March, so the trend's spacing and its ordering would disagree.
+    for (const date of ['2026-02-30', '2026-04-31', '2027-02-29']) {
+      expect(() => validatePersonal({ bodyweight: [{ date, kg: 75 }] }))
+        .toThrow(/personal\.bodyweight\[0\]\.date/)
+    }
+  })
+
+  it('still accepts a real leap day', () => {
+    expect(validatePersonal({ bodyweight: [{ date: '2028-02-29', kg: 75 }] }).bodyweight)
+      .toEqual([{ date: '2028-02-29', kg: 75 }])
+  })
+
+  it('keeps one entry per date when a file carries the same day twice', () => {
+    // Two exports concatenated by hand. On the device, logging the same day
+    // twice overwrites; an import must not be the one way to get duplicates.
+    const out = validatePersonal({ bodyweight: [
+      { date: '2026-09-01', kg: 75 },
+      { date: '2026-09-02', kg: 76 },
+      { date: '2026-09-01', kg: 80 },
+    ] })
+    expect(out.bodyweight).toEqual([
+      { date: '2026-09-01', kg: 80 },   // the later row wins, as re-logging does
+      { date: '2026-09-02', kg: 76 },
+    ])
+  })
+
   it('rejects a ladder rung that is not a small whole number', () => {
     expect(() => validatePersonal({ ladderRungs: { 'pronit::x': -1 } })).toThrow(/ladderRungs/)
     expect(() => validatePersonal({ ladderRungs: { 'pronit::x': 1.5 } })).toThrow(/ladderRungs/)
@@ -157,6 +186,13 @@ describe('restorePersonal', () => {
     })
     expect(progress().getRung(PROFILE_ID, 'assisted-pull-up')).toBe(4)
     expect(progress().getRung(PROFILE_ID, 'assisted-dip')).toBe(2)
+  })
+
+  it('does not double-log a date the file repeated', () => {
+    restorePersonal(validatePersonal({ bodyweight: [
+      { date: '2026-09-01', kg: 75 }, { date: '2026-09-01', kg: 80 },
+    ] }))
+    expect(progress().getBodyweight(PROFILE_ID)).toEqual([{ date: '2026-09-01', kg: 80 }])
   })
 
   it('reports nothing restored when there was nothing new', () => {
@@ -239,5 +275,27 @@ describe('a backup, end to end', () => {
     expect(progress().getBodyweight(PROFILE_ID).map(e => e.date)).toEqual(['2026-09-01', '2026-09-08'])
     expect(settings().weightGoal).toEqual({ direction: 'gain', pace: 'gentle' })
     expect(settings().name).toBe('Sam')
+  })
+})
+
+describe('when storage refuses the personal half', () => {
+  it('says the workouts landed rather than reporting a total failure', async () => {
+    // Restore runs after the database transaction commits, so "it failed" would
+    // be untrue — the workouts are already in.
+    const real = useProgressStore.getState().logBodyweight
+    useProgressStore.setState({
+      logBodyweight: () => { throw new Error('QuotaExceededError') },
+    })
+    // setState itself is what throws in the real failure, so break that instead.
+    const setState = useProgressStore.setState
+    useProgressStore.setState = (() => { throw new Error('QuotaExceededError') }) as typeof setState
+
+    try {
+      await expect(importAllDataFromJSON(backupFile({ bodyweight: [{ date: '2026-09-01', kg: 75 }] })))
+        .rejects.toThrow(/workouts were imported/i)
+    } finally {
+      useProgressStore.setState = setState
+      useProgressStore.setState({ logBodyweight: real })
+    }
   })
 })

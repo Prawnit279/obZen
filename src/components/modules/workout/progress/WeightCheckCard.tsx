@@ -4,7 +4,7 @@ import type { ProfileId } from '@/config/profiles'
 import { useProgressStore } from '@/store/useProgressStore'
 import { useProfileSettingsStore } from '@/store/useProfileSettingsStore'
 import {
-  weightTrend, weeklyRateKg, readWeight, paceLabel, strengthVsBodyweight, parseWeighInLb,
+  weightTrend, weeklyRateKg, readWeight, paceLabel, strengthVsBodyweight, parseLbToKg,
   MIN_READINGS_FOR_RATE, MIN_SPAN_DAYS_FOR_RATE, WEIGH_IN_LB,
 } from '@/lib/bodyweight'
 import type { WeightTone, StrengthVsBodyweight } from '@/lib/bodyweight'
@@ -65,12 +65,19 @@ export function WeightCheckCard({ profileId, sessions, keyLiftIds, fallbackKg }:
   const askingForGoal = !goal || editing
 
   const submit = () => {
-    const kg = parseWeighInLb(value)
+    const kg = parseLbToKg(value)
     if (kg === null) {
       setError(`Enter a weight between ${WEIGH_IN_LB.min} and ${WEIGH_IN_LB.max} lb.`)
       return
     }
-    logBodyweight(profileId, todayISO(), kg)
+    try {
+      logBodyweight(profileId, todayISO(), kg)
+    } catch {
+      // Storage can refuse a write — a full quota, most likely. Saying so beats
+      // a Log button that appears to do nothing at all.
+      setError('Could not save that weigh-in. Your device may be out of storage.')
+      return
+    }
     setValue('')
     setError(null)
   }

@@ -453,8 +453,21 @@ export async function importAllDataFromJSON(file: File): Promise<ImportResult> {
     // drumPDFs and cachedImages intentionally skipped — see JSDoc above
   })
 
-  // After the database commits, so a failed import leaves these untouched too.
-  if (personal) total += restorePersonal(personal)
+  // After the database commits, so a failed database import leaves these
+  // untouched too. The reverse is not symmetrical: by the time this runs the
+  // tables are already written, so if storage refuses these the error has to
+  // say what did land rather than reading as "nothing happened".
+  if (personal) {
+    try {
+      total += restorePersonal(personal)
+    } catch {
+      throw new Error(
+        'Your workouts were imported, but your weigh-ins and settings could not be '
+        + 'restored — this device may be out of storage. Importing the file again '
+        + 'once there is room will finish the job.'
+      )
+    }
+  }
 
   return { totalRecords: total, exportDate: metadata.exportDate }
 }

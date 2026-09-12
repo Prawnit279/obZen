@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import type { WorkoutDaySession, LoggedSet } from '@/db/dexie'
 import {
-  weightTrend, weeklyRateKg, readWeight, paceLabel, strengthVsBodyweight, parseWeighInLb,
+  weightTrend, weeklyRateKg, readWeight, paceLabel, strengthVsBodyweight, parseLbToKg,
   TREND_ALPHA_PER_DAY, PACE_BANDS, MAINTAIN_BAND_PCT, SEED_READINGS, SEED_WINDOW_DAYS,
   MIN_READINGS_FOR_RATE, RATE_WINDOW_DAYS, WEIGH_IN_LB,
 } from '@/lib/bodyweight'
@@ -267,6 +267,26 @@ describe('strengthVsBodyweight', () => {
     expect(kgToLb(row.toKg - row.fromKg)).toBeCloseTo(30, 0)
   })
 
+  it('weighs each session against the bodyweight of its own day', () => {
+    // Weighted pull-ups carry the lifter, so their estimated max depends on
+    // what the lifter weighed that day. Using today's weight for a session six
+    // weeks ago silently rewrites the "before" figure.
+    const losing = weightTrend(
+      Array.from({ length: 6 }, (_, i) => ({ date: day(i * 7), kg: lbToKg(200 - i * 4) }))
+    )
+    const sessions = [
+      session(day(0), 'weighted-pull-ups', 25, 1),
+      session(day(35), 'weighted-pull-ups', 25, 1),
+    ]
+    const [row] = strengthVsBodyweight(sessions, ['weighted-pull-ups'], losing)!.rows
+
+    // Same 25 lb belt on both days, but about 20 lb lighter a lifter by the end,
+    // so the load actually moved fell by roughly that much. Priced at a single
+    // bodyweight the two figures would come out identical.
+    expect(kgToLb(row.fromKg)).toBeCloseTo(225, 0)   // 25 lb belt + 200 lb lifter
+    expect(kgToLb(row.fromKg) - kgToLb(row.toKg)).toBeGreaterThan(15)
+  })
+
   it('keeps the lifts in the order they were asked for', () => {
     const sessions = [
       session(day(0), 'bench-press', 185), session(day(35), 'bench-press', 195),
@@ -277,29 +297,29 @@ describe('strengthVsBodyweight', () => {
   })
 })
 
-// ── parseWeighInLb ───────────────────────────────────────────────────────────
+// ── parseLbToKg ───────────────────────────────────────────────────────────
 
-describe('parseWeighInLb', () => {
+describe('parseLbToKg', () => {
   it('reads a typed weight in pounds and returns kilos', () => {
-    expect(parseWeighInLb('165')).toBeCloseTo(lbToKg(165), 6)
-    expect(parseWeighInLb(' 165.4 ')).toBeCloseTo(lbToKg(165.4), 6)
+    expect(parseLbToKg('165')).toBeCloseTo(lbToKg(165), 6)
+    expect(parseLbToKg(' 165.4 ')).toBeCloseTo(lbToKg(165.4), 6)
   })
 
   it('refuses anything that is not a number', () => {
-    for (const text of ['', '   ', 'abc', '16o', 'NaN']) expect(parseWeighInLb(text)).toBeNull()
+    for (const text of ['', '   ', 'abc', '16o', 'NaN']) expect(parseLbToKg(text)).toBeNull()
   })
 
   it('refuses a slipped key rather than storing it', () => {
     // 1650 for 165 would drag the trend for a week.
-    expect(parseWeighInLb('1650')).toBeNull()
-    expect(parseWeighInLb('16.5')).toBeNull()
-    expect(parseWeighInLb('0')).toBeNull()
-    expect(parseWeighInLb('-165')).toBeNull()
+    expect(parseLbToKg('1650')).toBeNull()
+    expect(parseLbToKg('16.5')).toBeNull()
+    expect(parseLbToKg('0')).toBeNull()
+    expect(parseLbToKg('-165')).toBeNull()
   })
 
   it('accepts the ends of the plausible range', () => {
-    expect(parseWeighInLb(String(WEIGH_IN_LB.min))).not.toBeNull()
-    expect(parseWeighInLb(String(WEIGH_IN_LB.max))).not.toBeNull()
-    expect(parseWeighInLb(String(WEIGH_IN_LB.max + 1))).toBeNull()
+    expect(parseLbToKg(String(WEIGH_IN_LB.min))).not.toBeNull()
+    expect(parseLbToKg(String(WEIGH_IN_LB.max))).not.toBeNull()
+    expect(parseLbToKg(String(WEIGH_IN_LB.max + 1))).toBeNull()
   })
 })

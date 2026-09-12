@@ -1,7 +1,9 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 import { PROFILES, PROFILE_ID } from '@/config/profiles'
+import { DOSHAS } from '@/data/doshas'
 import type { Dosha } from '@/data/doshas'
+import { isWeightGoal } from '@/lib/bodyweight'
 import type { WeightGoal } from '@/lib/bodyweight'
 
 /**
@@ -56,7 +58,29 @@ export const useProfileSettingsStore = create<ProfileSettingsState>()(
       setWeightGoal: (weightGoal: WeightGoal | null) => set({ weightGoal }),
       reset: () => set({ ...PROFILE_SETTINGS_DEFAULTS }),
     }),
-    { name: 'obzen-profile-settings' }
+    {
+      name: 'obzen-profile-settings',
+      /**
+       * What comes back out of localStorage is not trusted.
+       *
+       * It survives app versions and can be edited by hand, and a goal that
+       * only looks right would throw inside `readWeight`, which indexes the
+       * pace bands by both of its fields. Anything unrecognised falls back to
+       * the default rather than reaching the maths.
+       */
+      merge: (persisted, current) => {
+        const saved = (persisted ?? {}) as Partial<ProfileSettingsState>
+        return {
+          ...current,
+          ...saved,
+          name: typeof saved.name === 'string' && saved.name.trim() !== ''
+            ? saved.name
+            : current.name,
+          dosha: DOSHAS.includes(saved.dosha as Dosha) ? (saved.dosha as Dosha) : current.dosha,
+          weightGoal: isWeightGoal(saved.weightGoal) ? saved.weightGoal : null,
+        }
+      },
+    }
   )
 )
 
