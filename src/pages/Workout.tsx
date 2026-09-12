@@ -10,7 +10,8 @@ import { suggestProgression } from '@/lib/progress'
 import type { ProgressionSuggestion } from '@/lib/progress'
 import { db } from '@/db/dexie'
 import { isoWeekKey } from '@/lib/progress'
-import { trainedDates } from '@/lib/trainingWeek'
+import { weekSlots } from '@/lib/trainingWeek'
+import type { DaySlot } from '@/lib/trainingWeek'
 import { useProfileSettingsStore } from '@/store/useProfileSettingsStore'
 import type { DayLabel } from '@/db/dexie'
 import { todayISO } from '@/lib/utils'
@@ -32,16 +33,6 @@ import { StrengthTools } from '@/components/modules/workout/tools/StrengthTools'
 type Tab = 'program' | 'history' | 'tools'
 
 const ALL_DAYS: DayLabel[] = ['Day 1', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6']
-
-/**
- * The day slots for a plan of `count` days.
- *
- * Never fewer than the days already trained this week: a setting must not be
- * the reason a logged session has nowhere to appear.
- */
-function daysFor(count: number, trainedThisWeek: number): DayLabel[] {
-  return ALL_DAYS.slice(0, Math.min(ALL_DAYS.length, Math.max(count, trainedThisWeek)))
-}
 const TODAY = todayISO()
 
 /**
@@ -383,7 +374,33 @@ export default function Workout() {
       .toArray(),
     [activeProfileId]
   )
-  const days = daysFor(trainingDays, trainedDates(thisWeek ?? [], isoWeekKey(TODAY)).length)
+  const slots = weekSlots(thisWeek ?? [], isoWeekKey(TODAY), trainingDays, TODAY)
+
+  /**
+   * The session a slot opens.
+   *
+   * A slot that has been trained opens that session by the key it was already
+   * stored under — the stored label is an identity, not the number on screen,
+   * so nothing has to be rewritten for the numbering to change. An untrained
+   * slot opens today, and every untrained slot opens the *same* today, because
+   * today can only be one training day however far down the list it is tapped.
+   */
+  const openSlot = (slot: DaySlot) => {
+    if (slot.session) {
+      setSelectedDay(slot.session.dayLabel)
+      setSessionDate(slot.session.date)
+      return
+    }
+    const next = Math.min(slots.filter(x => x.session).length + 1, ALL_DAYS.length)
+    setSelectedDay(`Day ${next}` as DayLabel)
+    setSessionDate(TODAY)
+  }
+
+  const isOpen = (slot: DaySlot) =>
+    slot.session
+      ? selectedDay === slot.session.dayLabel && sessionDate === slot.session.date
+      : slot.isToday && sessionDate === TODAY
+        && !slots.some(x => x.session?.dayLabel === selectedDay && x.session?.date === TODAY)
 
   const todayCheckIn = useLiveQuery(
     () => db.checkIns.where('date').equals(TODAY).first(),
@@ -452,24 +469,30 @@ export default function Workout() {
         <>
           {/* Day selector */}
           <div className="flex gap-2">
-            {days.map(day => (
+            {slots.map(slot => {
+              const open = isOpen(slot)
+              return (
               <button
-                key={day}
-                onClick={() => setSelectedDay(day)}
-                aria-pressed={selectedDay === day}
+                key={slot.day}
+                onClick={() => openSlot(slot)}
+                aria-pressed={open}
+                aria-label={`Day ${slot.day}${slot.session ? ', trained' : ', not yet trained'}`}
                 className="flex-1 uppercase transition-colors"
                 style={{
                   padding: '10px 0',
                   borderRadius: 'var(--r-control)',
                   fontSize: 11, fontWeight: 500, letterSpacing: '0.08em',
-                  border: `1px solid ${selectedDay === day ? 'rgba(167,139,250,0.45)' : 'var(--hairline)'}`,
-                  background: selectedDay === day ? 'rgba(139,92,246,0.14)' : 'transparent',
-                  color: selectedDay === day ? 'var(--ink)' : 'var(--ink-faint)',
+                  border: `1px solid ${open ? 'rgba(167,139,250,0.45)' : 'var(--hairline)'}`,
+                  background: open ? 'rgba(139,92,246,0.14)' : 'transparent',
+                  // A trained slot reads at full strength; one still to come is
+                  // dimmed, so the week's shape is legible without tapping it.
+                  color: open ? 'var(--ink)' : slot.session ? 'var(--ink-dim)' : 'var(--ink-ghost)',
                 }}
               >
-                {day}
+                Day {slot.day}
               </button>
-            ))}
+              )
+            })}
             <button
               onClick={() => setSelectedDay('Rest')}
               aria-pressed={selectedDay === 'Rest'}

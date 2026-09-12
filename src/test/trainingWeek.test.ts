@@ -8,7 +8,7 @@
 import { describe, it, expect } from 'vitest'
 import type { WorkoutDaySession, LoggedSet } from '@/db/dexie'
 import {
-  trainedDates, dayNumberFor, weekSlots,
+  trainedDates, weekSessions, dayNumberFor, weekSlots,
   isTrainingDays, TRAINING_DAY_CHOICES, DEFAULT_TRAINING_DAYS,
 } from '@/lib/trainingWeek'
 import { isoWeekKey } from '@/lib/progress'
@@ -58,6 +58,14 @@ describe('trainedDates', () => {
     expect(trainedDates([logged(MON), logged(MON)], WEEK)).toEqual([MON])
   })
 
+  it('keeps both of a genuine two-a-day, in a stable order', () => {
+    // Same date, different labels. Collapsing them would hide a session that
+    // happened; ordering them by label keeps the pair from swapping about.
+    const second = { ...logged(MON), dayLabel: 'Day 2' as const }
+    const week = weekSessions([second, logged(MON)], WEEK)
+    expect(week.map(s => s.dayLabel)).toEqual(['Day 1', 'Day 2'])
+  })
+
   it('is empty for a week with no training', () => {
     expect(trainedDates([], WEEK)).toEqual([])
   })
@@ -99,19 +107,19 @@ describe('weekSlots', () => {
     const slots = weekSlots([logged(MON), logged(WED)], WEEK, 3, WED)
 
     expect(slots.map(s => s.day)).toEqual([1, 2, 3])
-    expect(slots.map(s => s.date)).toEqual([MON, WED, null])
+    expect(slots.map(s => s.session?.date ?? null)).toEqual([MON, WED, null])
   })
 
   it('marks the slot a session logged today would land in', () => {
     const slots = weekSlots([logged(MON)], WEEK, 3, WED)
     expect(slots.find(s => s.isToday)?.day).toBe(2)
-    expect(slots.find(s => s.isToday)?.date).toBeNull()
+    expect(slots.find(s => s.isToday)?.session).toBeNull()
   })
 
   it('marks today’s own slot once it has been logged', () => {
     const slots = weekSlots([logged(MON), logged(WED)], WEEK, 3, WED)
     expect(slots.find(s => s.isToday)?.day).toBe(2)
-    expect(slots.find(s => s.isToday)?.date).toBe(WED)
+    expect(slots.find(s => s.isToday)?.session?.date).toBe(WED)
   })
 
   it('grows past the plan rather than hiding a session that happened', () => {
@@ -121,13 +129,13 @@ describe('weekSlots', () => {
     const slots = weekSlots(sessions, WEEK, 3, THU)
 
     expect(slots).toHaveLength(4)
-    expect(slots[3].date).toBe(THU)
+    expect(slots[3].session?.date).toBe(THU)
   })
 
   it('shows the full plan before anything has been logged', () => {
     const slots = weekSlots([], WEEK, 5, MON)
     expect(slots).toHaveLength(5)
-    expect(slots.every(s => s.date === null)).toBe(true)
+    expect(slots.every(s => s.session === null)).toBe(true)
     expect(slots.find(s => s.isToday)?.day).toBe(1)
   })
 
