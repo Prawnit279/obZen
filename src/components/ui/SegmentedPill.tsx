@@ -67,7 +67,7 @@ export function SegmentedPill<T extends string | number>({
                 ? 'linear-gradient(140deg, var(--violet-400), var(--violet-900))'
                 : 'transparent',
               color: on ? 'var(--on-accent)' : 'var(--ink-faint)',
-              boxShadow: on ? '0 2px 14px rgba(76,29,149,0.6)' : 'none',
+              boxShadow: on ? '0 2px 14px rgb(var(--accent-deep-rgb) / 0.6)' : 'none',
             }}
           >
             {opt.label}

@@ -328,9 +328,9 @@ function AddBookSheet({ onClose, onSaved }: AddBookSheetProps) {
                     <button key={c} onClick={() => setCategory(c)}
                       className={cn('px-2.5 py-1 rounded-[var(--r-control)] text-[length:var(--text-sm)] uppercase tracking-widest transition-colors')}
                       style={{
-                        border: `1px solid ${category === c ? 'rgba(167,139,250,0.45)' : 'var(--hairline)'}`,
+                        border: `1px solid ${category === c ? 'rgb(var(--accent-soft-rgb) / 0.45)' : 'var(--hairline)'}`,
                         color: category === c ? 'var(--ink)' : 'var(--ink-faint)',
-                        background: category === c ? 'rgba(139,92,246,0.14)' : 'transparent',
+                        background: category === c ? 'rgb(var(--accent-rgb) / 0.14)' : 'transparent',
                       }}
                     >{c}</button>
                   ))}
@@ -657,9 +657,9 @@ export function DrumLibrary() {
             <button key={c} onClick={() => setCategoryFilter(c)}
               className={cn('px-2.5 py-1 rounded-[var(--r-control)] text-[length:var(--text-sm)] uppercase tracking-widest transition-colors')}
               style={{
-                border: `1px solid ${categoryFilter === c ? 'rgba(167,139,250,0.45)' : 'var(--hairline)'}`,
+                border: `1px solid ${categoryFilter === c ? 'rgb(var(--accent-soft-rgb) / 0.45)' : 'var(--hairline)'}`,
                 color: categoryFilter === c ? 'var(--ink)' : 'var(--ink-faint)',
-                background: categoryFilter === c ? 'rgba(139,92,246,0.14)' : 'transparent',
+                background: categoryFilter === c ? 'rgb(var(--accent-rgb) / 0.14)' : 'transparent',
               }}>
               {c}
             </button>

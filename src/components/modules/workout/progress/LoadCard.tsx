@@ -49,8 +49,8 @@ export function LoadCard({ load, deload, rated }: { load: Acwr; deload: DeloadAd
           className="flex flex-col"
           style={{
             gap: 4, padding: '12px 14px', borderRadius: 'var(--r-inset)',
-            border: `1px solid ${deload.recommend ? 'rgba(167,139,250,0.35)' : 'var(--hairline)'}`,
-            background: deload.recommend ? 'rgba(139,92,246,0.08)' : 'transparent',
+            border: `1px solid ${deload.recommend ? 'rgb(var(--accent-soft-rgb) / 0.35)' : 'var(--hairline)'}`,
+            background: deload.recommend ? 'rgb(var(--accent-rgb) / 0.08)' : 'transparent',
           }}
         >
           <span

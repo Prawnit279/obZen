@@ -160,11 +160,11 @@ function MetronomeTab() {
             fontSize: 'var(--text-base)', fontWeight: 700, letterSpacing: '0.04em',
             // Starting is the screen's primary action; stopping is a quieter
             // state, so it drops back to an outline rather than shouting twice.
-            border: isPlaying ? '1px solid rgba(167,139,250,0.45)' : 'none',
+            border: isPlaying ? '1px solid rgb(var(--accent-soft-rgb) / 0.45)' : 'none',
             background: isPlaying
-              ? 'rgba(139,92,246,0.14)'
+              ? 'rgb(var(--accent-rgb) / 0.14)'
               : 'linear-gradient(145deg, var(--violet-200), var(--violet-700))',
-            boxShadow: isPlaying ? 'none' : '0 8px 26px rgba(124,58,237,0.42)',
+            boxShadow: isPlaying ? 'none' : '0 8px 26px rgb(var(--accent-rgb) / 0.42)',
             color: isPlaying ? 'var(--ink)' : '#0A0810',
           }}
         >

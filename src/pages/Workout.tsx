@@ -111,8 +111,8 @@ function RpeScale({ value, onChange }: { value?: number; onChange: (rpe: number)
                 borderRadius: 'var(--r-control)',
                 fontSize: 'var(--text-sm)', fontWeight: 500,
                 fontVariantNumeric: 'tabular-nums',
-                border: `1px solid ${on ? 'rgba(167,139,250,0.45)' : 'var(--hairline)'}`,
-                background: on ? 'rgba(139,92,246,0.16)' : 'transparent',
+                border: `1px solid ${on ? 'rgb(var(--accent-soft-rgb) / 0.45)' : 'var(--hairline)'}`,
+                background: on ? 'rgb(var(--accent-rgb) / 0.16)' : 'transparent',
                 color: on ? 'var(--ink)' : 'var(--ink-faint)',
                 cursor: 'pointer',
               }}
@@ -241,7 +241,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
             style={{
               padding: '15px 0', border: 'none', cursor: 'pointer', borderRadius: 16,
               background: 'linear-gradient(145deg, var(--violet-200), var(--violet-700))',
-              boxShadow: '0 8px 26px rgba(124,58,237,0.42)',
+              boxShadow: '0 8px 26px rgb(var(--accent-rgb) / 0.42)',
               fontSize: 'var(--text-lg)', fontWeight: 700, letterSpacing: '0.02em', color: '#0A0810',
             }}
           >
@@ -482,8 +482,8 @@ export default function Workout() {
                   padding: '10px 0',
                   borderRadius: 'var(--r-control)',
                   fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.08em',
-                  border: `1px solid ${open ? 'rgba(167,139,250,0.45)' : 'var(--hairline)'}`,
-                  background: open ? 'rgba(139,92,246,0.14)' : 'transparent',
+                  border: `1px solid ${open ? 'rgb(var(--accent-soft-rgb) / 0.45)' : 'var(--hairline)'}`,
+                  background: open ? 'rgb(var(--accent-rgb) / 0.14)' : 'transparent',
                   // A trained slot reads at full strength; one still to come is
                   // dimmed, so the week's shape is legible without tapping it.
                   color: open ? 'var(--ink)' : slot.session ? 'var(--ink-dim)' : 'var(--ink-ghost)',
@@ -501,8 +501,8 @@ export default function Workout() {
                 padding: '10px 14px',
                 borderRadius: 'var(--r-control)',
                 fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.08em',
-                border: `1px solid ${selectedDay === 'Rest' ? 'rgba(167,139,250,0.45)' : 'var(--hairline)'}`,
-                background: selectedDay === 'Rest' ? 'rgba(139,92,246,0.14)' : 'transparent',
+                border: `1px solid ${selectedDay === 'Rest' ? 'rgb(var(--accent-soft-rgb) / 0.45)' : 'var(--hairline)'}`,
+                background: selectedDay === 'Rest' ? 'rgb(var(--accent-rgb) / 0.14)' : 'transparent',
                 color: selectedDay === 'Rest' ? 'var(--ink)' : 'var(--ink-faint)',
               }}
             >
@@ -521,7 +521,7 @@ export default function Workout() {
                 background: 'var(--card)',
                 // A past date is a deliberate, easy-to-miss state — the accent
                 // border is what makes it obvious the log is not for today.
-                border: `1px solid ${sessionDate === TODAY ? 'var(--hairline)' : 'rgba(167,139,250,0.45)'}`,
+                border: `1px solid ${sessionDate === TODAY ? 'var(--hairline)' : 'rgb(var(--accent-soft-rgb) / 0.45)'}`,
               }}
             >
               <label

@@ -1,5 +1,5 @@
 # obZen — Build Status
-Last updated: 2026-09-13 | SHA: 219bfb73
+Last updated: 2026-09-13 | SHA: 9290ef8a
 
 Local-first training and drum-practice PWA. One profile, one device, no
 account, no server. Everything lives in IndexedDB and localStorage, and a JSON
@@ -29,7 +29,14 @@ is also the source of fifteen library exercises, so it cannot simply be deleted.
 - Vite 5 + React 18 + TypeScript strict, Tailwind + CSS custom properties
 - Dexie v4 — 24 tables, schema version 4. Non-indexed fields (`rpe`, `isAmrap`)
   were added without a version bump; only indexes are versioned.
-- 6 themes (violet default, plus Daylight, crimson, void, steel, ember)
+- **14 themes**, nine dark and five light. A dark theme is `--bg`, six accent
+  steps and three accent channels, nothing more; the light themes share one
+  restatement of the whole token set and add only their own ramp. Four
+  families — Amethyst, Cobalt, Raspberry, Lagoon — exist in both modes.
+- Tinted surfaces mix from `--accent-rgb` / `--accent-soft-rgb` /
+  `--accent-deep-rgb` rather than literal violet rgba. Until they did, every
+  theme wore a violet wash: a selected day tab came out lavender in the blue
+  theme. No accent literal remains in `src`.
 - PWA: service worker, manifest, offline-first
 - GitHub Pages deploy on every push to main, with the tests gating it
 - **729 tests**, `src/lib` at 96% of statements
@@ -137,6 +144,8 @@ progress photos, analytics (external tool).
   The same shape now holds for `exercise-motions-extra.ts` and
   `exercise-guides-extra.ts`, which exist because their parents were at the
   file-size ceiling. Both tables are merged by the module that owns the types.
+- A new theme needs three accent channels as well as its ramp. Ship the ramp
+  alone and every tinted surface silently falls back to the violet in `:root`.
 - `epley1RM` exists twice with different units — `progress.ts` in kg,
   `strengthTools.ts` in lb. Correct today, easy to import the wrong one.
 - Tools has both a route and a Train tab, the same duplication the Progress tab

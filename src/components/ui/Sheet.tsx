@@ -64,7 +64,7 @@ export function Sheet({
         style={{
           maxHeight,
           borderRadius: '26px 26px 0 0',
-          borderTop: '1px solid rgba(167,139,250,0.22)',
+          borderTop: '1px solid rgb(var(--accent-soft-rgb) / 0.22)',
           background: 'linear-gradient(170deg, #191428 0%, #0D0B14 100%)',
           boxShadow: '0 -20px 60px rgba(0,0,0,0.6)',
         }}

@@ -534,8 +534,8 @@ export function BarChart({ data, unit = '' }: { data: BarDatum[]; unit?: string 
                     ? 'rgba(255,255,255,0.06)'
                     : on
                       ? 'linear-gradient(180deg, var(--violet-200), var(--violet-700))'
-                      : 'linear-gradient(180deg, rgba(167,139,250,0.33), rgba(91,33,182,0.40))',
-                  boxShadow: on ? '0 0 16px rgba(167,139,250,0.44)' : 'none',
+                      : 'linear-gradient(180deg, rgb(var(--accent-soft-rgb) / 0.33), rgb(var(--accent-deep-rgb) / 0.40))',
+                  boxShadow: on ? '0 0 16px rgb(var(--accent-soft-rgb) / 0.44)' : 'none',
                   transition: 'background var(--t-fast) ease',
                 }}
               />

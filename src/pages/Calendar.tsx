@@ -552,7 +552,7 @@ export default function Calendar() {
                       borderRadius: 'var(--r-control)',
                       // Today is ringed in the accent; a selected day is a
                       // quiet fill, so the two never compete.
-                      border: `1px solid ${isToday ? 'rgba(167,139,250,0.55)' : 'transparent'}`,
+                      border: `1px solid ${isToday ? 'rgb(var(--accent-soft-rgb) / 0.55)' : 'transparent'}`,
                       background: isSel && !isToday ? 'rgba(255,255,255,0.06)' : 'transparent',
                       color: isSat ? 'var(--ink-dim)' : 'var(--ink-2)',
                       fontVariantNumeric: 'tabular-nums',

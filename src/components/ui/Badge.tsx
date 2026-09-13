@@ -11,7 +11,7 @@ interface BadgeProps {
 
 const badgeVariants: Record<BadgeVariant, { border: string; color: string }> = {
   default: { border: 'rgba(255,255,255,0.13)', color: 'var(--ink-dim)' },
-  accent:  { border: 'rgba(167,139,250,0.34)', color: 'var(--violet-100)' },
+  accent:  { border: 'rgb(var(--accent-soft-rgb) / 0.34)', color: 'var(--violet-100)' },
   red:     { border: 'rgba(248,113,113,0.38)', color: 'var(--red)' },
   dim:     { border: 'var(--hairline)',        color: 'var(--ink-faint)' },
 }

@@ -148,7 +148,7 @@ export function ExerciseCard({
                     style={{
                       fontSize: 'var(--text-sm)', letterSpacing: '0.08em', padding: '2px 8px',
                       borderRadius: 'var(--r-pill)',
-                      color: 'var(--violet-100)', border: '1px solid rgba(167,139,250,0.35)',
+                      color: 'var(--violet-100)', border: '1px solid rgb(var(--accent-soft-rgb) / 0.35)',
                     }}
                   >
                     <Zap size={12} />
@@ -185,7 +185,7 @@ export function ExerciseCard({
                 <p
                   style={{
                     fontSize: 'var(--text-base)', lineHeight: 1.5, marginTop: 8, paddingLeft: 10,
-                    color: 'var(--ink-dim)', borderLeft: '2px solid rgba(167,139,250,0.35)',
+                    color: 'var(--ink-dim)', borderLeft: '2px solid rgb(var(--accent-soft-rgb) / 0.35)',
                   }}
                 >
                   {cue}

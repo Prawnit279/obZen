@@ -12,8 +12,8 @@ function Chips({ items, tone }: { items: string[]; tone: 'favor' | 'reduce' }) {
           style={{
             fontSize: 'var(--text-sm)', padding: '3px 9px', borderRadius: 'var(--r-pill)',
             color: tone === 'favor' ? 'var(--ink-2)' : 'var(--ink-dim)',
-            border: `1px solid ${tone === 'favor' ? 'rgba(167,139,250,0.35)' : 'var(--hairline)'}`,
-            background: tone === 'favor' ? 'rgba(139,92,246,0.08)' : 'transparent',
+            border: `1px solid ${tone === 'favor' ? 'rgb(var(--accent-soft-rgb) / 0.35)' : 'var(--hairline)'}`,
+            background: tone === 'favor' ? 'rgb(var(--accent-rgb) / 0.08)' : 'transparent',
           }}
         >
           {item}
@@ -65,7 +65,7 @@ export function DoshaGuidanceCard() {
           style={{
             fontSize: 'var(--text-md)', lineHeight: 1.5, color: 'var(--ink-dim)',
             padding: '10px 12px', borderRadius: 'var(--r-inset)',
-            border: '1px solid rgba(167,139,250,0.30)', background: 'rgba(139,92,246,0.07)',
+            border: '1px solid rgb(var(--accent-soft-rgb) / 0.30)', background: 'rgb(var(--accent-rgb) / 0.07)',
           }}
         >
           Watch for: {g.training.watchFor}

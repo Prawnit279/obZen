@@ -188,7 +188,7 @@ export default function Dashboard() {
                 className="flex items-start gap-2"
                 style={{
                   padding: '12px 14px', borderRadius: 'var(--r-inset)',
-                  border: '1px solid rgba(167,139,250,0.30)', background: 'rgba(139,92,246,0.07)',
+                  border: '1px solid rgb(var(--accent-soft-rgb) / 0.30)', background: 'rgb(var(--accent-rgb) / 0.07)',
                 }}
               >
                 <Zap size={14} style={{ color: 'var(--violet-100)' }} className="mt-0.5 shrink-0" />

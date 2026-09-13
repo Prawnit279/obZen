@@ -49,7 +49,7 @@ export function TrendRates({ signals }: { signals: LiftSignal[] }) {
  */
 export function StallCard({ signals }: { signals: LiftSignal[] }) {
   return (
-    <Card elevated style={{ border: '1px solid rgba(167,139,250,0.30)' }}>
+    <Card elevated style={{ border: '1px solid rgb(var(--accent-soft-rgb) / 0.30)' }}>
       <h3
         className="uppercase"
         style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em', color: 'var(--violet-100)' }}

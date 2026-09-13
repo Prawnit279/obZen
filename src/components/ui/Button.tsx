@@ -18,7 +18,7 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
  */
 const variantClasses: Record<Variant, string> = {
   default: 'border-[color:var(--hairline)] text-[color:var(--ink-2)] hover:border-[color:var(--border-strong)] hover:text-[color:var(--ink)] bg-transparent',
-  primary: 'border-transparent text-[#0A0810] bg-gradient-to-br from-[color:var(--violet-200)] to-[color:var(--violet-700)] shadow-[0_8px_26px_rgba(124,58,237,0.42)] active:scale-[0.98]',
+  primary: 'border-transparent text-[#0A0810] bg-gradient-to-br from-[color:var(--violet-200)] to-[color:var(--violet-700)] shadow-[0_8px_26px_rgb(var(--accent-rgb) / 0.42)] active:scale-[0.98]',
   ghost: 'border-transparent text-[color:var(--ink-dim)] hover:text-[color:var(--ink)] bg-transparent',
   danger: 'border-[color:var(--skip-border)] text-[color:var(--skip-text)] hover:bg-[color:var(--skip-bg)] bg-transparent',
 }

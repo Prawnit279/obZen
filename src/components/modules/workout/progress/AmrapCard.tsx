@@ -25,8 +25,8 @@ function AdviceRow({ advice }: { advice: TmAdvice }) {
       className="flex flex-col"
       style={{
         gap: 6, padding: '12px 14px', borderRadius: 'var(--r-inset)',
-        border: `1px solid ${advice.verdict === 'reset' ? 'rgba(167,139,250,0.35)' : 'var(--hairline)'}`,
-        background: advice.verdict === 'reset' ? 'rgba(139,92,246,0.08)' : 'transparent',
+        border: `1px solid ${advice.verdict === 'reset' ? 'rgb(var(--accent-soft-rgb) / 0.35)' : 'var(--hairline)'}`,
+        background: advice.verdict === 'reset' ? 'rgb(var(--accent-rgb) / 0.08)' : 'transparent',
       }}
     >
       <div className="flex items-baseline justify-between gap-2">
