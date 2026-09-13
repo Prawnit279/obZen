@@ -66,8 +66,8 @@ function NadiShodhanaAnim() {
         <ellipse className="ns-rn" cx="74" cy="65" rx="8" ry="5" />
         <path className="ns-lf" d="M38 80 Q30 95 38 105" fill="none" stroke="var(--accent)" strokeWidth="2" strokeDasharray="4,3" />
         <path className="ns-rf" d="M82 80 Q90 95 82 105" fill="none" stroke="var(--accent)" strokeWidth="2" strokeDasharray="4,3" />
-        <text x="38" y="120" textAnchor="middle" fontSize="8" fill="var(--dim)">LEFT</text>
-        <text x="82" y="120" textAnchor="middle" fontSize="8" fill="var(--dim)">RIGHT</text>
+        <text x="38" y="120" textAnchor="middle" style={{ fontSize: 'var(--text-sm)' }} fill="var(--dim)">LEFT</text>
+        <text x="82" y="120" textAnchor="middle" style={{ fontSize: 'var(--text-sm)' }} fill="var(--dim)">RIGHT</text>
       </svg>
       <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">6s cycle · alternating nostrils</div>
     </div>
@@ -86,7 +86,7 @@ function SheetaliAnim() {
         <path d="M80 44 Q88 40 90 45" fill="none" stroke="#0a0a0a" strokeWidth="1" />
         <path d="M92 44 L112 40" stroke="var(--dim)" strokeWidth="1.5" strokeDasharray="4,3" />
         <polygon points="110,36 116,40 110,44" fill="var(--dim)" />
-        <text x="96" y="34" fontSize="7" fill="var(--dim)">cool air</text>
+        <text x="96" y="34" style={{ fontSize: 'var(--text-xs)' }} fill="var(--dim)">cool air</text>
         <line x1="0" y1="115" x2="120" y2="115" stroke="var(--dim)" strokeWidth="1" />
       </svg>
       <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">static · inhale through rolled tongue</div>
@@ -135,8 +135,8 @@ function SoHumAnim() {
         `}</style>
         <circle className="sh-ring"   cx="60" cy="60" r="38" fill="var(--accent)" />
         <circle className="sh-circle" cx="60" cy="60" r="24" fill="var(--accent)" />
-        <text className="sh-so"  x="60" y="55" textAnchor="middle" fontSize="14" fill="var(--dim)" fontStyle="italic">So</text>
-        <text className="sh-hum" x="60" y="70" textAnchor="middle" fontSize="14" fill="var(--dim)" fontStyle="italic">Hum</text>
+        <text className="sh-so"  x="60" y="55" textAnchor="middle" style={{ fontSize: 'var(--text-2xl)' }} fill="var(--dim)" fontStyle="italic">So</text>
+        <text className="sh-hum" x="60" y="70" textAnchor="middle" style={{ fontSize: 'var(--text-2xl)' }} fill="var(--dim)" fontStyle="italic">Hum</text>
       </svg>
       <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">4s cycle · mantra on each breath</div>
     </div>
@@ -163,7 +163,7 @@ function UjjayiAnim() {
         {/* Breath waves emanating from throat */}
         <path className="uj-w1" d="M56 56 Q70 48 84 56 Q70 64 56 56" fill="var(--accent)" opacity=".7" />
         <path className="uj-w2" d="M56 60 Q72 50 88 60 Q72 70 56 60" fill="var(--muted)" opacity=".5" />
-        <text x="60" y="90" textAnchor="middle" fontSize="8" fill="var(--dim)">ocean sound</text>
+        <text x="60" y="90" textAnchor="middle" style={{ fontSize: 'var(--text-sm)' }} fill="var(--dim)">ocean sound</text>
         <line x1="0" y1="120" x2="120" y2="120" stroke="var(--dim)" strokeWidth="1" />
       </svg>
       <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">3s cycle · throat constriction</div>
@@ -205,10 +205,10 @@ function BoxBreathingAnim() {
           strokeLinejoin="round"
         />
         {/* Corner labels */}
-        <text x="60" y="26"  textAnchor="middle" fontSize="7" fill="var(--dim)">INHALE</text>
-        <text x="97" y="62"  textAnchor="start"  fontSize="7" fill="var(--dim)">HOLD</text>
-        <text x="60" y="103" textAnchor="middle" fontSize="7" fill="var(--dim)">EXHALE</text>
-        <text x="23" y="62"  textAnchor="end"    fontSize="7" fill="var(--dim)">HOLD</text>
+        <text x="60" y="26"  textAnchor="middle" style={{ fontSize: 'var(--text-xs)' }} fill="var(--dim)">INHALE</text>
+        <text x="97" y="62"  textAnchor="start"  style={{ fontSize: 'var(--text-xs)' }} fill="var(--dim)">HOLD</text>
+        <text x="60" y="103" textAnchor="middle" style={{ fontSize: 'var(--text-xs)' }} fill="var(--dim)">EXHALE</text>
+        <text x="23" y="62"  textAnchor="end"    style={{ fontSize: 'var(--text-xs)' }} fill="var(--dim)">HOLD</text>
       </svg>
       <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">16s cycle · 4 counts each side</div>
     </div>
@@ -253,8 +253,8 @@ function Breath478Anim() {
         {/* Animated arc */}
         <circle className="arc-478" cx="60" cy="60" r={R} fill="none" stroke="var(--accent)" strokeWidth="6" strokeLinecap="round" />
         {/* Center label */}
-        <text className="cnt-478" x="60" y="56" textAnchor="middle" fontSize="9" fill="var(--muted)">4 · 7 · 8</text>
-        <text x="60" y="68" textAnchor="middle" fontSize="7" fill="var(--dim)">breath</text>
+        <text className="cnt-478" x="60" y="56" textAnchor="middle" style={{ fontSize: 'var(--text-base)' }} fill="var(--muted)">4 · 7 · 8</text>
+        <text x="60" y="68" textAnchor="middle" style={{ fontSize: 'var(--text-xs)' }} fill="var(--dim)">breath</text>
       </svg>
       <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">19s cycle · inhale 4 · hold 7 · exhale 8</div>
     </div>
@@ -310,9 +310,9 @@ function SuryaBhedanaAnim() {
         <ellipse className="sb-ln" cx="46" cy="65" rx="8" ry="5" />
         {/* Right thumb blocking left nostril */}
         <circle className="sb-rf" cx="46" cy="65" r="5" fill="var(--dim)" opacity=".8" />
-        <text x="46" y="120" textAnchor="middle" fontSize="8" fill="var(--dim)">LEFT</text>
-        <text x="74" y="120" textAnchor="middle" fontSize="8" fill="var(--dim)">RIGHT</text>
-        <text x="60" y="108" textAnchor="middle" fontSize="7" fill="var(--dim)">☀ solar</text>
+        <text x="46" y="120" textAnchor="middle" style={{ fontSize: 'var(--text-sm)' }} fill="var(--dim)">LEFT</text>
+        <text x="74" y="120" textAnchor="middle" style={{ fontSize: 'var(--text-sm)' }} fill="var(--dim)">RIGHT</text>
+        <text x="60" y="108" textAnchor="middle" style={{ fontSize: 'var(--text-xs)' }} fill="var(--dim)">☀ solar</text>
       </svg>
       <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">6s cycle · right = solar · heating</div>
     </div>
@@ -339,9 +339,9 @@ function ChandraBhedanaAnim() {
         <ellipse className="cb-rn" cx="74" cy="65" rx="8" ry="5" />
         {/* Ring finger blocking right nostril */}
         <circle className="cb-lf" cx="74" cy="65" r="5" fill="var(--dim)" opacity=".8" />
-        <text x="46" y="120" textAnchor="middle" fontSize="8" fill="var(--dim)">LEFT</text>
-        <text x="74" y="120" textAnchor="middle" fontSize="8" fill="var(--dim)">RIGHT</text>
-        <text x="60" y="108" textAnchor="middle" fontSize="7" fill="var(--dim)">☽ lunar</text>
+        <text x="46" y="120" textAnchor="middle" style={{ fontSize: 'var(--text-sm)' }} fill="var(--dim)">LEFT</text>
+        <text x="74" y="120" textAnchor="middle" style={{ fontSize: 'var(--text-sm)' }} fill="var(--dim)">RIGHT</text>
+        <text x="60" y="108" textAnchor="middle" style={{ fontSize: 'var(--text-xs)' }} fill="var(--dim)">☽ lunar</text>
       </svg>
       <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">6s cycle · left = lunar · cooling</div>
     </div>
@@ -366,8 +366,8 @@ function SitaliAnim() {
         {/* Cool air flow */}
         <path className="si-cool" d="M92 44 L112 40" stroke="var(--dim)" strokeWidth="1.5" strokeDasharray="4,3" />
         <polygon className="si-cool" points="110,36 116,40 110,44" fill="var(--dim)" />
-        <text x="60" y="85" textAnchor="middle" fontSize="7" fill="var(--dim)">flat tongue</text>
-        <text x="60" y="96" textAnchor="middle" fontSize="7" fill="var(--dim)">Sheetali variation</text>
+        <text x="60" y="85" textAnchor="middle" style={{ fontSize: 'var(--text-xs)' }} fill="var(--dim)">flat tongue</text>
+        <text x="60" y="96" textAnchor="middle" style={{ fontSize: 'var(--text-xs)' }} fill="var(--dim)">Sheetali variation</text>
         <line x1="0" y1="112" x2="120" y2="112" stroke="var(--dim)" strokeWidth="1" />
       </svg>
       <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">4s cycle · cool air over flat tongue</div>

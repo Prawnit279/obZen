@@ -7,7 +7,8 @@
  */
 import { describe, it, expect, afterEach } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
-import { LineChart, monotoneCubic, liftHue } from '@/components/modules/workout/progress/Charts'
+import userEvent from '@testing-library/user-event'
+import { LineChart, monotoneCubic, liftHue, niceTicks } from '@/components/modules/workout/progress/Charts'
 
 afterEach(cleanup)
 
@@ -96,16 +97,27 @@ describe('LineChart — several lifts', () => {
     }
   })
 
-  it('draws one axis that spans every lift', () => {
+  it('draws one axis whose gridlines cover the lifts on it', () => {
     const { container } = render(<LineChart series={[squat, deadlift]} />)
-    const ticks = [...container.querySelectorAll('text')]
+    // Axis labels only. The end-of-line value labels are also numbers, and
+    // picking those up made this look like an axis with uneven spacing.
+    const ticks = [...container.querySelectorAll('text[text-anchor="end"]')]
       .map(t => Number(t.textContent))
       .filter(n => Number.isFinite(n) && n > 100)
+      .sort((a, b) => a - b)
 
-    // The axis has to reach past the lowest and highest value on the chart —
-    // squat bottoms at 215, deadlift tops at 320 — or a line leaves the plot.
-    expect(Math.min(...ticks)).toBeLessThanOrEqual(215)
-    expect(Math.max(...ticks)).toBeGreaterThanOrEqual(320)
+    // Round gridlines sit inside the data rather than bracketing it — the
+    // scale still pads, the labels no longer have to. What matters is that
+    // they span most of it and read as round numbers.
+    // Round gridlines, evenly spaced, covering most of the plotted range.
+    // Here that is 220/240/260/280/300/320 — the exact step depends on the
+    // data, so what is asserted is the property, not the numbers.
+    expect(ticks.length).toBeGreaterThanOrEqual(3)
+    expect(ticks.every(t => t % 10 === 0)).toBe(true)
+    const gaps = ticks.slice(1).map((t, i) => t - ticks[i])
+    expect(new Set(gaps).size).toBe(1)
+    expect(Math.min(...ticks)).toBeLessThan(260)    // reaches down toward squat
+    expect(Math.max(...ticks)).toBeGreaterThan(300) // and up toward deadlift
   })
 
   it('puts the same weight at the same height for every lift', () => {
@@ -229,5 +241,128 @@ describe('LineChart — one lift', () => {
   it('renders a goal line when one is given', () => {
     render(<LineChart series={[squat]} goal={{ value: 300, label: 'Target' }} />)
     expect(screen.getByText('Target')).toBeInTheDocument()
+  })
+})
+
+// ── Axis ticks ───────────────────────────────────────────────────────────────
+
+describe('niceTicks', () => {
+  it('lands on numbers a person would say', () => {
+    // The complaint this replaced: a real squat range gave 212 / 324 / 436.
+    const ticks = niceTicks(212, 436)
+    expect(ticks.every(t => t % 50 === 0)).toBe(true)
+    expect(ticks).toContain(250)
+    expect(ticks).toContain(400)
+  })
+
+  it('stays inside the range it was given', () => {
+    for (const [lo, hi] of [[212, 436], [0, 7], [95, 105], [1200, 4800]]) {
+      for (const t of niceTicks(lo, hi)) {
+        expect(t).toBeGreaterThanOrEqual(lo)
+        expect(t).toBeLessThanOrEqual(hi)
+      }
+    }
+  })
+
+  it('spaces every tick equally', () => {
+    const ticks = niceTicks(212, 436)
+    const gaps = ticks.slice(1).map((t, i) => t - ticks[i])
+    expect(new Set(gaps.map(g => Math.round(g * 1e6)))).toHaveProperty('size', 1)
+  })
+
+  it('gives roughly the number of lines asked for', () => {
+    for (const [lo, hi] of [[0, 100], [212, 436], [1.2, 4.8], [990, 1010]]) {
+      const n = niceTicks(lo, hi, 4).length
+      expect(n).toBeGreaterThanOrEqual(2)
+      expect(n).toBeLessThanOrEqual(7)
+    }
+  })
+
+  it('scales its step to the size of the numbers', () => {
+    expect(niceTicks(0, 10).every(t => t % 2 === 0 || t % 5 === 0)).toBe(true)
+    expect(niceTicks(0, 10000).every(t => t % 1000 === 0 || t % 2500 === 0)).toBe(true)
+  })
+
+  it('works on a ×BW axis, where the whole range is under three', () => {
+    const ticks = niceTicks(0.8, 2.4)
+    expect(ticks.length).toBeGreaterThanOrEqual(2)
+    expect(ticks.every(t => Number.isFinite(t))).toBe(true)
+  })
+
+  it('does not divide by a flat or backwards range', () => {
+    expect(niceTicks(5, 5)).toEqual([5])
+    expect(niceTicks(10, 2)).toEqual([10])
+    expect(niceTicks(NaN, 10)).toEqual([])
+  })
+
+  it('emits no floating-point dust', () => {
+    for (const t of niceTicks(0.1, 0.9)) {
+      expect(String(t)).not.toMatch(/\d{6,}/)
+    }
+  })
+})
+
+// ── Reading a number off the chart ───────────────────────────────────────────
+
+describe('LineChart — reading values', () => {
+  it('prints each lift’s current value beside its line', () => {
+    render(<LineChart series={[squat, deadlift]} />)
+    // 250 and 320 are the last points; they appear on the line and in the key.
+    expect(screen.getAllByText('250').length).toBeGreaterThan(0)
+    expect(screen.getAllByText('320').length).toBeGreaterThan(0)
+  })
+
+  it('shows the latest until a session is picked', () => {
+    render(<LineChart series={[squat, deadlift]} />)
+    expect(screen.getByText('Latest')).toBeInTheDocument()
+    expect(screen.getByText(/tap the chart/i)).toBeInTheDocument()
+  })
+
+  it('reads a session when its column is tapped', async () => {
+    const user = userEvent.setup()
+    const { container } = render(<LineChart series={[squat, deadlift]} />)
+
+    // The first column is 2026-05-11, where squat is 225 and deadlift untrained.
+    await user.click(container.querySelectorAll('rect')[0])
+
+    expect(screen.getByText('2026-05-11')).toBeInTheDocument()
+    expect(screen.getByText('225')).toBeInTheDocument()
+    expect(screen.getByText(/not trained/i)).toBeInTheDocument()
+  })
+
+  it('says a lift was not trained rather than showing it as zero', async () => {
+    const user = userEvent.setup()
+    const { container } = render(<LineChart series={[squat, deadlift]} />)
+    await user.click(container.querySelectorAll('rect')[0])
+
+    // Deadlift has no session on that date. Zero would read as a failed lift.
+    expect(screen.getByText(/not trained/i)).toBeInTheDocument()
+    expect(screen.queryByText('0')).not.toBeInTheDocument()
+  })
+
+  it('goes back to the latest', async () => {
+    const user = userEvent.setup()
+    const { container } = render(<LineChart series={[squat, deadlift]} />)
+    await user.click(container.querySelectorAll('rect')[0])
+    await user.click(screen.getByRole('button', { name: /back to latest/i }))
+
+    expect(screen.getByText('Latest')).toBeInTheDocument()
+  })
+
+  it('lets the same column close the reading it opened', async () => {
+    const user = userEvent.setup()
+    const { container } = render(<LineChart series={[squat, deadlift]} />)
+    const column = container.querySelectorAll('rect')[0]
+
+    await user.click(column)
+    expect(screen.getByText('2026-05-11')).toBeInTheDocument()
+    await user.click(column)
+    expect(screen.getByText('Latest')).toBeInTheDocument()
+  })
+
+  it('gives every session a tap target', () => {
+    const { container } = render(<LineChart series={[squat, deadlift]} />)
+    const dates = new Set([...squat.points, ...deadlift.points].map(p => p.date))
+    expect(container.querySelectorAll('rect')).toHaveLength(dates.size)
   })
 })

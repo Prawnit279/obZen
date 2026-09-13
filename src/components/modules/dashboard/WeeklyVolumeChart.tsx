@@ -90,7 +90,7 @@ export function WeeklyVolumeChart() {
             <g key={t}>
               <line x1={ml} y1={y} x2={W - mr} y2={y} stroke="var(--dim)" strokeWidth="1" />
               {t > 0 && (
-                <text x={ml - 3} y={y + 3} fontSize="7" fill="var(--dim)" textAnchor="end">
+                <text x={ml - 3} y={y + 3} style={{ fontSize: 'var(--text-xs)' }} fill="var(--dim)" textAnchor="end">
                   {fmtVol(maxVol * t)}
                 </text>
               )}
@@ -121,11 +121,11 @@ export function WeeklyVolumeChart() {
               ))}
               {total > 0 && (
                 <text x={x + barW / 2} y={mt + ch - totalH - 3}
-                  fontSize="6" fill="var(--muted)" textAnchor="middle">
+                  style={{ fontSize: 'var(--text-2xs)' }} fill="var(--muted)" textAnchor="middle">
                   {fmtVol(total)}
                 </text>
               )}
-              <text x={x + barW / 2} y={H - mb + 13} fontSize="7" fill="var(--dim)" textAnchor="middle">
+              <text x={x + barW / 2} y={H - mb + 13} style={{ fontSize: 'var(--text-xs)' }} fill="var(--dim)" textAnchor="middle">
                 {dayLabel}
               </text>
             </g>

@@ -68,7 +68,7 @@ export function MacroComplianceChart() {
                 strokeWidth="1"
                 strokeDasharray={t === 1 ? '4,3' : undefined}
               />
-              <text x={ml - 3} y={y + 3} fontSize="7" fill="var(--dim)" textAnchor="end">
+              <text x={ml - 3} y={y + 3} style={{ fontSize: 'var(--text-xs)' }} fill="var(--dim)" textAnchor="end">
                 {t * 100}%
               </text>
             </g>
@@ -98,7 +98,7 @@ export function MacroComplianceChart() {
                 )
               })}
               <text x={ml + i * colW + colW / 2} y={H - mb + 13}
-                fontSize="7" fill="var(--dim)" textAnchor="middle">
+                style={{ fontSize: 'var(--text-xs)' }} fill="var(--dim)" textAnchor="middle">
                 {dayLabel}
               </text>
             </g>

@@ -63,9 +63,56 @@ export function ChartEmpty({ text }: { text: string }) {
   )
 }
 
-function niceTicks(min: number, max: number): number[] {
-  if (max === min) return [min]
-  return [min, min + (max - min) / 2, max]
+/**
+ * Gridlines at numbers a person would actually say.
+ *
+ * The old version returned the padded minimum, the midpoint and the padded
+ * maximum, which on a real range gave 212 / 324 / 436 — three values nobody
+ * thinks in, so a point could only be read by doing arithmetic against them.
+ * These land on a 1, 2 or 5 step scaled to the range, so the lines fall on 200,
+ * 250, 300 and a reader can place anything between them by eye.
+ */
+export function niceTicks(min: number, max: number, target = 4): number[] {
+  if (!Number.isFinite(min) || !Number.isFinite(max) || max <= min) {
+    return Number.isFinite(min) ? [min] : []
+  }
+
+  const magnitude = 10 ** Math.floor(Math.log10((max - min) / target))
+  // 1, 2 and 5 are the steps that read as round at any magnitude, and the
+  // neighbouring decades are included so a short range is not forced onto a
+  // step too coarse to put more than two lines on the chart.
+  //
+  // 2.5 is deliberately absent: it is round to look at but its decimals do not
+  // survive the magnitude-based rounding below, and a 0-to-10 axis came out as
+  // 0, 3, 5, 8, 10.
+  const steps = [...new Set(
+    [1, 2, 5, 10].flatMap(m => [m * magnitude / 10, m * magnitude, m * magnitude * 10])
+  )].sort((a, b) => a - b)
+
+  const build = (step: number): number[] => {
+    // Enough decimals to express the step exactly and no more: 3 × 0.2 is
+    // 0.6000000000000001 in binary floating point, which would become a label.
+    const decimals = Math.max(0, -Math.floor(Math.log10(step)))
+    const out: number[] = []
+    for (let t = Math.ceil(min / step) * step; t <= max + step * 1e-9; t += step) {
+      out.push(Number(t.toFixed(decimals)))
+      if (out.length > 40) break          // a step far too small for the range
+    }
+    return out
+  }
+
+  // Pick the step that lands nearest the number of gridlines asked for, with a
+  // strong preference for at least three — two lines on a chart is barely a
+  // scale, which is what rounding the step alone kept producing.
+  let best: number[] | null = null
+  let bestScore = Infinity
+  for (const step of steps) {
+    const ticks = build(step)
+    if (ticks.length < 2) continue
+    const score = Math.abs(ticks.length - target) + (ticks.length < 3 ? 10 : 0)
+    if (score < bestScore) { bestScore = score; best = ticks }
+  }
+  return best ?? [min]
 }
 
 function fmt(n: number): string {
@@ -189,7 +236,7 @@ function AreaChart({
       {niceTicks(min, max).map(t => (
         <g key={t}>
           <line x1={ML} y1={y(t)} x2={W - MR} y2={y(t)} stroke={GRID} strokeWidth="0.5" />
-          <text x={ML - 4} y={y(t) + 3} textAnchor="end" fontSize="10" fill={TICK}>{fmt(t)}</text>
+          <text x={ML - 4} y={y(t) + 3} textAnchor="end" style={{ fontSize: 'var(--text-lg)' }} fill={TICK}>{fmt(t)}</text>
         </g>
       ))}
 
@@ -199,7 +246,7 @@ function AreaChart({
             x1={ML} y1={y(goal.value)} x2={W - MR} y2={y(goal.value)}
             stroke="var(--ok)" strokeWidth="1" strokeDasharray="3 2"
           />
-          <text x={W - MR} y={y(goal.value) - 4} textAnchor="end" fontSize="10" fill="var(--ok)">
+          <text x={W - MR} y={y(goal.value) - 4} textAnchor="end" style={{ fontSize: 'var(--text-lg)' }} fill="var(--ok)">
             {goal.label}
           </text>
         </g>
@@ -213,9 +260,9 @@ function AreaChart({
       {/* The live value — where the eye should land. */}
       <circle cx={last[0]} cy={last[1]} r="4" fill="var(--surface)" stroke="var(--violet-100)" strokeWidth="2.25" />
 
-      <text x={ML} y={H - 6} fontSize="10" fill={TICK}>{dates[0]?.slice(5)}</text>
+      <text x={ML} y={H - 6} style={{ fontSize: 'var(--text-lg)' }} fill={TICK}>{dates[0]?.slice(5)}</text>
       {n > 1 && (
-        <text x={W - MR} y={H - 6} textAnchor="end" fontSize="10" fill={TICK}>
+        <text x={W - MR} y={H - 6} textAnchor="end" style={{ fontSize: 'var(--text-lg)' }} fill={TICK}>
           {dates[n - 1].slice(5)}
         </text>
       )}
@@ -240,9 +287,16 @@ function AreaChart({
  * chart does anyway.
  */
 function MultiLineChart({ series, yLabel }: { series: LineSeries[]; yLabel?: string }) {
+  // Which session is being read, if any. Null means "show me the latest",
+  // which is the question the chart answers when nobody has asked another.
+  const [picked, setPicked] = useState<number | null>(null)
+
   const height = 168
   const legendGap = 26              // room under the plot for dates
   const plotBottom = height - legendGap
+  // The right margin holds each line's current value, so the number can be
+  // read off the line itself rather than matched back to a key.
+  const valueGutter = 34
 
   const dates = [...new Set(series.flatMap(s => s.points.map(p => p.date)))].sort()
   const values = series.flatMap(s => s.points.map(p => p.value))
@@ -254,8 +308,9 @@ function MultiLineChart({ series, yLabel }: { series: LineSeries[]; yLabel?: str
   const min = Math.max(0, rawMin - pad)
   const max = rawMax + pad
 
-  const x = (date: string) =>
-    dates.length === 1 ? ML : ML + (dates.indexOf(date) / (dates.length - 1)) * (W - ML - MR)
+  const plotRight = W - valueGutter
+  const xAt = (i: number) => dates.length === 1 ? ML : ML + (i / (dates.length - 1)) * (plotRight - ML)
+  const x = (date: string) => xAt(dates.indexOf(date))
   const y = (v: number) => MT + (1 - (v - min) / (max - min)) * (plotBottom - MT)
 
   const lines = series.map((s, i) => {
@@ -268,6 +323,8 @@ function MultiLineChart({ series, yLabel }: { series: LineSeries[]; yLabel?: str
       d: monotoneCubic(pts),
       end: pts[pts.length - 1],
       latest: vals[vals.length - 1],
+      /** The value on the session being read, if this lift was trained then. */
+      at: (i: number) => s.points.find(p => p.date === dates[i])?.value ?? null,
       single: s.points.length === 1,
       delta: s.points.length > 1 ? vals[vals.length - 1] - vals[0] : null,
     }
@@ -279,12 +336,23 @@ function MultiLineChart({ series, yLabel }: { series: LineSeries[]; yLabel?: str
         {/* Shared gridlines — one scale, so these mean the same for every lift. */}
         {niceTicks(min, max).map(t => (
           <g key={t}>
-            <line x1={ML} y1={y(t)} x2={W - MR} y2={y(t)} stroke={GRID} strokeWidth="0.5" />
-            <text x={ML - 4} y={y(t) + 3} textAnchor="end" fontSize="9" fill={TICK}>{fmt(t)}</text>
+            <line x1={ML} y1={y(t)} x2={plotRight} y2={y(t)} stroke={GRID} strokeWidth="0.5" />
+            <text x={ML - 4} y={y(t) + 3} textAnchor="end" style={{ fontSize: 'var(--text-base)' }} fill={TICK}>{fmt(t)}</text>
           </g>
         ))}
 
-        {lines.map(l => (
+        {/* The session being read, marked down the whole plot so every lift's
+            value at that date can be found at a glance. */}
+        {picked !== null && (
+          <line
+            x1={xAt(picked)} y1={MT} x2={xAt(picked)} y2={plotBottom}
+            stroke="var(--ink-faint)" strokeWidth="0.75" strokeDasharray="2 2"
+          />
+        )}
+
+        {lines.map(l => {
+          const readAt = picked === null ? null : l.at(picked)
+          return (
           <g key={l.label}>
             {/* A lift with one session has no line to draw, only a point. */}
             {!l.single && (
@@ -294,40 +362,103 @@ function MultiLineChart({ series, yLabel }: { series: LineSeries[]; yLabel?: str
               />
             )}
             {l.end && <circle cx={l.end[0]} cy={l.end[1]} r="2.8" fill={l.hue} />}
+            {/* Its current value, beside the line that reached it. */}
+            {l.end && (
+              <text
+                x={l.end[0] + 5} y={l.end[1] + 4} fill={l.hue}
+                style={{ fontSize: 'var(--text-sm)', fontWeight: 700 }}
+              >
+                {fmt(l.latest)}
+              </text>
+            )}
+            {readAt !== null && (
+              <circle cx={xAt(picked!)} cy={y(readAt)} r="3.4" fill={l.hue}
+                      stroke="var(--bg)" strokeWidth="1.2" />
+            )}
           </g>
-        ))}
+        )})}
 
-        <text x={ML} y={height - 8} fontSize="9.5" fill={TICK}>{dates[0]?.slice(5)}</text>
+        {/* One tap target per session, the full height of the plot — a data
+            point is a few pixels across and a finger is not. */}
+        {dates.map((date, i) => {
+          const half = dates.length > 1 ? (plotRight - ML) / (dates.length - 1) / 2 : (plotRight - ML) / 2
+          return (
+            <rect
+              key={date}
+              x={Math.max(ML, xAt(i) - half)} y={MT}
+              width={Math.min(half * 2, plotRight - ML)} height={plotBottom - MT}
+              fill="transparent" style={{ cursor: 'pointer' }}
+              onClick={() => setPicked(picked === i ? null : i)}
+            />
+          )
+        })}
+
+        <text x={ML} y={height - 8} style={{ fontSize: 'var(--text-base)' }} fill={TICK}>{dates[0]?.slice(5)}</text>
         {dates.length > 1 && (
-          <text x={W - MR} y={height - 8} textAnchor="end" fontSize="9.5" fill={TICK}>
+          <text x={plotRight} y={height - 8} textAnchor="end" style={{ fontSize: 'var(--text-base)' }} fill={TICK}>
             {dates[dates.length - 1].slice(5)}
           </text>
         )}
       </svg>
 
-      {/* Key — colour and dash together, so nothing rests on colour alone. */}
-      <div className="flex flex-wrap" style={{ gap: '6px 14px', marginTop: 8 }}>
-        {lines.map(l => (
-          <span key={l.label} className="flex items-baseline" style={{ gap: 6 }}>
-            <svg width="16" height="6" aria-hidden="true" style={{ alignSelf: 'center' }}>
-              <line x1="0" y1="3" x2="16" y2="3" stroke={l.hue} strokeWidth="1.9" strokeDasharray={l.dash} />
-            </svg>
-            <span style={{ fontSize: 'var(--text-md)', color: 'var(--ink-dim)' }}>{l.label}</span>
-            <span
-              style={{
-                fontSize: 'var(--text-md)', fontWeight: 700, color: l.hue,
-                fontVariantNumeric: 'tabular-nums',
-              }}
-            >
-              {fmt(l.latest)}
-            </span>
-            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)' }}>
-              {l.delta === null
-                ? 'one session'
-                : `${l.delta > 0 ? '+' : ''}${fmt(l.delta)}`}
-            </span>
+      {/* Key and readout in one. Colour and dash together, so nothing rests on
+          colour alone; and when a session is being read it shows that day's
+          numbers rather than the latest, so there is one place to look. */}
+      <div style={{ marginTop: 8 }}>
+        <div
+          className="flex items-baseline justify-between"
+          style={{ marginBottom: 6, minHeight: 18 }}
+        >
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)' }}>
+            {picked === null ? 'Latest' : dates[picked]}
           </span>
-        ))}
+          {picked !== null && (
+            <button
+              onClick={() => setPicked(null)}
+              style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-dim)' }}
+            >
+              Back to latest
+            </button>
+          )}
+        </div>
+
+        <div className="flex flex-wrap" style={{ gap: '6px 14px' }}>
+          {lines.map(l => {
+            const readAt = picked === null ? l.latest : l.at(picked)
+            return (
+              <span key={l.label} className="flex items-baseline" style={{ gap: 6 }}>
+                <svg width="16" height="6" aria-hidden="true" style={{ alignSelf: 'center' }}>
+                  <line x1="0" y1="3" x2="16" y2="3" stroke={l.hue} strokeWidth="1.9" strokeDasharray={l.dash} />
+                </svg>
+                <span style={{ fontSize: 'var(--text-md)', color: 'var(--ink-dim)' }}>{l.label}</span>
+                <span
+                  style={{
+                    fontSize: 'var(--text-md)', fontWeight: 700,
+                    color: readAt === null ? 'var(--ink-ghost)' : l.hue,
+                    fontVariantNumeric: 'tabular-nums',
+                  }}
+                >
+                  {/* Not trained that day is a real answer, and a different one
+                      from a weight of zero. */}
+                  {readAt === null ? 'not trained' : fmt(readAt)}
+                </span>
+                {picked === null && (
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)' }}>
+                    {l.delta === null
+                      ? 'one session'
+                      : `${l.delta > 0 ? '+' : ''}${fmt(l.delta)}`}
+                  </span>
+                )}
+              </span>
+            )
+          })}
+        </div>
+
+        {dates.length > 1 && (
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-ghost)', marginTop: 6 }}>
+            Tap the chart to read a session.
+          </p>
+        )}
       </div>
     </div>
   )

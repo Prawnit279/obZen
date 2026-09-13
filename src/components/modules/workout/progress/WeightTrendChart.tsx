@@ -58,7 +58,7 @@ export function WeightTrendChart({ trend, ariaLabel }: Props) {
       {[min, (min + max) / 2, max].map(t => (
         <g key={t}>
           <line x1={ML} y1={y(t)} x2={W - MR} y2={y(t)} stroke="var(--hairline-soft)" strokeWidth="0.5" />
-          <text x={ML - 5} y={y(t) + 3} textAnchor="end" fontSize="9.5" fill="var(--ink-faint)">
+          <text x={ML - 5} y={y(t) + 3} textAnchor="end" style={{ fontSize: 'var(--text-base)' }} fill="var(--ink-faint)">
             {tick(t)}
           </text>
         </g>
@@ -77,8 +77,8 @@ export function WeightTrendChart({ trend, ariaLabel }: Props) {
       />
       <circle cx={x(end.date)} cy={endY} r="3.8" fill="var(--surface)" stroke="var(--violet-100)" strokeWidth="2" />
 
-      <text x={ML} y={H - 6} fontSize="9.5" fill="var(--ink-faint)">{trend[0].date.slice(5)}</text>
-      <text x={W - MR} y={H - 6} textAnchor="end" fontSize="9.5" fill="var(--ink-faint)">
+      <text x={ML} y={H - 6} style={{ fontSize: 'var(--text-base)' }} fill="var(--ink-faint)">{trend[0].date.slice(5)}</text>
+      <text x={W - MR} y={H - 6} textAnchor="end" style={{ fontSize: 'var(--text-base)' }} fill="var(--ink-faint)">
         {end.date.slice(5)}
       </text>
     </svg>
