@@ -36,10 +36,13 @@ is also the source of fifteen library exercises, so it cannot simply be deleted.
 - Tinted surfaces mix from `--accent-rgb` / `--accent-soft-rgb` /
   `--accent-deep-rgb` rather than literal violet rgba. Until they did, every
   theme wore a violet wash: a selected day tab came out lavender in the blue
-  theme. No accent literal remains in `src`.
+  theme. The only accent literals left are the switcher's own swatches, which
+  must stay literal: all fourteen render while one theme is active, so a var
+  would paint them identically. A sweep that matches only `rgba(...)` misses
+  bare hex — a chart fill survived the first pass that way.
 - PWA: service worker, manifest, offline-first
 - GitHub Pages deploy on every push to main, with the tests gating it
-- **729 tests**, `src/lib` at 96% of statements
+- **750 tests**, `src/lib` at 96% of statements
 - All type sizes come from `--text-*` tokens (globals.css) — no hardcoded
   `fontSize`/`text-[Npx]` anywhere, including SVG (which needs
   `style={{ fontSize: 'var(...)' }}`, not the `fontSize="N"` attribute — a

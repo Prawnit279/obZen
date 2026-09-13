@@ -1,5 +1,7 @@
 import { describe, it, expect } from 'vitest'
-import { barWeightLbFor, isBarLoaded, DEFAULT_BAR_LB, EZ_BAR_LB } from '@/lib/barWeight'
+import {
+  barWeightLbFor, isBarLoaded, DEFAULT_BAR_LB, EZ_BAR_LB, EZ_BAR_LOADED, NOT_BAR_LOADED,
+} from '@/lib/barWeight'
 import { EXERCISE_MOTIONS } from '@/data/exercise-motions'
 import { trackingModeFor } from '@/data/obzen-program'
 import {
@@ -60,20 +62,25 @@ describe('barWeightLbFor', () => {
     expect(EZ_BAR_LB).toBeLessThan(DEFAULT_BAR_LB)
   })
 
-  it('sorts every bar-tagged lift into exactly one weight', () => {
-    const tagged = Object.entries(EXERCISE_MOTIONS)
-      .filter(([, m]) => m.equipment === 'bar')
-      .map(([id]) => id)
-    const olympic = tagged.filter(id => barWeightLbFor(id) === DEFAULT_BAR_LB)
-    const ez = tagged.filter(id => barWeightLbFor(id) === EZ_BAR_LB)
-    const excluded = tagged.filter(id => !isBarLoaded(id))
+  it('keeps the two exception lists honest', () => {
+    // This replaced a set of hardcoded counts (34/22/6/6). They broke on every
+    // unrelated bar-tagged addition, and the partition they asserted held by
+    // construction — `barWeightLbFor` returns one of three values, so the three
+    // buckets could never fail to sum. These are the properties that can fail.
+    const tagged = new Set(
+      Object.entries(EXERCISE_MOTIONS).filter(([, m]) => m.equipment === 'bar').map(([id]) => id)
+    )
 
-    expect(tagged).toHaveLength(34)
-    expect(olympic).toHaveLength(22)
-    expect(ez).toHaveLength(6)
-    expect(excluded).toHaveLength(6)
-    // No lift may fall into two of those, or none of them.
-    expect(olympic.length + ez.length + excluded.length).toBe(tagged.length)
+    // An exception only means anything for a lift the tag actually caught.
+    for (const id of [...EZ_BAR_LOADED, ...NOT_BAR_LOADED]) {
+      expect(tagged.has(id), `${id} is excepted but is not tagged 'bar'`).toBe(true)
+    }
+    // A lift cannot be both a lighter bar and no bar at all.
+    const both = [...EZ_BAR_LOADED].filter(id => NOT_BAR_LOADED.has(id))
+    expect(both, `listed twice: ${both.join(', ')}`).toHaveLength(0)
+    // And each list does what it says.
+    for (const id of EZ_BAR_LOADED) expect(barWeightLbFor(id), id).toBe(EZ_BAR_LB)
+    for (const id of NOT_BAR_LOADED) expect(barWeightLbFor(id), id).toBe(0)
   })
 })
 

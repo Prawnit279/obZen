@@ -1,7 +1,7 @@
 /**
  * Which parent lift each movement is a variant of.
  *
- * The catalog is 119 movements and the picker listed them flat, so finding the
+ * The catalog is 121 movements and the picker listed them flat, so finding the
  * squat you wanted meant reading past nine of them. Grouping is by *named
  * parent lift* — Squat, Deadlift, Bench Press, Curl — rather than by movement
  * pattern, so the list reads the way a lifter names things.
@@ -11,7 +11,7 @@
  * exercise-guides.ts points a variant at its parent's coaching text. That last
  * one is a near-neighbour of this file and deliberately not merged with it —
  * it exists only where a parent has written setup/faults/cues to inherit, which
- * is eleven lifts, not twenty-eight families.
+ * is eleven lifts, not twenty-nine families.
  *
  * Families are display-ordered by muscle group, matching the picker's chips.
  * Membership is stated family-first because that is how the categorisation
@@ -169,15 +169,11 @@ const MEMBERS: Record<FamilyId, string[]> = {
 }
 
 /** Family for an exercise id, inverted from the membership lists above. */
-export const FAMILY_BY_EXERCISE: Record<string, FamilyId> = Object.fromEntries(
+const FAMILY_BY_EXERCISE: Record<string, FamilyId> = Object.fromEntries(
   Object.entries(MEMBERS).flatMap(([family, ids]) =>
     ids.map(id => [id, family as FamilyId])
   )
 )
-
-export const FAMILY_LABEL: Record<FamilyId, string> = Object.fromEntries(
-  FAMILIES.map(f => [f.id, f.label])
-) as Record<FamilyId, string>
 
 /**
  * Family for a logged exercise id, or undefined for a custom addition the
@@ -185,6 +181,37 @@ export const FAMILY_LABEL: Record<FamilyId, string> = Object.fromEntries(
  */
 export function familyFor(exerciseId: string): FamilyId | undefined {
   return FAMILY_BY_EXERCISE[exerciseId]
+}
+
+/**
+ * Split a list into its families, in display order, plus whatever has none.
+ *
+ * Pure and exported for its own sake: this decides whether a movement is
+ * reachable in the picker at all, and a bug here hides one rather than
+ * misplacing it — nothing on screen would say so. Every input appears in
+ * exactly one of the two outputs.
+ */
+export function groupByFamily<T>(
+  items: T[],
+  idOf: (item: T) => string
+): { groups: { family: ExerciseFamily; members: T[] }[]; ungrouped: T[] } {
+  const byFamily = new Map<FamilyId, T[]>()
+  const ungrouped: T[] = []
+
+  for (const item of items) {
+    const family = familyFor(idOf(item))
+    if (!family) {
+      ungrouped.push(item)
+      continue
+    }
+    byFamily.set(family, [...(byFamily.get(family) ?? []), item])
+  }
+
+  const groups = FAMILIES
+    .filter(f => byFamily.has(f.id))
+    .map(family => ({ family, members: byFamily.get(family.id)! }))
+
+  return { groups, ungrouped }
 }
 
 export { MEMBERS as FAMILY_MEMBERS }

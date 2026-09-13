@@ -6,10 +6,10 @@
  * because that one is already past the file-size budget. `exercise-motions.ts`
  * merges the two into one table.
  *
- * The import direction matters: this file value-imports the data module for its
- * `pose` helper and type-imports the types module. The types module value-imports
- * both tables. Reversing either of those would close the cycle the data module's
- * own header warns about.
+ * The import direction matters and is load-bearing: this file value-imports the
+ * data module for its `pose` helper and type-imports the types module, while the
+ * types module value-imports both tables. Add a value import from either table
+ * back to the types module and that becomes a runtime cycle.
  */
 
 import type { ExerciseMotion, Pose } from './exercise-motions'

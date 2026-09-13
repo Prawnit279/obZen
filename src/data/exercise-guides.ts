@@ -593,5 +593,6 @@ const DETAIL_ALIASES: Record<string, string> = {
 
 /** Setup/faults/cues for a lift, following variant aliases. */
 export function coreDetailFor(exerciseId: string): Pick<ExerciseGuide, 'setup' | 'mistakes' | 'cues'> | undefined {
-  return CORE_DETAIL[exerciseId] ?? CORE_DETAIL[DETAIL_ALIASES[exerciseId] ?? '']
+  const id = canonicalExerciseId(exerciseId)
+  return CORE_DETAIL[id] ?? CORE_DETAIL[DETAIL_ALIASES[id] ?? '']
 }

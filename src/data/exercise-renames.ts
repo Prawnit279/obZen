@@ -10,9 +10,12 @@
  * Mapping old id to new here keeps that history attached. Entries are permanent
  * once added; a logged session from any past build has to keep resolving.
  *
- * A leaf module on purpose — the catalog, the motion table and the guides all
- * resolve through it, and none of them should have to import each other to do
- * so.
+ * A leaf module on purpose. Everything a logged id reaches resolves through it —
+ * `libraryFor` (and so `exerciseNameFor`, `trackingModeFor`, `bodyweightFactorFor`),
+ * `motionFor`, `guideFor`, `coreDetailFor`, `barWeightLbFor`, and the picker's
+ * already-added check — and none of them should have to import each other to do
+ * so. A lookup that skips it fails silently: the set stays in the database and
+ * quietly stops matching the catalog.
  */
 
 export const RENAMED_EXERCISE_IDS: Record<string, string> = {

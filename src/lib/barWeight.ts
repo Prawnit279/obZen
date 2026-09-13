@@ -22,6 +22,7 @@
  */
 
 import { EXERCISE_MOTIONS } from '@/data/exercise-motions'
+import { canonicalExerciseId } from '@/data/exercise-renames'
 
 /** A standard Olympic barbell. */
 export const DEFAULT_BAR_LB = 45
@@ -41,7 +42,7 @@ export const EZ_BAR_LB = 25
  * renderer wants a bar through both hands for these, and the load maths wants a
  * lighter one.
  */
-const EZ_BAR_LOADED: ReadonlySet<string> = new Set([
+export const EZ_BAR_LOADED: ReadonlySet<string> = new Set([
   'ez-bar-curl',
   'ez-bar-preacher-curl',
   'ez-bar-reverse-curl',
@@ -54,7 +55,7 @@ const EZ_BAR_LOADED: ReadonlySet<string> = new Set([
  * Tagged `bar`, but not carrying a free 45 lb bar — the logged number is
  * already the whole load, so adding to it would overstate the lift.
  */
-const NOT_BAR_LOADED: ReadonlySet<string> = new Set([
+export const NOT_BAR_LOADED: ReadonlySet<string> = new Set([
   'lat-pulldown',       // cable stack; the bar is a handle
   'seated-cable-row',   // cable stack, likewise
   'smith-machine-squat', // counterbalanced, and the residue varies by machine
@@ -70,9 +71,13 @@ const NOT_BAR_LOADED: ReadonlySet<string> = new Set([
  * inflate it.
  */
 export function barWeightLbFor(exerciseId: string): number {
-  if (NOT_BAR_LOADED.has(exerciseId)) return 0
-  if (EZ_BAR_LOADED.has(exerciseId)) return EZ_BAR_LB
-  return EXERCISE_MOTIONS[exerciseId]?.equipment === 'bar' ? DEFAULT_BAR_LB : 0
+  // Resolved first: all three lookups below are keyed by current id, and a set
+  // logged before a rename carries the old one. Without this, renaming a
+  // bar-loaded lift would quietly drop 45 lb from every set in its history.
+  const id = canonicalExerciseId(exerciseId)
+  if (NOT_BAR_LOADED.has(id)) return 0
+  if (EZ_BAR_LOADED.has(id)) return EZ_BAR_LB
+  return EXERCISE_MOTIONS[id]?.equipment === 'bar' ? DEFAULT_BAR_LB : 0
 }
 
 

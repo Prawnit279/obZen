@@ -224,8 +224,8 @@ function AreaChart({
     <svg viewBox={`0 0 ${W} ${H}`} className="w-full" role="img" aria-label={yLabel ?? series.label}>
       <defs>
         <linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.42" />
-          <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0" />
+          <stop offset="0%" stopColor="rgb(var(--accent-rgb))" stopOpacity="0.42" />
+          <stop offset="100%" stopColor="rgb(var(--accent-rgb))" stopOpacity="0" />
         </linearGradient>
         <filter id="lineGlow" x="-25%" y="-60%" width="150%" height="240%">
           <feGaussianBlur stdDeviation="3" result="b" />

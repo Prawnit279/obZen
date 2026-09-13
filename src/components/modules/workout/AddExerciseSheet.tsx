@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Sheet } from '@/components/ui/Sheet'
 import { Search, Plus, ChevronDown } from 'lucide-react'
 import { getProgram, EXERCISE_LIBRARY, formatTarget, toExerciseId } from '@/data/obzen-program'
-import { FAMILIES, familyFor } from '@/data/exercise-families'
+import { groupByFamily } from '@/data/exercise-families'
 import { useProfileStore } from '@/store/useProfileStore'
 import type { MuscleGroup, LibraryExercise } from '@/data/obzen-program'
 import type { FamilyId } from '@/data/exercise-families'
@@ -75,7 +75,7 @@ function OtherDaysTab({
                     <div>
                       <div className="text-[length:var(--text-lg)]" style={{ color: 'var(--ink)' }}>{ex.name}</div>
                       <div className="text-[length:var(--text-sm)] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>
-                        {ex.muscle} · {ex.sets}×{ex.reps}
+                        {ex.muscle}{formatTarget(ex) && ` · ${formatTarget(ex)}`}
                       </div>
                     </div>
                     <Plus size={14} style={{ color: 'var(--ink-dim)' }} />
@@ -141,20 +141,11 @@ function LibraryTab({
     return matchSearch && matchMuscle && !existingIds.includes(toExerciseId(ex.name))
   })
 
-  const byFamily = new Map<FamilyId, LibraryExercise[]>()
-  const ungrouped: LibraryExercise[] = []
-  for (const ex of filtered) {
-    const family = familyFor(toExerciseId(ex.name))
-    if (!family) {
-      ungrouped.push(ex)
-      continue
-    }
-    byFamily.set(family, [...(byFamily.get(family) ?? []), ex])
-  }
-  const groups = FAMILIES.filter(f => byFamily.has(f.id))
+  const { groups, ungrouped } = groupByFamily(filtered, ex => toExerciseId(ex.name))
 
   // Searching opens everything: a hit inside a collapsed family looks like no
-  // hit at all, and the whole point of typing is to skip the browsing.
+  // hit at all, and the whole point of typing is to skip the browsing. The
+  // headers stop being toggles while that holds — see `disabled` below.
   const searching = search.trim().length > 0
   const isOpen = (id: FamilyId) => searching || expanded.includes(id)
   const toggle = (id: FamilyId) => setExpanded(prev =>
@@ -204,13 +195,16 @@ function LibraryTab({
           <p className="text-[length:var(--text-sm)]" style={{ color: 'var(--ink-faint)' }}>No exercises found.</p>
         ) : (
           <>
-            {groups.map(family => {
-              const members = byFamily.get(family.id) ?? []
+            {groups.map(({ family, members }) => {
               const open = isOpen(family.id)
               return (
                 <div key={family.id} className="space-y-1">
                   <button
                     onClick={() => toggle(family.id)}
+                    /* While searching every family is forced open, so the
+                       header has nothing to toggle. Left live it would flip
+                       hidden state on a tap that visibly does nothing. */
+                    disabled={searching}
                     className="w-full flex items-center justify-between px-3 py-2 rounded-[var(--r-control)] text-left transition-opacity hover:opacity-70"
                     style={{ background: 'var(--card-accent)', border: '1px solid var(--hairline)' }}
                     aria-expanded={open}

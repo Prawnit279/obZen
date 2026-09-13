@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom'
 import { Plus, AlertTriangle, Zap } from 'lucide-react'
 import { getProgram, EXERCISE_LIBRARY, toExerciseId, PULL_HEAVY_EXERCISES, FOREARM_LOAD_EXERCISES } from '@/data/obzen-program'
 import type { ProgramExercise } from '@/data/obzen-program'
+import { canonicalExerciseId } from '@/data/exercise-renames'
 import { useProfileStore } from '@/store/useProfileStore'
 import { belongsToProfile } from '@/lib/workoutSession'
 import { suggestProgression } from '@/lib/progress'
@@ -315,7 +316,13 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
       {showAddSheet && (
         <AddExerciseSheet
           currentDay={dayLabel}
-          existingIds={session.exercises.map(e => e.exerciseId)}
+          existingIds={session.exercises.map(e =>
+            // Canonical, because the picker compares these against the slug of a
+            // current catalog name. A set logged before a rename still carries
+            // the old id, which would miss — and the picker would offer a
+            // movement already in the session, splitting the lift across two ids.
+            canonicalExerciseId(e.exerciseId)
+          )}
           onAdd={(ex: ExerciseSessionState) => store.addExercise(dayLabel, ex, sessionDate)}
           onClose={() => setShowAddSheet(false)}
         />
