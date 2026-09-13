@@ -1,5 +1,5 @@
 # obZen — Build Status
-Last updated: 2026-09-12 | SHA: 83cdc141
+Last updated: 2026-09-13 | SHA: 219bfb73
 
 Local-first training and drum-practice PWA. One profile, one device, no
 account, no server. Everything lives in IndexedDB and localStorage, and a JSON
@@ -32,7 +32,12 @@ is also the source of fifteen library exercises, so it cannot simply be deleted.
 - 6 themes (violet default, plus Daylight, crimson, void, steel, ember)
 - PWA: service worker, manifest, offline-first
 - GitHub Pages deploy on every push to main, with the tests gating it
-- **669 tests**, `src/lib` at 85% of statements
+- **728 tests**, `src/lib` at 96% of statements
+- All type sizes come from `--text-*` tokens (globals.css) — no hardcoded
+  `fontSize`/`text-[Npx]` anywhere, including SVG (which needs
+  `style={{ fontSize: 'var(...)' }}`, not the `fontSize="N"` attribute — a
+  first sweep missed 41 of these because it only matched the CSS/Tailwind
+  forms)
 
 ### Train
 - 2–6 day week, set in Settings. Day N is the week's Nth logged session, and
@@ -51,7 +56,11 @@ views stay mounted and are hidden only on screen, so Print still captures the
 whole page.
 
 - **Lift trend** — Est. 1RM, top set, ×BW, or % change; 8 weeks / 6 months /
-  all; one lift or every lift
+  all; one lift or every lift. One shared axis with rounded gridlines
+  (200/250/300, not the raw padded min/mid/max); each line prints its
+  current value beside its end point; tap the chart to read any session
+  (a guide line, a dot per lift, the key switches to that day's numbers —
+  a lift not trained that day says so rather than showing 0)
 - SBD total, DOTS, strength standards, PRs, recent breaks, lift balance
 - **Weight check** — weigh-in log, smoothed trend, read against a goal you set,
   and strength against bodyweight
@@ -90,8 +99,11 @@ Meetings, Projects kanban, Settings (themes, profile, storage, backup).
 ## Remaining
 
 ### Untested
-`axis-master.ts` (169 lines) and `metronome.ts` have no tests. `src/pages` sits
-at 0% — several findings from the last review land there.
+`axis-master.ts` and `metronome.ts` are now covered (44 tests). `axis-master.ts`
+is dead code, though — nothing imports it, including its own `clamp`, which is
+shadowed by an unused-but-different `clamp` in `lib/utils.ts`; worth deleting
+rather than maintaining. `src/pages` still sits at 0% — several findings from
+the last review land there.
 
 ### Partially built
 | Area | What's missing |
