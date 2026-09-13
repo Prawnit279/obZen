@@ -594,7 +594,7 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
       pose({ elbow: [120, 50], hand: [104, 44] }),
     ],
   },
-  'reverse-pec-deck': {
+  'rear-delt-fly-machine': {
     equipment: 'none', durationSec: 2.6, bench: { x: 84, y: 100, width: 26 },
     caption: 'Open the arms wide, squeeze the rear delts',
     poses: [

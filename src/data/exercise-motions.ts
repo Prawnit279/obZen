@@ -43,6 +43,7 @@ export interface ExerciseMotion {
 
 import { EXERCISE_MOTIONS as PROGRAMME_MOTIONS } from './exercise-motions-data'
 import { EXTRA_MOTIONS } from './exercise-motions-extra'
+import { canonicalExerciseId } from './exercise-renames'
 
 /** Both tables as one lookup: the programme movements plus the free-weight set. */
 export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
@@ -50,7 +51,8 @@ export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
   ...EXTRA_MOTIONS,
 }
 
-/** Motion for an exercise id, if one exists. */
+/** Motion for an exercise id, if one exists. Follows renames, so a session
+ *  logged under an old id keeps its animation. */
 export function motionFor(exerciseId: string): ExerciseMotion | undefined {
-  return EXERCISE_MOTIONS[exerciseId]
+  return EXERCISE_MOTIONS[exerciseId] ?? EXERCISE_MOTIONS[canonicalExerciseId(exerciseId)]
 }

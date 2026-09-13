@@ -1,3 +1,5 @@
+import { canonicalExerciseId } from './exercise-renames'
+
 export type MuscleGroup = 'legs' | 'back' | 'shoulders' | 'arms' | 'chest' | 'core'
 
 export interface ProgramExercise {
@@ -80,7 +82,7 @@ export const AISHWARYA_PROGRAM: Record<string, ProgramDay> = {
       { name: 'Assisted Dip',            muscle: 'chest',     sets: 3, reps: '6–8',    rest: '90s', coached: true, cue: 'Lean forward slightly. Stop at the depth where the shoulder feels stretched, never below it.', swaps: ['Push-Up', 'Bench Dip', 'Chest Press Machine'] },
       { name: 'Seated Cable Row',        muscle: 'back',      sets: 3, reps: '10–12',  rest: '75s', cue: 'Pull to the belly button and drive the shoulder blades back. No rocking the torso.', swaps: ['Chest-Supported Row', 'One-Arm DB Row', 'Machine Row'] },
       { name: 'Dumbbell Shoulder Press', muscle: 'shoulders', sets: 3, reps: '10',     rest: '75s', cue: 'Ribs down, glutes tight. Press up and slightly back rather than forward.', swaps: ['Machine Shoulder Press', 'Arnold Press', 'Landmine Press'] },
-      { name: 'Face Pull',               muscle: 'shoulders', sets: 2, reps: '15',     rest: '45s', cue: 'Pull toward the forehead with elbows high. This is the antidote to a desk job.', swaps: ['Reverse Pec Deck', 'Band Pull-Apart', 'Rear Delt Fly'] },
+      { name: 'Face Pull',               muscle: 'shoulders', sets: 2, reps: '15',     rest: '45s', cue: 'Pull toward the forehead with elbows high. This is the antidote to a desk job.', swaps: ['Rear Delt Fly Machine', 'Band Pull-Apart', 'Rear Delt Fly'] },
       { name: 'Cable Pallof Press',      muscle: 'core',      sets: 3, reps: '10/side',rest: '45s', isCore: true, cue: 'Resist the twist. Nothing moves except your arms. This is the waist exercise that works.', swaps: ['Side Plank', 'Suitcase Carry', 'Half-Kneeling Chop'] },
       { name: 'Hollow Body Hold',        muscle: 'core',      sets: 3, reps: '20–30s', rest: '45s', isCore: true, cue: 'Lower back pressed flat into the floor. Drop the legs closer to the ground to make it harder.', swaps: ['Plank', 'Ab Wheel from Knees', 'Leg Lowers'] },
     ],
@@ -312,7 +314,7 @@ const EXTRA_LIBRARY: Omit<LibraryExercise, 'trackingMode' | 'isCompetitionLift'>
   { name: 'Neutral Grip Pull-Ups', muscle: 'back', sets: 3, reps: '5–8', rest: '90s',
     swaps: ['Pull-Ups', 'Chin-Ups', 'Lat Pulldown'] },
   { name: 'Barbell Rear Delt Row', muscle: 'shoulders', sets: 3, reps: '10–12', rest: '75s',
-    swaps: ['Dumbbell Rear Delt Row', 'Face Pull', 'Reverse Pec Deck'] },
+    swaps: ['Dumbbell Rear Delt Row', 'Face Pull', 'Rear Delt Fly Machine'] },
   { name: 'Dumbbell Rear Delt Row', muscle: 'shoulders', sets: 3, reps: '10–12', rest: '75s',
     swaps: ['Barbell Rear Delt Row', 'Face Pull', 'Rear Delt Fly'] },
   { name: 'Barbell Front Raises', muscle: 'shoulders', sets: 3, reps: '10–12', rest: '60s',
@@ -381,6 +383,12 @@ const EXTRA_LIBRARY: Omit<LibraryExercise, 'trackingMode' | 'isCompetitionLift'>
     swaps: ['Cable Fly', 'Dumbbell Fly', 'Chest Press Machine'] },
   { name: 'Seated Calf Raise', muscle: 'legs', sets: 3, reps: '15–20', rest: '45s',
     swaps: ['Standing Calf Raises'] },
+  { name: 'Incline Chest Press Machine', muscle: 'chest', sets: 3, reps: '8–12', rest: '90s',
+    swaps: ['Chest Press Machine', 'Incline Dumbbell Press', 'Incline Bench Press'] },
+  // The only adductor movement in the catalog; the swaps are the two lifts that
+  // load them hardest rather than true alternatives.
+  { name: 'Inner Thigh Machine', muscle: 'legs', sets: 3, reps: '12–15', rest: '60s',
+    swaps: ['Sumo Deadlift', 'Goblet Squat'] },
 ]
 
 /** Combined catalog — every movement from both programs is pickable. */
@@ -413,8 +421,13 @@ export const COMPETITION_LIFT_IDS: string[] = EXERCISE_LIBRARY
 export function libraryFor(exerciseId: string): LibraryExercise | undefined {
   const exact = LIBRARY_BY_ID[exerciseId]
   if (exact) return exact
+  // A movement that has been renamed since this set was logged.
+  const renamed = LIBRARY_BY_ID[canonicalExerciseId(exerciseId)]
+  if (renamed) return renamed
   const normalised = toExerciseId(exerciseId)
-  return normalised === exerciseId ? undefined : LIBRARY_BY_ID[normalised]
+  return normalised === exerciseId
+    ? undefined
+    : LIBRARY_BY_ID[normalised] ?? LIBRARY_BY_ID[canonicalExerciseId(normalised)]
 }
 
 /** Display name for a logged exercise id, falling back to the id itself. */

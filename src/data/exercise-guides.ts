@@ -7,6 +7,7 @@
  */
 
 import { EXTRA_GUIDES } from './exercise-guides-extra'
+import { canonicalExerciseId } from './exercise-renames'
 
 export type MuscleId =
   | 'glutes' | 'hamstrings' | 'quads' | 'calves' | 'adductors'
@@ -397,7 +398,7 @@ const GROUP_FALLBACK: Record<string, MuscleId[]> = {
 }
 
 export function guideFor(exerciseId: string, muscleGroup?: string): ExerciseGuide | undefined {
-  const guide = EXERCISE_GUIDES[exerciseId]
+  const guide = EXERCISE_GUIDES[exerciseId] ?? EXERCISE_GUIDES[canonicalExerciseId(exerciseId)]
   if (guide) return guide
   const primary = muscleGroup ? GROUP_FALLBACK[muscleGroup] : undefined
   return primary ? { primary, steps: [] } : undefined

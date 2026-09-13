@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import { Sheet } from '@/components/ui/Sheet'
-import { Search, Plus } from 'lucide-react'
+import { Search, Plus, ChevronDown } from 'lucide-react'
 import { getProgram, EXERCISE_LIBRARY, formatTarget, toExerciseId } from '@/data/obzen-program'
+import { FAMILIES, familyFor } from '@/data/exercise-families'
 import { useProfileStore } from '@/store/useProfileStore'
-import type { MuscleGroup } from '@/data/obzen-program'
+import type { MuscleGroup, LibraryExercise } from '@/data/obzen-program'
+import type { FamilyId } from '@/data/exercise-families'
 import type { ExerciseSessionState, DayLabel } from '@/db/dexie'
 import { cn } from '@/lib/utils'
 
@@ -92,18 +94,72 @@ function OtherDaysTab({
 // Library tab
 // ---------------------------------------------------------------------------
 
+/** One pickable movement. Shared by the grouped list and the ungrouped tail. */
+function LibraryRow({
+  ex,
+  onAdd,
+}: { ex: LibraryExercise; onAdd: (ex: ExerciseSessionState) => void }) {
+  return (
+    <button
+      onClick={() => onAdd(makeExerciseState(ex.name, 'library', {
+        muscle: ex.muscle,
+        target: formatTarget(ex),
+      }))}
+      className="w-full flex items-center justify-between px-3 py-2.5 rounded-[var(--r-control)] text-left transition-opacity hover:opacity-70"
+      style={{ background: 'var(--elevated)', border: '1px solid var(--hairline)' }}
+    >
+      <div>
+        <div className="text-[length:var(--text-lg)] flex items-center gap-2" style={{ color: 'var(--ink)' }}>
+          {ex.name}
+          {ex.isCore && (
+            <span className="text-[length:var(--text-2xs)] uppercase tracking-widest px-1 py-0.5 rounded-[var(--r-control)]" style={{ color: 'var(--ink-dim)', border: '1px solid var(--border-strong)' }}>Core</span>
+          )}
+        </div>
+        <div className="text-[length:var(--text-sm)] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>
+          {/* `formatTarget` rather than sets×reps: the movements carried over
+              from the load-based programme have no sets/reps at all, and were
+              rendering as a bare "×". */}
+          {ex.muscle}{formatTarget(ex) && ` · ${formatTarget(ex)}`}
+        </div>
+      </div>
+      <Plus size={14} style={{ color: 'var(--ink-dim)' }} />
+    </button>
+  )
+}
+
 function LibraryTab({
   existingIds,
   onAdd,
 }: { existingIds: string[]; onAdd: (ex: ExerciseSessionState) => void }) {
   const [search, setSearch] = useState('')
   const [muscle, setMuscle] = useState<MuscleGroup | 'all'>('all')
+  const [expanded, setExpanded] = useState<FamilyId[]>([])
 
   const filtered = EXERCISE_LIBRARY.filter(ex => {
     const matchSearch = !search || ex.name.toLowerCase().includes(search.toLowerCase())
     const matchMuscle = muscle === 'all' || ex.muscle === muscle
     return matchSearch && matchMuscle && !existingIds.includes(toExerciseId(ex.name))
   })
+
+  const byFamily = new Map<FamilyId, LibraryExercise[]>()
+  const ungrouped: LibraryExercise[] = []
+  for (const ex of filtered) {
+    const family = familyFor(toExerciseId(ex.name))
+    if (!family) {
+      ungrouped.push(ex)
+      continue
+    }
+    byFamily.set(family, [...(byFamily.get(family) ?? []), ex])
+  }
+  const groups = FAMILIES.filter(f => byFamily.has(f.id))
+
+  // Searching opens everything: a hit inside a collapsed family looks like no
+  // hit at all, and the whole point of typing is to skip the browsing.
+  const searching = search.trim().length > 0
+  const isOpen = (id: FamilyId) => searching || expanded.includes(id)
+  const toggle = (id: FamilyId) => setExpanded(prev =>
+    prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]
+  )
 
   return (
     <div className="space-y-3">
@@ -141,35 +197,53 @@ function LibraryTab({
         ))}
       </div>
 
-      {/* Exercise list */}
-      <div className="space-y-1 max-h-60 overflow-y-auto">
+      {/* Exercise list, grouped by parent lift. No result cap: a cap can hide a
+          whole family behind a collapsed header, which reads as an empty one. */}
+      <div className="space-y-1.5 max-h-60 overflow-y-auto">
         {filtered.length === 0 ? (
           <p className="text-[length:var(--text-sm)]" style={{ color: 'var(--ink-faint)' }}>No exercises found.</p>
         ) : (
-          filtered.slice(0, 50).map(ex => (
-            <button
-              key={ex.name}
-              onClick={() => onAdd(makeExerciseState(ex.name, 'library', {
-                muscle: ex.muscle,
-                target: formatTarget(ex),
-              }))}
-              className="w-full flex items-center justify-between px-3 py-2.5 rounded-[var(--r-control)] text-left transition-opacity hover:opacity-70"
-              style={{ background: 'var(--elevated)', border: '1px solid var(--hairline)' }}
-            >
-              <div>
-                <div className="text-[length:var(--text-lg)] flex items-center gap-2" style={{ color: 'var(--ink)' }}>
-                  {ex.name}
-                  {ex.isCore && (
-                    <span className="text-[length:var(--text-2xs)] uppercase tracking-widest px-1 py-0.5 rounded-[var(--r-control)]" style={{ color: 'var(--ink-dim)', border: '1px solid var(--border-strong)' }}>Core</span>
+          <>
+            {groups.map(family => {
+              const members = byFamily.get(family.id) ?? []
+              const open = isOpen(family.id)
+              return (
+                <div key={family.id} className="space-y-1">
+                  <button
+                    onClick={() => toggle(family.id)}
+                    className="w-full flex items-center justify-between px-3 py-2 rounded-[var(--r-control)] text-left transition-opacity hover:opacity-70"
+                    style={{ background: 'var(--card-accent)', border: '1px solid var(--hairline)' }}
+                    aria-expanded={open}
+                  >
+                    <span className="text-[length:var(--text-md)] uppercase tracking-widest" style={{ color: 'var(--ink-2)' }}>
+                      {family.label}
+                    </span>
+                    <span className="flex items-center gap-2">
+                      <span className="text-[length:var(--text-sm)]" style={{ color: 'var(--ink-faint)' }}>
+                        {members.length}
+                      </span>
+                      <ChevronDown
+                        size={13}
+                        style={{
+                          color: 'var(--ink-dim)',
+                          transform: open ? 'rotate(180deg)' : 'none',
+                          transition: 'transform var(--t-fast) var(--ease-out)',
+                        }}
+                      />
+                    </span>
+                  </button>
+                  {open && (
+                    <div className="space-y-1 pl-2">
+                      {members.map(ex => <LibraryRow key={ex.name} ex={ex} onAdd={onAdd} />)}
+                    </div>
                   )}
                 </div>
-                <div className="text-[length:var(--text-sm)] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>
-                  {ex.muscle} · {ex.sets}×{ex.reps}
-                </div>
-              </div>
-              <Plus size={14} style={{ color: 'var(--ink-dim)' }} />
-            </button>
-          ))
+              )
+            })}
+            {/* Anything the categorisation has never heard of, rather than
+                dropping it on the floor. */}
+            {ungrouped.map(ex => <LibraryRow key={ex.name} ex={ex} onAdd={onAdd} />)}
+          </>
         )}
       </div>
     </div>

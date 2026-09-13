@@ -228,6 +228,24 @@ export const EXTRA_GUIDES: Record<string, ExerciseGuide> = {
       'Open back to a stretch without letting the weight stack rest.',
     ],
   },
+  'incline-chest-press-machine': {
+    primary: ['chest', 'frontDelts'], secondary: ['triceps'],
+    steps: [
+      'Set the seat so the handles sit level with the upper chest.',
+      'Press the back into the pad and pull the shoulders down before the first rep.',
+      'Press up and away, stopping just short of locking the elbows.',
+      'Return until the hands are back level with the chest, under control.',
+    ],
+  },
+  'inner-thigh-machine': {
+    primary: ['adductors'],
+    steps: [
+      'Sit with the pads against the inside of the knees, back flat on the seat.',
+      'Open only as far as the stretch is comfortable — this is the range that hurts people.',
+      'Squeeze the knees together and hold for a beat.',
+      'Let them open slowly; the return is where the work is.',
+    ],
+  },
   'seated-calf-raise': {
     primary: ['calves'],
     steps: [

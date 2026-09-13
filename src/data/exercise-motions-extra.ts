@@ -253,6 +253,29 @@ export const EXTRA_MOTIONS: Record<string, ExerciseMotion> = {
       { head: [92, 48], neck: [94, 60], hip: [96, 98], knee: [124, 106], ankle: [128, 134], elbow: [110, 64], hand: [104, 62] },
     ],
   },
+  'incline-chest-press-machine': {
+    equipment: 'none', durationSec: 2.8, ground: false, bench: { x: 64, y: 104, width: 22 },
+    caption: 'Seated incline press, up and away from the chest',
+    poses: [
+      { head: [80, 54], neck: [82, 66], hip: [84, 102], knee: [112, 110], ankle: [116, 136], elbow: [92, 76], hand: [104, 70] },
+      { head: [80, 54], neck: [82, 66], hip: [84, 102], knee: [112, 110], ankle: [116, 136], elbow: [96, 70], hand: [120, 60] },
+      { head: [80, 54], neck: [82, 66], hip: [84, 102], knee: [112, 110], ankle: [116, 136], elbow: [100, 64], hand: [136, 48] },
+    ],
+  },
+  /**
+   * Drawn facing the viewer, which is the only angle that shows the movement at
+   * all: the knees travel toward each other, and the front rig mirrors each
+   * joint about the centre line, so one knee x gives both legs.
+   */
+  'inner-thigh-machine': {
+    equipment: 'none', durationSec: 2.8, bench: { x: 84, y: 100, width: 26 },
+    caption: 'Seated, squeeze the knees together',
+    poses: [
+      { head: [100, 48], neck: [100, 60], hip: [100, 98], knee: [124, 112], ankle: [132, 134], elbow: [92, 76], hand: [88, 94] },
+      { head: [100, 48], neck: [100, 60], hip: [100, 98], knee: [116, 112], ankle: [120, 134], elbow: [92, 76], hand: [88, 94] },
+      { head: [100, 48], neck: [100, 60], hip: [100, 98], knee: [108, 112], ankle: [108, 134], elbow: [92, 76], hand: [88, 94] },
+    ],
+  },
   'seated-calf-raise': {
     equipment: 'none', view: 'side', durationSec: 2.2, bench: { x: 62, y: 104, width: 40 },
     caption: 'Full stretch down, then high onto the toes',

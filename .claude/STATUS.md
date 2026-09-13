@@ -57,13 +57,21 @@ is also the source of fifteen library exercises, so it cannot simply be deleted.
   stored `dayLabel` is an opaque key, not the number on screen.
 - Three day templates (Pull/Legs/Arms, Zercher/Quad/Shoulders, Posterior/Delts)
   load as a starting point; slots beyond them start empty.
-- Set-by-set logging, drag-to-reorder, swap, add from a **119-exercise
-  library** (40 legs, 21 shoulders, 17 core, 14 arms, 14 back, 13 chest). The
-  catalog is derived from both programme templates plus their swaps and
-  `EXTRA_LIBRARY`; the free-weight set added there covers EZ bar (six
+- Set-by-set logging, drag-to-reorder, swap, add from a **121-exercise
+  library**. The catalog is derived from both programme templates plus their
+  swaps and `EXTRA_LIBRARY`; the free-weight set added there covers EZ bar (six
   movements, the first in the app), barbell, dumbbell, and the cable, machine
   and kettlebell work that came with them. Every entry has a movement
   animation — a test enforces it, so a library addition without one fails.
+- The picker groups those 121 into **29 families by parent lift**
+  (`exercise-families.ts`) — Squat, Deadlift, Curl, Rear Delt and so on.
+  Families are collapsed while browsing, so the list reads as an index, and
+  open automatically while searching, because a hit inside a collapsed family
+  looks like no hit. Legs splits four ways at the top: Squat (leg press
+  included), Lunge & Split Squat, Deadlift, Hinge (every RDL, plus the swing).
+  Tests hold both directions — nothing in the library is unfiled, nothing is
+  filed twice, no family names a movement the library lacks, and no family
+  spans two muscle groups, which the filter chips assume.
 - Session RPE, and a per-set AMRAP flag that drives the 5/3/1 training max
 - Tabs: Program · History · Tools. The open tab lives in the URL.
 
@@ -146,6 +154,12 @@ progress photos, analytics (external tool).
   file-size ceiling. Both tables are merged by the module that owns the types.
 - A new theme needs three accent channels as well as its ramp. Ship the ramp
   alone and every tinted surface silently falls back to the violet in `:root`.
+- **Renaming a movement strands its history.** A session stores the slug of the
+  name it was logged under and nothing rewrites it, so the old id has to keep
+  resolving: add it to `exercise-renames.ts`, which `libraryFor`, `motionFor`
+  and `guideFor` all pass through. Entries there are permanent. Reverse Pec Deck
+  → Rear Delt Fly Machine is the one that exists, and the test for it is the
+  template.
 - `epley1RM` exists twice with different units — `progress.ts` in kg,
   `strengthTools.ts` in lb. Correct today, easy to import the wrong one.
 - Tools has both a route and a Train tab, the same duplication the Progress tab
