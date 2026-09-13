@@ -434,7 +434,7 @@ function MultiLineChart({ series, yLabel }: { series: LineSeries[]; yLabel?: str
                 <span
                   style={{
                     fontSize: 'var(--text-md)', fontWeight: 700,
-                    color: readAt === null ? 'var(--ink-ghost)' : l.hue,
+                    color: readAt === null ? 'var(--ink-dim)' : l.hue,
                     fontVariantNumeric: 'tabular-nums',
                   }}
                 >
@@ -455,7 +455,7 @@ function MultiLineChart({ series, yLabel }: { series: LineSeries[]; yLabel?: str
         </div>
 
         {dates.length > 1 && (
-          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-ghost)', marginTop: 6 }}>
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-dim)', marginTop: 6 }}>
             Tap the chart to read a session.
           </p>
         )}

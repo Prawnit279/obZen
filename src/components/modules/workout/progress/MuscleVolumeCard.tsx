@@ -81,7 +81,7 @@ function MuscleRow({ reading }: RowProps) {
         ))}
       </div>
 
-      <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-ghost)' }}>
+      <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-dim)' }}>
         {landmark.mev}–{landmark.mav} reference, {landmark.mrv} ceiling
         {landmark.covers.length > 1 && ` · covers ${landmark.covers.join(', ')}`}
       </span>
@@ -107,7 +107,7 @@ export function MuscleVolumeCard({ readings }: { readings: MuscleReading[] }) {
         {readings.map(r => <MuscleRow key={r.muscle} reading={r} />)}
       </div>
 
-      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-ghost)' }}>
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-dim)' }}>
         Counts come from your logged sets. The reference ranges are coaching
         heuristics rather than measured thresholds, they vary between people,
         and this app records six coarse groups where the published landmarks are

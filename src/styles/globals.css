@@ -53,7 +53,16 @@
 
     /* ink — body copy sits at --ink-dim or lighter; --ink-off is for 10–11px
        labels only; --ink-ghost marks future/untracked slots and is never text
-       the reader needs. */
+       the reader needs.
+
+       That last rule is now actually kept. Twelve blocks of real copy were
+       drawn in --ink-ghost — the dosha disclaimer, the volume-reference
+       explanation, "tap the chart to read a session", "not trained" — which on
+       a light ground is 1.7:1 and effectively invisible. They are body copy and
+       sit at --ink-dim. What is left on --ink-ghost is a placeholder, an em
+       dash for a day with nothing logged, and an untrained day slot: marks,
+       not messages. Note --ink-faint measures 4.4:1 on a light card, so it is
+       not the fallback for anything that has to be read. */
     --ink:       #F2F0F7;
     --ink-2:     #CFC9DE;
     --ink-dim:   #A29DB4;

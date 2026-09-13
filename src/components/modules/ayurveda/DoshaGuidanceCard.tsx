@@ -102,7 +102,7 @@ export function DoshaGuidanceCard() {
 
       <p
         style={{
-          fontSize: 'var(--text-sm)', lineHeight: 1.5, color: 'var(--ink-ghost)',
+          fontSize: 'var(--text-sm)', lineHeight: 1.5, color: 'var(--ink-dim)',
           paddingTop: 12, borderTop: '1px solid var(--hairline-soft)',
         }}
       >

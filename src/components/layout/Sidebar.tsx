@@ -79,7 +79,7 @@ export function Sidebar() {
       <div className="px-4 py-3" style={{ borderTop: '1px solid var(--hairline)' }}>
         <div
           className="uppercase"
-          style={{ fontSize: 'var(--text-sm)', letterSpacing: '0.08em', color: 'var(--ink-ghost)' }}
+          style={{ fontSize: 'var(--text-sm)', letterSpacing: '0.08em', color: 'var(--ink-dim)' }}
         >
           v1.0.0
         </div>

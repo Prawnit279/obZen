@@ -22,7 +22,7 @@ export function TrendRates({ signals }: { signals: LiftSignal[] }) {
           <div key={sig.exerciseId} className="flex items-baseline justify-between" style={{ gap: 12 }}>
             <span style={{ fontSize: 'var(--text-base)', color: 'var(--ink-dim)' }}>{sig.name}</span>
             {rate === null ? (
-              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-ghost)' }}>not enough sessions</span>
+              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-dim)' }}>not enough sessions</span>
             ) : (
               <span
                 style={{

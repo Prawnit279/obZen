@@ -82,7 +82,7 @@ export function AmrapCard({ advice }: { advice: TmAdvice[] }) {
     <Card label="Off your last all-out set">
       {advice.map(a => <AdviceRow key={a.exerciseId} advice={a} />)}
 
-      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-ghost)' }}>
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-dim)' }}>
         The app stores no training max, so “what you have been running” is taken
         from the best estimate in your history before that set. Treat these as a
         starting point for the next cycle, not a prescription.

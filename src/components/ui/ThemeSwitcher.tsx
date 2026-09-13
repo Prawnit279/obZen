@@ -76,7 +76,11 @@ export function ThemeSwitcher() {
             className="uppercase"
             style={{
               fontSize: 'var(--text-2xs)', letterSpacing: '0.14em',
-              color: 'var(--ink-off)',
+              /* --ink-off is the token for a label this size, but at 10px it
+                 lands at 3.5:1 on a light card and 3.9:1 on the dark ground.
+                 These name a section rather than annotate one, so they take the
+                 next step up the scale and clear AA in both. */
+              color: 'var(--ink-dim)',
             }}
           >
             {group.label}

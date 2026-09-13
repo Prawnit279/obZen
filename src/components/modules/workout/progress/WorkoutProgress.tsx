@@ -390,7 +390,7 @@ export function WorkoutProgress() {
                   <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)' }}>
                     {ev.previousKg === null ? 'first' : `from ${lb(ev.previousKg)}`}
                   </span>
-                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-ghost)' }}>{ev.date.slice(5)}</span>
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-dim)' }}>{ev.date.slice(5)}</span>
                 </span>
               </li>
             ))}

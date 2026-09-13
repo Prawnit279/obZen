@@ -199,7 +199,7 @@ export default function Settings() {
                 {guidance.elements} · {guidance.qualities.slice(0, 3).join(', ')}.
                 {' '}{guidance.principle}
               </p>
-              <p className="text-[length:var(--text-sm)] leading-relaxed pt-1.5" style={{ color: 'var(--ink-ghost)' }}>
+              <p className="text-[length:var(--text-sm)] leading-relaxed pt-1.5" style={{ color: 'var(--ink-dim)' }}>
                 A traditional framework, not medical advice. It shapes the tips
                 the app offers, nothing it calculates.
               </p>
@@ -217,7 +217,7 @@ export default function Settings() {
                 Days a week the plan asks for. Train shows this many, and the
                 week counts against it.
               </p>
-              <p className="text-[length:var(--text-sm)] leading-relaxed pt-1.5" style={{ color: 'var(--ink-ghost)' }}>
+              <p className="text-[length:var(--text-sm)] leading-relaxed pt-1.5" style={{ color: 'var(--ink-dim)' }}>
                 Train more than you planned and the week simply grows — lowering
                 this never hides a session you already logged.
               </p>
