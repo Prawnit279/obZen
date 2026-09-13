@@ -116,7 +116,7 @@ export function ExerciseCard({
                     status === 'complete' && 'line-through opacity-60'
                   )}
                   style={{
-                    fontSize: 17, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.25,
+                    fontSize: 'var(--text-2xl)', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.25,
                     color: status === 'skipped' ? 'var(--ink-faint)' : 'var(--ink)',
                     // Visible enough to read as tappable on both themes.
                     textDecorationColor: 'var(--ink-off)',
@@ -126,7 +126,7 @@ export function ExerciseCard({
                   {displayName}
                 </button>
                 {exerciseState.addedFrom && (
-                  <span className="uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', color: 'var(--ink-faint)' }}>
+                  <span className="uppercase" style={{ fontSize: 'var(--text-sm)', letterSpacing: '0.08em', color: 'var(--ink-faint)' }}>
                     +{exerciseState.addedFrom}
                   </span>
                 )}
@@ -134,7 +134,7 @@ export function ExerciseCard({
                   <span
                     className="uppercase"
                     style={{
-                      fontSize: 11, letterSpacing: '0.08em', padding: '2px 8px',
+                      fontSize: 'var(--text-sm)', letterSpacing: '0.08em', padding: '2px 8px',
                       borderRadius: 'var(--r-pill)', border: '1px solid var(--hairline)',
                       color: 'var(--ink-dim)',
                     }}
@@ -146,7 +146,7 @@ export function ExerciseCard({
                   <span
                     className="flex items-center gap-1 uppercase"
                     style={{
-                      fontSize: 11, letterSpacing: '0.08em', padding: '2px 8px',
+                      fontSize: 'var(--text-sm)', letterSpacing: '0.08em', padding: '2px 8px',
                       borderRadius: 'var(--r-pill)',
                       color: 'var(--violet-100)', border: '1px solid rgba(167,139,250,0.35)',
                     }}
@@ -159,7 +159,7 @@ export function ExerciseCard({
 
               {/* Prescription / muscle label */}
               {(target || muscle) && (
-                <div className="uppercase" style={{ fontSize: 11, letterSpacing: '0.08em', color: 'var(--ink-dim)', marginTop: 4 }}>
+                <div className="uppercase" style={{ fontSize: 'var(--text-sm)', letterSpacing: '0.08em', color: 'var(--ink-dim)', marginTop: 4 }}>
                   {target}
                   {muscle && <span className="ml-2 normal-case capitalize">{muscle}</span>}
                 </div>
@@ -171,7 +171,7 @@ export function ExerciseCard({
                   className="inline-block"
                   style={{
                     marginTop: 8, padding: '3px 10px', borderRadius: 'var(--r-pill)',
-                    fontSize: 11, color: 'var(--complete-text)',
+                    fontSize: 'var(--text-sm)', color: 'var(--complete-text)',
                     border: '1px solid var(--complete-border)',
                   }}
                 >
@@ -184,7 +184,7 @@ export function ExerciseCard({
               {cue && status !== 'skipped' && (
                 <p
                   style={{
-                    fontSize: 13, lineHeight: 1.5, marginTop: 8, paddingLeft: 10,
+                    fontSize: 'var(--text-base)', lineHeight: 1.5, marginTop: 8, paddingLeft: 10,
                     color: 'var(--ink-dim)', borderLeft: '2px solid rgba(167,139,250,0.35)',
                   }}
                 >
@@ -232,7 +232,7 @@ export function ExerciseCard({
                 border: '1px solid var(--skip-border)', background: 'var(--skip-bg)',
               }}
             >
-              <p style={{ fontSize: 13, color: 'var(--ink-2)' }}>
+              <p style={{ fontSize: 'var(--text-base)', color: 'var(--ink-2)' }}>
                 Remove {displayName} from this day?
                 {exerciseState.sets.length > 0 && (
                   <span style={{ color: 'var(--skip-text)' }}>
@@ -247,7 +247,7 @@ export function ExerciseCard({
                   className="uppercase transition-opacity hover:opacity-70"
                   style={{
                     padding: '7px 14px', borderRadius: 'var(--r-control)',
-                    fontSize: 11, fontWeight: 500, letterSpacing: '0.08em',
+                    fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.08em',
                     border: '1px solid var(--hairline)', color: 'var(--ink-dim)',
                   }}
                 >
@@ -258,7 +258,7 @@ export function ExerciseCard({
                   className="uppercase transition-opacity hover:opacity-70"
                   style={{
                     padding: '7px 14px', borderRadius: 'var(--r-control)',
-                    fontSize: 11, fontWeight: 500, letterSpacing: '0.08em',
+                    fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.08em',
                     border: '1px solid var(--skip-border)', color: 'var(--skip-text)',
                   }}
                   aria-label={`Confirm remove ${displayName}`}
@@ -278,7 +278,7 @@ export function ExerciseCard({
                   className="uppercase transition-opacity hover:opacity-70"
                   style={{
                     padding: '6px 12px', borderRadius: 'var(--r-control)',
-                    fontSize: 11, fontWeight: 500, letterSpacing: '0.08em',
+                    fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.08em',
                     border: '1px solid var(--complete-border)', color: 'var(--complete-text)',
                   }}
                   aria-label={`Complete ${displayName}`}
@@ -290,7 +290,7 @@ export function ExerciseCard({
                   className="uppercase transition-opacity hover:opacity-70"
                   style={{
                     padding: '7px 14px', borderRadius: 'var(--r-control)',
-                    fontSize: 11, fontWeight: 500, letterSpacing: '0.08em',
+                    fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.08em',
                     border: '1px solid var(--skip-border)', color: 'var(--skip-text)',
                   }}
                   aria-label={`Skip ${displayName}`}
@@ -305,7 +305,7 @@ export function ExerciseCard({
                 className="uppercase transition-opacity hover:opacity-70"
                 style={{
                   padding: '6px 12px', borderRadius: 'var(--r-control)',
-                  fontSize: 11, fontWeight: 500, letterSpacing: '0.08em',
+                  fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.08em',
                   border: '1px solid var(--hairline)', color: 'var(--ink-dim)',
                 }}
                 aria-label={`Undo ${displayName}`}

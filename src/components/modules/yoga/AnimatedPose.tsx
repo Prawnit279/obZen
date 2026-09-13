@@ -53,7 +53,7 @@ export function AnimatedPose({
           borderRadius: 2,
         }}
       >
-        <span style={{ fontSize: 10, color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: 2 }}>
+        <span style={{ fontSize: 'var(--text-xs)', color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: 2 }}>
           —
         </span>
       </div>

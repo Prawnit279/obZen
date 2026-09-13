@@ -21,14 +21,14 @@ export function DaySummaryBar({ dayLabel, focus, exercises }: Props) {
       {/* Label row */}
       <div className="flex items-baseline justify-between">
         <div>
-          <span className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink)' }}>
+          <span className="text-[length:var(--text-sm)] uppercase tracking-widest" style={{ color: 'var(--ink)' }}>
             {dayLabel}
           </span>
-          <span className="text-[11px] uppercase tracking-widest ml-2" style={{ color: 'var(--ink-faint)' }}>
+          <span className="text-[length:var(--text-sm)] uppercase tracking-widest ml-2" style={{ color: 'var(--ink-faint)' }}>
             · {focus}
           </span>
         </div>
-        <span className="text-[11px] font-mono tabular-nums" style={{ color: 'var(--ink-faint)' }}>
+        <span className="text-[length:var(--text-sm)] font-mono tabular-nums" style={{ color: 'var(--ink-faint)' }}>
           {pct}%
         </span>
       </div>
@@ -42,7 +42,7 @@ export function DaySummaryBar({ dayLabel, focus, exercises }: Props) {
       </div>
 
       {/* Counts */}
-      <div className="flex gap-4 text-[11px] uppercase tracking-widest">
+      <div className="flex gap-4 text-[length:var(--text-sm)] uppercase tracking-widest">
         <span style={{ color: 'var(--complete-text)' }}>{complete} complete</span>
         <span style={{ color: 'var(--skip-text)' }}>{skipped} skipped</span>
         <span style={{ color: 'var(--ink-faint)' }}>{pending} pending</span>

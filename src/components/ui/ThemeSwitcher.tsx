@@ -50,7 +50,7 @@ export function ThemeSwitcher() {
               <span
                 className="uppercase"
                 style={{
-                  fontSize: 11, letterSpacing: '0.08em',
+                  fontSize: 'var(--text-sm)', letterSpacing: '0.08em',
                   color: isActive ? 'var(--ink)' : 'var(--ink-faint)',
                 }}
               >

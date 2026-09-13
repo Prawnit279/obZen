@@ -68,7 +68,7 @@ export function ProgressOverloadChart() {
 
   return (
     <div>
-      <div className="text-[9px] uppercase tracking-widest text-noir-dim mb-2">
+      <div className="text-[length:var(--text-2xs)] uppercase tracking-widest text-noir-dim mb-2">
         Progressive Overload · working weight · lbs
       </div>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`}>
@@ -124,7 +124,7 @@ export function ProgressOverloadChart() {
         {activeSeries.map(ex => (
           <div key={ex} className="flex items-center gap-1">
             <div className="w-4 h-[2px]" style={{ background: LINE_COLORS[keyLiftIds.indexOf(ex)] }} />
-            <span className="text-[8px] uppercase tracking-widest text-noir-dim">
+            <span className="text-[length:var(--text-3xs)] uppercase tracking-widest text-noir-dim">
               {exerciseNameFor(ex)}
             </span>
           </div>
@@ -136,7 +136,7 @@ export function ProgressOverloadChart() {
 
 function Empty({ text }: { text: string }) {
   return (
-    <div className="h-36 flex items-center justify-center text-[10px] uppercase tracking-widest text-noir-dim">
+    <div className="h-36 flex items-center justify-center text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim">
       {text}
     </div>
   )

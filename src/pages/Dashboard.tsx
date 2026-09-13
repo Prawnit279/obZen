@@ -109,7 +109,7 @@ export default function Dashboard() {
           <div className="flex items-center justify-between gap-2">
             <span
               className="uppercase"
-              style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+              style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
             >
               {dayOfWeek()}
             </span>
@@ -117,23 +117,23 @@ export default function Dashboard() {
           <h1
             className="mt-1"
             style={{
-              fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em',
+              fontSize: 'var(--text-6xl)', fontWeight: 700, letterSpacing: '-0.025em',
               lineHeight: 1.1, color: 'var(--ink)',
             }}
           >
             {formatDateLong(new Date())}
           </h1>
-          <div style={{ fontSize: 13, color: 'var(--ink-dim)', marginTop: 2 }}>
+          <div style={{ fontSize: 'var(--text-base)', color: 'var(--ink-dim)', marginTop: 2 }}>
             {profileName}'s day
           </div>
           <div className="flex items-center gap-3 mt-1 flex-wrap">
             {SHOW_ASTROLOGY && (
               <>
-                <span className="text-[10px] uppercase tracking-widest text-noir-dim">
+                <span className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim">
                   {planetaryDay.planet} Day
                 </span>
                 <span className="text-noir-dim">·</span>
-                <span className="text-[10px] uppercase tracking-widest text-noir-dim">
+                <span className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim">
                   {getMoonPhaseName()}
                 </span>
               </>
@@ -174,8 +174,8 @@ export default function Dashboard() {
               >
                 <AlertTriangle size={14} style={{ color: 'var(--red)' }} className="mt-0.5 shrink-0" />
                 <div>
-                  <div className="uppercase" style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', marginBottom: 2, color: 'var(--red)' }}>Low Readiness</div>
-                  <div style={{ fontSize: 13, color: 'var(--ink-dim)' }}>
+                  <div className="uppercase" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em', marginBottom: 2, color: 'var(--red)' }}>Low Readiness</div>
+                  <div style={{ fontSize: 'var(--text-base)', color: 'var(--ink-dim)' }}>
                     {checkIn?.soreness === 'high' && 'High soreness. '}
                     {checkIn && checkIn.energy <= 2 && 'Low energy. '}
                     Consider rest only today.
@@ -193,8 +193,8 @@ export default function Dashboard() {
               >
                 <Zap size={14} style={{ color: 'var(--violet-100)' }} className="mt-0.5 shrink-0" />
                 <div>
-                  <div className="uppercase" style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', marginBottom: 2, color: 'var(--violet-100)' }}>Forearm Fatigue</div>
-                  <div style={{ fontSize: 13, color: 'var(--ink-dim)' }}>Reduce pull-up volume. Skip Hammer Curls.</div>
+                  <div className="uppercase" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em', marginBottom: 2, color: 'var(--violet-100)' }}>Forearm Fatigue</div>
+                  <div style={{ fontSize: 'var(--text-base)', color: 'var(--ink-dim)' }}>Reduce pull-up volume. Skip Hammer Curls.</div>
                 </div>
               </div>
             )}
@@ -208,8 +208,8 @@ export default function Dashboard() {
               >
                 <Flame size={14} style={{ color: 'var(--ink-dim)' }} className="mt-0.5 shrink-0" />
                 <div>
-                  <div className="uppercase" style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', marginBottom: 2, color: 'var(--ink-2)' }}>Saturn Day</div>
-                  <div style={{ fontSize: 13, color: 'var(--ink-dim)' }}>Om Shani Namaha · Service · No new starts.</div>
+                  <div className="uppercase" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em', marginBottom: 2, color: 'var(--ink-2)' }}>Saturn Day</div>
+                  <div style={{ fontSize: 'var(--text-base)', color: 'var(--ink-dim)' }}>Om Shani Namaha · Service · No new starts.</div>
                 </div>
               </div>
             )}
@@ -225,7 +225,7 @@ export default function Dashboard() {
               border: '1px dashed var(--hairline)',
               borderRadius: 'var(--r-card)',
               padding: '16px 0',
-              fontSize: 11,
+              fontSize: 'var(--text-sm)',
               fontWeight: 500,
               letterSpacing: '0.12em',
               color: 'var(--ink-faint)',
@@ -239,7 +239,7 @@ export default function Dashboard() {
             <div className="flex items-center justify-between">
               <span
                 className="uppercase"
-                style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+                style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
               >
                 Today's Check-in
               </span>
@@ -253,27 +253,27 @@ export default function Dashboard() {
             </div>
             <div className="grid grid-cols-4 gap-2">
               <div className="text-center">
-                <div style={{ fontSize: 20, fontWeight: 700, lineHeight: 1, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{checkIn.mood}</div>
-                <div className="uppercase" style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', color: 'var(--ink-faint)', marginTop: 6 }}>Mood</div>
+                <div style={{ fontSize: 'var(--text-4xl)', fontWeight: 700, lineHeight: 1, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{checkIn.mood}</div>
+                <div className="uppercase" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.08em', color: 'var(--ink-faint)', marginTop: 6 }}>Mood</div>
               </div>
               <div className="text-center">
-                <div style={{ fontSize: 20, fontWeight: 700, lineHeight: 1, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{checkIn.energy}</div>
-                <div className="uppercase" style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', color: 'var(--ink-faint)', marginTop: 6 }}>Energy</div>
+                <div style={{ fontSize: 'var(--text-4xl)', fontWeight: 700, lineHeight: 1, color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>{checkIn.energy}</div>
+                <div className="uppercase" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.08em', color: 'var(--ink-faint)', marginTop: 6 }}>Energy</div>
               </div>
               <div className="text-center">
-                <div className="capitalize" style={{ fontSize: 15, fontWeight: 500, lineHeight: 1.35, color: 'var(--ink-2)' }}>
+                <div className="capitalize" style={{ fontSize: 'var(--text-xl)', fontWeight: 500, lineHeight: 1.35, color: 'var(--ink-2)' }}>
                   {checkIn.soreness}
                 </div>
-                <div className="uppercase" style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', color: 'var(--ink-faint)', marginTop: 6 }}>Soreness</div>
+                <div className="uppercase" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.08em', color: 'var(--ink-faint)', marginTop: 6 }}>Soreness</div>
               </div>
               <div className="text-center">
                 <div style={{
-                  fontSize: 15, fontWeight: 500, lineHeight: 1.35,
+                  fontSize: 'var(--text-xl)', fontWeight: 500, lineHeight: 1.35,
                   color: checkIn.forearmFatigue ? 'var(--violet-100)' : 'var(--ink-faint)',
                 }}>
                   {checkIn.forearmFatigue ? 'Yes' : 'No'}
                 </div>
-                <div className="uppercase" style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', color: 'var(--ink-faint)', marginTop: 6 }}>Forearm</div>
+                <div className="uppercase" style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.08em', color: 'var(--ink-faint)', marginTop: 6 }}>Forearm</div>
               </div>
             </div>
           </Card>
@@ -288,19 +288,19 @@ export default function Dashboard() {
           <CardHeader label="Today's Workout" />
           {program ? (
             <div className="flex flex-col" style={{ gap: 6 }}>
-              <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
+              <div style={{ fontSize: 'var(--text-4xl)', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
                 {programDayLabel}
               </div>
-              <div style={{ fontSize: 13, color: 'var(--ink-dim)' }}>{program.focus}</div>
+              <div style={{ fontSize: 'var(--text-base)', color: 'var(--ink-dim)' }}>{program.focus}</div>
               <div
                 className="uppercase"
-                style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', color: 'var(--ink-faint)' }}
+                style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.08em', color: 'var(--ink-faint)' }}
               >
                 {program.exercises.length} exercises · tap to start
               </div>
             </div>
           ) : (
-            <div style={{ fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
+            <div style={{ fontSize: 'var(--text-4xl)', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
               {programDayLabel}
             </div>
           )}
@@ -339,11 +339,11 @@ export default function Dashboard() {
         {SHOW_VEDIC && (
           <Card>
             <CardHeader label={`Vedic · ${dailyRemedy.planet}`} />
-            <p style={{ fontSize: 13, lineHeight: 1.55, fontStyle: 'italic', color: 'var(--ink-2)' }}>
+            <p style={{ fontSize: 'var(--text-base)', lineHeight: 1.55, fontStyle: 'italic', color: 'var(--ink-2)' }}>
               "{dailyRemedy.affirmation}"
             </p>
             {dailyRemedy.remedies[0] && (
-              <p style={{ fontSize: 13, color: 'var(--ink-dim)' }}>{dailyRemedy.remedies[0]}</p>
+              <p style={{ fontSize: 'var(--text-base)', color: 'var(--ink-dim)' }}>{dailyRemedy.remedies[0]}</p>
             )}
           </Card>
         )}
@@ -356,8 +356,8 @@ export default function Dashboard() {
               {upcomingEvents.map(event => (
                 <div key={event.id} className="flex items-center justify-between py-1.5 border-b border-noir-border last:border-0">
                   <div>
-                    <div className="text-[12px] text-noir-accent">{event.title}</div>
-                    <div className="text-[10px] text-noir-dim">{event.date}{event.startTime ? ` · ${event.startTime}` : ''}</div>
+                    <div className="text-[length:var(--text-md)] text-noir-accent">{event.title}</div>
+                    <div className="text-[length:var(--text-xs)] text-noir-dim">{event.date}{event.startTime ? ` · ${event.startTime}` : ''}</div>
                   </div>
                   <Badge variant="dim">{event.category}</Badge>
                 </div>

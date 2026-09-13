@@ -10,15 +10,15 @@ export default function Tools() {
     <div className="page-container space-y-4">
       <button
         onClick={goBack}
-        className="flex items-center gap-1.5 text-[12px] uppercase tracking-widest transition-opacity hover:opacity-70"
+        className="flex items-center gap-1.5 text-[length:var(--text-md)] uppercase tracking-widest transition-opacity hover:opacity-70"
         style={{ color: 'var(--muted)' }}
       >
         <ArrowLeft size={14} /> Back
       </button>
 
       <div className="pt-1">
-        <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Lab</div>
-        <h1 className="text-[20px] uppercase tracking-wide" style={{ color: 'var(--accent)' }}>Tools</h1>
+        <div className="text-[length:var(--text-sm)] uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Lab</div>
+        <h1 className="text-[length:var(--text-4xl)] uppercase tracking-wide" style={{ color: 'var(--accent)' }}>Tools</h1>
       </div>
 
       <StrengthTools />

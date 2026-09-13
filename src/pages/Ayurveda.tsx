@@ -16,8 +16,8 @@ export default function Ayurveda() {
   return (
     <div className="page-container space-y-4">
       <div className="pt-2">
-        <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-dim)]">Pitta Dosha</div>
-        <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
+        <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-dim)]">Pitta Dosha</div>
+        <h1 style={{ fontSize: 'var(--text-6xl)', fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
           Ayurveda
         </h1>
       </div>
@@ -68,7 +68,7 @@ function RoutineTab() {
       <Card>
         <CardHeader
           label="Morning Practices"
-          action={<span className="text-[11px] text-[color:var(--ink-dim)]">{morningDone}/{morningTotal}</span>}
+          action={<span className="text-[length:var(--text-sm)] text-[color:var(--ink-dim)]">{morningDone}/{morningTotal}</span>}
         />
         <div className="space-y-2">
           {PITTA_DINACHARYA.morningPractices.map(practice => {
@@ -83,10 +83,10 @@ function RoutineTab() {
                   {done ? <CheckSquare size={14} /> : <Square size={14} />}
                 </div>
                 <div>
-                  <div className={cn('text-[12px] transition-colors', done ? 'text-[color:var(--ink-dim)] line-through' : 'text-[color:var(--ink-2)]')}>
+                  <div className={cn('text-[length:var(--text-md)] transition-colors', done ? 'text-[color:var(--ink-dim)] line-through' : 'text-[color:var(--ink-2)]')}>
                     {practice.label}
                   </div>
-                  <div className="text-[11px] text-[color:var(--ink-faint)]">{practice.note}</div>
+                  <div className="text-[length:var(--text-sm)] text-[color:var(--ink-faint)]">{practice.note}</div>
                 </div>
               </button>
             )
@@ -97,7 +97,7 @@ function RoutineTab() {
       <Card>
         <CardHeader
           label="Evening Practices"
-          action={<span className="text-[11px] text-[color:var(--ink-dim)]">{eveningDone}/{eveningTotal}</span>}
+          action={<span className="text-[length:var(--text-sm)] text-[color:var(--ink-dim)]">{eveningDone}/{eveningTotal}</span>}
         />
         <div className="space-y-2">
           {PITTA_DINACHARYA.eveningPractices.map(practice => {
@@ -112,10 +112,10 @@ function RoutineTab() {
                   {done ? <CheckSquare size={14} /> : <Square size={14} />}
                 </div>
                 <div>
-                  <div className={cn('text-[12px] transition-colors', done ? 'text-[color:var(--ink-dim)] line-through' : 'text-[color:var(--ink-2)]')}>
+                  <div className={cn('text-[length:var(--text-md)] transition-colors', done ? 'text-[color:var(--ink-dim)] line-through' : 'text-[color:var(--ink-2)]')}>
                     {practice.label}
                   </div>
-                  <div className="text-[11px] text-[color:var(--ink-faint)]">{practice.note}</div>
+                  <div className="text-[length:var(--text-sm)] text-[color:var(--ink-faint)]">{practice.note}</div>
                 </div>
               </button>
             )
@@ -149,34 +149,34 @@ function RemediesTab() {
             onClick={() => setExpanded(expanded === remedy.condition ? null : remedy.condition)}
             className="w-full text-left p-4 flex items-center justify-between"
           >
-            <span className="text-[13px] text-[color:var(--ink-2)]">{remedy.condition}</span>
+            <span className="text-[length:var(--text-base)] text-[color:var(--ink-2)]">{remedy.condition}</span>
             {expanded === remedy.condition ? <ChevronDown size={14} className="text-[color:var(--ink-faint)]" /> : <ChevronRight size={14} className="text-[color:var(--ink-faint)]" />}
           </button>
           {expanded === remedy.condition && (
             <div className="px-4 pb-4 space-y-3 border-t border-[color:var(--hairline)] pt-3">
               <div>
-                <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-2">Remedies</div>
+                <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-faint)] mb-2">Remedies</div>
                 <ul className="space-y-1">
                   {remedy.remedies.map((r, j) => (
-                    <li key={j} className="text-[12px] text-[color:var(--ink-dim)] flex gap-2">
+                    <li key={j} className="text-[length:var(--text-md)] text-[color:var(--ink-dim)] flex gap-2">
                       <span className="text-[color:var(--ink-faint)] shrink-0">·</span>{r}
                     </li>
                   ))}
                 </ul>
               </div>
               <div>
-                <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-1.5">Herbs</div>
+                <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-faint)] mb-1.5">Herbs</div>
                 <div className="flex flex-wrap gap-1.5">
                   {remedy.herbs.map(h => (
-                    <span key={h} className="text-[11px] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-2 py-0.5 text-[color:var(--ink-dim)]">
+                    <span key={h} className="text-[length:var(--text-sm)] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-2 py-0.5 text-[color:var(--ink-dim)]">
                       {h}
                     </span>
                   ))}
                 </div>
               </div>
               <div>
-                <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-1">Lifestyle</div>
-                <p className="text-[12px] text-[color:var(--ink-dim)]">{remedy.lifestyle}</p>
+                <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-faint)] mb-1">Lifestyle</div>
+                <p className="text-[length:var(--text-md)] text-[color:var(--ink-dim)]">{remedy.lifestyle}</p>
               </div>
             </div>
           )}

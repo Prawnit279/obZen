@@ -27,7 +27,7 @@ export function Badge({ children, variant = 'default', className }: BadgeProps) 
         borderRadius: 'var(--r-pill)',
         border: `1px solid ${v.border}`,
         color: v.color,
-        fontSize: 11,
+        fontSize: 'var(--text-sm)',
         fontWeight: 500,
         letterSpacing: '0.08em',
         lineHeight: 1.4,

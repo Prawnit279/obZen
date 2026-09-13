@@ -6,8 +6,8 @@ const CARD = { background: 'var(--card)', border: '1px solid var(--border)' } as
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
     <section className="rounded-[var(--r-control)] p-4" style={CARD}>
-      <h2 style={{ fontSize: 18, fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--ink)' }}>{title}</h2>
-      <div className="text-[13px] leading-relaxed mt-2 space-y-2" style={{ color: 'var(--ink-dim)' }}>
+      <h2 style={{ fontSize: 'var(--text-3xl)', fontWeight: 600, letterSpacing: '-0.01em', color: 'var(--ink)' }}>{title}</h2>
+      <div className="text-[length:var(--text-base)] leading-relaxed mt-2 space-y-2" style={{ color: 'var(--ink-dim)' }}>
         {children}
       </div>
     </section>
@@ -25,15 +25,15 @@ export default function FiveThreeOneGuide() {
     <div className="page-container space-y-4">
       <button
         onClick={goBack}
-        className="flex items-center gap-1.5 text-[12px] uppercase tracking-widest transition-opacity hover:opacity-70"
+        className="flex items-center gap-1.5 text-[length:var(--text-md)] uppercase tracking-widest transition-opacity hover:opacity-70"
         style={{ color: 'var(--ink-dim)' }}
       >
         <ArrowLeft size={14} /> Back
       </button>
 
       <div className="pt-1">
-        <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-dim)' }}>Reference</div>
-        <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
+        <div className="text-[length:var(--text-sm)] uppercase tracking-widest" style={{ color: 'var(--ink-dim)' }}>Reference</div>
+        <h1 style={{ fontSize: 'var(--text-6xl)', fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
           5/3/1 Guide
         </h1>
       </div>

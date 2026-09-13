@@ -10,7 +10,7 @@ export function Input({ label, error, className, id, ...props }: InputProps) {
   return (
     <div className="flex flex-col gap-1">
       {label && (
-        <label htmlFor={id} className="text-[10px] uppercase tracking-widest text-noir-muted">
+        <label htmlFor={id} className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-muted">
           {label}
         </label>
       )}
@@ -18,14 +18,14 @@ export function Input({ label, error, className, id, ...props }: InputProps) {
         id={id}
         className={cn(
           'bg-noir-surface border border-noir-border rounded-[2px] px-3 py-2',
-          'text-[13px] text-noir-accent placeholder:text-noir-dim',
+          'text-[length:var(--text-base)] text-noir-accent placeholder:text-noir-dim',
           'focus:outline-none focus:border-noir-strong transition-colors duration-150 w-full',
           error && 'border-noir-red',
           className
         )}
         {...props}
       />
-      {error && <span className="text-[11px] text-noir-red">{error}</span>}
+      {error && <span className="text-[length:var(--text-sm)] text-noir-red">{error}</span>}
     </div>
   )
 }
@@ -39,7 +39,7 @@ export function Textarea({ label, error, className, id, ...props }: TextareaProp
   return (
     <div className="flex flex-col gap-1">
       {label && (
-        <label htmlFor={id} className="text-[10px] uppercase tracking-widest text-noir-muted">
+        <label htmlFor={id} className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-muted">
           {label}
         </label>
       )}
@@ -47,14 +47,14 @@ export function Textarea({ label, error, className, id, ...props }: TextareaProp
         id={id}
         className={cn(
           'bg-noir-surface border border-noir-border rounded-[2px] px-3 py-2',
-          'text-[13px] text-noir-accent placeholder:text-noir-dim resize-none',
+          'text-[length:var(--text-base)] text-noir-accent placeholder:text-noir-dim resize-none',
           'focus:outline-none focus:border-noir-strong transition-colors duration-150 w-full',
           error && 'border-noir-red',
           className
         )}
         {...props}
       />
-      {error && <span className="text-[11px] text-noir-red">{error}</span>}
+      {error && <span className="text-[length:var(--text-sm)] text-noir-red">{error}</span>}
     </div>
   )
 }
@@ -69,7 +69,7 @@ export function Select({ label, options, error, className, id, ...props }: Selec
   return (
     <div className="flex flex-col gap-1">
       {label && (
-        <label htmlFor={id} className="text-[10px] uppercase tracking-widest text-noir-muted">
+        <label htmlFor={id} className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-muted">
           {label}
         </label>
       )}
@@ -77,7 +77,7 @@ export function Select({ label, options, error, className, id, ...props }: Selec
         id={id}
         className={cn(
           'bg-noir-surface border border-noir-border rounded-[2px] px-3 py-2',
-          'text-[13px] text-noir-accent',
+          'text-[length:var(--text-base)] text-noir-accent',
           'focus:outline-none focus:border-noir-strong transition-colors duration-150 w-full',
           error && 'border-noir-red',
           className
@@ -90,7 +90,7 @@ export function Select({ label, options, error, className, id, ...props }: Selec
           </option>
         ))}
       </select>
-      {error && <span className="text-[11px] text-noir-red">{error}</span>}
+      {error && <span className="text-[length:var(--text-sm)] text-noir-red">{error}</span>}
     </div>
   )
 }

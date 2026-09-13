@@ -93,13 +93,13 @@ export function WeightCheckCard({ profileId, sessions, keyLiftIds, fallbackKg }:
         />
       ) : (
         <div className="flex items-center justify-between" style={{ gap: 12 }}>
-          <span style={{ fontSize: 12, color: 'var(--ink-dim)' }}>
+          <span style={{ fontSize: 'var(--text-md)', color: 'var(--ink-dim)' }}>
             Goal · <span style={{ color: 'var(--ink-2)' }}>{paceLabel(goal)}</span>
           </span>
           <button
             onClick={() => setEditing(true)}
             className="uppercase"
-            style={{ fontSize: 11, letterSpacing: '0.08em', color: 'var(--ink-faint)' }}
+            style={{ fontSize: 'var(--text-sm)', letterSpacing: '0.08em', color: 'var(--ink-faint)' }}
           >
             Change
           </button>
@@ -108,18 +108,18 @@ export function WeightCheckCard({ profileId, sessions, keyLiftIds, fallbackKg }:
 
       {/* The trend weight leads, not today's reading: that is the number that means something. */}
       <div className="flex items-baseline flex-wrap" style={{ gap: '4px 10px' }}>
-        <span style={{ fontSize: 30, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>
+        <span style={{ fontSize: 'var(--text-7xl)', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--ink)', fontVariantNumeric: 'tabular-nums' }}>
           {latest ? lb1(latest.trendKg) : '—'}
         </span>
-        <span style={{ fontSize: 13, color: 'var(--ink-faint)' }}>lb trend</span>
+        <span style={{ fontSize: 'var(--text-base)', color: 'var(--ink-faint)' }}>lb trend</span>
         {rateKg !== null && (
-          <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink-2)', fontVariantNumeric: 'tabular-nums' }}>
+          <span style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--ink-2)', fontVariantNumeric: 'tabular-nums' }}>
             {signed(lb1(rateKg))} lb/week
           </span>
         )}
       </div>
       {latest && (
-        <p style={{ fontSize: 11.5, color: 'var(--ink-faint)', marginTop: -6 }}>
+        <p style={{ fontSize: 'var(--text-md)', color: 'var(--ink-faint)', marginTop: -6 }}>
           Last weigh-in {lb1(latest.kg)} lb on {latest.date.slice(5)}
         </p>
       )}
@@ -130,16 +130,16 @@ export function WeightCheckCard({ profileId, sessions, keyLiftIds, fallbackKg }:
           ariaLabel={`Bodyweight trend, now ${lb1(latest.trendKg)} lb`}
         />
       ) : (
-        <p style={{ fontSize: 13, color: 'var(--ink-faint)' }}>
+        <p style={{ fontSize: 'var(--text-base)', color: 'var(--ink-faint)' }}>
           {trend.length === 0 ? 'Log your weight to start a trend.' : 'Log once more to start a trend.'}
         </p>
       )}
 
       {!askingForGoal && latest && (
         reading ? (
-          <p style={{ fontSize: 13.5, color: TONE_COLOUR[reading.tone] }}>{reading.sentence}</p>
+          <p style={{ fontSize: 'var(--text-lg)', color: TONE_COLOUR[reading.tone] }}>{reading.sentence}</p>
         ) : (
-          <p style={{ fontSize: 12, color: 'var(--ink-faint)' }}>
+          <p style={{ fontSize: 'var(--text-md)', color: 'var(--ink-faint)' }}>
             A rate needs {MIN_READINGS_FOR_RATE} weigh-ins across at least {MIN_SPAN_DAYS_FOR_RATE} days.
           </p>
         )
@@ -162,7 +162,7 @@ export function WeightCheckCard({ profileId, sessions, keyLiftIds, fallbackKg }:
             aria-describedby={error ? 'weigh-in-error' : undefined}
             className="flex-1 bg-transparent focus:outline-none"
             style={{
-              padding: '9px 12px', borderRadius: 'var(--r-control)', fontSize: 15,
+              padding: '9px 12px', borderRadius: 'var(--r-control)', fontSize: 'var(--text-xl)',
               color: 'var(--ink)', border: `1px solid ${error ? 'var(--red)' : 'var(--hairline)'}`,
             }}
           />
@@ -171,7 +171,7 @@ export function WeightCheckCard({ profileId, sessions, keyLiftIds, fallbackKg }:
             disabled={!value.trim()}
             className="uppercase transition-opacity disabled:opacity-30"
             style={{
-              padding: '0 16px', borderRadius: 'var(--r-control)', fontSize: 12,
+              padding: '0 16px', borderRadius: 'var(--r-control)', fontSize: 'var(--text-md)',
               letterSpacing: '0.1em', color: 'var(--ink)', border: '1px solid var(--hairline)',
             }}
           >
@@ -179,11 +179,11 @@ export function WeightCheckCard({ profileId, sessions, keyLiftIds, fallbackKg }:
           </button>
         </div>
         {error && (
-          <p id="weigh-in-error" role="alert" style={{ fontSize: 12, color: 'var(--red)' }}>{error}</p>
+          <p id="weigh-in-error" role="alert" style={{ fontSize: 'var(--text-md)', color: 'var(--red)' }}>{error}</p>
         )}
       </div>
 
-      <p style={{ fontSize: 11, color: 'var(--ink-faint)', paddingTop: 12, borderTop: '1px solid var(--hairline-soft)' }}>
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)', paddingTop: 12, borderTop: '1px solid var(--hairline-soft)' }}>
         The trend smooths out daily water swings. Pace ranges are reference figures, as a
         share of bodyweight per week, and vary with training age and build.
       </p>
@@ -197,14 +197,14 @@ function StrengthAgainstWeight({ compare }: { compare: StrengthVsBodyweight }) {
   return (
     <div className="flex flex-col" style={{ gap: 8 }}>
       <div className="flex items-baseline justify-between" style={{ gap: 12 }}>
-        <span className="uppercase" style={{ fontSize: 11, letterSpacing: '0.1em', color: 'var(--ink-faint)' }}>
+        <span className="uppercase" style={{ fontSize: 'var(--text-sm)', letterSpacing: '0.1em', color: 'var(--ink-faint)' }}>
           Strength vs bodyweight
         </span>
-        <span style={{ fontSize: 11, color: 'var(--ink-faint)' }}>
+        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)' }}>
           {compare.fromDate.slice(5)} → {compare.toDate.slice(5)}
         </span>
       </div>
-      <p style={{ fontSize: 12.5, color: 'var(--ink-dim)' }}>
+      <p style={{ fontSize: 'var(--text-base)', color: 'var(--ink-dim)' }}>
         Bodyweight {signed(bw)} lb over this stretch.
       </p>
       {compare.rows.map(r => {
@@ -212,8 +212,8 @@ function StrengthAgainstWeight({ compare }: { compare: StrengthVsBodyweight }) {
         const falling = r.toRatio < r.fromRatio - 0.005
         return (
           <div key={r.exerciseId} className="flex items-baseline justify-between" style={{ gap: 12 }}>
-            <span style={{ fontSize: 13, color: 'var(--ink-2)' }}>{r.name}</span>
-            <span style={{ fontSize: 12.5, fontVariantNumeric: 'tabular-nums', color: 'var(--ink-dim)' }}>
+            <span style={{ fontSize: 'var(--text-base)', color: 'var(--ink-2)' }}>{r.name}</span>
+            <span style={{ fontSize: 'var(--text-base)', fontVariantNumeric: 'tabular-nums', color: 'var(--ink-dim)' }}>
               {signed(lb1(r.toKg - r.fromKg))} lb
               <span
                 style={{

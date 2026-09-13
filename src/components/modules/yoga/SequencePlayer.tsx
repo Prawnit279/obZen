@@ -204,14 +204,14 @@ export function SequencePlayer({ poses, sequenceName, onClose }: Props) {
         <div className="flex-1 min-w-0">
           {phase === 'active' && (
             <p
-              className="text-[10px] tracking-widest uppercase mb-0.5"
+              className="text-[length:var(--text-xs)] tracking-widest uppercase mb-0.5"
               style={{ color: 'var(--dim)' }}
             >
               Pose {poseIdx + 1} of {poses.length}
             </p>
           )}
           <p
-            className="text-[13px] truncate"
+            className="text-[length:var(--text-base)] truncate"
             style={{ color: 'var(--accent)' }}
           >
             {sequenceName}
@@ -227,12 +227,12 @@ export function SequencePlayer({ poses, sequenceName, onClose }: Props) {
           <div className="flex flex-col items-center gap-6 w-full max-w-xs mt-8">
             <div className="flex flex-col items-center gap-1">
               <h1
-                className="text-[22px] text-center font-medium tracking-wide"
+                className="text-[length:var(--text-5xl)] text-center font-medium tracking-wide"
                 style={{ color: 'var(--accent)' }}
               >
                 {sequenceName}
               </h1>
-              <p className="text-[13px]" style={{ color: 'var(--dim)' }}>
+              <p className="text-[length:var(--text-base)]" style={{ color: 'var(--dim)' }}>
                 {poses.length} pose{poses.length !== 1 ? 's' : ''}
               </p>
             </div>
@@ -242,14 +242,14 @@ export function SequencePlayer({ poses, sequenceName, onClose }: Props) {
               {poses.slice(0, 3).map((p, i) => (
                 <li
                   key={p.id}
-                  className="text-[12px] px-3 py-1.5 rounded"
+                  className="text-[length:var(--text-md)] px-3 py-1.5 rounded"
                   style={{ color: 'var(--dim)', background: 'var(--surface)' }}
                 >
                   {i + 1}. {p.name}
                 </li>
               ))}
               {poses.length > 3 && (
-                <li className="text-[11px] px-3" style={{ color: 'var(--dim)' }}>
+                <li className="text-[length:var(--text-sm)] px-3" style={{ color: 'var(--dim)' }}>
                   +{poses.length - 3} more
                 </li>
               )}
@@ -258,7 +258,7 @@ export function SequencePlayer({ poses, sequenceName, onClose }: Props) {
             <button
               onClick={handleBegin}
               className={cn(
-                'w-full py-3 rounded text-[14px] tracking-widest uppercase transition-opacity hover:opacity-80',
+                'w-full py-3 rounded text-[length:var(--text-lg)] tracking-widest uppercase transition-opacity hover:opacity-80',
               )}
               style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}
             >
@@ -291,7 +291,7 @@ export function SequencePlayer({ poses, sequenceName, onClose }: Props) {
                   className="flex items-center justify-center w-[120px] h-[135px] rounded"
                   style={{ background: 'var(--elevated)' }}
                 >
-                  <span className="text-[11px]" style={{ color: 'var(--dim)' }}>
+                  <span className="text-[length:var(--text-sm)]" style={{ color: 'var(--dim)' }}>
                     —
                   </span>
                 </div>
@@ -301,13 +301,13 @@ export function SequencePlayer({ poses, sequenceName, onClose }: Props) {
             {/* Pose name */}
             <div className="flex flex-col items-center gap-0.5 text-center">
               <h2
-                className="text-[18px] uppercase tracking-wide leading-snug"
+                className="text-[length:var(--text-3xl)] uppercase tracking-wide leading-snug"
                 style={{ color: 'var(--accent)' }}
               >
                 {currentPose.name}
               </h2>
               {currentPose.sanskritName && (
-                <p className="text-[11px] italic" style={{ color: 'var(--dim)' }}>
+                <p className="text-[length:var(--text-sm)] italic" style={{ color: 'var(--dim)' }}>
                   {currentPose.sanskritName}
                 </p>
               )}
@@ -326,7 +326,7 @@ export function SequencePlayer({ poses, sequenceName, onClose }: Props) {
             </div>
 
             {/* Timer */}
-            <p className="text-[36px] font-mono tabular-nums" style={{ color: 'var(--accent)' }}>
+            <p className="text-[length:var(--text-8xl)] font-mono tabular-nums" style={{ color: 'var(--accent)' }}>
               {formatTime(timeLeft)}
             </p>
 
@@ -336,7 +336,7 @@ export function SequencePlayer({ poses, sequenceName, onClose }: Props) {
                 className="w-full pl-3"
                 style={{ borderLeft: '2px solid var(--border)' }}
               >
-                <p className="text-[11px] leading-relaxed" style={{ color: 'var(--dim)' }}>
+                <p className="text-[length:var(--text-sm)] leading-relaxed" style={{ color: 'var(--dim)' }}>
                   Pitta: {currentPose.pittaNote}
                 </p>
               </div>
@@ -344,7 +344,7 @@ export function SequencePlayer({ poses, sequenceName, onClose }: Props) {
 
             {/* Next pose hint */}
             {nextPose && (
-              <p className="text-[11px] uppercase tracking-widest mt-1" style={{ color: 'var(--dim)' }}>
+              <p className="text-[length:var(--text-sm)] uppercase tracking-widest mt-1" style={{ color: 'var(--dim)' }}>
                 Next: {nextPose.name}
               </p>
             )}
@@ -356,17 +356,17 @@ export function SequencePlayer({ poses, sequenceName, onClose }: Props) {
           <div className="flex flex-col items-center gap-6 w-full max-w-xs mt-10">
             <CheckCircle size={48} style={{ color: 'var(--accent)' }} strokeWidth={1.5} />
             <div className="flex flex-col items-center gap-1">
-              <h2 className="text-[20px]" style={{ color: 'var(--accent)' }}>
+              <h2 className="text-[length:var(--text-4xl)]" style={{ color: 'var(--accent)' }}>
                 Sequence Complete
               </h2>
-              <p className="text-[13px]" style={{ color: 'var(--dim)' }}>
+              <p className="text-[length:var(--text-base)]" style={{ color: 'var(--dim)' }}>
                 {completedIds.length} pose{completedIds.length !== 1 ? 's' : ''} &middot;{' '}
                 {totalMinutesElapsed} min
               </p>
             </div>
             <button
               onClick={handleFinish}
-              className="w-full py-3 rounded text-[14px] tracking-widest uppercase transition-opacity hover:opacity-80"
+              className="w-full py-3 rounded text-[length:var(--text-lg)] tracking-widest uppercase transition-opacity hover:opacity-80"
               style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}
             >
               Close
@@ -384,7 +384,7 @@ export function SequencePlayer({ poses, sequenceName, onClose }: Props) {
           {/* End */}
           <button
             onClick={handleEnd}
-            className="flex items-center justify-center px-4 py-2 rounded text-[13px] transition-opacity hover:opacity-70"
+            className="flex items-center justify-center px-4 py-2 rounded text-[length:var(--text-base)] transition-opacity hover:opacity-70"
             style={{ border: '1px solid var(--border)', color: 'var(--dim)' }}
             aria-label="End sequence"
           >
@@ -394,7 +394,7 @@ export function SequencePlayer({ poses, sequenceName, onClose }: Props) {
           {/* Pause / Resume */}
           <button
             onClick={handlePauseResume}
-            className="flex-1 flex items-center justify-center gap-2 py-2 rounded text-[13px] transition-opacity hover:opacity-70"
+            className="flex-1 flex items-center justify-center gap-2 py-2 rounded text-[length:var(--text-base)] transition-opacity hover:opacity-70"
             style={{ border: '1px solid #888888', color: 'var(--muted)' }}
             aria-label={paused ? 'Resume' : 'Pause'}
           >
@@ -414,7 +414,7 @@ export function SequencePlayer({ poses, sequenceName, onClose }: Props) {
           {/* Skip */}
           <button
             onClick={handleSkip}
-            className="flex items-center justify-center gap-1.5 px-4 py-2 rounded text-[13px] transition-opacity hover:opacity-70"
+            className="flex items-center justify-center gap-1.5 px-4 py-2 rounded text-[length:var(--text-base)] transition-opacity hover:opacity-70"
             style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}
             aria-label="Skip to next pose"
           >

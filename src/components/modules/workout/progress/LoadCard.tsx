@@ -23,22 +23,22 @@ export function LoadCard({ load, deload, rated }: { load: Acwr; deload: DeloadAd
       <div className="flex items-baseline" style={{ gap: 8 }}>
         <span
           style={{
-            fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em',
+            fontSize: 'var(--text-5xl)', fontWeight: 700, letterSpacing: '-0.02em',
             color: 'var(--ink)', fontVariantNumeric: 'tabular-nums',
           }}
         >
           {known ? `${load.ratio!.toFixed(2)}×` : '—'}
         </span>
-        <span style={{ fontSize: 13, color: 'var(--ink-dim)' }}>{ACWR_LABEL[load.verdict]}</span>
+        <span style={{ fontSize: 'var(--text-base)', color: 'var(--ink-dim)' }}>{ACWR_LABEL[load.verdict]}</span>
       </div>
 
       {known ? (
-        <p style={{ fontSize: 13, color: 'var(--ink-dim)' }}>
+        <p style={{ fontSize: 'var(--text-base)', color: 'var(--ink-dim)' }}>
           This week against your four-week average, from {rated} rated{' '}
           {rated === 1 ? 'session' : 'sessions'}.
         </p>
       ) : (
-        <p style={{ fontSize: 13, color: 'var(--ink-dim)' }}>
+        <p style={{ fontSize: 'var(--text-base)', color: 'var(--ink-dim)' }}>
           Rate a few sessions when you finish them and this will compare your
           current week against your recent average.
         </p>
@@ -56,14 +56,14 @@ export function LoadCard({ load, deload, rated }: { load: Acwr; deload: DeloadAd
           <span
             className="uppercase"
             style={{
-              fontSize: 11, fontWeight: 500, letterSpacing: '0.12em',
+              fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em',
               color: deload.recommend ? 'var(--violet-100)' : 'var(--ink-dim)',
             }}
           >
             {deload.recommend ? 'Consider a lighter week' : 'Worth watching'}
           </span>
           {deload.reasons.map(r => (
-            <span key={r} style={{ fontSize: 13, color: 'var(--ink-dim)' }}>{r}</span>
+            <span key={r} style={{ fontSize: 'var(--text-base)', color: 'var(--ink-dim)' }}>{r}</span>
           ))}
         </div>
       )}
@@ -71,7 +71,7 @@ export function LoadCard({ load, deload, rated }: { load: Acwr; deload: DeloadAd
       {known && (
         <p
           style={{
-            fontSize: 11, color: 'var(--ink-faint)',
+            fontSize: 'var(--text-sm)', color: 'var(--ink-faint)',
             paddingTop: 12, borderTop: '1px solid var(--hairline-soft)',
           }}
         >

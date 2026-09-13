@@ -60,7 +60,7 @@ export function SegmentedPill<T extends string | number>({
               border: 'none',
               cursor: 'pointer',
               borderRadius: 'var(--r-pill)',
-              fontSize: 11,
+              fontSize: 'var(--text-sm)',
               fontWeight: 500,
               letterSpacing: '0.03em',
               background: on

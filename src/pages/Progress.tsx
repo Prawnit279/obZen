@@ -19,7 +19,7 @@ export default function Progress() {
     <div className="page-container wide space-y-4">
       <button
         onClick={goBack}
-        className="print-hide flex items-center gap-1.5 text-[12px] uppercase tracking-widest transition-opacity hover:opacity-70"
+        className="print-hide flex items-center gap-1.5 text-[length:var(--text-md)] uppercase tracking-widest transition-opacity hover:opacity-70"
         style={{ color: 'var(--muted)' }}
       >
         <ArrowLeft size={14} /> Back
@@ -27,10 +27,10 @@ export default function Progress() {
 
       <div className="flex items-end justify-between gap-3 pt-1">
         <div>
-          <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--muted)' }}>
+          <div className="text-[length:var(--text-sm)] uppercase tracking-widest" style={{ color: 'var(--muted)' }}>
             {name}
           </div>
-          <h1 className="text-[20px] uppercase tracking-wide" style={{ color: 'var(--accent)' }}>
+          <h1 className="text-[length:var(--text-4xl)] uppercase tracking-wide" style={{ color: 'var(--accent)' }}>
             Progress
           </h1>
         </div>
@@ -39,7 +39,7 @@ export default function Progress() {
             this needs a print layout rather than a PDF library. */}
         <button
           onClick={() => window.print()}
-          className="print-hide flex items-center gap-1.5 shrink-0 text-[11px] uppercase tracking-widest transition-opacity hover:opacity-70"
+          className="print-hide flex items-center gap-1.5 shrink-0 text-[length:var(--text-sm)] uppercase tracking-widest transition-opacity hover:opacity-70"
           style={{ color: 'var(--ink-dim)' }}
         >
           <Printer size={13} /> Print
@@ -49,10 +49,10 @@ export default function Progress() {
       {/* A printed page arrives with no context of its own — whose numbers
           these are, and when they were true. */}
       <div className="print-only" style={{ marginBottom: 8 }}>
-        <div style={{ fontSize: 11, letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+        <div style={{ fontSize: 'var(--text-sm)', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
           obZen — training log
         </div>
-        <div style={{ fontSize: 12 }}>
+        <div style={{ fontSize: 'var(--text-md)' }}>
           {name} · printed {printedOn()}
         </div>
       </div>

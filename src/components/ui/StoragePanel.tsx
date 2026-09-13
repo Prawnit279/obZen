@@ -73,13 +73,13 @@ export function StoragePanel() {
       <div className="flex items-center gap-3 p-3 bg-white/[0.05] border border-[color:var(--hairline)] rounded-[var(--r-control)]">
         <HardDrive size={14} className="text-[color:var(--ink-faint)] shrink-0" />
         <div className="flex-1 min-w-0">
-          <div className="text-[12px] text-[color:var(--ink-2)]">
+          <div className="text-[length:var(--text-md)] text-[color:var(--ink-2)]">
             {totalCount} cached image{totalCount !== 1 ? 's' : ''}
           </div>
-          <div className="text-[11px] text-[color:var(--ink-faint)]">{formatBytes(totalSize)} estimated</div>
+          <div className="text-[length:var(--text-sm)] text-[color:var(--ink-faint)]">{formatBytes(totalSize)} estimated</div>
         </div>
         {cleared && (
-          <div className="flex items-center gap-1 text-[11px] text-green-400">
+          <div className="flex items-center gap-1 text-[length:var(--text-sm)] text-green-400">
             <CheckCircle2 size={12} />
             <span>{cleared} cleared</span>
           </div>
@@ -91,7 +91,7 @@ export function StoragePanel() {
         const s = stats[type]
         if (!s) return null
         return (
-          <div key={type} className="flex items-center gap-2 text-[12px]">
+          <div key={type} className="flex items-center gap-2 text-[length:var(--text-md)]">
             <ImageIcon size={12} className="text-[color:var(--ink-faint)] shrink-0" />
             <span className="flex-1 text-[color:var(--ink-dim)]">{TYPE_LABELS[type]}</span>
             <span className="text-[color:var(--ink-faint)] tabular-nums">{s.count}</span>
@@ -112,7 +112,7 @@ export function StoragePanel() {
 
       {/* Empty state */}
       {totalCount === 0 && (
-        <p className="text-[11px] text-[color:var(--ink-faint)] text-center py-2">
+        <p className="text-[length:var(--text-sm)] text-[color:var(--ink-faint)] text-center py-2">
           No cached images. Cache is populated when AI generation runs.
         </p>
       )}
@@ -132,7 +132,7 @@ export function StoragePanel() {
       )}
 
       {/* Future generation notice */}
-      <div className="text-[11px] text-[color:var(--ink-faint)] border border-dashed border-[color:var(--hairline)] rounded-[var(--r-control)] p-2.5 leading-relaxed">
+      <div className="text-[length:var(--text-sm)] text-[color:var(--ink-faint)] border border-dashed border-[color:var(--hairline)] rounded-[var(--r-control)] p-2.5 leading-relaxed">
         Images are generated via the Nanobanana service and stored locally for offline use.
         Clearing cache does not delete any session data.
       </div>

@@ -31,10 +31,10 @@ export function ProgressionLadder({ profileId, exerciseId, name, path, assistanc
   return (
     <section className="rounded-[var(--r-control)] p-4" style={{ background: 'var(--card)', border: '1px solid var(--border)' }}>
       <div className="flex items-baseline justify-between gap-2 mb-3">
-        <h3 className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-dim)' }}>
+        <h3 className="text-[length:var(--text-sm)] uppercase tracking-widest" style={{ color: 'var(--ink-dim)' }}>
           {name} — progression
         </h3>
-        <span className="text-[11px]" style={{ color: 'var(--ink-faint)' }}>{milestone}</span>
+        <span className="text-[length:var(--text-sm)]" style={{ color: 'var(--ink-faint)' }}>{milestone}</span>
       </div>
 
       <ol className="flex items-stretch gap-1" role="list">
@@ -56,7 +56,7 @@ export function ProgressionLadder({ profileId, exerciseId, name, path, assistanc
                 <span className="flex items-center gap-1">
                   {done && <Check size={12} style={{ color: 'var(--complete-text)' }} aria-hidden="true" />}
                   <span
-                    className="text-[10px] uppercase tracking-widest truncate"
+                    className="text-[length:var(--text-xs)] uppercase tracking-widest truncate"
                     style={{ color: isCurrent ? 'var(--ink)' : done ? 'var(--complete-text)' : 'var(--ink-faint)' }}
                   >
                     {rung}
@@ -68,7 +68,7 @@ export function ProgressionLadder({ profileId, exerciseId, name, path, assistanc
         })}
       </ol>
 
-      <p className="text-[11px] mt-2" style={{ color: 'var(--ink-faint)' }}>
+      <p className="text-[length:var(--text-sm)] mt-2" style={{ color: 'var(--ink-faint)' }}>
         Tap a rung to set where you are now.
       </p>
     </section>

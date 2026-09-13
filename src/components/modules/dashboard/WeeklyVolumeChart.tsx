@@ -82,7 +82,7 @@ export function WeeklyVolumeChart() {
 
   return (
     <div>
-      <div className="text-[9px] uppercase tracking-widest text-noir-dim mb-2">Weekly Volume · lbs lifted</div>
+      <div className="text-[length:var(--text-2xs)] uppercase tracking-widest text-noir-dim mb-2">Weekly Volume · lbs lifted</div>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`}>
         {[0, 0.5, 1].map(t => {
           const y = mt + ch * (1 - t)
@@ -136,7 +136,7 @@ export function WeeklyVolumeChart() {
         {MUSCLES.map(m => (
           <div key={m} className="flex items-center gap-1">
             <div className="w-2 h-2" style={{ background: MUSCLE_COLORS[m] }} />
-            <span className="text-[8px] uppercase tracking-widest text-noir-dim">{m}</span>
+            <span className="text-[length:var(--text-3xs)] uppercase tracking-widest text-noir-dim">{m}</span>
           </div>
         ))}
       </div>
@@ -146,7 +146,7 @@ export function WeeklyVolumeChart() {
 
 function Empty({ text }: { text: string }) {
   return (
-    <div className="h-36 flex items-center justify-center text-[10px] uppercase tracking-widest text-noir-dim">
+    <div className="h-36 flex items-center justify-center text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim">
       {text}
     </div>
   )

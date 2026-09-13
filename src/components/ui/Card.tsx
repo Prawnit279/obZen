@@ -37,7 +37,7 @@ export function Card({ children, elevated, noPadding, label, className, style, .
       {label && (
         <h3
           className="uppercase"
-          style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+          style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
         >
           {label}
         </h3>
@@ -60,7 +60,7 @@ export function CardHeader({ label, action, className }: CardHeaderProps) {
       <span
         className="uppercase"
         style={{
-          fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)',
+          fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)',
         }}
       >
         {label}

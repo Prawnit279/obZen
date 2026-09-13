@@ -75,7 +75,7 @@ function WeekBar({ weekNum, days, completedDays, currentDay }: WeekBarProps) {
   return (
     <div className="flex items-center gap-3">
       <span
-        className="text-[10px] uppercase tracking-widest shrink-0 w-14"
+        className="text-[length:var(--text-xs)] uppercase tracking-widest shrink-0 w-14"
         style={{ color: 'var(--dim)' }}
       >
         Week {weekNum}
@@ -93,7 +93,7 @@ function WeekBar({ weekNum, days, completedDays, currentDay }: WeekBarProps) {
         />
       </div>
       <span
-        className="text-[10px] tabular-nums shrink-0 w-8 text-right"
+        className="text-[length:var(--text-xs)] tabular-nums shrink-0 w-8 text-right"
         style={{ color: 'var(--dim)' }}
       >
         {done}/{total}
@@ -146,12 +146,12 @@ function DayCell({ day, completed, isToday, isFuture, selected, onSelect }: DayC
       aria-label={`Day ${day}: ${abbr}`}
     >
       <span
-        className="absolute top-0.5 left-1 text-[8px] leading-none tabular-nums"
+        className="absolute top-0.5 left-1 text-[length:var(--text-3xs)] leading-none tabular-nums"
         style={{ color: 'var(--dim)' }}
       >
         {day}
       </span>
-      <span className="text-[9px] leading-tight" style={{ color: textColor }}>
+      <span className="text-[length:var(--text-2xs)] leading-tight" style={{ color: textColor }}>
         {abbr}
       </span>
       {completed && (
@@ -208,17 +208,17 @@ function SelectedDayPanel({
       {/* Header */}
       <div className="mb-3 pr-6">
         <div
-          className="text-[10px] uppercase tracking-widest mb-1"
+          className="text-[length:var(--text-xs)] uppercase tracking-widest mb-1"
           style={{ color: 'var(--dim)' }}
         >
           Day {day}
         </div>
-        <div className="text-[16px] leading-snug" style={{ color: 'var(--accent)' }}>
+        <div className="text-[length:var(--text-xl)] leading-snug" style={{ color: 'var(--accent)' }}>
           {pose.name}
         </div>
         {pose.sanskritName && (
           <div
-            className="text-[11px] italic mt-0.5"
+            className="text-[length:var(--text-sm)] italic mt-0.5"
             style={{ color: 'var(--dim)' }}
           >
             {pose.sanskritName}
@@ -235,7 +235,7 @@ function SelectedDayPanel({
 
       {/* Duration */}
       <div
-        className="text-[10px] uppercase tracking-widest mb-3"
+        className="text-[length:var(--text-xs)] uppercase tracking-widest mb-3"
         style={{ color: 'var(--dim)' }}
       >
         {pose.duration}
@@ -244,7 +244,7 @@ function SelectedDayPanel({
       {/* Steps — first 3 only */}
       <div className="mb-3">
         <div
-          className="text-[9px] uppercase tracking-widest mb-1.5"
+          className="text-[length:var(--text-2xs)] uppercase tracking-widest mb-1.5"
           style={{ color: 'var(--dim)' }}
         >
           Steps
@@ -253,7 +253,7 @@ function SelectedDayPanel({
           {pose.steps.slice(0, 3).map((step, i) => (
             <li
               key={i}
-              className="text-[12px] flex gap-2 leading-snug"
+              className="text-[length:var(--text-md)] flex gap-2 leading-snug"
               style={{ color: 'var(--muted)' }}
             >
               <span style={{ color: 'var(--dim)' }} className="shrink-0">
@@ -263,7 +263,7 @@ function SelectedDayPanel({
             </li>
           ))}
           {pose.steps.length > 3 && (
-            <li className="text-[11px]" style={{ color: 'var(--dim)' }}>
+            <li className="text-[length:var(--text-sm)]" style={{ color: 'var(--dim)' }}>
               ...
             </li>
           )}
@@ -277,12 +277,12 @@ function SelectedDayPanel({
           style={{ borderLeft: '2px solid var(--border)' }}
         >
           <div
-            className="text-[9px] uppercase tracking-widest mb-0.5"
+            className="text-[length:var(--text-2xs)] uppercase tracking-widest mb-0.5"
             style={{ color: 'var(--dim)' }}
           >
             Pitta Note
           </div>
-          <p className="text-[11px] leading-snug" style={{ color: 'var(--dim)' }}>
+          <p className="text-[length:var(--text-sm)] leading-snug" style={{ color: 'var(--dim)' }}>
             {pose.pittaNote}
           </p>
         </div>
@@ -293,7 +293,7 @@ function SelectedDayPanel({
         onClick={() => onMarkComplete(day)}
         disabled={!canMark}
         className={cn(
-          'w-full py-2.5 rounded-[2px] text-[11px] uppercase tracking-widest transition-opacity',
+          'w-full py-2.5 rounded-[2px] text-[length:var(--text-sm)] uppercase tracking-widest transition-opacity',
           canMark ? 'hover:opacity-80' : 'opacity-30 cursor-not-allowed',
         )}
         style={{
@@ -353,18 +353,18 @@ export function ChallengeTracker() {
       <div className="flex flex-col items-center gap-4 py-10 px-4 text-center">
         <div>
           <h2
-            className="text-[18px] uppercase tracking-wide mb-1"
+            className="text-[length:var(--text-3xl)] uppercase tracking-wide mb-1"
             style={{ color: 'var(--accent)' }}
           >
             30-Day Yoga Challenge
           </h2>
-          <p className="text-[12px]" style={{ color: 'var(--dim)' }}>
+          <p className="text-[length:var(--text-md)]" style={{ color: 'var(--dim)' }}>
             Build a daily practice, one pose at a time.
           </p>
         </div>
         <button
           onClick={startChallenge}
-          className="px-6 py-2.5 rounded-[2px] text-[12px] uppercase tracking-widest transition-opacity hover:opacity-80"
+          className="px-6 py-2.5 rounded-[2px] text-[length:var(--text-md)] uppercase tracking-widest transition-opacity hover:opacity-80"
           style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}
         >
           Start Challenge
@@ -392,16 +392,16 @@ export function ChallengeTracker() {
       {/* Header row */}
       <div className="flex items-start justify-between">
         <div className="space-y-0.5">
-          <div className="text-[13px]" style={{ color: 'var(--accent)' }}>
+          <div className="text-[length:var(--text-base)]" style={{ color: 'var(--accent)' }}>
             Day {currentDay} of 30
           </div>
-          <div className="text-[11px]" style={{ color: 'var(--dim)' }}>
+          <div className="text-[length:var(--text-sm)]" style={{ color: 'var(--dim)' }}>
             {completed} completed
           </div>
         </div>
         <button
           onClick={resetChallenge}
-          className="text-[10px] uppercase tracking-widest transition-opacity hover:opacity-60"
+          className="text-[length:var(--text-xs)] uppercase tracking-widest transition-opacity hover:opacity-60"
           style={{ color: 'var(--dim)' }}
         >
           Reset

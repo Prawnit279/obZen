@@ -25,13 +25,13 @@ export function AdherenceCard({ data }: { data: Adherence }) {
       <div className="flex items-baseline" style={{ gap: 8 }}>
         <span
           style={{
-            fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em',
+            fontSize: 'var(--text-5xl)', fontWeight: 700, letterSpacing: '-0.02em',
             color: 'var(--ink)', fontVariantNumeric: 'tabular-nums',
           }}
         >
           {rate === null ? '—' : `${rate}%`}
         </span>
-        <span style={{ fontSize: 13, color: 'var(--ink-dim)' }}>
+        <span style={{ fontSize: 'var(--text-base)', color: 'var(--ink-dim)' }}>
           {rate === null
             ? 'nothing scheduled yet'
             : `${data.trained} of ${data.planned} planned sessions`}
@@ -44,7 +44,7 @@ export function AdherenceCard({ data }: { data: Adherence }) {
             <span
               key={i}
               className="flex-1 text-center uppercase"
-              style={{ fontSize: 10, fontWeight: 500, letterSpacing: '0.06em', color: 'var(--ink-faint)' }}
+              style={{ fontSize: 'var(--text-xs)', fontWeight: 500, letterSpacing: '0.06em', color: 'var(--ink-faint)' }}
             >
               {d}
             </span>
@@ -74,11 +74,11 @@ export function AdherenceCard({ data }: { data: Adherence }) {
         {(['trained', 'missed', 'rest'] as const).map(k => (
           <span key={k} className="flex items-center" style={{ gap: 6 }}>
             <span style={{ width: 10, height: 10, borderRadius: 3, background: DAY_FILL[k] }} />
-            <span className="capitalize" style={{ fontSize: 11, color: 'var(--ink-faint)' }}>{k}</span>
+            <span className="capitalize" style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)' }}>{k}</span>
           </span>
         ))}
         {data.extra > 0 && (
-          <span style={{ fontSize: 11, color: 'var(--ok)' }}>
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ok)' }}>
             +{data.extra} unplanned {data.extra === 1 ? 'session' : 'sessions'}
           </span>
         )}

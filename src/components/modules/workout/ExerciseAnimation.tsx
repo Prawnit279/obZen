@@ -372,7 +372,7 @@ export function ExerciseAnimation({ motion, label }: { motion: ExerciseMotion; l
             </>
           )}
         </svg>
-        <p className="text-[10px] uppercase tracking-widest text-center" style={{ color: 'var(--ink-faint)' }}>
+        <p className="text-[length:var(--text-xs)] uppercase tracking-widest text-center" style={{ color: 'var(--ink-faint)' }}>
           {motion.caption}
         </p>
       </div>

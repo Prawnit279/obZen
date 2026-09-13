@@ -153,8 +153,8 @@ export default function Settings() {
     <div className="page-container wide">
       <div className="card-grid">
         <div className="card-grid-full pt-2">
-          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-dim)]">Preferences</div>
-          <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
+          <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-dim)]">Preferences</div>
+          <h1 style={{ fontSize: 'var(--text-6xl)', fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
             Settings
           </h1>
         </div>
@@ -172,7 +172,7 @@ export default function Settings() {
             <div>
               <label
                 htmlFor="profile-name"
-                className="block text-[11px] uppercase tracking-widest pb-1.5"
+                className="block text-[length:var(--text-sm)] uppercase tracking-widest pb-1.5"
                 style={{ color: 'var(--ink-faint)' }}
               >
                 Name
@@ -182,7 +182,7 @@ export default function Settings() {
                 value={name}
                 onChange={e => setName(e.target.value)}
                 placeholder={profile.name}
-                className="w-full rounded-[var(--r-control)] border bg-transparent text-[14px] focus:outline-none transition-colors"
+                className="w-full rounded-[var(--r-control)] border bg-transparent text-[length:var(--text-lg)] focus:outline-none transition-colors"
                 style={{ color: 'var(--ink)', borderColor: 'var(--hairline)', padding: '8px 10px' }}
               />
             </div>
@@ -195,11 +195,11 @@ export default function Settings() {
                 grow
                 options={DOSHAS.map(d => ({ value: d, label: d }))}
               />
-              <p className="text-[12px] leading-relaxed pt-2" style={{ color: 'var(--ink-dim)' }}>
+              <p className="text-[length:var(--text-md)] leading-relaxed pt-2" style={{ color: 'var(--ink-dim)' }}>
                 {guidance.elements} · {guidance.qualities.slice(0, 3).join(', ')}.
                 {' '}{guidance.principle}
               </p>
-              <p className="text-[11px] leading-relaxed pt-1.5" style={{ color: 'var(--ink-ghost)' }}>
+              <p className="text-[length:var(--text-sm)] leading-relaxed pt-1.5" style={{ color: 'var(--ink-ghost)' }}>
                 A traditional framework, not medical advice. It shapes the tips
                 the app offers, nothing it calculates.
               </p>
@@ -213,11 +213,11 @@ export default function Settings() {
                 grow
                 options={TRAINING_DAY_CHOICES.map(n => ({ value: n, label: String(n) }))}
               />
-              <p className="text-[12px] leading-relaxed pt-2" style={{ color: 'var(--ink-dim)' }}>
+              <p className="text-[length:var(--text-md)] leading-relaxed pt-2" style={{ color: 'var(--ink-dim)' }}>
                 Days a week the plan asks for. Train shows this many, and the
                 week counts against it.
               </p>
-              <p className="text-[11px] leading-relaxed pt-1.5" style={{ color: 'var(--ink-ghost)' }}>
+              <p className="text-[length:var(--text-sm)] leading-relaxed pt-1.5" style={{ color: 'var(--ink-ghost)' }}>
                 Train more than you planned and the week simply grows — lowering
                 this never hides a session you already logged.
               </p>
@@ -225,7 +225,7 @@ export default function Settings() {
           </div>
 
           {/* Active profile details */}
-          <div className="space-y-2 text-[13px]">
+          <div className="space-y-2 text-[length:var(--text-base)]">
             <ProfileRow label="Bodyweight" value={profile.body.bodyweight} />
             {profile.program && <ProfileRow label="Program" value={profile.program} />}
             {profile.body.bodyFat && <ProfileRow label="Body Fat" value={profile.body.bodyFat} />}
@@ -236,7 +236,7 @@ export default function Settings() {
             {SHOW_VEDIC && profile.mahadasha && <ProfileRow label="Mahadasha" value={profile.mahadasha} />}
             {SHOW_VEDIC && profile.atmakaraka && <ProfileRow label="Atmakaraka" value={profile.atmakaraka} />}
             {profile.body.goal && (
-              <p className="text-[12px] leading-relaxed pt-1" style={{ color: 'var(--ink-dim)' }}>
+              <p className="text-[length:var(--text-md)] leading-relaxed pt-1" style={{ color: 'var(--ink-dim)' }}>
                 {profile.body.goal}
               </p>
             )}
@@ -264,7 +264,7 @@ export default function Settings() {
                 here would be a permanent question about a problem nobody has. */}
             {stranded && stranded.count > 0 && (
               <div className="pt-1">
-                <p className="text-[12px] leading-relaxed pb-2" style={{ color: 'var(--ink-dim)' }}>
+                <p className="text-[length:var(--text-md)] leading-relaxed pb-2" style={{ color: 'var(--ink-dim)' }}>
                   {stranded.count} workout{stranded.count === 1 ? '' : 's'}
                   {stranded.range && ` from ${stranded.range.from} to ${stranded.range.to}`}
                   {' '}are stored on this device under an older profile, so nothing
@@ -284,7 +284,7 @@ export default function Settings() {
             </Button>
             {importMsg && (
               <p
-                className="text-[11px] text-center pt-1"
+                className="text-[length:var(--text-sm)] text-center pt-1"
                 style={{ color: importMsg.ok ? 'var(--complete-text)' : 'var(--skip-text)' }}
               >
                 {importMsg.text}
@@ -300,7 +300,7 @@ export default function Settings() {
 
         <Card>
           <CardHeader label="Storage" />
-          <div className="space-y-2 text-[12px]">
+          <div className="space-y-2 text-[length:var(--text-md)]">
             <div className="flex justify-between">
               <span className="text-[color:var(--ink-faint)]">Used</span>
               <span className="text-[color:var(--ink-dim)]">{used !== null ? formatBytes(used) : '—'}</span>
@@ -323,7 +323,7 @@ export default function Settings() {
         <Card>
           <CardHeader label="Migration" />
           <div className="space-y-2">
-            <p className="text-[11px] leading-relaxed" style={{ color: 'var(--ink-faint)' }}>
+            <p className="text-[length:var(--text-sm)] leading-relaxed" style={{ color: 'var(--ink-faint)' }}>
               Import historical workout data from{' '}
               <span style={{ color: 'var(--ink-dim)' }}>obZen_workout_import.json</span>.
               Place the file in the <span style={{ color: 'var(--ink-dim)' }}>/public</span> folder
@@ -334,7 +334,7 @@ export default function Settings() {
             </Button>
             {migrateMsg && (
               <p
-                className="text-[11px] text-center pt-1"
+                className="text-[length:var(--text-sm)] text-center pt-1"
                 style={{ color: migrateMsg.ok ? 'var(--complete-text)' : 'var(--skip-text)' }}
               >
                 {migrateMsg.text}
@@ -345,7 +345,7 @@ export default function Settings() {
 
         <Card>
           <CardHeader label="App" />
-          <div className="space-y-2 text-[12px]">
+          <div className="space-y-2 text-[length:var(--text-md)]">
             <div className="flex justify-between">
               <span className="text-[color:var(--ink-faint)]">Version</span>
               <span className="text-[color:var(--ink-dim)]">1.0.0</span>

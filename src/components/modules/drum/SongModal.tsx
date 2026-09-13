@@ -57,42 +57,42 @@ export function SongModal({ open, existing, onClose, onSaved }: Props) {
       <div className="space-y-5">
 
         <div>
-          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-dim)] mb-2">Title *</div>
+          <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-dim)] mb-2">Title *</div>
           <input
             value={title}
             onChange={e => setTitle(e.target.value)}
             placeholder="Song title"
-            className="w-full bg-[color:var(--bg)] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-3 py-2 text-[12px] text-[color:var(--ink-2)] placeholder:text-[color:var(--ink-faint)] focus:outline-none focus:border-[color:var(--border-strong)]"
+            className="w-full bg-[color:var(--bg)] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-3 py-2 text-[length:var(--text-md)] text-[color:var(--ink-2)] placeholder:text-[color:var(--ink-faint)] focus:outline-none focus:border-[color:var(--border-strong)]"
           />
-          {error && <div className="text-[11px] text-[color:var(--red)] mt-1">{error}</div>}
+          {error && <div className="text-[length:var(--text-sm)] text-[color:var(--red)] mt-1">{error}</div>}
         </div>
 
         <div>
-          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-dim)] mb-2">Artist</div>
+          <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-dim)] mb-2">Artist</div>
           <input
             value={artist}
             onChange={e => setArtist(e.target.value)}
             placeholder="Artist / band"
-            className="w-full bg-[color:var(--bg)] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-3 py-2 text-[12px] text-[color:var(--ink-2)] placeholder:text-[color:var(--ink-faint)] focus:outline-none focus:border-[color:var(--border-strong)]"
+            className="w-full bg-[color:var(--bg)] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-3 py-2 text-[length:var(--text-md)] text-[color:var(--ink-2)] placeholder:text-[color:var(--ink-faint)] focus:outline-none focus:border-[color:var(--border-strong)]"
           />
         </div>
 
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-dim)] mb-2">BPM</div>
+            <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-dim)] mb-2">BPM</div>
             <input
               value={bpm}
               onChange={e => setBpm(e.target.value.replace(/\D/, ''))}
               placeholder="e.g. 120"
-              className="w-full bg-[color:var(--bg)] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-3 py-2 text-[12px] text-[color:var(--ink-2)] placeholder:text-[color:var(--ink-faint)] focus:outline-none focus:border-[color:var(--border-strong)]"
+              className="w-full bg-[color:var(--bg)] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-3 py-2 text-[length:var(--text-md)] text-[color:var(--ink-2)] placeholder:text-[color:var(--ink-faint)] focus:outline-none focus:border-[color:var(--border-strong)]"
             />
           </div>
           <div>
-            <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-dim)] mb-2">Time Sig.</div>
+            <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-dim)] mb-2">Time Sig.</div>
             <select
               value={timeSignature}
               onChange={e => setTimeSignature(e.target.value)}
-              className="w-full bg-[color:var(--bg)] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-3 py-2 text-[12px] text-[color:var(--ink-2)] focus:outline-none focus:border-[color:var(--border-strong)]"
+              className="w-full bg-[color:var(--bg)] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-3 py-2 text-[length:var(--text-md)] text-[color:var(--ink-2)] focus:outline-none focus:border-[color:var(--border-strong)]"
             >
               {['4/4', '3/4', '6/8', '5/4', '7/8', '12/8'].map(ts => (
                 <option key={ts} value={ts}>{ts}</option>
@@ -102,14 +102,14 @@ export function SongModal({ open, existing, onClose, onSaved }: Props) {
         </div>
 
         <div>
-          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-dim)] mb-2">Status</div>
+          <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-dim)] mb-2">Status</div>
           <div className="grid grid-cols-3 gap-1.5">
             {STATUS_OPTIONS.map(s => (
               <button
                 key={s}
                 onClick={() => setStatus(s)}
                 className={cn(
-                  'py-2 border rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-colors',
+                  'py-2 border rounded-[var(--r-control)] text-[length:var(--text-sm)] uppercase tracking-widest transition-colors',
                   status === s
                     ? 'border-[color:var(--violet-400)] text-[color:var(--ink)] bg-white/[0.05]'
                     : 'border-[color:var(--hairline)] text-[color:var(--ink-faint)] hover:border-[color:var(--border-strong)]'
@@ -122,14 +122,14 @@ export function SongModal({ open, existing, onClose, onSaved }: Props) {
         </div>
 
         <div>
-          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-dim)] mb-2">Purpose</div>
+          <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-dim)] mb-2">Purpose</div>
           <div className="grid grid-cols-4 gap-1.5">
             {PURPOSE_OPTIONS.map(p => (
               <button
                 key={p}
                 onClick={() => setPurpose(p)}
                 className={cn(
-                  'py-2 border rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-colors',
+                  'py-2 border rounded-[var(--r-control)] text-[length:var(--text-sm)] uppercase tracking-widest transition-colors',
                   purpose === p
                     ? 'border-[color:var(--violet-400)] text-[color:var(--ink)] bg-white/[0.05]'
                     : 'border-[color:var(--hairline)] text-[color:var(--ink-faint)] hover:border-[color:var(--border-strong)]'
@@ -142,13 +142,13 @@ export function SongModal({ open, existing, onClose, onSaved }: Props) {
         </div>
 
         <div>
-          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-dim)] mb-2">Notes (optional)</div>
+          <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-dim)] mb-2">Notes (optional)</div>
           <textarea
             value={notes}
             onChange={e => setNotes(e.target.value)}
             placeholder="Key, difficulty, arrangement notes..."
             rows={2}
-            className="w-full bg-[color:var(--bg)] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-3 py-2 text-[12px] text-[color:var(--ink-2)] placeholder:text-[color:var(--ink-faint)] focus:outline-none focus:border-[color:var(--border-strong)] resize-none"
+            className="w-full bg-[color:var(--bg)] border border-[color:var(--hairline)] rounded-[var(--r-control)] px-3 py-2 text-[length:var(--text-md)] text-[color:var(--ink-2)] placeholder:text-[color:var(--ink-faint)] focus:outline-none focus:border-[color:var(--border-strong)] resize-none"
           />
         </div>
 

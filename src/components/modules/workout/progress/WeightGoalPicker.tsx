@@ -74,8 +74,8 @@ export function WeightGoalPicker({ current, bodyweightKg, onChoose, onCancel }: 
       }}
     >
       <div className="flex flex-col" style={{ gap: 3 }}>
-        <p style={{ fontSize: 15, fontWeight: 600, color: 'var(--ink)' }}>What are you aiming for?</p>
-        <p style={{ fontSize: 12, color: 'var(--ink-dim)' }}>
+        <p style={{ fontSize: 'var(--text-xl)', fontWeight: 600, color: 'var(--ink)' }}>What are you aiming for?</p>
+        <p style={{ fontSize: 'var(--text-md)', color: 'var(--ink-dim)' }}>
           This decides how your trend is read. Until you choose, it is shown without a verdict.
         </p>
       </div>
@@ -97,7 +97,7 @@ export function WeightGoalPicker({ current, bodyweightKg, onChoose, onCancel }: 
 
       {(direction === 'gain' || direction === 'lose') && (
         <div role="radiogroup" aria-label="Pace" className="flex flex-col" style={{ gap: 6 }}>
-          <p className="uppercase" style={{ fontSize: 11, letterSpacing: '0.1em', color: 'var(--ink-faint)' }}>
+          <p className="uppercase" style={{ fontSize: 'var(--text-sm)', letterSpacing: '0.1em', color: 'var(--ink-faint)' }}>
             How fast
           </p>
           {(['gentle', 'steady'] as const).map(p => (
@@ -119,7 +119,7 @@ export function WeightGoalPicker({ current, bodyweightKg, onChoose, onCancel }: 
           className="flex-1 transition-opacity disabled:opacity-35"
           style={{
             padding: '10px 14px', borderRadius: 'var(--r-control)', border: 'none',
-            fontSize: 13, fontWeight: 600, color: 'var(--on-accent)',
+            fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--on-accent)',
             background: 'linear-gradient(140deg, var(--violet-400), var(--violet-900))',
           }}
         >
@@ -131,7 +131,7 @@ export function WeightGoalPicker({ current, bodyweightKg, onChoose, onCancel }: 
             style={{
               padding: '10px 14px', borderRadius: 'var(--r-control)',
               border: '1px solid var(--hairline)', background: 'transparent',
-              fontSize: 13, color: 'var(--ink-dim)',
+              fontSize: 'var(--text-base)', color: 'var(--ink-dim)',
             }}
           >
             Cancel
@@ -158,10 +158,10 @@ function Choice({ checked, title, detail, onSelect }: {
         background: checked ? 'color-mix(in srgb, var(--violet-400) 14%, transparent)' : 'transparent',
       }}
     >
-      <span style={{ fontSize: 13.5, fontWeight: 600, color: checked ? 'var(--ink)' : 'var(--ink-2)' }}>
+      <span style={{ fontSize: 'var(--text-lg)', fontWeight: 600, color: checked ? 'var(--ink)' : 'var(--ink-2)' }}>
         {title}
       </span>
-      <span style={{ fontSize: 12, color: 'var(--ink-dim)' }}>{detail}</span>
+      <span style={{ fontSize: 'var(--text-md)', color: 'var(--ink-dim)' }}>{detail}</span>
     </button>
   )
 }

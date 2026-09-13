@@ -25,9 +25,9 @@ const variantClasses: Record<Variant, string> = {
 
 /** `sm` sits at the 11px floor rather than below it. */
 const sizeClasses: Record<Size, string> = {
-  sm: 'px-3 py-1.5 text-[11px]',
-  md: 'px-4 py-2 text-[12px]',
-  lg: 'px-5 py-2.5 text-[13px]',
+  sm: 'px-3 py-1.5 text-[length:var(--text-sm)]',
+  md: 'px-4 py-2 text-[length:var(--text-md)]',
+  lg: 'px-5 py-2.5 text-[length:var(--text-base)]',
 }
 
 export function Button({

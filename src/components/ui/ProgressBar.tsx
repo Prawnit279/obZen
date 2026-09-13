@@ -18,9 +18,9 @@ export function ProgressBar({ value, max, className, showLabel, label, compact }
     <div className={cn('flex flex-col gap-1', className)}>
       {(showLabel || label) && (
         <div className="flex justify-between items-center">
-          {label && <span className="text-[10px] uppercase tracking-widest text-noir-muted">{label}</span>}
+          {label && <span className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-muted">{label}</span>}
           {showLabel && (
-            <span className={cn('text-[11px]', over ? 'text-noir-red' : 'text-noir-muted')}>
+            <span className={cn('text-[length:var(--text-sm)]', over ? 'text-noir-red' : 'text-noir-muted')}>
               {value} / {max}
             </span>
           )}

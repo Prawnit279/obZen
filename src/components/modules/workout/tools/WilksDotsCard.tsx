@@ -53,21 +53,21 @@ export function WilksDotsCard() {
       {scores && (
         <div className="flex gap-6 mt-4">
           <div>
-            <div className="text-[22px] tabular-nums" style={{ color: 'var(--accent)' }}>
+            <div className="text-[length:var(--text-5xl)] tabular-nums" style={{ color: 'var(--accent)' }}>
               {Math.round(scores.wilks * 10) / 10}
             </div>
-            <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Wilks (est.)</div>
+            <div className="text-[length:var(--text-sm)] uppercase tracking-widest" style={{ color: 'var(--muted)' }}>Wilks (est.)</div>
           </div>
           <div>
-            <div className="text-[22px] tabular-nums" style={{ color: 'var(--accent)' }}>
+            <div className="text-[length:var(--text-5xl)] tabular-nums" style={{ color: 'var(--accent)' }}>
               {Math.round(scores.dots * 10) / 10}
             </div>
-            <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--muted)' }}>DOTS (est.)</div>
+            <div className="text-[length:var(--text-sm)] uppercase tracking-widest" style={{ color: 'var(--muted)' }}>DOTS (est.)</div>
           </div>
         </div>
       )}
 
-      <p className="text-[11px] mt-3 pt-3" style={{ color: 'var(--dim)', borderTop: '1px solid var(--border)' }}>
+      <p className="text-[length:var(--text-sm)] mt-3 pt-3" style={{ color: 'var(--dim)', borderTop: '1px solid var(--border)' }}>
         Reference coefficients, not independently verified — worth checking against a
         source you trust before relying on them.
       </p>

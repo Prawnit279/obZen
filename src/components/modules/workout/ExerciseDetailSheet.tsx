@@ -28,8 +28,8 @@ function Legend({ colour, label, muscles }: { colour: string; label: string; mus
     <div className="flex items-start gap-2">
       <span className="w-3 h-3 rounded-[var(--r-control)] mt-0.5 shrink-0" style={{ background: colour }} />
       <div>
-        <div className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>{label}</div>
-        <div className="text-[13px]" style={{ color: 'var(--ink)' }}>{muscles.join(' · ')}</div>
+        <div className="text-[length:var(--text-xs)] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>{label}</div>
+        <div className="text-[length:var(--text-base)]" style={{ color: 'var(--ink)' }}>{muscles.join(' · ')}</div>
       </div>
     </div>
   )
@@ -87,12 +87,12 @@ export function ExerciseDetailSheet({
           {/* Setting up, before the first rep */}
           {detail?.setup && (
             <section>
-              <h3 className="text-[11px] uppercase tracking-widest mb-2" style={{ color: 'var(--ink-dim)' }}>
+              <h3 className="text-[length:var(--text-sm)] uppercase tracking-widest mb-2" style={{ color: 'var(--ink-dim)' }}>
                 Setting up
               </h3>
               <ul className="space-y-1.5">
                 {detail.setup.map((line, i) => (
-                  <li key={i} className="text-[14px] leading-snug pl-3" style={{ color: 'var(--ink)', borderLeft: '2px solid var(--border)' }}>
+                  <li key={i} className="text-[length:var(--text-lg)] leading-snug pl-3" style={{ color: 'var(--ink)', borderLeft: '2px solid var(--border)' }}>
                     {line}
                   </li>
                 ))}
@@ -103,12 +103,12 @@ export function ExerciseDetailSheet({
           {/* How to do it */}
           {guide && guide.steps.length > 0 && (
             <section>
-              <h3 className="text-[11px] uppercase tracking-widest mb-2" style={{ color: 'var(--ink-dim)' }}>
+              <h3 className="text-[length:var(--text-sm)] uppercase tracking-widest mb-2" style={{ color: 'var(--ink-dim)' }}>
                 How to perform it
               </h3>
               <ol className="space-y-2">
                 {guide.steps.map((step, i) => (
-                  <li key={i} className="flex gap-3 text-[14px] leading-snug" style={{ color: 'var(--ink)' }}>
+                  <li key={i} className="flex gap-3 text-[length:var(--text-lg)] leading-snug" style={{ color: 'var(--ink)' }}>
                     <span className="tabular-nums shrink-0" style={{ color: 'var(--ink-faint)' }}>{i + 1}</span>
                     <span>{step}</span>
                   </li>
@@ -119,7 +119,7 @@ export function ExerciseDetailSheet({
 
           {cue && (
             <p
-              className="text-[13px] leading-snug pl-3"
+              className="text-[length:var(--text-base)] leading-snug pl-3"
               style={{ color: 'var(--ink-dim)', borderLeft: '2px solid var(--border-strong)' }}
             >
               {cue}
@@ -129,17 +129,17 @@ export function ExerciseDetailSheet({
           {/* Common faults and their fixes */}
           {detail?.mistakes && (
             <section>
-              <h3 className="text-[11px] uppercase tracking-widest mb-2" style={{ color: 'var(--ink-dim)' }}>
+              <h3 className="text-[length:var(--text-sm)] uppercase tracking-widest mb-2" style={{ color: 'var(--ink-dim)' }}>
                 Common mistakes
               </h3>
               <div className="space-y-2.5">
                 {detail.mistakes.map((m, i) => (
                   <div key={i} className="rounded-[var(--r-control)] p-3" style={{ background: 'var(--elevated)' }}>
-                    <div className="flex gap-2 text-[13px] leading-snug">
+                    <div className="flex gap-2 text-[length:var(--text-base)] leading-snug">
                       <span className="shrink-0" style={{ color: 'var(--skip-text)' }}>✕</span>
                       <span style={{ color: 'var(--ink-dim)' }}>{m.wrong}</span>
                     </div>
-                    <div className="flex gap-2 text-[13px] leading-snug mt-1">
+                    <div className="flex gap-2 text-[length:var(--text-base)] leading-snug mt-1">
                       <span className="shrink-0" style={{ color: 'var(--complete-text)' }}>✓</span>
                       <span style={{ color: 'var(--ink)' }}>{m.fix}</span>
                     </div>
@@ -152,12 +152,12 @@ export function ExerciseDetailSheet({
           {/* What a good set looks like */}
           {detail?.cues && (
             <section>
-              <h3 className="text-[11px] uppercase tracking-widest mb-2" style={{ color: 'var(--ink-dim)' }}>
+              <h3 className="text-[length:var(--text-sm)] uppercase tracking-widest mb-2" style={{ color: 'var(--ink-dim)' }}>
                 You did it right if
               </h3>
               <ul className="space-y-1">
                 {detail.cues.map((c, i) => (
-                  <li key={i} className="flex gap-2 text-[14px] leading-snug" style={{ color: 'var(--ink)' }}>
+                  <li key={i} className="flex gap-2 text-[length:var(--text-lg)] leading-snug" style={{ color: 'var(--ink)' }}>
                     <span className="shrink-0" style={{ color: 'var(--complete-text)' }}>·</span>
                     <span>{c}</span>
                   </li>
@@ -169,7 +169,7 @@ export function ExerciseDetailSheet({
           {/* Swap options straight from the plan */}
           {swaps.length > 0 && (
             <section>
-              <h3 className="text-[11px] uppercase tracking-widest mb-2" style={{ color: 'var(--ink-dim)' }}>
+              <h3 className="text-[length:var(--text-sm)] uppercase tracking-widest mb-2" style={{ color: 'var(--ink-dim)' }}>
                 Swap for
               </h3>
               <div className="space-y-1.5">
@@ -184,7 +184,7 @@ export function ExerciseDetailSheet({
                         className="rounded-[var(--r-control)] p-3 space-y-2"
                         style={{ border: '1px solid var(--skip-border)', background: 'rgba(127,29,29,0.08)' }}
                       >
-                        <p className="text-[13px]" style={{ color: 'var(--ink)' }}>
+                        <p className="text-[length:var(--text-base)]" style={{ color: 'var(--ink)' }}>
                           Swap to {swapName}?
                           <span style={{ color: 'var(--skip-text)' }}>
                             {' '}Your {loggedSetCount} logged{' '}
@@ -194,14 +194,14 @@ export function ExerciseDetailSheet({
                         <div className="flex gap-2">
                           <button
                             onClick={() => setPendingSwap(null)}
-                            className="flex-1 py-2 rounded-[var(--r-control)] text-[12px] uppercase tracking-widest"
+                            className="flex-1 py-2 rounded-[var(--r-control)] text-[length:var(--text-md)] uppercase tracking-widest"
                             style={{ border: '1px solid var(--hairline)', color: 'var(--ink-dim)' }}
                           >
                             Cancel
                           </button>
                           <button
                             onClick={() => { setPendingSwap(null); onSwap?.(swapName) }}
-                            className="flex-1 py-2 rounded-[var(--r-control)] text-[12px] uppercase tracking-widest"
+                            className="flex-1 py-2 rounded-[var(--r-control)] text-[length:var(--text-md)] uppercase tracking-widest"
                             style={{ border: '1px solid var(--skip-border)', color: 'var(--skip-text)' }}
                           >
                             Swap
@@ -220,9 +220,9 @@ export function ExerciseDetailSheet({
                       className="w-full flex items-center justify-between px-3 py-2.5 rounded-[var(--r-control)] text-left transition-opacity hover:opacity-75 disabled:opacity-60"
                       style={{ background: 'var(--elevated)', border: '1px solid var(--hairline)' }}
                     >
-                      <span className="text-[14px]" style={{ color: 'var(--ink)' }}>{swapName}</span>
+                      <span className="text-[length:var(--text-lg)]" style={{ color: 'var(--ink)' }}>{swapName}</span>
                       {alreadyOnDay ? (
-                        <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>
+                        <span className="text-[length:var(--text-xs)] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>
                           already added
                         </span>
                       ) : onSwap ? (
@@ -232,14 +232,14 @@ export function ExerciseDetailSheet({
                   )
                 })}
               </div>
-              <p className="text-[11px] mt-2" style={{ color: 'var(--ink-faint)' }}>
+              <p className="text-[length:var(--text-sm)] mt-2" style={{ color: 'var(--ink-faint)' }}>
                 Cap it at two swaps per session, so there is still enough repetition to track progress.
               </p>
             </section>
           )}
 
           {!guide && swaps.length === 0 && (
-            <p className="text-[13px]" style={{ color: 'var(--ink-faint)' }}>
+            <p className="text-[length:var(--text-base)]" style={{ color: 'var(--ink-faint)' }}>
               No guide for this movement yet.
             </p>
           )}

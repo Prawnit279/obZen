@@ -83,13 +83,13 @@ export function Sheet({
           style={{ borderBottom: '1px solid var(--hairline)' }}
         >
           <div className="min-w-0">
-            <h2 style={{ fontSize: 17, fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
+            <h2 style={{ fontSize: 'var(--text-2xl)', fontWeight: 700, letterSpacing: '-0.02em', color: 'var(--ink)' }}>
               {title}
             </h2>
             {subtitle && (
               <p
                 className="uppercase"
-                style={{ fontSize: 11, letterSpacing: '0.08em', color: 'var(--ink-dim)', marginTop: 2 }}
+                style={{ fontSize: 'var(--text-sm)', letterSpacing: '0.08em', color: 'var(--ink-dim)', marginTop: 2 }}
               >
                 {subtitle}
               </p>

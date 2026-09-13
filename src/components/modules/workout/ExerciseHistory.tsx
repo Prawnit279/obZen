@@ -49,22 +49,22 @@ export function ExerciseHistory({ exerciseId, exerciseName }: Props) {
       className="px-4 pb-3 pt-2 space-y-2"
       style={{ background: 'var(--bg)', borderTop: '1px solid var(--border)' }}
     >
-      <div className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
+      <div className="text-[length:var(--text-2xs)] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
         Previous Sessions
       </div>
 
       {!history || history.length === 0 ? (
-        <p className="text-[11px]" style={{ color: 'var(--dim)' }}>
+        <p className="text-[length:var(--text-sm)]" style={{ color: 'var(--dim)' }}>
           No previous logs
         </p>
       ) : (
         <div className="space-y-1.5">
           {history.map((entry, i) => (
             <div key={i} className="space-y-0.5">
-              <div className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
+              <div className="text-[length:var(--text-xs)] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
                 {formatSessionDate(entry.date)}
               </div>
-              <div className="text-[11px]" style={{ color: 'var(--muted)' }}>
+              <div className="text-[length:var(--text-sm)]" style={{ color: 'var(--muted)' }}>
                 {entry.sets.map(s => (
                   `Set ${s.setNumber}: ${s.weight > 0 ? Math.round(loadedWeightLb(exerciseId, s)) + 'lb' : '—'}×${s.reps}`
                 )).join('  ')}

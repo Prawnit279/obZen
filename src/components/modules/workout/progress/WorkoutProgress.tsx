@@ -110,7 +110,7 @@ export function WorkoutProgress() {
   )
 
   if (!sessions) {
-    return <div className="py-10 text-center" style={{ fontSize: 13, color: 'var(--ink-faint)' }}>Loading…</div>
+    return <div className="py-10 text-center" style={{ fontSize: 'var(--text-base)', color: 'var(--ink-faint)' }}>Loading…</div>
   }
 
   // Everything below is computed from this profile's real training only.
@@ -133,8 +133,8 @@ export function WorkoutProgress() {
           className="text-center space-y-2"
           style={{ ...CARD, borderRadius: 'var(--r-card)', padding: 24 }}
         >
-          <p style={{ fontSize: 15, color: 'var(--ink-2)' }}>No training logged yet</p>
-          <p style={{ fontSize: 13, color: 'var(--ink-dim)' }}>
+          <p style={{ fontSize: 'var(--text-xl)', color: 'var(--ink-2)' }}>No training logged yet</p>
+          <p style={{ fontSize: 'var(--text-base)', color: 'var(--ink-dim)' }}>
             Log a few sessions and your strength trends, volume and PRs will appear here.
           </p>
         </div>
@@ -278,7 +278,7 @@ export function WorkoutProgress() {
               const hue = row.key === 'total' ? 'var(--violet-200)' : liftHue(row.name, i)
               return (
                 <div key={row.key} className="flex flex-col" style={{ gap: 6 }}>
-                  <div className="flex items-baseline justify-between" style={{ fontSize: 13 }}>
+                  <div className="flex items-baseline justify-between" style={{ fontSize: 'var(--text-base)' }}>
                     <span style={{ color: 'var(--ink-2)' }}>{row.name}</span>
                     <span style={{ color: 'var(--ink-dim)' }}>
                       {std.band}
@@ -306,7 +306,7 @@ export function WorkoutProgress() {
                     />
                   </div>
                   {std.toNextKg !== null && std.nextBand && (
-                    <div style={{ fontSize: 11, color: 'var(--ink-faint)' }}>
+                    <div style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)' }}>
                       {lb(std.toNextKg)} lb to {std.nextBand}
                     </div>
                   )}
@@ -316,7 +316,7 @@ export function WorkoutProgress() {
           </div>
           <p
             style={{
-              fontSize: 11, color: 'var(--ink-faint)',
+              fontSize: 'var(--text-sm)', color: 'var(--ink-faint)',
               paddingTop: 12, borderTop: '1px solid var(--hairline-soft)',
             }}
           >
@@ -340,11 +340,11 @@ export function WorkoutProgress() {
               // name was the part that got clipped, which is the wrong loser.
               <li key={pr.exerciseId} className="flex flex-col" style={{ gap: 2 }}>
                 <div className="flex items-baseline justify-between gap-3">
-                  <span style={{ fontSize: 15, color: 'var(--ink-2)' }}>{pr.name}</span>
+                  <span style={{ fontSize: 'var(--text-xl)', color: 'var(--ink-2)' }}>{pr.name}</span>
                   <span
                     className="shrink-0"
                     style={{
-                      fontSize: 15, fontWeight: 700, color: 'var(--ink)',
+                      fontSize: 'var(--text-xl)', fontWeight: 700, color: 'var(--ink)',
                       fontVariantNumeric: 'tabular-nums',
                     }}
                   >
@@ -353,7 +353,7 @@ export function WorkoutProgress() {
                 </div>
                 <div
                   className="flex items-baseline justify-between gap-3"
-                  style={{ fontSize: 11, color: 'var(--ink-faint)', fontVariantNumeric: 'tabular-nums' }}
+                  style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)', fontVariantNumeric: 'tabular-nums' }}
                 >
                   <span>~{lb(pr.e1rm)} est. 1RM</span>
                   <span>{pr.date}</span>
@@ -370,11 +370,11 @@ export function WorkoutProgress() {
           <ul className="space-y-2.5">
             {feed.map((ev, i) => (
               <li key={`${ev.exerciseId}-${ev.date}-${ev.kind}-${i}`} className="flex items-baseline justify-between gap-3">
-                <span className="min-w-0" style={{ fontSize: 13, color: 'var(--ink-2)' }}>
+                <span className="min-w-0" style={{ fontSize: 'var(--text-base)', color: 'var(--ink-2)' }}>
                   {ev.name}
                   {/* A qualifier on the name, so it sits at the label size
                       rather than inheriting body and reading as equal weight. */}
-                  <span style={{ fontSize: 11, color: 'var(--ink-faint)' }}>
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)' }}>
                     {ev.kind === 'e1rm' ? ' · est. 1RM' : ''}
                   </span>
                 </span>
@@ -382,15 +382,15 @@ export function WorkoutProgress() {
                   className="shrink-0 flex items-baseline"
                   style={{ gap: 8, fontVariantNumeric: 'tabular-nums' }}
                 >
-                  <span style={{ fontSize: 13, fontWeight: 700, color: 'var(--ok)' }}>
+                  <span style={{ fontSize: 'var(--text-base)', fontWeight: 700, color: 'var(--ok)' }}>
                     {lb(ev.valueKg)} lb{ev.reps ? ` × ${ev.reps}` : ''}
                   </span>
                   {/* What it beat — a record means little without the number
                       it replaced. */}
-                  <span style={{ fontSize: 11, color: 'var(--ink-faint)' }}>
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)' }}>
                     {ev.previousKg === null ? 'first' : `from ${lb(ev.previousKg)}`}
                   </span>
-                  <span style={{ fontSize: 11, color: 'var(--ink-ghost)' }}>{ev.date.slice(5)}</span>
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-ghost)' }}>{ev.date.slice(5)}</span>
                 </span>
               </li>
             ))}
@@ -417,17 +417,17 @@ export function WorkoutProgress() {
             <div className="flex items-baseline gap-3 mb-3">
               <span
                 style={{
-                  fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em',
+                  fontSize: 'var(--text-5xl)', fontWeight: 700, letterSpacing: '-0.02em',
                   color: 'var(--ink)', fontVariantNumeric: 'tabular-nums',
                 }}
               >
                 {Math.round(latest * 10) / 10}
               </span>
-              <span style={{ fontSize: 13, color: 'var(--ink-faint)' }}>{unit}</span>
+              <span style={{ fontSize: 'var(--text-base)', color: 'var(--ink-faint)' }}>{unit}</span>
               {series.length > 1 && (
                 <span
                   style={{
-                    fontSize: 13, fontWeight: 500,
+                    fontSize: 'var(--text-base)', fontWeight: 500,
                     color: improving ? 'var(--ok)' : 'var(--ink-faint)',
                     fontVariantNumeric: 'tabular-nums',
                   }}
@@ -445,7 +445,7 @@ export function WorkoutProgress() {
               <div className="mt-3">
                 <div
                   className="uppercase"
-                  style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)', marginBottom: 6 }}
+                  style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)', marginBottom: 6 }}
                 >
                   Weekly rep volume
                 </div>

@@ -52,7 +52,7 @@ export function Modal({ open, onClose, title, children, className, size = 'md' }
       >
         {title && (
           <div className="flex items-center justify-between px-4 py-3 border-b border-noir-border">
-            <span className="text-[11px] uppercase tracking-widest text-noir-accent">{title}</span>
+            <span className="text-[length:var(--text-sm)] uppercase tracking-widest text-noir-accent">{title}</span>
             <button
               onClick={onClose}
               className="text-noir-muted hover:text-noir-accent transition-colors"

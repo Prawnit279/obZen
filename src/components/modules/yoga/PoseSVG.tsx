@@ -488,7 +488,7 @@ export function PoseSVG({ poseId, size = 120, drummerRecovery }: PoseSVGProps) {
           title="Drumming recovery pose"
           style={{ transform: `scale(${Math.max(0.7, scale)})`, transformOrigin: 'top right' }}
         >
-          <span style={{ fontSize: 8, color: '#f5c842' }}>♩</span>
+          <span style={{ fontSize: 'var(--text-3xs)', color: '#f5c842' }}>♩</span>
         </div>
       )}
     </div>

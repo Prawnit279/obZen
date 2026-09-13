@@ -39,7 +39,7 @@ function BasicBreathAnim() {
         <line x1="10"  y1="60" x2="20"  y2="60" stroke="var(--dim)" strokeWidth="1.5" />
         <line x1="100" y1="60" x2="110" y2="60" stroke="var(--dim)" strokeWidth="1.5" />
       </svg>
-      <div className="text-[10px] uppercase tracking-widest text-noir-dim mt-2">4s cycle · belly expands on inhale</div>
+      <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">4s cycle · belly expands on inhale</div>
     </div>
   )
 }
@@ -69,7 +69,7 @@ function NadiShodhanaAnim() {
         <text x="38" y="120" textAnchor="middle" fontSize="8" fill="var(--dim)">LEFT</text>
         <text x="82" y="120" textAnchor="middle" fontSize="8" fill="var(--dim)">RIGHT</text>
       </svg>
-      <div className="text-[10px] uppercase tracking-widest text-noir-dim mt-2">6s cycle · alternating nostrils</div>
+      <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">6s cycle · alternating nostrils</div>
     </div>
   )
 }
@@ -89,7 +89,7 @@ function SheetaliAnim() {
         <text x="96" y="34" fontSize="7" fill="var(--dim)">cool air</text>
         <line x1="0" y1="115" x2="120" y2="115" stroke="var(--dim)" strokeWidth="1" />
       </svg>
-      <div className="text-[10px] uppercase tracking-widest text-noir-dim mt-2">static · inhale through rolled tongue</div>
+      <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">static · inhale through rolled tongue</div>
     </div>
   )
 }
@@ -112,7 +112,7 @@ function BhastrikaAnim() {
         <line x1="60" y1="102" x2="60" y2="110" stroke="var(--dim)" strokeWidth="1.5" strokeDasharray="2,2" />
         <polygon points="56,110 60,117 64,110" fill="var(--dim)" />
       </svg>
-      <div className="text-[10px] uppercase tracking-widest text-noir-dim mt-2">0.6s cycle · rapid diaphragm pump</div>
+      <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">0.6s cycle · rapid diaphragm pump</div>
     </div>
   )
 }
@@ -138,7 +138,7 @@ function SoHumAnim() {
         <text className="sh-so"  x="60" y="55" textAnchor="middle" fontSize="14" fill="var(--dim)" fontStyle="italic">So</text>
         <text className="sh-hum" x="60" y="70" textAnchor="middle" fontSize="14" fill="var(--dim)" fontStyle="italic">Hum</text>
       </svg>
-      <div className="text-[10px] uppercase tracking-widest text-noir-dim mt-2">4s cycle · mantra on each breath</div>
+      <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">4s cycle · mantra on each breath</div>
     </div>
   )
 }
@@ -166,7 +166,7 @@ function UjjayiAnim() {
         <text x="60" y="90" textAnchor="middle" fontSize="8" fill="var(--dim)">ocean sound</text>
         <line x1="0" y1="120" x2="120" y2="120" stroke="var(--dim)" strokeWidth="1" />
       </svg>
-      <div className="text-[10px] uppercase tracking-widest text-noir-dim mt-2">3s cycle · throat constriction</div>
+      <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">3s cycle · throat constriction</div>
     </div>
   )
 }
@@ -210,7 +210,7 @@ function BoxBreathingAnim() {
         <text x="60" y="103" textAnchor="middle" fontSize="7" fill="var(--dim)">EXHALE</text>
         <text x="23" y="62"  textAnchor="end"    fontSize="7" fill="var(--dim)">HOLD</text>
       </svg>
-      <div className="text-[10px] uppercase tracking-widest text-noir-dim mt-2">16s cycle · 4 counts each side</div>
+      <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">16s cycle · 4 counts each side</div>
     </div>
   )
 }
@@ -256,7 +256,7 @@ function Breath478Anim() {
         <text className="cnt-478" x="60" y="56" textAnchor="middle" fontSize="9" fill="var(--muted)">4 · 7 · 8</text>
         <text x="60" y="68" textAnchor="middle" fontSize="7" fill="var(--dim)">breath</text>
       </svg>
-      <div className="text-[10px] uppercase tracking-widest text-noir-dim mt-2">19s cycle · inhale 4 · hold 7 · exhale 8</div>
+      <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">19s cycle · inhale 4 · hold 7 · exhale 8</div>
     </div>
   )
 }
@@ -285,7 +285,7 @@ function KapalbhatiAnim() {
         <circle className="kb-d2" cx="60" cy="36" r="2.5" fill="var(--dim)" />
         <circle className="kb-d3" cx="68" cy="38" r="2.5" fill="var(--dim)" />
       </svg>
-      <div className="text-[10px] uppercase tracking-widest text-noir-dim mt-2">0.5s cycle · sharp exhale pump</div>
+      <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">0.5s cycle · sharp exhale pump</div>
     </div>
   )
 }
@@ -314,7 +314,7 @@ function SuryaBhedanaAnim() {
         <text x="74" y="120" textAnchor="middle" fontSize="8" fill="var(--dim)">RIGHT</text>
         <text x="60" y="108" textAnchor="middle" fontSize="7" fill="var(--dim)">☀ solar</text>
       </svg>
-      <div className="text-[10px] uppercase tracking-widest text-noir-dim mt-2">6s cycle · right = solar · heating</div>
+      <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">6s cycle · right = solar · heating</div>
     </div>
   )
 }
@@ -343,7 +343,7 @@ function ChandraBhedanaAnim() {
         <text x="74" y="120" textAnchor="middle" fontSize="8" fill="var(--dim)">RIGHT</text>
         <text x="60" y="108" textAnchor="middle" fontSize="7" fill="var(--dim)">☽ lunar</text>
       </svg>
-      <div className="text-[10px] uppercase tracking-widest text-noir-dim mt-2">6s cycle · left = lunar · cooling</div>
+      <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">6s cycle · left = lunar · cooling</div>
     </div>
   )
 }
@@ -370,7 +370,7 @@ function SitaliAnim() {
         <text x="60" y="96" textAnchor="middle" fontSize="7" fill="var(--dim)">Sheetali variation</text>
         <line x1="0" y1="112" x2="120" y2="112" stroke="var(--dim)" strokeWidth="1" />
       </svg>
-      <div className="text-[10px] uppercase tracking-widest text-noir-dim mt-2">4s cycle · cool air over flat tongue</div>
+      <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-2">4s cycle · cool air over flat tongue</div>
     </div>
   )
 }

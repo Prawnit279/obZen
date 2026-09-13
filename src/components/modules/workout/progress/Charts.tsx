@@ -57,7 +57,7 @@ export function liftHue(name: string, fallbackIndex = 0): string {
 
 export function ChartEmpty({ text }: { text: string }) {
   return (
-    <div className="py-8 text-center" style={{ fontSize: 13, color: 'var(--ink-faint)' }}>
+    <div className="py-8 text-center" style={{ fontSize: 'var(--text-base)', color: 'var(--ink-faint)' }}>
       {text}
     </div>
   )
@@ -312,16 +312,16 @@ function MultiLineChart({ series, yLabel }: { series: LineSeries[]; yLabel?: str
             <svg width="16" height="6" aria-hidden="true" style={{ alignSelf: 'center' }}>
               <line x1="0" y1="3" x2="16" y2="3" stroke={l.hue} strokeWidth="1.9" strokeDasharray={l.dash} />
             </svg>
-            <span style={{ fontSize: 11.5, color: 'var(--ink-dim)' }}>{l.label}</span>
+            <span style={{ fontSize: 'var(--text-md)', color: 'var(--ink-dim)' }}>{l.label}</span>
             <span
               style={{
-                fontSize: 11.5, fontWeight: 700, color: l.hue,
+                fontSize: 'var(--text-md)', fontWeight: 700, color: l.hue,
                 fontVariantNumeric: 'tabular-nums',
               }}
             >
               {fmt(l.latest)}
             </span>
-            <span style={{ fontSize: 11, color: 'var(--ink-faint)' }}>
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)' }}>
               {l.delta === null
                 ? 'one session'
                 : `${l.delta > 0 ? '+' : ''}${fmt(l.delta)}`}
@@ -368,7 +368,7 @@ export function BarChart({ data, unit = '' }: { data: BarDatum[]; unit?: string 
         <span style={{ width: 6, height: 6, borderRadius: 2, background: 'var(--violet-200)' }} />
         <span
           style={{
-            fontSize: 11, fontWeight: 700, color: 'var(--ink)',
+            fontSize: 'var(--text-sm)', fontWeight: 700, color: 'var(--ink)',
             whiteSpace: 'nowrap', fontVariantNumeric: 'tabular-nums',
           }}
         >
@@ -411,7 +411,7 @@ export function BarChart({ data, unit = '' }: { data: BarDatum[]; unit?: string 
               <span
                 className="uppercase"
                 style={{
-                  fontSize: 10, fontWeight: 500, letterSpacing: '0.06em',
+                  fontSize: 'var(--text-xs)', fontWeight: 500, letterSpacing: '0.06em',
                   color: on ? 'var(--ink)' : 'var(--ink-faint)',
                 }}
               >

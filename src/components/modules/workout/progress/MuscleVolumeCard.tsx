@@ -34,20 +34,20 @@ function MuscleRow({ reading }: RowProps) {
       <div className="flex items-baseline justify-between gap-2">
         <span
           className="capitalize"
-          style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}
+          style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--ink)' }}
         >
           {reading.muscle}
         </span>
         <span className="flex items-baseline shrink-0" style={{ gap: 6 }}>
           <span
             style={{
-              fontSize: 15, fontWeight: 700, color: 'var(--ink)',
+              fontSize: 'var(--text-xl)', fontWeight: 700, color: 'var(--ink)',
               fontVariantNumeric: 'tabular-nums',
             }}
           >
             {sets}
           </span>
-          <span style={{ fontSize: 11, color: bandColor(band) }}>
+          <span style={{ fontSize: 'var(--text-sm)', color: bandColor(band) }}>
             {sets === 0 ? 'none logged' : BAND_LABEL[band]}
           </span>
         </span>
@@ -81,7 +81,7 @@ function MuscleRow({ reading }: RowProps) {
         ))}
       </div>
 
-      <span style={{ fontSize: 11, color: 'var(--ink-ghost)' }}>
+      <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-ghost)' }}>
         {landmark.mev}–{landmark.mav} reference, {landmark.mrv} ceiling
         {landmark.covers.length > 1 && ` · covers ${landmark.covers.join(', ')}`}
       </span>
@@ -107,7 +107,7 @@ export function MuscleVolumeCard({ readings }: { readings: MuscleReading[] }) {
         {readings.map(r => <MuscleRow key={r.muscle} reading={r} />)}
       </div>
 
-      <p style={{ fontSize: 11, color: 'var(--ink-ghost)' }}>
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-ghost)' }}>
         Counts come from your logged sets. The reference ranges are coaching
         heuristics rather than measured thresholds, they vary between people,
         and this app records six coarse groups where the published landmarks are

@@ -44,15 +44,15 @@ function NewBoardSheet({ onClose }: { onClose: () => void }) {
     <Sheet title="New Board" onClose={onClose} noPadding>
       <div className="p-4 space-y-3">
           <div>
-            <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Board Name *</label>
+            <label className="text-[length:var(--text-2xs)] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Board Name *</label>
             <input className="input w-full" value={name} onChange={e => setName(e.target.value)} placeholder="e.g. Q2 Work, Album Project..." autoFocus />
           </div>
           <div>
-            <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Category</label>
+            <label className="text-[length:var(--text-2xs)] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Category</label>
             <div className="flex gap-1.5">
               {CATEGORIES.map(c => (
                 <button key={c} onClick={() => setCategory(c)}
-                  className="flex-1 py-1.5 rounded-[2px] text-[9px] uppercase tracking-widest capitalize transition-colors"
+                  className="flex-1 py-1.5 rounded-[2px] text-[length:var(--text-2xs)] uppercase tracking-widest capitalize transition-colors"
                   style={{ border: `1px solid ${category === c ? '#888888' : 'var(--border)'}`, color: category === c ? 'var(--accent)' : 'var(--dim)', background: category === c ? '#181818' : 'transparent' }}>
                   {c}
                 </button>
@@ -60,7 +60,7 @@ function NewBoardSheet({ onClose }: { onClose: () => void }) {
             </div>
           </div>
           <button onClick={handleSave} disabled={!name.trim() || saving}
-            className="w-full py-2.5 rounded-[2px] text-[11px] uppercase tracking-widest disabled:opacity-30"
+            className="w-full py-2.5 rounded-[2px] text-[length:var(--text-sm)] uppercase tracking-widest disabled:opacity-30"
             style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}>
             {saving ? 'Creating...' : 'Create Board'}
           </button>
@@ -92,16 +92,16 @@ function NewTaskSheet({ boardId, onClose }: { boardId: number; onClose: () => vo
     <Sheet title="New Task" onClose={onClose} noPadding>
       <div className="p-4 space-y-3">
           <div>
-            <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Task *</label>
+            <label className="text-[length:var(--text-2xs)] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Task *</label>
             <input className="input w-full" value={title} onChange={e => setTitle(e.target.value)} placeholder="What needs to be done?" autoFocus />
           </div>
           <div className="grid grid-cols-2 gap-2">
             <div>
-              <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Priority</label>
+              <label className="text-[length:var(--text-2xs)] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Priority</label>
               <div className="flex gap-1">
                 {PRIORITIES.map(p => (
                   <button key={p} onClick={() => setPriority(p)}
-                    className="flex-1 py-1 rounded-[2px] text-[9px] uppercase tracking-widest capitalize"
+                    className="flex-1 py-1 rounded-[2px] text-[length:var(--text-2xs)] uppercase tracking-widest capitalize"
                     style={{ border: `1px solid ${priority === p ? PRIORITY_COLOR[p] : 'var(--border)'}`, color: priority === p ? PRIORITY_COLOR[p] : 'var(--dim)' }}>
                     {p}
                   </button>
@@ -109,16 +109,16 @@ function NewTaskSheet({ boardId, onClose }: { boardId: number; onClose: () => vo
               </div>
             </div>
             <div>
-              <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Due</label>
+              <label className="text-[length:var(--text-2xs)] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Due</label>
               <input type="date" className="input w-full" value={dueDate} onChange={e => setDueDate(e.target.value)} />
             </div>
           </div>
           <div>
-            <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Notes</label>
+            <label className="text-[length:var(--text-2xs)] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Notes</label>
             <textarea className="input w-full resize-none" rows={2} value={notes} onChange={e => setNotes(e.target.value)} placeholder="Optional..." />
           </div>
           <button onClick={handleSave} disabled={!title.trim() || saving}
-            className="w-full py-2.5 rounded-[2px] text-[11px] uppercase tracking-widest disabled:opacity-30"
+            className="w-full py-2.5 rounded-[2px] text-[length:var(--text-sm)] uppercase tracking-widest disabled:opacity-30"
             style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}>
             {saving ? 'Adding...' : 'Add Task'}
           </button>
@@ -149,14 +149,14 @@ function SortableTask({ task }: { task: Task }) {
         <GripVertical size={12} style={{ color: 'var(--dim)' }} />
       </div>
       <div className="flex-1 min-w-0">
-        <p className={cn('text-[12px]', task.status === 'done' && 'line-through opacity-50')} style={{ color: 'var(--accent)' }}>{task.title}</p>
+        <p className={cn('text-[length:var(--text-md)]', task.status === 'done' && 'line-through opacity-50')} style={{ color: 'var(--accent)' }}>{task.title}</p>
         <div className="flex items-center gap-2 mt-0.5">
-          <span className="text-[9px] uppercase" style={{ color: PRIORITY_COLOR[task.priority] }}>{task.priority}</span>
-          {task.dueDate && <span className="text-[9px]" style={{ color: 'var(--dim)' }}>Due {task.dueDate.slice(5)}</span>}
+          <span className="text-[length:var(--text-2xs)] uppercase" style={{ color: PRIORITY_COLOR[task.priority] }}>{task.priority}</span>
+          {task.dueDate && <span className="text-[length:var(--text-2xs)]" style={{ color: 'var(--dim)' }}>Due {task.dueDate.slice(5)}</span>}
         </div>
       </div>
       <div className="flex items-center gap-1 shrink-0">
-        <button onClick={cycleStatus} className="text-[9px] uppercase tracking-widest px-1.5 py-0.5 rounded-[2px] transition-colors"
+        <button onClick={cycleStatus} className="text-[length:var(--text-2xs)] uppercase tracking-widest px-1.5 py-0.5 rounded-[2px] transition-colors"
           style={{ border: '1px solid var(--border)', color: 'var(--dim)' }}>
           →
         </button>
@@ -203,11 +203,11 @@ function BoardView({ board, onBack }: { board: Board; onBack: () => void }) {
           <ChevronLeft size={18} />
         </button>
         <div className="flex-1">
-          <div className="text-[11px] uppercase tracking-widest text-noir-muted capitalize">{board.category}</div>
-          <div className="text-[18px] uppercase tracking-wide text-noir-white">{board.name}</div>
+          <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-noir-muted capitalize">{board.category}</div>
+          <div className="text-[length:var(--text-3xl)] uppercase tracking-wide text-noir-white">{board.name}</div>
         </div>
         <button onClick={() => setShowNewTask(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 border border-noir-border rounded-[2px] text-[10px] uppercase tracking-widest text-noir-muted hover:text-noir-white hover:border-noir-strong transition-colors">
+          className="flex items-center gap-1.5 px-3 py-1.5 border border-noir-border rounded-[2px] text-[length:var(--text-xs)] uppercase tracking-widest text-noir-muted hover:text-noir-white hover:border-noir-strong transition-colors">
           <Plus size={12} /> Task
         </button>
       </div>
@@ -219,8 +219,8 @@ function BoardView({ board, onBack }: { board: Board; onBack: () => void }) {
             return (
               <div key={col.status} className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <p className="text-[9px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>{col.label}</p>
-                  <span className="text-[9px]" style={{ color: 'var(--dim)' }}>{colTasks.length}</span>
+                  <p className="text-[length:var(--text-2xs)] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>{col.label}</p>
+                  <span className="text-[length:var(--text-2xs)]" style={{ color: 'var(--dim)' }}>{colTasks.length}</span>
                 </div>
                 <div className="min-h-[60px] space-y-1.5 rounded-[2px] p-1.5" style={{ background: 'var(--bg)', border: '1px solid #1a1a1a' }}>
                   <SortableContext items={colTasks.map(t => t.id!)} strategy={verticalListSortingStrategy}>
@@ -231,7 +231,7 @@ function BoardView({ board, onBack }: { board: Board; onBack: () => void }) {
                     ))}
                   </SortableContext>
                   {colTasks.length === 0 && (
-                    <p className="text-[9px] text-center py-3" style={{ color: 'var(--dim)' }}>Empty</p>
+                    <p className="text-[length:var(--text-2xs)] text-center py-3" style={{ color: 'var(--dim)' }}>Empty</p>
                   )}
                 </div>
               </div>
@@ -267,11 +267,11 @@ function BoardCard({ board, onClick }: { board: Board; onClick: () => void }) {
       className="w-full flex items-center justify-between p-4 rounded-[2px] text-left transition-colors hover:bg-noir-elevated"
       style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
       <div>
-        <p className="text-[13px]" style={{ color: 'var(--accent)' }}>{board.name}</p>
-        <p className="text-[10px] mt-0.5 capitalize" style={{ color: 'var(--dim)' }}>{board.category}</p>
+        <p className="text-[length:var(--text-base)]" style={{ color: 'var(--accent)' }}>{board.name}</p>
+        <p className="text-[length:var(--text-xs)] mt-0.5 capitalize" style={{ color: 'var(--dim)' }}>{board.category}</p>
       </div>
       <div className="flex items-center gap-3">
-        <span className="text-[10px]" style={{ color: total === 0 ? 'var(--dim)' : 'var(--dim)' }}>{countLabel}</span>
+        <span className="text-[length:var(--text-xs)]" style={{ color: total === 0 ? 'var(--dim)' : 'var(--dim)' }}>{countLabel}</span>
         <button onClick={e => { e.stopPropagation(); db.boards.delete(board.id!) }}
           aria-label="Delete board" className="p-1">
           <Trash2 size={14} style={{ color: 'var(--dim)' }} />
@@ -300,19 +300,19 @@ export default function Projects() {
     <div className="page-container space-y-4">
       <div className="flex items-center justify-between pt-2">
         <div>
-          <div className="text-[11px] uppercase tracking-widest text-noir-muted">Kanban</div>
-          <div className="text-[18px] uppercase tracking-wide text-noir-white">Projects</div>
+          <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-noir-muted">Kanban</div>
+          <div className="text-[length:var(--text-3xl)] uppercase tracking-wide text-noir-white">Projects</div>
         </div>
         <button onClick={() => setShowNewBoard(true)}
-          className="flex items-center gap-1.5 px-3 py-1.5 border border-noir-border rounded-[2px] text-[10px] uppercase tracking-widest text-noir-muted hover:text-noir-white hover:border-noir-strong transition-colors">
+          className="flex items-center gap-1.5 px-3 py-1.5 border border-noir-border rounded-[2px] text-[length:var(--text-xs)] uppercase tracking-widest text-noir-muted hover:text-noir-white hover:border-noir-strong transition-colors">
           <Plus size={12} /> Board
         </button>
       </div>
 
       {boards.length === 0 ? (
         <div className="text-center py-10 space-y-2">
-          <p className="text-[13px]" style={{ color: 'var(--dim)' }}>No boards yet.</p>
-          <p className="text-[11px]" style={{ color: 'var(--dim)' }}>Create boards for Work, Creative, Personal, or Courses.</p>
+          <p className="text-[length:var(--text-base)]" style={{ color: 'var(--dim)' }}>No boards yet.</p>
+          <p className="text-[length:var(--text-sm)]" style={{ color: 'var(--dim)' }}>Create boards for Work, Creative, Personal, or Courses.</p>
         </div>
       ) : (
         <div className="space-y-2">

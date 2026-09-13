@@ -20,13 +20,13 @@ export function TrendRates({ signals }: { signals: LiftSignal[] }) {
         const falling = (rate ?? 0) < -0.05
         return (
           <div key={sig.exerciseId} className="flex items-baseline justify-between" style={{ gap: 12 }}>
-            <span style={{ fontSize: 13, color: 'var(--ink-dim)' }}>{sig.name}</span>
+            <span style={{ fontSize: 'var(--text-base)', color: 'var(--ink-dim)' }}>{sig.name}</span>
             {rate === null ? (
-              <span style={{ fontSize: 11, color: 'var(--ink-ghost)' }}>not enough sessions</span>
+              <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-ghost)' }}>not enough sessions</span>
             ) : (
               <span
                 style={{
-                  fontSize: 13, fontWeight: 700, fontVariantNumeric: 'tabular-nums',
+                  fontSize: 'var(--text-base)', fontWeight: 700, fontVariantNumeric: 'tabular-nums',
                   color: rising ? 'var(--ok)' : falling ? 'var(--red)' : 'var(--ink-faint)',
                 }}
               >
@@ -52,7 +52,7 @@ export function StallCard({ signals }: { signals: LiftSignal[] }) {
     <Card elevated style={{ border: '1px solid rgba(167,139,250,0.30)' }}>
       <h3
         className="uppercase"
-        style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--violet-100)' }}
+        style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em', color: 'var(--violet-100)' }}
       >
         Not moving
       </h3>
@@ -60,14 +60,14 @@ export function StallCard({ signals }: { signals: LiftSignal[] }) {
         {signals.map(sig => (
           <div key={sig.exerciseId} className="flex flex-col" style={{ gap: 2 }}>
             <div className="flex items-baseline justify-between" style={{ gap: 12 }}>
-              <span style={{ fontSize: 15, color: 'var(--ink)' }}>{sig.name}</span>
+              <span style={{ fontSize: 'var(--text-xl)', color: 'var(--ink)' }}>{sig.name}</span>
               <span
-                style={{ fontSize: 13, color: 'var(--ink-dim)', fontVariantNumeric: 'tabular-nums' }}
+                style={{ fontSize: 'var(--text-base)', color: 'var(--ink-dim)', fontVariantNumeric: 'tabular-nums' }}
               >
                 {Math.round(sig.stall!.weeksSincePeak)} weeks
               </span>
             </div>
-            <span style={{ fontSize: 11, color: 'var(--ink-faint)' }}>
+            <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)' }}>
               Best {displayLb(sig.stall!.peakKg)} lb on {sig.stall!.peakDate}. Consider resetting
               the training max to {displayLb(sig.stall!.resetToKg)} lb.
             </span>

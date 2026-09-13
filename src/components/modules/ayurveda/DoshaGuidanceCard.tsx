@@ -10,7 +10,7 @@ function Chips({ items, tone }: { items: string[]; tone: 'favor' | 'reduce' }) {
           key={item}
           className="capitalize"
           style={{
-            fontSize: 11, padding: '3px 9px', borderRadius: 'var(--r-pill)',
+            fontSize: 'var(--text-sm)', padding: '3px 9px', borderRadius: 'var(--r-pill)',
             color: tone === 'favor' ? 'var(--ink-2)' : 'var(--ink-dim)',
             border: `1px solid ${tone === 'favor' ? 'rgba(167,139,250,0.35)' : 'var(--hairline)'}`,
             background: tone === 'favor' ? 'rgba(139,92,246,0.08)' : 'transparent',
@@ -28,7 +28,7 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     <div className="flex flex-col" style={{ gap: 6 }}>
       <h4
         className="uppercase"
-        style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+        style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
       >
         {title}
       </h4>
@@ -50,20 +50,20 @@ export function DoshaGuidanceCard() {
 
   return (
     <Card label={`${g.dosha} — ${g.elements}`}>
-      <p style={{ fontSize: 13, lineHeight: 1.5, color: 'var(--ink-2)' }}>{g.principle}</p>
+      <p style={{ fontSize: 'var(--text-base)', lineHeight: 1.5, color: 'var(--ink-2)' }}>{g.principle}</p>
 
       <Section title="Qualities">
         <Chips items={g.qualities} tone="reduce" />
       </Section>
 
       <Section title="Training">
-        <p style={{ fontSize: 13, lineHeight: 1.5, color: 'var(--ink-dim)' }}>{g.training.approach}</p>
-        <p style={{ fontSize: 12, color: 'var(--ink-faint)' }}>
+        <p style={{ fontSize: 'var(--text-base)', lineHeight: 1.5, color: 'var(--ink-dim)' }}>{g.training.approach}</p>
+        <p style={{ fontSize: 'var(--text-md)', color: 'var(--ink-faint)' }}>
           Best time: {g.training.bestTime}
         </p>
         <p
           style={{
-            fontSize: 12, lineHeight: 1.5, color: 'var(--ink-dim)',
+            fontSize: 'var(--text-md)', lineHeight: 1.5, color: 'var(--ink-dim)',
             padding: '10px 12px', borderRadius: 'var(--r-inset)',
             border: '1px solid rgba(167,139,250,0.30)', background: 'rgba(139,92,246,0.07)',
           }}
@@ -83,7 +83,7 @@ export function DoshaGuidanceCard() {
       <Section title="Daily">
         <ul className="flex flex-col" style={{ gap: 5 }}>
           {g.daily.map(d => (
-            <li key={d} className="flex" style={{ gap: 8, fontSize: 13, color: 'var(--ink-dim)', lineHeight: 1.45 }}>
+            <li key={d} className="flex" style={{ gap: 8, fontSize: 'var(--text-base)', color: 'var(--ink-dim)', lineHeight: 1.45 }}>
               <span aria-hidden="true" style={{ color: 'var(--violet-200)' }}>·</span>
               <span>{d}</span>
             </li>
@@ -92,17 +92,17 @@ export function DoshaGuidanceCard() {
       </Section>
 
       <Section title={`In excess, ${g.dosha} looks like`}>
-        <p style={{ fontSize: 13, lineHeight: 1.5, color: 'var(--ink-dim)' }}>
+        <p style={{ fontSize: 'var(--text-base)', lineHeight: 1.5, color: 'var(--ink-dim)' }}>
           {g.excess.join(', ')}. Balanced, it reads as {g.balanced.join(', ')}.
         </p>
-        <p style={{ fontSize: 12, color: 'var(--ink-faint)' }}>
+        <p style={{ fontSize: 'var(--text-md)', color: 'var(--ink-faint)' }}>
           Accumulates in: {g.season}
         </p>
       </Section>
 
       <p
         style={{
-          fontSize: 11, lineHeight: 1.5, color: 'var(--ink-ghost)',
+          fontSize: 'var(--text-sm)', lineHeight: 1.5, color: 'var(--ink-ghost)',
           paddingTop: 12, borderTop: '1px solid var(--hairline-soft)',
         }}
       >

@@ -156,11 +156,11 @@ export function MuscleFigure({ primary, secondary = [] }: Props) {
     <div className="flex items-start justify-center gap-3">
       <figure className="flex flex-col items-center gap-1">
         <FrontFigure shade={shade} />
-        <figcaption className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>Front</figcaption>
+        <figcaption className="text-[length:var(--text-xs)] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>Front</figcaption>
       </figure>
       <figure className="flex flex-col items-center gap-1">
         <BackFigure shade={shade} />
-        <figcaption className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>Back</figcaption>
+        <figcaption className="text-[length:var(--text-xs)] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>Back</figcaption>
       </figure>
     </div>
   )

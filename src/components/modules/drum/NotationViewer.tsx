@@ -154,8 +154,8 @@ export function NotationViewer({ data }: Props) {
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between">
-        <span className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)]">{data.title}</span>
-        <span className="text-[11px] text-[color:var(--ink-faint)]">{data.tempo} BPM · {data.timeSignature.beats}/{data.timeSignature.value}</span>
+        <span className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-faint)]">{data.title}</span>
+        <span className="text-[length:var(--text-sm)] text-[color:var(--ink-faint)]">{data.tempo} BPM · {data.timeSignature.beats}/{data.timeSignature.value}</span>
       </div>
       <div
         className="overflow-x-auto rounded-[var(--r-control)] border border-[color:var(--hairline)] cursor-pointer select-none"
@@ -164,7 +164,7 @@ export function NotationViewer({ data }: Props) {
       >
         <div ref={containerRef} />
       </div>
-      <div className="text-[11px] text-[color:var(--ink-faint)]">* = flam  ~ = drag  &gt; = accent · tap note to hear click</div>
+      <div className="text-[length:var(--text-sm)] text-[color:var(--ink-faint)]">* = flam  ~ = drag  &gt; = accent · tap note to hear click</div>
     </div>
   )
 }

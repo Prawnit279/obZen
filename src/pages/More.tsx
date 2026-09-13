@@ -22,11 +22,11 @@ export default function More() {
       <div className="pt-2">
         <div
           className="uppercase"
-          style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+          style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
         >
           All Modules
         </div>
-        <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
+        <h1 style={{ fontSize: 'var(--text-6xl)', fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
           More
         </h1>
       </div>
@@ -45,8 +45,8 @@ export default function More() {
         >
           <Icon size={18} style={{ color: 'var(--ink-faint)' }} className="shrink-0" strokeWidth={1.5} />
           <div>
-            <div style={{ fontSize: 15, fontWeight: 500, color: 'var(--ink)' }}>{label}</div>
-            <div style={{ fontSize: 13, color: 'var(--ink-dim)' }}>{sub}</div>
+            <div style={{ fontSize: 'var(--text-xl)', fontWeight: 500, color: 'var(--ink)' }}>{label}</div>
+            <div style={{ fontSize: 'var(--text-base)', color: 'var(--ink-dim)' }}>{sub}</div>
           </div>
         </button>
       ))}

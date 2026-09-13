@@ -30,13 +30,13 @@ function AdviceRow({ advice }: { advice: TmAdvice }) {
       }}
     >
       <div className="flex items-baseline justify-between gap-2">
-        <span style={{ fontSize: 13, fontWeight: 600, color: 'var(--ink)' }}>
+        <span style={{ fontSize: 'var(--text-base)', fontWeight: 600, color: 'var(--ink)' }}>
           {exerciseNameFor(advice.exerciseId)}
         </span>
         <span
           className="uppercase shrink-0"
           style={{
-            fontSize: 11, fontWeight: 500, letterSpacing: '0.12em',
+            fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em',
             color: verdictColor(advice.verdict),
           }}
         >
@@ -47,23 +47,23 @@ function AdviceRow({ advice }: { advice: TmAdvice }) {
       <div className="flex items-baseline flex-wrap" style={{ gap: 8 }}>
         <span
           style={{
-            fontSize: 20, fontWeight: 700, letterSpacing: '-0.02em',
+            fontSize: 'var(--text-4xl)', fontWeight: 700, letterSpacing: '-0.02em',
             color: 'var(--ink)', fontVariantNumeric: 'tabular-nums',
           }}
         >
           {advice.nextTmLb} lb
         </span>
-        <span style={{ fontSize: 12, color: 'var(--ink-dim)' }}>
+        <span style={{ fontSize: 'var(--text-md)', color: 'var(--ink-dim)' }}>
           next training max
         </span>
       </div>
 
-      <p style={{ fontSize: 12, color: 'var(--ink-dim)' }}>
+      <p style={{ fontSize: 'var(--text-md)', color: 'var(--ink-dim)' }}>
         {advice.set.weightLb} lb × {advice.set.reps} on {shortDate(advice.set.dateISO)} —{' '}
         <span style={{ fontVariantNumeric: 'tabular-nums' }}>{advice.e1rmLb} lb</span> estimated max.
       </p>
 
-      <p style={{ fontSize: 12, color: 'var(--ink-faint)' }}>{advice.reason}</p>
+      <p style={{ fontSize: 'var(--text-md)', color: 'var(--ink-faint)' }}>{advice.reason}</p>
     </div>
   )
 }
@@ -82,7 +82,7 @@ export function AmrapCard({ advice }: { advice: TmAdvice[] }) {
     <Card label="Off your last all-out set">
       {advice.map(a => <AdviceRow key={a.exerciseId} advice={a} />)}
 
-      <p style={{ fontSize: 11, color: 'var(--ink-ghost)' }}>
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-ghost)' }}>
         The app stores no training max, so “what you have been running” is taken
         from the best estimate in your history before that set. Treat these as a
         starting point for the next cycle, not a prescription.

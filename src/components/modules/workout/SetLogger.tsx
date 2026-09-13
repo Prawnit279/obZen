@@ -63,7 +63,7 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
       {/* Set number */}
       <span
         className="uppercase shrink-0 w-9"
-        style={{ fontSize: 11, letterSpacing: '0.08em', color: 'var(--ink-faint)' }}
+        style={{ fontSize: 'var(--text-sm)', letterSpacing: '0.08em', color: 'var(--ink-faint)' }}
       >
         Set {set.setNumber}
       </span>
@@ -76,7 +76,7 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
         onChange={e => setWeight(e.target.value)}
         aria-label={`${units.weightAria}, set ${set.setNumber}`}
         placeholder="—"
-        className="w-16 text-center rounded-[var(--r-control)] border text-[13px] bg-transparent focus:outline-none transition-colors"
+        className="w-16 text-center rounded-[var(--r-control)] border text-[length:var(--text-base)] bg-transparent focus:outline-none transition-colors"
         style={{
           color: 'var(--ink)',
           borderColor: 'var(--hairline)',
@@ -88,7 +88,7 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
       <button
         onClick={() => setUnit(u => u === 'lbs' ? 'kg' : 'lbs')}
         className="uppercase shrink-0 w-7"
-        style={{ fontSize: 11, letterSpacing: '0.06em', color: 'var(--ink-faint)' }}
+        style={{ fontSize: 'var(--text-sm)', letterSpacing: '0.06em', color: 'var(--ink-faint)' }}
         aria-label={`Unit: ${unit}. Tap to switch.`}
       >
         {unit}
@@ -102,7 +102,7 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
         onChange={e => setReps(e.target.value)}
         aria-label={`${units.countAria}, set ${set.setNumber}`}
         placeholder="—"
-        className="w-12 text-center rounded-[var(--r-control)] border text-[13px] bg-transparent focus:outline-none transition-colors"
+        className="w-12 text-center rounded-[var(--r-control)] border text-[length:var(--text-base)] bg-transparent focus:outline-none transition-colors"
         style={{
           color: 'var(--ink)',
           borderColor: 'var(--hairline)',
@@ -115,7 +115,7 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
           itself rather than another control competing for width. A timed hold
           has no rep ceiling to probe, so it stays a plain label. */}
       {units.isDuration ? (
-        <span className="shrink-0" style={{ fontSize: 11, color: 'var(--ink-faint)' }}>
+        <span className="shrink-0" style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)' }}>
           {units.countLabel}
         </span>
       ) : (
@@ -124,7 +124,7 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
           aria-pressed={isAmrap}
           aria-label={`Mark set ${set.setNumber} as AMRAP — as many reps as possible`}
           className="shrink-0 transition-colors"
-          style={{ fontSize: 11, color: isAmrap ? 'var(--complete-text)' : 'var(--ink-faint)' }}
+          style={{ fontSize: 'var(--text-sm)', color: isAmrap ? 'var(--complete-text)' : 'var(--ink-faint)' }}
         >
           {units.countLabel}{isAmrap ? '+' : ''}
         </button>
@@ -208,7 +208,7 @@ export function SetLogger({ exerciseId, sets, onAddSet, onUpdateSet, onRemoveSet
       <div
         className="uppercase"
         style={{
-          fontSize: 11, fontWeight: 500, letterSpacing: '0.12em',
+          fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em',
           color: 'var(--ink-dim)', marginBottom: 8,
         }}
       >
@@ -239,7 +239,7 @@ export function SetLogger({ exerciseId, sets, onAddSet, onUpdateSet, onRemoveSet
       {sets.length < MAX_SETS && (
         <button
           onClick={handleAddRow}
-          className="mt-2 flex items-center gap-1.5 text-[11px] uppercase tracking-widest transition-opacity hover:opacity-70"
+          className="mt-2 flex items-center gap-1.5 text-[length:var(--text-sm)] uppercase tracking-widest transition-opacity hover:opacity-70"
           style={{ color: 'var(--ink-faint)' }}
         >
           <Plus size={12} />

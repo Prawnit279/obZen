@@ -33,7 +33,7 @@ export default function SessionDetail() {
   const back = (
     <button
       onClick={goBack}
-      className="flex items-center gap-1.5 text-[12px] uppercase tracking-widest transition-opacity hover:opacity-70"
+      className="flex items-center gap-1.5 text-[length:var(--text-md)] uppercase tracking-widest transition-opacity hover:opacity-70"
       style={{ color: 'var(--ink-dim)' }}
     >
       <ArrowLeft size={14} /> Back
@@ -46,7 +46,7 @@ export default function SessionDetail() {
     return (
       <div className="page-container space-y-4">
         {back}
-        <div className="text-center py-10 text-[13px]" style={{ color: 'var(--ink-faint)' }}>Loading session…</div>
+        <div className="text-center py-10 text-[length:var(--text-base)]" style={{ color: 'var(--ink-faint)' }}>Loading session…</div>
       </div>
     )
   }
@@ -54,7 +54,7 @@ export default function SessionDetail() {
     return (
       <div className="page-container space-y-4">
         {back}
-        <div className="text-center py-10 text-[13px]" style={{ color: 'var(--ink-faint)' }}>Session not found.</div>
+        <div className="text-center py-10 text-[length:var(--text-base)]" style={{ color: 'var(--ink-faint)' }}>Session not found.</div>
       </div>
     )
   }
@@ -84,20 +84,20 @@ export default function SessionDetail() {
       <div className="pt-1">
         <div
           className="uppercase"
-          style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+          style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
         >
           {session.dayLabel}{session.focus ? ` · ${session.focus}` : ''}
         </div>
-        <h1 style={{ fontSize: 22, fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.2, color: 'var(--ink)' }}>
+        <h1 style={{ fontSize: 'var(--text-5xl)', fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.2, color: 'var(--ink)' }}>
           {formatDateFull(session.date)}
         </h1>
         <div className="flex items-center gap-3 mt-1">
-          <span className="text-[12px]" style={{ color: 'var(--ink-faint)' }}>
+          <span className="text-[length:var(--text-md)]" style={{ color: 'var(--ink-faint)' }}>
             {exercises.length} exercise{exercises.length === 1 ? '' : 's'} · {setCount} set{setCount === 1 ? '' : 's'}
           </span>
           {session.completedAt && (
             <span
-              className="text-[11px] uppercase tracking-widest px-2.5 py-0.5 rounded-[var(--r-pill)]"
+              className="text-[length:var(--text-sm)] uppercase tracking-widest px-2.5 py-0.5 rounded-[var(--r-pill)]"
               style={{ color: 'var(--complete-text)', border: '1px solid var(--complete-border)' }}
             >
               Workout Complete
@@ -108,7 +108,7 @@ export default function SessionDetail() {
         {/* Finish (or reopen) a workout after the day it was trained. */}
         <button
           onClick={toggleComplete}
-          className="mt-3 w-full py-2.5 rounded-[var(--r-control)] text-[12px] uppercase tracking-widest transition-opacity hover:opacity-80"
+          className="mt-3 w-full py-2.5 rounded-[var(--r-control)] text-[length:var(--text-md)] uppercase tracking-widest transition-opacity hover:opacity-80"
           style={session.completedAt
             ? { border: '1px solid var(--border)', color: 'var(--ink-dim)' }
             : { border: '1px solid var(--complete-border)', color: 'var(--complete-text)' }}
@@ -119,7 +119,7 @@ export default function SessionDetail() {
         {/* Editing sets happens in Train, on this session's own date. */}
         <button
           onClick={() => navigate(`/workout?date=${session.date}&day=${encodeURIComponent(session.dayLabel)}`)}
-          className="mt-2 w-full py-2.5 rounded-[var(--r-control)] text-[12px] uppercase tracking-widest transition-opacity hover:opacity-80"
+          className="mt-2 w-full py-2.5 rounded-[var(--r-control)] text-[length:var(--text-md)] uppercase tracking-widest transition-opacity hover:opacity-80"
           style={{ border: '1px solid var(--border)', color: 'var(--ink-dim)' }}
         >
           Edit sets for this day
@@ -128,7 +128,7 @@ export default function SessionDetail() {
 
       {/* Exercises */}
       {exercises.length === 0 ? (
-        <div className="text-center py-10 text-[13px]" style={{ color: 'var(--ink-faint)' }}>
+        <div className="text-center py-10 text-[length:var(--text-base)]" style={{ color: 'var(--ink-faint)' }}>
           No exercises were logged for this day.
         </div>
       ) : (
@@ -143,15 +143,15 @@ export default function SessionDetail() {
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="min-w-0">
-                    <div className="text-[15px]" style={{ color: 'var(--ink)' }}>{displayName(ex)}</div>
+                    <div className="text-[length:var(--text-xl)]" style={{ color: 'var(--ink)' }}>{displayName(ex)}</div>
                     {(ex.target || ex.muscle) && (
-                      <div className="text-[11px] uppercase tracking-widest mt-0.5" style={{ color: 'var(--ink-dim)' }}>
+                      <div className="text-[length:var(--text-sm)] uppercase tracking-widest mt-0.5" style={{ color: 'var(--ink-dim)' }}>
                         {ex.target}
                         {ex.muscle && <span className="ml-2 normal-case capitalize">{ex.muscle}</span>}
                       </div>
                     )}
                   </div>
-                  <span className="text-[11px] uppercase tracking-widest shrink-0" style={{ color: status.color }}>
+                  <span className="text-[length:var(--text-sm)] uppercase tracking-widest shrink-0" style={{ color: status.color }}>
                     {status.text}
                   </span>
                 </div>
@@ -162,10 +162,10 @@ export default function SessionDetail() {
                     {ex.sets.map((s, i) => (
                       <div
                         key={i}
-                        className="flex items-center justify-between text-[13px] py-1.5 px-2 rounded-[var(--r-control)]"
+                        className="flex items-center justify-between text-[length:var(--text-base)] py-1.5 px-2 rounded-[var(--r-control)]"
                         style={{ background: 'rgba(255,255,255,0.05)' }}
                       >
-                        <span style={{ color: 'var(--ink-faint)' }} className="uppercase tracking-widest text-[11px]">
+                        <span style={{ color: 'var(--ink-faint)' }} className="uppercase tracking-widest text-[length:var(--text-sm)]">
                           Set {s.setNumber}
                         </span>
                         <span className="font-mono tabular-nums" style={{ color: 'var(--ink)' }}>
@@ -176,12 +176,12 @@ export default function SessionDetail() {
                   </div>
                 ) : (
                   ex.status !== 'skipped' && (
-                    <div className="mt-2 text-[12px]" style={{ color: 'var(--ink-faint)' }}>No sets logged for this exercise.</div>
+                    <div className="mt-2 text-[length:var(--text-md)]" style={{ color: 'var(--ink-faint)' }}>No sets logged for this exercise.</div>
                   )
                 )}
 
                 {ex.note && (
-                  <div className="mt-2 text-[12px] italic" style={{ color: 'var(--ink-dim)' }}>{ex.note}</div>
+                  <div className="mt-2 text-[length:var(--text-md)] italic" style={{ color: 'var(--ink-dim)' }}>{ex.note}</div>
                 )}
               </div>
             )

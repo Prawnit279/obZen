@@ -19,7 +19,7 @@ export function BalanceCard({ report }: { report: BalanceReport }) {
           const behind = l.index < 1
           return (
             <div key={l.exerciseId} className="flex flex-col" style={{ gap: 5 }}>
-              <div className="flex items-baseline justify-between" style={{ fontSize: 13, gap: 12 }}>
+              <div className="flex items-baseline justify-between" style={{ fontSize: 'var(--text-base)', gap: 12 }}>
                 <span style={{ color: 'var(--ink-2)' }}>{l.name}</span>
                 <span style={{ color: 'var(--ink-dim)', fontVariantNumeric: 'tabular-nums' }}>
                   {l.ratio.toFixed(2)}× squat
@@ -41,7 +41,7 @@ export function BalanceCard({ report }: { report: BalanceReport }) {
       </div>
 
       {report.lagging && (
-        <p style={{ fontSize: 13, color: 'var(--ink-dim)' }}>
+        <p style={{ fontSize: 'var(--text-base)', color: 'var(--ink-dim)' }}>
           {report.lagging.name} is furthest behind the others. Worth asking whether
           it needs more attention — or whether these ratios simply are not yours.
         </p>
@@ -49,7 +49,7 @@ export function BalanceCard({ report }: { report: BalanceReport }) {
 
       <p
         style={{
-          fontSize: 11, color: 'var(--ink-faint)',
+          fontSize: 'var(--text-sm)', color: 'var(--ink-faint)',
           paddingTop: 12, borderTop: '1px solid var(--hairline-soft)',
         }}
       >

@@ -67,8 +67,8 @@ function MacroBar({ label, value, max, color, unit = 'g' }: MacroBarProps) {
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>{label}</span>
-        <span className="text-[11px]" style={{ color: 'var(--accent)' }}>
+        <span className="text-[length:var(--text-xs)] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>{label}</span>
+        <span className="text-[length:var(--text-sm)]" style={{ color: 'var(--accent)' }}>
           {value}{unit} <span style={{ color: 'var(--dim)' }}>/ {max}{unit}</span>
         </span>
       </div>
@@ -155,7 +155,7 @@ function AddMealSheet({ date, isTrainingDay, savedMeals, initialMealType, onClos
     <div className="fixed inset-0 z-50 flex flex-col justify-end" style={{ background: 'rgba(0,0,0,0.75)' }}>
       <div className="rounded-t-[4px] p-4 space-y-3 max-h-[85vh] overflow-y-auto" style={{ background: 'var(--surface)', border: '1px solid var(--border)' }}>
         <div className="flex items-center justify-between">
-          <p className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--accent)' }}>Add Meal</p>
+          <p className="text-[length:var(--text-sm)] uppercase tracking-widest" style={{ color: 'var(--accent)' }}>Add Meal</p>
           <button onClick={onClose}><X size={14} style={{ color: 'var(--dim)' }} /></button>
         </div>
 
@@ -165,7 +165,7 @@ function AddMealSheet({ date, isTrainingDay, savedMeals, initialMealType, onClos
             <button
               key={mt}
               onClick={() => setMealType(mt)}
-              className="flex-1 py-1.5 rounded-[2px] text-[9px] uppercase tracking-widest transition-colors"
+              className="flex-1 py-1.5 rounded-[2px] text-[length:var(--text-2xs)] uppercase tracking-widest transition-colors"
               style={mealType === mt
                 ? { background: 'var(--border)', color: 'var(--accent)', border: '1px solid var(--border-strong)' }
                 : { background: 'transparent', color: 'var(--dim)', border: '1px solid #1a1a1a' }
@@ -182,7 +182,7 @@ function AddMealSheet({ date, isTrainingDay, savedMeals, initialMealType, onClos
             <button
               key={t}
               onClick={() => setTab(t)}
-              className="pb-2 text-[10px] uppercase tracking-widest transition-colors"
+              className="pb-2 text-[length:var(--text-xs)] uppercase tracking-widest transition-colors"
               style={tab === t
                 ? { color: 'var(--accent)', borderBottom: '1px solid var(--accent)' }
                 : { color: 'var(--dim)' }
@@ -196,7 +196,7 @@ function AddMealSheet({ date, isTrainingDay, savedMeals, initialMealType, onClos
         {tab === 'custom' && (
           <div className="space-y-2.5">
             <div>
-              <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Food / Meal *</label>
+              <label className="text-[length:var(--text-2xs)] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Food / Meal *</label>
               <input
                 className="input w-full"
                 value={name}
@@ -207,37 +207,37 @@ function AddMealSheet({ date, isTrainingDay, savedMeals, initialMealType, onClos
             </div>
             <div className="grid grid-cols-2 gap-2">
               <div>
-                <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Calories (kcal)</label>
+                <label className="text-[length:var(--text-2xs)] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Calories (kcal)</label>
                 <input type="number" className="input w-full" value={calories} onChange={e => setCalories(e.target.value)} placeholder="450" min="0" />
               </div>
               <div>
-                <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Time</label>
+                <label className="text-[length:var(--text-2xs)] uppercase tracking-widest block mb-1" style={{ color: 'var(--dim)' }}>Time</label>
                 <input type="time" className="input w-full" value={time} onChange={e => setTime(e.target.value)} />
               </div>
             </div>
             <div className="grid grid-cols-3 gap-2">
               <div>
-                <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: MACRO_CLR.protein }}>Protein (g)</label>
+                <label className="text-[length:var(--text-2xs)] uppercase tracking-widest block mb-1" style={{ color: MACRO_CLR.protein }}>Protein (g)</label>
                 <input type="number" className="input w-full" value={protein} onChange={e => setProtein(e.target.value)} placeholder="40" min="0" />
               </div>
               <div>
-                <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: MACRO_CLR.carbs }}>Carbs (g)</label>
+                <label className="text-[length:var(--text-2xs)] uppercase tracking-widest block mb-1" style={{ color: MACRO_CLR.carbs }}>Carbs (g)</label>
                 <input type="number" className="input w-full" value={carbs} onChange={e => setCarbs(e.target.value)} placeholder="50" min="0" />
               </div>
               <div>
-                <label className="text-[9px] uppercase tracking-widest block mb-1" style={{ color: MACRO_CLR.fat }}>Fat (g)</label>
+                <label className="text-[length:var(--text-2xs)] uppercase tracking-widest block mb-1" style={{ color: MACRO_CLR.fat }}>Fat (g)</label>
                 <input type="number" className="input w-full" value={fat} onChange={e => setFat(e.target.value)} placeholder="15" min="0" />
               </div>
             </div>
             <label className="flex items-center gap-2 cursor-pointer">
               <input type="checkbox" checked={pitta} onChange={e => setPitta(e.target.checked)} className="rounded-[2px]" />
-              <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>Pitta-friendly</span>
+              <span className="text-[length:var(--text-xs)] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>Pitta-friendly</span>
             </label>
             <div className="flex gap-2">
               <button
                 onClick={handleLog}
                 disabled={!canSave || saving}
-                className="flex-1 py-2 rounded-[2px] text-[10px] uppercase tracking-widest disabled:opacity-30"
+                className="flex-1 py-2 rounded-[2px] text-[length:var(--text-xs)] uppercase tracking-widest disabled:opacity-30"
                 style={{ border: '1px solid var(--accent)', color: 'var(--accent)' }}
               >
                 {saving ? 'Logging…' : 'Log Meal'}
@@ -258,22 +258,22 @@ function AddMealSheet({ date, isTrainingDay, savedMeals, initialMealType, onClos
         {tab === 'saved' && (
           <div className="space-y-1.5">
             {savedMeals.length === 0 && (
-              <p className="text-[11px] text-center py-4" style={{ color: 'var(--dim)' }}>
+              <p className="text-[length:var(--text-sm)] text-center py-4" style={{ color: 'var(--dim)' }}>
                 No saved meals. Log a meal and tap ★ to save it.
               </p>
             )}
             {savedMeals.map(meal => (
               <div key={meal.id} className="flex items-center gap-2 px-3 py-2.5 rounded-[2px]" style={{ background: 'var(--bg)', border: '1px solid #1a1a1a' }}>
                 <div className="flex-1 min-w-0">
-                  <div className="text-[12px]" style={{ color: 'var(--accent)' }}>{meal.name}</div>
-                  <div className="text-[10px] mt-0.5" style={{ color: 'var(--dim)' }}>
+                  <div className="text-[length:var(--text-md)]" style={{ color: 'var(--accent)' }}>{meal.name}</div>
+                  <div className="text-[length:var(--text-xs)] mt-0.5" style={{ color: 'var(--dim)' }}>
                     {meal.calories}kcal · <span style={{ color: MACRO_CLR.protein }}>{meal.protein}p</span> · <span style={{ color: MACRO_CLR.carbs }}>{meal.carbs}c</span> · <span style={{ color: MACRO_CLR.fat }}>{meal.fat}f</span>
                   </div>
                 </div>
                 <div className="flex items-center gap-1.5 shrink-0">
                   <button
                     onClick={() => handleQuickAdd(meal)}
-                    className="px-2 py-1 rounded-[2px] text-[9px] uppercase tracking-widest"
+                    className="px-2 py-1 rounded-[2px] text-[length:var(--text-2xs)] uppercase tracking-widest"
                     style={{ border: '1px solid var(--border)', color: 'var(--accent)' }}
                   >
                     Add
@@ -308,33 +308,33 @@ function MealSection({ type, entries, logId, allEntries, onAdd }: MealSectionPro
     <div>
       <div className="flex items-center justify-between mb-1.5">
         <div className="flex items-center gap-2">
-          <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>{type}</span>
+          <span className="text-[length:var(--text-xs)] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>{type}</span>
           {sectionCals > 0 && (
-            <span className="text-[10px]" style={{ color: 'var(--dim)' }}>{sectionCals} kcal</span>
+            <span className="text-[length:var(--text-xs)]" style={{ color: 'var(--dim)' }}>{sectionCals} kcal</span>
           )}
         </div>
         <button
           onClick={() => onAdd(type)}
-          className="flex items-center gap-1 text-[9px] uppercase tracking-widest px-2 py-1 rounded-[2px]"
+          className="flex items-center gap-1 text-[length:var(--text-2xs)] uppercase tracking-widest px-2 py-1 rounded-[2px]"
           style={{ border: '1px solid #1a1a1a', color: 'var(--dim)' }}
         >
           <Plus size={12} /> Add
         </button>
       </div>
       {entries.length === 0 ? (
-        <div className="py-1.5 text-[10px]" style={{ color: 'var(--dim)' }}>—</div>
+        <div className="py-1.5 text-[length:var(--text-xs)]" style={{ color: 'var(--dim)' }}>—</div>
       ) : (
         <div className="space-y-1">
           {entries.map(entry => (
             <div key={entry.id} className="flex items-center gap-2 px-2.5 py-2 rounded-[2px]" style={{ background: 'var(--bg)', border: '1px solid #1a1a1a' }}>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <span className="text-[12px]" style={{ color: 'var(--accent)' }}>{entry.name}</span>
+                  <span className="text-[length:var(--text-md)]" style={{ color: 'var(--accent)' }}>{entry.name}</span>
                   {entry.isPittaFriendly && (
-                    <span className="text-[9px] px-1 rounded-[2px]" style={{ background: '#0d2a1a', color: 'var(--complete-text)' }}>pitta</span>
+                    <span className="text-[length:var(--text-2xs)] px-1 rounded-[2px]" style={{ background: '#0d2a1a', color: 'var(--complete-text)' }}>pitta</span>
                   )}
                 </div>
-                <div className="text-[10px] mt-0.5 flex flex-wrap gap-1" style={{ color: 'var(--dim)' }}>
+                <div className="text-[length:var(--text-xs)] mt-0.5 flex flex-wrap gap-1" style={{ color: 'var(--dim)' }}>
                   <span>{entry.calories}kcal</span>
                   {(entry.protein ?? 0) > 0 && <span style={{ color: MACRO_CLR.protein }}>{entry.protein}p</span>}
                   {(entry.carbs ?? 0) > 0 && <span style={{ color: MACRO_CLR.carbs }}>{entry.carbs}c</span>}
@@ -390,13 +390,13 @@ export default function Nutrition() {
       {/* Header */}
       <div className="flex items-center justify-between pt-2">
         <div>
-          <div className="text-[11px] uppercase tracking-widest text-noir-muted">Daily Log</div>
-          <div className="text-[18px] uppercase tracking-wide text-noir-white">Nutrition</div>
+          <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-noir-muted">Daily Log</div>
+          <div className="text-[length:var(--text-3xl)] uppercase tracking-wide text-noir-white">Nutrition</div>
         </div>
         <button
           onClick={toggleTrainingDay}
           className={cn(
-            'px-3 py-1.5 border rounded-[2px] text-[10px] uppercase tracking-widest transition-colors',
+            'px-3 py-1.5 border rounded-[2px] text-[length:var(--text-xs)] uppercase tracking-widest transition-colors',
             isTrainingDay
               ? 'border-noir-accent text-noir-white bg-noir-elevated'
               : 'border-noir-border text-noir-dim hover:border-noir-strong'
@@ -415,7 +415,7 @@ export default function Nutrition() {
         >
           <ChevronLeft size={14} style={{ color: 'var(--dim)' }} />
         </button>
-        <span className="text-[12px]" style={{ color: isToday ? 'var(--accent)' : 'var(--muted)' }}>
+        <span className="text-[length:var(--text-md)]" style={{ color: isToday ? 'var(--accent)' : 'var(--muted)' }}>
           {isToday ? 'Today' : date}
         </span>
         <button
@@ -432,8 +432,8 @@ export default function Nutrition() {
       <Card>
         <div className="flex items-center justify-between mb-3">
           <CardHeader label="Macros" />
-          <span className="text-[16px]" style={{ color: totalCalories > 0 ? 'var(--accent)' : 'var(--dim)' }}>
-            {totalCalories} <span className="text-[10px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>kcal</span>
+          <span className="text-[length:var(--text-xl)]" style={{ color: totalCalories > 0 ? 'var(--accent)' : 'var(--dim)' }}>
+            {totalCalories} <span className="text-[length:var(--text-xs)] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>kcal</span>
           </span>
         </div>
         <div className="space-y-3">
@@ -441,7 +441,7 @@ export default function Nutrition() {
           <MacroBar label="Carbs" value={totalCarbs} max={targets.carbs.max} color={MACRO_CLR.carbs} />
           <MacroBar label="Fat" value={totalFat} max={targets.fat.max} color={MACRO_CLR.fat} />
         </div>
-        <div className="mt-3 text-[10px] border-l pl-3" style={{ color: 'var(--dim)', borderColor: 'var(--border)' }}>
+        <div className="mt-3 text-[length:var(--text-xs)] border-l pl-3" style={{ color: 'var(--dim)', borderColor: 'var(--border)' }}>
           {targets.ayurvedicNote}
         </div>
       </Card>
@@ -468,7 +468,7 @@ export default function Nutrition() {
         <CardHeader label="Pitta-Favor Foods" />
         <div className="flex flex-wrap gap-1.5">
           {PITTA_NUTRITION.favorFoods.map((food: string) => (
-            <span key={food} className="text-[11px] border border-noir-border rounded-[2px] px-2 py-0.5 text-noir-muted">
+            <span key={food} className="text-[length:var(--text-sm)] border border-noir-border rounded-[2px] px-2 py-0.5 text-noir-muted">
               {food}
             </span>
           ))}

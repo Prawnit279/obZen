@@ -20,8 +20,8 @@ export function DoshaTip() {
 
   return (
     <Card label={`${guidance.dosha} today`}>
-      <p style={{ fontSize: 14, lineHeight: 1.5, color: 'var(--ink-2)' }}>{tip}</p>
-      <p style={{ fontSize: 11, color: 'var(--ink-ghost)' }}>
+      <p style={{ fontSize: 'var(--text-lg)', lineHeight: 1.5, color: 'var(--ink-2)' }}>{tip}</p>
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-ghost)' }}>
         {guidance.training.bestTime} suits {guidance.dosha} training best.
       </p>
     </Card>

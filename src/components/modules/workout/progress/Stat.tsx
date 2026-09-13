@@ -14,7 +14,7 @@ export function Stat({ value, unit, label, sub, hero }: {
     >
       <span
         className="uppercase"
-        style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+        style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
       >
         {label}
       </span>
@@ -29,9 +29,9 @@ export function Stat({ value, unit, label, sub, hero }: {
         >
           {value}
         </span>
-        {unit && <span style={{ fontSize: 13, fontWeight: 500, color: 'var(--ink-faint)' }}>{unit}</span>}
+        {unit && <span style={{ fontSize: 'var(--text-base)', fontWeight: 500, color: 'var(--ink-faint)' }}>{unit}</span>}
       </div>
-      {sub && <span style={{ fontSize: 11, color: 'var(--ink-faint)' }}>{sub}</span>}
+      {sub && <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)' }}>{sub}</span>}
     </div>
   )
 }

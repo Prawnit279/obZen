@@ -32,11 +32,11 @@ export default function DrumStudio() {
       <div className="pt-2">
         <div
           className="uppercase"
-          style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+          style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
         >
           Practice
         </div>
-        <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
+        <h1 style={{ fontSize: 'var(--text-6xl)', fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
           Drums
         </h1>
       </div>
@@ -110,15 +110,15 @@ function MetronomeTab() {
               )} />
             ))}
           </div>
-          <div className="text-[56px] text-[color:var(--ink)] font-light tracking-tight leading-none">{bpm}</div>
-          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mt-1">BPM</div>
+          <div className="text-[length:var(--text-9xl)] text-[color:var(--ink)] font-light tracking-tight leading-none">{bpm}</div>
+          <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-faint)] mt-1">BPM</div>
         </div>
 
         <div className="flex items-center justify-center gap-3 mt-4">
           <button onClick={() => setBpm(bpm - 5)} className="p-3 border border-[color:var(--hairline)] rounded-[var(--r-control)] text-[color:var(--ink-dim)] hover:border-[color:var(--border-strong)] hover:text-[color:var(--ink-2)] transition-colors"><Minus size={14} /></button>
           <div className="flex gap-1.5">
             {[-1, 1].map(d => (
-              <button key={d} onClick={() => setBpm(bpm + d)} className="px-3 py-2 border border-[color:var(--hairline)] rounded-[var(--r-control)] text-[11px] text-[color:var(--ink-dim)] hover:border-[color:var(--border-strong)] hover:text-[color:var(--ink-2)] transition-colors">
+              <button key={d} onClick={() => setBpm(bpm + d)} className="px-3 py-2 border border-[color:var(--hairline)] rounded-[var(--r-control)] text-[length:var(--text-sm)] text-[color:var(--ink-dim)] hover:border-[color:var(--border-strong)] hover:text-[color:var(--ink-2)] transition-colors">
                 {d > 0 ? '+1' : '−1'}
               </button>
             ))}
@@ -128,15 +128,15 @@ function MetronomeTab() {
 
         <div className="mt-4 px-1">
           <input type="range" min={20} max={300} value={bpm} onChange={e => setBpm(parseInt(e.target.value, 10))} className="w-full accent-[color:var(--violet-400)]" />
-          <div className="flex justify-between text-[11px] text-[color:var(--ink-faint)] mt-0.5"><span>20</span><span>160</span><span>300</span></div>
+          <div className="flex justify-between text-[length:var(--text-sm)] text-[color:var(--ink-faint)] mt-0.5"><span>20</span><span>160</span><span>300</span></div>
         </div>
 
         <div className="mt-5">
-          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-2">Time Signature</div>
+          <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-faint)] mb-2">Time Signature</div>
           <div className="flex gap-1.5">
             {[2, 3, 4, 5, 6, 7].map(ts => (
               <button key={ts} onClick={() => setTimeSignature(ts)}
-                className={cn('flex-1 py-1.5 border rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-colors',
+                className={cn('flex-1 py-1.5 border rounded-[var(--r-control)] text-[length:var(--text-sm)] uppercase tracking-widest transition-colors',
                   timeSignature === ts ? 'border-[color:var(--violet-400)] text-[color:var(--ink)] bg-white/[0.05]' : 'border-[color:var(--hairline)] text-[color:var(--ink-faint)] hover:border-[color:var(--border-strong)]')}>
                 {ts}/4
               </button>
@@ -145,7 +145,7 @@ function MetronomeTab() {
         </div>
 
         <div className="mt-4 flex items-center justify-between">
-          <span className="text-[11px] text-[color:var(--ink-dim)]">Accent Beat 1</span>
+          <span className="text-[length:var(--text-sm)] text-[color:var(--ink-dim)]">Accent Beat 1</span>
           <button onClick={toggleAccentBeat1} className={cn('w-10 h-5 rounded-[var(--r-pill)] border transition-colors flex items-center', accentBeat1 ? 'border-[color:var(--violet-400)] bg-[color:var(--violet-400)]/20' : 'border-[color:var(--hairline)]')}>
             <div className={cn('w-3.5 h-3.5 rounded-[var(--r-pill)] bg-[color:var(--violet-200)] transition-transform mx-0.5', accentBeat1 ? 'translate-x-5' : 'translate-x-0')} />
           </button>
@@ -157,7 +157,7 @@ function MetronomeTab() {
           style={{
             padding: '14px 0',
             borderRadius: 16,
-            fontSize: 13, fontWeight: 700, letterSpacing: '0.04em',
+            fontSize: 'var(--text-base)', fontWeight: 700, letterSpacing: '0.04em',
             // Starting is the screen's primary action; stopping is a quieter
             // state, so it drops back to an outline rather than shouting twice.
             border: isPlaying ? '1px solid rgba(167,139,250,0.45)' : 'none',
@@ -199,7 +199,7 @@ function RudimentsTab() {
         const rudiments = getRudimentsByFamily(family)
         return (
           <div key={family}>
-            <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-dim)] mb-2 capitalize">
+            <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-dim)] mb-2 capitalize">
               {family.replace(/-/g, ' ')} ({rudiments.length})
             </div>
             <div className="space-y-1.5">
@@ -210,26 +210,26 @@ function RudimentsTab() {
                     className={cn('w-full text-left p-3 border rounded-[var(--r-control)] transition-colors',
                       selected === r.id ? 'border-[color:var(--border-strong)] bg-white/[0.05]' : 'border-[color:var(--hairline)] bg-[color:var(--surface)] hover:border-[color:var(--border-strong)]')}>
                     <div className="flex items-center justify-between">
-                      <span className="text-[13px] text-[color:var(--ink-2)]">{r.name}</span>
+                      <span className="text-[length:var(--text-base)] text-[color:var(--ink-2)]">{r.name}</span>
                       <DifficultyBadge difficulty={r.difficulty} />
                     </div>
-                    <div className="text-[11px] text-[color:var(--ink-faint)] font-mono mt-1">{r.notation}</div>
+                    <div className="text-[length:var(--text-sm)] text-[color:var(--ink-faint)] font-mono mt-1">{r.notation}</div>
                   </button>
 
                   {selected === r.id && (
                     <div className="p-3 bg-white/[0.05] border border-[color:var(--border-strong)] border-t-0 rounded-b-[2px] space-y-3">
-                      <p className="text-[12px] text-[color:var(--ink-dim)]">{r.description}</p>
+                      <p className="text-[length:var(--text-md)] text-[color:var(--ink-dim)]">{r.description}</p>
                       <div className="flex gap-3">
                         <div>
-                          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-1">BPM Range</div>
-                          <div className="text-[13px] text-[color:var(--ink-2)]">{r.bpmRange.min} – {r.bpmRange.max}</div>
+                          <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-faint)] mb-1">BPM Range</div>
+                          <div className="text-[length:var(--text-base)] text-[color:var(--ink-2)]">{r.bpmRange.min} – {r.bpmRange.max}</div>
                         </div>
                       </div>
                       <div>
-                        <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-1.5">Practice Tips</div>
+                        <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-faint)] mb-1.5">Practice Tips</div>
                         <ul className="space-y-1">
                           {r.tips.map((tip, i) => (
-                            <li key={i} className="text-[12px] text-[color:var(--ink-dim)] flex gap-2">
+                            <li key={i} className="text-[length:var(--text-md)] text-[color:var(--ink-dim)] flex gap-2">
                               <span className="text-[color:var(--ink-faint)] shrink-0">{i + 1}.</span>{tip}
                             </li>
                           ))}
@@ -239,13 +239,13 @@ function RudimentsTab() {
                       {/* Notation viewer */}
                       {getNotation(r.id) ? (
                         <div>
-                          <div className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] mb-2">Notation</div>
+                          <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-faint)] mb-2">Notation</div>
                           <NotationViewer data={getNotation(r.id)!} />
                         </div>
                       ) : (
                         <button
                           onClick={() => setNotationModal(r.id)}
-                          className="w-full py-2 border border-dashed border-[color:var(--hairline)] rounded-[var(--r-control)] text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)] hover:border-[color:var(--border-strong)] hover:text-[color:var(--ink-dim)] transition-colors flex items-center justify-center gap-2">
+                          className="w-full py-2 border border-dashed border-[color:var(--hairline)] rounded-[var(--r-control)] text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-faint)] hover:border-[color:var(--border-strong)] hover:text-[color:var(--ink-dim)] transition-colors flex items-center justify-center gap-2">
                           <Music2 size={12} />
                           Add Notation
                         </button>
@@ -291,12 +291,12 @@ function LessonsTab() {
           <button onClick={() => setExpanded(expanded === book.id ? null : book.id)} className="w-full text-left p-4">
             <div className="flex items-start justify-between gap-2">
               <div>
-                <div className="text-[13px] text-[color:var(--ink-2)]">{book.title}</div>
-                <div className="text-[11px] text-[color:var(--ink-dim)]">{book.author}</div>
+                <div className="text-[length:var(--text-base)] text-[color:var(--ink-2)]">{book.title}</div>
+                <div className="text-[length:var(--text-sm)] text-[color:var(--ink-dim)]">{book.author}</div>
               </div>
               <Badge variant="dim">{book.lessons.length} lessons</Badge>
             </div>
-            <div className="text-[11px] text-[color:var(--ink-faint)] mt-1">{book.focus}</div>
+            <div className="text-[length:var(--text-sm)] text-[color:var(--ink-faint)] mt-1">{book.focus}</div>
           </button>
 
           {expanded === book.id && (
@@ -307,8 +307,8 @@ function LessonsTab() {
                   <div key={lesson.id} className="px-4 py-3 space-y-2">
                     <div className="flex items-start justify-between gap-2">
                       <div className="flex-1">
-                        <div className="text-[12px] text-[color:var(--ink-2)]">{lesson.concept}</div>
-                        <div className="text-[11px] text-[color:var(--ink-faint)] mt-0.5">{lesson.exerciseRef}</div>
+                        <div className="text-[length:var(--text-md)] text-[color:var(--ink-2)]">{lesson.concept}</div>
+                        <div className="text-[length:var(--text-sm)] text-[color:var(--ink-faint)] mt-0.5">{lesson.exerciseRef}</div>
                       </div>
                       <div className="flex items-center gap-1.5">
                         <DifficultyBadge difficulty={lesson.difficulty} />
@@ -321,13 +321,13 @@ function LessonsTab() {
                       </div>
                     </div>
                     <div>
-                      <span className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)]">Goal: </span>
-                      <span className="text-[11px] text-[color:var(--ink-dim)]">{lesson.practiceGoal}</span>
+                      <span className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-faint)]">Goal: </span>
+                      <span className="text-[length:var(--text-sm)] text-[color:var(--ink-dim)]">{lesson.practiceGoal}</span>
                     </div>
                     {lesson.bpmTarget && (
                       <div>
-                        <span className="text-[11px] uppercase tracking-widest text-[color:var(--ink-faint)]">Target: </span>
-                        <span className="text-[11px] text-[color:var(--ink-2)]">{lesson.bpmTarget} BPM</span>
+                        <span className="text-[length:var(--text-sm)] uppercase tracking-widest text-[color:var(--ink-faint)]">Target: </span>
+                        <span className="text-[length:var(--text-sm)] text-[color:var(--ink-2)]">{lesson.bpmTarget} BPM</span>
                       </div>
                     )}
                     {notation && (
@@ -343,7 +343,7 @@ function LessonsTab() {
 
       {uploadModal && (
         <Modal open title="Add Notation" onClose={() => setUploadModal(null)}>
-          <div className="text-[11px] text-[color:var(--ink-dim)] mb-3">{uploadModal.title}</div>
+          <div className="text-[length:var(--text-sm)] text-[color:var(--ink-dim)] mb-3">{uploadModal.title}</div>
           <NotationUpload
             lessonId={uploadModal.lessonId}
             onSaved={(data) => handleNotationSaved(uploadModal.lessonId, data)}
@@ -377,7 +377,7 @@ function SongsTab() {
         <div className="flex gap-1.5">
           {(['all', 'learning', 'ready', 'performed'] as const).map(f => (
             <button key={f} onClick={() => setFilter(f)}
-              className={cn('px-2.5 py-1 border rounded-[var(--r-control)] text-[11px] uppercase tracking-widest transition-colors',
+              className={cn('px-2.5 py-1 border rounded-[var(--r-control)] text-[length:var(--text-sm)] uppercase tracking-widest transition-colors',
                 filter === f ? 'border-[color:var(--violet-400)] text-[color:var(--ink)] bg-white/[0.05]' : 'border-[color:var(--hairline)] text-[color:var(--ink-faint)] hover:border-[color:var(--border-strong)]')}>
               {f}
             </button>
@@ -391,7 +391,7 @@ function SongsTab() {
       {filtered.length === 0 && (
         <div className="text-center py-8 space-y-2">
           <Music size={24} className="text-[color:var(--ink-faint)] mx-auto" />
-          <div className="text-[12px] text-[color:var(--ink-dim)]">
+          <div className="text-[length:var(--text-md)] text-[color:var(--ink-dim)]">
             {songs?.length === 0 ? 'No songs yet. Add your first.' : 'No songs in this category.'}
           </div>
         </div>
@@ -402,23 +402,23 @@ function SongsTab() {
           <div className="flex items-start justify-between gap-2">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[13px] text-[color:var(--ink-2)] truncate">{song.title}</span>
+                <span className="text-[length:var(--text-base)] text-[color:var(--ink-2)] truncate">{song.title}</span>
                 <Badge variant={STATUS_COLORS[song.status]}>{song.status}</Badge>
                 <Badge variant="dim">{song.purpose}</Badge>
               </div>
-              {song.artist && <div className="text-[11px] text-[color:var(--ink-dim)] mt-0.5">{song.artist}</div>}
+              {song.artist && <div className="text-[length:var(--text-sm)] text-[color:var(--ink-dim)] mt-0.5">{song.artist}</div>}
               <div className="flex items-center gap-3 mt-1 flex-wrap">
-                {song.bpm && <span className="text-[11px] text-[color:var(--ink-faint)]">{song.bpm} BPM</span>}
-                {song.timeSignature && <span className="text-[11px] text-[color:var(--ink-faint)]">{song.timeSignature}</span>}
+                {song.bpm && <span className="text-[length:var(--text-sm)] text-[color:var(--ink-faint)]">{song.bpm} BPM</span>}
+                {song.timeSignature && <span className="text-[length:var(--text-sm)] text-[color:var(--ink-faint)]">{song.timeSignature}</span>}
               </div>
-              {song.notes && <div className="text-[11px] text-[color:var(--ink-faint)] mt-1.5 border-l border-[color:var(--border-strong)] pl-2">{song.notes}</div>}
+              {song.notes && <div className="text-[length:var(--text-sm)] text-[color:var(--ink-faint)] mt-1.5 border-l border-[color:var(--border-strong)] pl-2">{song.notes}</div>}
             </div>
             <div className="flex items-center gap-1 shrink-0">
               <button onClick={() => { setEditing(song); setModalOpen(true) }} className="p-1.5 text-[color:var(--ink-faint)] hover:text-[color:var(--ink-dim)] transition-colors" aria-label="Edit"><Edit2 size={12} /></button>
               {confirmDelete === song.id ? (
                 <div className="flex items-center gap-1">
-                  <button onClick={() => { deleteSong(song.id!); setConfirmDelete(null) }} className="text-[11px] text-[color:var(--red)] uppercase tracking-widest px-1.5 py-0.5 border border-[color:var(--skip-border)] rounded-[var(--r-control)]">Confirm</button>
-                  <button onClick={() => setConfirmDelete(null)} className="text-[11px] text-[color:var(--ink-faint)] uppercase tracking-widest">Cancel</button>
+                  <button onClick={() => { deleteSong(song.id!); setConfirmDelete(null) }} className="text-[length:var(--text-sm)] text-[color:var(--red)] uppercase tracking-widest px-1.5 py-0.5 border border-[color:var(--skip-border)] rounded-[var(--r-control)]">Confirm</button>
+                  <button onClick={() => setConfirmDelete(null)} className="text-[length:var(--text-sm)] text-[color:var(--ink-faint)] uppercase tracking-widest">Cancel</button>
                 </div>
               ) : (
                 <button onClick={() => setConfirmDelete(song.id!)} className="p-1.5 text-[color:var(--ink-faint)] hover:text-[color:var(--red)] transition-colors" aria-label="Delete"><Trash2 size={12} /></button>

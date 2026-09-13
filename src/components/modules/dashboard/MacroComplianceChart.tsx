@@ -54,7 +54,7 @@ export function MacroComplianceChart() {
 
   return (
     <div>
-      <div className="text-[9px] uppercase tracking-widest text-noir-dim mb-2">
+      <div className="text-[length:var(--text-2xs)] uppercase tracking-widest text-noir-dim mb-2">
         Macro Compliance · % of target
       </div>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`}>
@@ -110,10 +110,10 @@ export function MacroComplianceChart() {
         {MACROS.map(m => (
           <div key={m} className="flex items-center gap-1">
             <div className="w-2 h-2" style={{ background: MACRO_COLORS[m] }} />
-            <span className="text-[8px] uppercase tracking-widest text-noir-dim">{m}</span>
+            <span className="text-[length:var(--text-3xs)] uppercase tracking-widest text-noir-dim">{m}</span>
           </div>
         ))}
-        <span className="text-[8px] text-noir-dim ml-auto">dashed = target</span>
+        <span className="text-[length:var(--text-3xs)] text-noir-dim ml-auto">dashed = target</span>
       </div>
     </div>
   )
@@ -121,7 +121,7 @@ export function MacroComplianceChart() {
 
 function Empty({ text }: { text: string }) {
   return (
-    <div className="h-36 flex items-center justify-center text-[10px] uppercase tracking-widest text-noir-dim">
+    <div className="h-36 flex items-center justify-center text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim">
       {text}
     </div>
   )

@@ -64,10 +64,10 @@ function RestDayCard() {
       className="rounded-[var(--r-control)] p-6 text-center space-y-2"
       style={{ background: 'var(--card)', border: '1px solid var(--border)' }}
     >
-      <div className="text-[14px]" style={{ color: 'var(--ink)' }}>Rest Day</div>
-      <div className="text-[12px]" style={{ color: 'var(--ink-dim)' }}>Light recovery only.</div>
+      <div className="text-[length:var(--text-lg)]" style={{ color: 'var(--ink)' }}>Rest Day</div>
+      <div className="text-[length:var(--text-md)]" style={{ color: 'var(--ink-dim)' }}>Light recovery only.</div>
       <div
-        className="text-[11px] pl-3 text-left max-w-xs mx-auto mt-3"
+        className="text-[length:var(--text-sm)] pl-3 text-left max-w-xs mx-auto mt-3"
         style={{ color: 'var(--ink-faint)', borderLeft: '1px solid var(--border-strong)' }}
       >
         Pitta: recovery is productive. Avoid the urge to overtrain.
@@ -88,11 +88,11 @@ function RpeScale({ value, onChange }: { value?: number; onChange: (rpe: number)
       <div className="flex items-baseline justify-between">
         <span
           className="uppercase"
-          style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+          style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
         >
           How hard was it?
         </span>
-        <span style={{ fontSize: 11, color: 'var(--ink-faint)' }}>
+        <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)' }}>
           {value === undefined ? 'Not rated' : `RPE ${value}`}
         </span>
       </div>
@@ -109,7 +109,7 @@ function RpeScale({ value, onChange }: { value?: number; onChange: (rpe: number)
               style={{
                 padding: '7px 0',
                 borderRadius: 'var(--r-control)',
-                fontSize: 11, fontWeight: 500,
+                fontSize: 'var(--text-sm)', fontWeight: 500,
                 fontVariantNumeric: 'tabular-nums',
                 border: `1px solid ${on ? 'rgba(167,139,250,0.45)' : 'var(--hairline)'}`,
                 background: on ? 'rgba(139,92,246,0.16)' : 'transparent',
@@ -182,7 +182,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
   if (!session) {
     return (
       <div className="flex items-center justify-center py-12">
-        <span className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>
+        <span className="text-[length:var(--text-sm)] uppercase tracking-widest" style={{ color: 'var(--ink-faint)' }}>
           Loading...
         </span>
       </div>
@@ -205,7 +205,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
           style={{ border: '1px solid rgba(127,29,29,0.4)' }}
         >
           <AlertTriangle size={14} style={{ color: 'var(--red)', marginTop: 1 }} className="shrink-0" />
-          <span className="text-[11px]" style={{ color: 'var(--ink-dim)' }}>
+          <span className="text-[length:var(--text-sm)]" style={{ color: 'var(--ink-dim)' }}>
             Low readiness — consider reducing volume or choosing a rest day.
           </span>
         </div>
@@ -216,7 +216,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
           style={{ border: '1px solid rgba(161,98,7,0.4)' }}
         >
           <Zap size={14} style={{ color: '#ca8a04', marginTop: 1 }} className="shrink-0" />
-          <span className="text-[11px]" style={{ color: 'var(--ink-dim)' }}>
+          <span className="text-[length:var(--text-sm)]" style={{ color: 'var(--ink-dim)' }}>
             Forearm fatigue active — pull-heavy exercises flagged.
           </span>
         </div>
@@ -231,7 +231,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
             background: 'var(--card)', border: '1px dashed var(--hairline)',
           }}
         >
-          <p style={{ fontSize: 14, color: 'var(--ink-dim)' }}>
+          <p style={{ fontSize: 'var(--text-lg)', color: 'var(--ink-dim)' }}>
             No exercises yet — load the {dayLabel} template as a starting point, or add your own below.
           </p>
           {/* The one primary action on this screen, so it takes the gradient. */}
@@ -242,7 +242,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
               padding: '15px 0', border: 'none', cursor: 'pointer', borderRadius: 16,
               background: 'linear-gradient(145deg, var(--violet-200), var(--violet-700))',
               boxShadow: '0 8px 26px rgba(124,58,237,0.42)',
-              fontSize: 14, fontWeight: 700, letterSpacing: '0.02em', color: '#0A0810',
+              fontSize: 'var(--text-lg)', fontWeight: 700, letterSpacing: '0.02em', color: '#0A0810',
             }}
           >
             Load {dayLabel} · {program.focus}
@@ -271,7 +271,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
       {/* Add Exercise button */}
       <button
         onClick={() => setShowAddSheet(true)}
-        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[var(--r-control)] text-[12px] uppercase tracking-widest transition-opacity hover:opacity-70"
+        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-[var(--r-control)] text-[length:var(--text-md)] uppercase tracking-widest transition-opacity hover:opacity-70"
         style={{ border: '1px dashed var(--border)', color: 'var(--ink-dim)' }}
       >
         <Plus size={14} />
@@ -283,7 +283,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
         session.completedAt ? (
           <div className="flex flex-col" style={{ gap: 10 }}>
             <div
-              className="text-center text-[13px] uppercase tracking-widest py-2.5 rounded-[var(--r-control)]"
+              className="text-center text-[length:var(--text-base)] uppercase tracking-widest py-2.5 rounded-[var(--r-control)]"
               style={{ color: 'var(--complete-text)', border: '1px solid var(--complete-border)', background: 'var(--complete-bg)' }}
             >
               ✓ Workout Complete
@@ -302,7 +302,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
             <RpeScale value={pendingRpe ?? session.rpe} onChange={setPendingRpe} />
             <button
               onClick={() => store.completeSession(dayLabel, sessionDate, pendingRpe)}
-              className="w-full py-3 rounded-[var(--r-control)] text-[13px] uppercase tracking-widest transition-opacity hover:opacity-80"
+              className="w-full py-3 rounded-[var(--r-control)] text-[length:var(--text-base)] uppercase tracking-widest transition-opacity hover:opacity-80"
               style={{ border: '1px solid var(--complete-border)', color: 'var(--complete-text)' }}
             >
               Complete Workout
@@ -433,16 +433,16 @@ export default function Workout() {
         <div className="min-w-0">
           <div
             className="uppercase"
-            style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+            style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
           >
             Obzen Program
           </div>
-          <h1 style={{ fontSize: 26, fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
+          <h1 style={{ fontSize: 'var(--text-6xl)', fontWeight: 700, letterSpacing: '-0.025em', color: 'var(--ink)' }}>
             Workout
           </h1>
         </div>
         <div className="flex flex-col items-end gap-1 shrink-0">
-          <div style={{ fontSize: 11, color: 'var(--ink-faint)', fontVariantNumeric: 'tabular-nums' }}>
+          <div style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)', fontVariantNumeric: 'tabular-nums' }}>
             {weekSessions ?? 0}/{trainingDays} this week
           </div>
         </div>
@@ -481,7 +481,7 @@ export default function Workout() {
                 style={{
                   padding: '10px 0',
                   borderRadius: 'var(--r-control)',
-                  fontSize: 11, fontWeight: 500, letterSpacing: '0.08em',
+                  fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.08em',
                   border: `1px solid ${open ? 'rgba(167,139,250,0.45)' : 'var(--hairline)'}`,
                   background: open ? 'rgba(139,92,246,0.14)' : 'transparent',
                   // A trained slot reads at full strength; one still to come is
@@ -500,7 +500,7 @@ export default function Workout() {
               style={{
                 padding: '10px 14px',
                 borderRadius: 'var(--r-control)',
-                fontSize: 11, fontWeight: 500, letterSpacing: '0.08em',
+                fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.08em',
                 border: `1px solid ${selectedDay === 'Rest' ? 'rgba(167,139,250,0.45)' : 'var(--hairline)'}`,
                 background: selectedDay === 'Rest' ? 'rgba(139,92,246,0.14)' : 'transparent',
                 color: selectedDay === 'Rest' ? 'var(--ink)' : 'var(--ink-faint)',
@@ -527,7 +527,7 @@ export default function Workout() {
               <label
                 htmlFor="session-date"
                 className="uppercase shrink-0"
-                style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
+                style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.12em', color: 'var(--ink-dim)' }}
               >
                 {sessionDate === TODAY ? 'Logging today' : 'Logging past date'}
               </label>
@@ -536,7 +536,7 @@ export default function Workout() {
                   <button
                     onClick={() => setSessionDate(TODAY)}
                     className="uppercase transition-opacity hover:opacity-70"
-                    style={{ fontSize: 11, fontWeight: 500, letterSpacing: '0.08em', color: 'var(--violet-100)' }}
+                    style={{ fontSize: 'var(--text-sm)', fontWeight: 500, letterSpacing: '0.08em', color: 'var(--violet-100)' }}
                   >
                     Today
                   </button>
@@ -550,7 +550,7 @@ export default function Workout() {
                   className="bg-transparent focus:outline-none"
                   style={{
                     padding: '5px 8px', borderRadius: 'var(--r-control)',
-                    fontSize: 13, border: '1px solid var(--hairline)', color: 'var(--ink-2)',
+                    fontSize: 'var(--text-base)', border: '1px solid var(--hairline)', color: 'var(--ink-2)',
                   }}
                 />
               </div>

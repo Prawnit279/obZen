@@ -39,8 +39,8 @@ export default function Yoga() {
   return (
     <div className="page-container space-y-4">
       <div className="pt-2">
-        <div className="text-[11px] uppercase tracking-widest text-noir-muted">Practice</div>
-        <div className="text-[18px] uppercase tracking-wide text-noir-white">Yoga</div>
+        <div className="text-[length:var(--text-sm)] uppercase tracking-widest text-noir-muted">Practice</div>
+        <div className="text-[length:var(--text-3xl)] uppercase tracking-wide text-noir-white">Yoga</div>
       </div>
 
       {/* Tab bar — scrollable */}
@@ -50,7 +50,7 @@ export default function Yoga() {
             key={t.id}
             onClick={() => setTab(t.id)}
             className={cn(
-              'flex-1 py-2 text-[10px] uppercase tracking-widest transition-colors border-r border-noir-border last:border-r-0 whitespace-nowrap',
+              'flex-1 py-2 text-[length:var(--text-xs)] uppercase tracking-widest transition-colors border-r border-noir-border last:border-r-0 whitespace-nowrap',
               tab === t.id ? 'bg-noir-elevated text-noir-white' : 'text-noir-dim hover:text-noir-muted hover:bg-noir-elevated/30'
             )}
           >
@@ -103,10 +103,10 @@ function SequencesTab({ onPlay }: { onPlay: (poses: YogaPose[], name: string) =>
               <div>
                 <div className="flex items-center gap-2">
                   {seq.highlight && <Drum size={12} className="text-yellow-600 shrink-0" />}
-                  <div className="text-[13px] text-noir-accent">{seq.label}</div>
+                  <div className="text-[length:var(--text-base)] text-noir-accent">{seq.label}</div>
                 </div>
-                <div className="text-[11px] text-noir-dim mt-0.5">{seq.description}</div>
-                <div className="text-[10px] uppercase tracking-widest text-noir-dim mt-1">{poses.length} poses</div>
+                <div className="text-[length:var(--text-sm)] text-noir-dim mt-0.5">{seq.description}</div>
+                <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim mt-1">{poses.length} poses</div>
               </div>
               {isExpanded
                 ? <ChevronDown size={14} className="text-noir-dim shrink-0 mt-1" />
@@ -119,7 +119,7 @@ function SequencesTab({ onPlay }: { onPlay: (poses: YogaPose[], name: string) =>
                 {/* Play button */}
                 <button
                   onClick={() => onPlay(poses, seq.label)}
-                  className="w-full flex items-center justify-center gap-2 py-3 border-b border-noir-border text-[11px] uppercase tracking-widest text-noir-accent hover:bg-noir-elevated transition-colors"
+                  className="w-full flex items-center justify-center gap-2 py-3 border-b border-noir-border text-[length:var(--text-sm)] uppercase tracking-widest text-noir-accent hover:bg-noir-elevated transition-colors"
                 >
                   <Play size={12} />
                   Start Sequence
@@ -142,7 +142,7 @@ function SequencesTab({ onPlay }: { onPlay: (poses: YogaPose[], name: string) =>
 function PoseRow({ pose, index }: { pose: YogaPose; index: number }) {
   return (
     <div className="px-4 py-3 flex items-start gap-3">
-      <div className="text-[10px] text-noir-dim shrink-0 w-4 mt-1">{index + 1}</div>
+      <div className="text-[length:var(--text-xs)] text-noir-dim shrink-0 w-4 mt-1">{index + 1}</div>
       {hasPoseAnim(pose.id) && (
         <div className="shrink-0">
           <AnimatedPose poseId={pose.id} size="small" autoPlay />
@@ -151,9 +151,9 @@ function PoseRow({ pose, index }: { pose: YogaPose; index: number }) {
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">
           <div>
-            <div className="text-[12px] text-noir-accent">{pose.name}</div>
+            <div className="text-[length:var(--text-md)] text-noir-accent">{pose.name}</div>
             {pose.sanskritName && (
-              <div className="text-[10px] text-noir-dim italic">{pose.sanskritName}</div>
+              <div className="text-[length:var(--text-xs)] text-noir-dim italic">{pose.sanskritName}</div>
             )}
           </div>
           <div className="flex gap-1.5 shrink-0">
@@ -162,12 +162,12 @@ function PoseRow({ pose, index }: { pose: YogaPose; index: number }) {
           </div>
         </div>
         {pose.pittaNote && (
-          <div className="mt-1.5 text-[11px] text-noir-dim border-l border-noir-strong pl-2">
+          <div className="mt-1.5 text-[length:var(--text-sm)] text-noir-dim border-l border-noir-strong pl-2">
             Pitta: {pose.pittaNote}
           </div>
         )}
         {pose.drummerNote && (
-          <div className="mt-1 text-[11px] text-noir-dim border-l border-yellow-700/60 pl-2">
+          <div className="mt-1 text-[length:var(--text-sm)] text-noir-dim border-l border-yellow-700/60 pl-2">
             Drummer: {pose.drummerNote}
           </div>
         )}
@@ -197,7 +197,7 @@ function PosesTab({ onPlay }: { onPlay: (poses: YogaPose[], name: string) => voi
             key={cat}
             onClick={() => setFilter(cat)}
             className={cn(
-              'px-2 py-0.5 border rounded-[2px] text-[10px] uppercase tracking-widest transition-colors',
+              'px-2 py-0.5 border rounded-[2px] text-[length:var(--text-xs)] uppercase tracking-widest transition-colors',
               filter === cat
                 ? 'border-noir-accent text-noir-white bg-noir-elevated'
                 : 'border-noir-border text-noir-dim hover:border-noir-strong'
@@ -211,7 +211,7 @@ function PosesTab({ onPlay }: { onPlay: (poses: YogaPose[], name: string) => voi
       <button
         onClick={() => setShowDrummerOnly(!showDrummerOnly)}
         className={cn(
-          'flex items-center gap-2 px-3 py-1.5 border rounded-[2px] text-[10px] uppercase tracking-widest transition-colors',
+          'flex items-center gap-2 px-3 py-1.5 border rounded-[2px] text-[length:var(--text-xs)] uppercase tracking-widest transition-colors',
           showDrummerOnly
             ? 'border-yellow-700/60 text-yellow-600 bg-yellow-900/10'
             : 'border-noir-border text-noir-dim hover:border-noir-strong'
@@ -239,9 +239,9 @@ function PosesTab({ onPlay }: { onPlay: (poses: YogaPose[], name: string) => voi
                     <AnimatedPose poseId={pose.id} size="small" autoPlay />
                   )}
                   <div>
-                    <span className="text-[13px] text-noir-accent">{pose.name}</span>
-                    {pose.day && <span className="text-[10px] text-noir-dim ml-2">Day {pose.day}</span>}
-                    <div className="text-[11px] text-noir-dim mt-0.5 capitalize">{pose.category} · {pose.duration}</div>
+                    <span className="text-[length:var(--text-base)] text-noir-accent">{pose.name}</span>
+                    {pose.day && <span className="text-[length:var(--text-xs)] text-noir-dim ml-2">Day {pose.day}</span>}
+                    <div className="text-[length:var(--text-sm)] text-noir-dim mt-0.5 capitalize">{pose.category} · {pose.duration}</div>
                   </div>
                 </div>
                 <DifficultyBadge difficulty={pose.difficulty} />
@@ -259,16 +259,16 @@ function PosesTab({ onPlay }: { onPlay: (poses: YogaPose[], name: string) => voi
                 {/* Pitta note — prominent */}
                 {pose.pittaNote && (
                   <div className="border-l-2 border-noir-strong pl-3">
-                    <div className="text-[9px] uppercase tracking-widest text-noir-dim mb-0.5">Pitta Note</div>
-                    <p className="text-[12px] text-noir-muted">{pose.pittaNote}</p>
+                    <div className="text-[length:var(--text-2xs)] uppercase tracking-widest text-noir-dim mb-0.5">Pitta Note</div>
+                    <p className="text-[length:var(--text-md)] text-noir-muted">{pose.pittaNote}</p>
                   </div>
                 )}
 
                 <div>
-                  <div className="text-[9px] uppercase tracking-widest text-noir-dim mb-1.5">Steps</div>
+                  <div className="text-[length:var(--text-2xs)] uppercase tracking-widest text-noir-dim mb-1.5">Steps</div>
                   <ol className="space-y-1.5">
                     {pose.steps.map((step, i) => (
-                      <li key={i} className="text-[12px] text-noir-muted flex gap-2">
+                      <li key={i} className="text-[length:var(--text-md)] text-noir-muted flex gap-2">
                         <span className="text-noir-dim shrink-0">{i + 1}.</span>{step}
                       </li>
                     ))}
@@ -276,10 +276,10 @@ function PosesTab({ onPlay }: { onPlay: (poses: YogaPose[], name: string) => voi
                 </div>
 
                 <div>
-                  <div className="text-[9px] uppercase tracking-widest text-noir-dim mb-1.5">Cues</div>
+                  <div className="text-[length:var(--text-2xs)] uppercase tracking-widest text-noir-dim mb-1.5">Cues</div>
                   <ul className="space-y-1">
                     {pose.cues.map((cue, i) => (
-                      <li key={i} className="text-[12px] text-noir-accent flex gap-2">
+                      <li key={i} className="text-[length:var(--text-md)] text-noir-accent flex gap-2">
                         <span className="text-noir-dim">·</span>{cue}
                       </li>
                     ))}
@@ -288,14 +288,14 @@ function PosesTab({ onPlay }: { onPlay: (poses: YogaPose[], name: string) => voi
 
                 {pose.drummerNote && (
                   <div className="border-l-2 border-yellow-700/60 pl-3">
-                    <div className="text-[9px] uppercase tracking-widest text-noir-dim mb-0.5">Drummer Note</div>
-                    <p className="text-[12px] text-noir-muted">{pose.drummerNote}</p>
+                    <div className="text-[length:var(--text-2xs)] uppercase tracking-widest text-noir-dim mb-0.5">Drummer Note</div>
+                    <p className="text-[length:var(--text-md)] text-noir-muted">{pose.drummerNote}</p>
                   </div>
                 )}
 
                 <button
                   onClick={() => onPlay([pose], pose.name)}
-                  className="w-full flex items-center justify-center gap-2 py-2 border border-noir-border rounded-[2px] text-[10px] uppercase tracking-widest text-noir-muted hover:border-noir-strong hover:text-noir-accent transition-colors"
+                  className="w-full flex items-center justify-center gap-2 py-2 border border-noir-border rounded-[2px] text-[length:var(--text-xs)] uppercase tracking-widest text-noir-muted hover:border-noir-strong hover:text-noir-accent transition-colors"
                 >
                   <Play size={12} />
                   Start Timer
@@ -341,7 +341,7 @@ function BreathingTab() {
 
       {/* Pitta quick-access row */}
       <div>
-        <div className="text-[9px] uppercase tracking-widest text-noir-dim mb-2">Pitta Priority</div>
+        <div className="text-[length:var(--text-2xs)] uppercase tracking-widest text-noir-dim mb-2">Pitta Priority</div>
         <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
           {pittaQuick.map(t => (
             <button
@@ -351,7 +351,7 @@ function BreathingTab() {
               style={{ minWidth: 80 }}
             >
               <Wind size={12} className="text-noir-dim" />
-              <span className="text-[9px] uppercase tracking-widest text-noir-dim text-center leading-tight">
+              <span className="text-[length:var(--text-2xs)] uppercase tracking-widest text-noir-dim text-center leading-tight">
                 {t.name.split('(')[0].trim()}
               </span>
             </button>
@@ -366,7 +366,7 @@ function BreathingTab() {
             key={tab.id}
             onClick={() => setFilter(tab.id)}
             className={cn(
-              'px-2.5 py-0.5 border rounded-[2px] text-[10px] uppercase tracking-widest transition-colors',
+              'px-2.5 py-0.5 border rounded-[2px] text-[length:var(--text-xs)] uppercase tracking-widest transition-colors',
               filter === tab.id
                 ? 'border-noir-accent text-noir-white bg-noir-elevated'
                 : 'border-noir-border text-noir-dim hover:border-noir-strong'
@@ -393,10 +393,10 @@ function BreathingTab() {
               <Wind size={14} className="text-noir-dim mt-0.5 shrink-0" />
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 flex-wrap">
-                  <div className="text-[13px] text-noir-accent">{technique.name}</div>
+                  <div className="text-[length:var(--text-base)] text-noir-accent">{technique.name}</div>
                   <Badge variant="dim">{technique.type}</Badge>
                 </div>
-                <div className="text-[10px] text-noir-dim mt-0.5">{technique.dosha} · {technique.duration}</div>
+                <div className="text-[length:var(--text-xs)] text-noir-dim mt-0.5">{technique.dosha} · {technique.duration}</div>
               </div>
             </button>
 
@@ -405,17 +405,17 @@ function BreathingTab() {
                 <div className="border-b border-noir-border">
                   <BreathingAnimation techniqueId={technique.id} />
                 </div>
-                <p className="text-[12px] text-noir-muted">{technique.description}</p>
+                <p className="text-[length:var(--text-md)] text-noir-muted">{technique.description}</p>
                 {technique.warning && (
                   <div className="px-3 py-2 border border-noir-red/30 rounded-[2px] bg-noir-red/5">
-                    <p className="text-[11px] text-noir-red">{technique.warning}</p>
+                    <p className="text-[length:var(--text-sm)] text-noir-red">{technique.warning}</p>
                   </div>
                 )}
                 <div>
-                  <div className="text-[9px] uppercase tracking-widest text-noir-dim mb-1.5">Steps</div>
+                  <div className="text-[length:var(--text-2xs)] uppercase tracking-widest text-noir-dim mb-1.5">Steps</div>
                   <ol className="space-y-1.5">
                     {technique.steps.map((step, i) => (
-                      <li key={i} className="text-[12px] text-noir-muted flex gap-2">
+                      <li key={i} className="text-[length:var(--text-md)] text-noir-muted flex gap-2">
                         <span className="text-noir-dim shrink-0">{i + 1}.</span>{step}
                       </li>
                     ))}
@@ -423,13 +423,13 @@ function BreathingTab() {
                 </div>
                 {technique.pittaNote && (
                   <div className="border-l-2 border-noir-strong pl-3">
-                    <div className="text-[9px] uppercase tracking-widest text-noir-dim mb-0.5">Pitta Note</div>
-                    <p className="text-[12px] text-noir-muted">{technique.pittaNote}</p>
+                    <div className="text-[length:var(--text-2xs)] uppercase tracking-widest text-noir-dim mb-0.5">Pitta Note</div>
+                    <p className="text-[length:var(--text-md)] text-noir-muted">{technique.pittaNote}</p>
                   </div>
                 )}
                 <button
                   onClick={() => setTimer(technique)}
-                  className="w-full flex items-center justify-center gap-2 py-2 border border-noir-border rounded-[2px] text-[10px] uppercase tracking-widest text-noir-muted hover:border-noir-strong hover:text-noir-accent transition-colors"
+                  className="w-full flex items-center justify-center gap-2 py-2 border border-noir-border rounded-[2px] text-[length:var(--text-xs)] uppercase tracking-widest text-noir-muted hover:border-noir-strong hover:text-noir-accent transition-colors"
                 >
                   <Timer size={12} />
                   Start Timer
@@ -444,9 +444,9 @@ function BreathingTab() {
       <div className="p-3 border border-yellow-700/30 rounded-[2px] bg-yellow-900/5 space-y-1">
         <div className="flex items-center gap-2">
           <Drum size={12} className="text-yellow-700 shrink-0" />
-          <span className="text-[9px] uppercase tracking-widest text-yellow-700">Drummer's Breath Guide</span>
+          <span className="text-[length:var(--text-2xs)] uppercase tracking-widest text-yellow-700">Drummer's Breath Guide</span>
         </div>
-        <p className="text-[11px] text-noir-dim leading-relaxed">
+        <p className="text-[length:var(--text-sm)] text-noir-dim leading-relaxed">
           Before heavy pull sessions — 5 rounds Box Breathing.
           Post-workout — Chandra Bhedana or Sheetali to cool down.
           Before drum practice — Ujjayi to focus without tension.

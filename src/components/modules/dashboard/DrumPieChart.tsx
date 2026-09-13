@@ -79,7 +79,7 @@ export function DrumPieChart() {
 
   return (
     <div>
-      <div className="text-[9px] uppercase tracking-widest text-noir-dim mb-2">
+      <div className="text-[length:var(--text-2xs)] uppercase tracking-widest text-noir-dim mb-2">
         Practice Breakdown · last 30 days · {fmtMin(grandTotal)} total
       </div>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`}>
@@ -113,7 +113,7 @@ export function DrumPieChart() {
 
 function Empty({ text }: { text: string }) {
   return (
-    <div className="h-36 flex items-center justify-center text-[10px] uppercase tracking-widest text-noir-dim">
+    <div className="h-36 flex items-center justify-center text-[length:var(--text-xs)] uppercase tracking-widest text-noir-dim">
       {text}
     </div>
   )

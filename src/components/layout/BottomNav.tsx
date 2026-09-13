@@ -64,7 +64,11 @@ export function BottomNav() {
               <span
                 className="uppercase w-full text-center"
                 style={{
-                  fontSize: 11, letterSpacing: '0.04em',
+                  // One rung below the rest of the app, and tracked tighter.
+                  // Six labels share the width of a phone, and "Progress" and
+                  // "Calendar" are eight characters: at the body size they
+                  // ellipsed to "PROGR…", which is worse than being small.
+                  fontSize: 'var(--text-xs)', letterSpacing: '0.01em',
                   overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                 }}
               >

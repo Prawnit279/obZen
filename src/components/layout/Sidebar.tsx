@@ -44,14 +44,14 @@ export function Sidebar() {
       <div className="px-4 py-5" style={{ borderBottom: '1px solid var(--hairline)' }}>
         <span
           className="uppercase"
-          style={{ fontSize: 13, fontWeight: 700, letterSpacing: '0.2em', color: 'var(--ink)' }}
+          style={{ fontSize: 'var(--text-base)', fontWeight: 700, letterSpacing: '0.2em', color: 'var(--ink)' }}
         >
           Obzen
         </span>
         {/* The app has two profiles; this used to read "Pronit's OS". */}
         <div
           className="uppercase"
-          style={{ fontSize: 11, letterSpacing: '0.08em', color: 'var(--ink-faint)', marginTop: 2 }}
+          style={{ fontSize: 'var(--text-sm)', letterSpacing: '0.08em', color: 'var(--ink-faint)', marginTop: 2 }}
         >
           Training log
         </div>
@@ -65,7 +65,7 @@ export function Sidebar() {
             // nested under /workout, so both need an exact match.
             end={path === '/' || path === '/workout'}
             className={({ isActive }) => cn(
-              'flex items-center gap-3 px-4 py-2.5 text-[11px] uppercase tracking-widest transition-colors border-l',
+              'flex items-center gap-3 px-4 py-2.5 text-[length:var(--text-sm)] uppercase tracking-widest transition-colors border-l',
               isActive
                 ? 'text-[color:var(--ink)] bg-white/[0.05] border-l-[color:var(--violet-400)]'
                 : 'text-[color:var(--ink-faint)] hover:text-[color:var(--ink-2)] hover:bg-white/[0.03] border-l-transparent'
@@ -79,7 +79,7 @@ export function Sidebar() {
       <div className="px-4 py-3" style={{ borderTop: '1px solid var(--hairline)' }}>
         <div
           className="uppercase"
-          style={{ fontSize: 11, letterSpacing: '0.08em', color: 'var(--ink-ghost)' }}
+          style={{ fontSize: 'var(--text-sm)', letterSpacing: '0.08em', color: 'var(--ink-ghost)' }}
         >
           v1.0.0
         </div>

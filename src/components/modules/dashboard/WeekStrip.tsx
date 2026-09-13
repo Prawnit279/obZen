@@ -63,13 +63,13 @@ export function WeekStrip() {
           const dayCol = (
             <div className="flex items-center gap-3 shrink-0 w-20">
               <span
-                className="text-[11px] uppercase tracking-widest"
+                className="text-[length:var(--text-sm)] uppercase tracking-widest"
                 style={{ color: isToday ? 'var(--accent)' : 'var(--muted)' }}
               >
                 {weekday}
               </span>
               <span
-                className="text-[13px]"
+                className="text-[length:var(--text-base)]"
                 style={{
                   color: isToday ? 'var(--ink)' : 'var(--ink-dim)',
                   fontVariantNumeric: 'tabular-nums',
@@ -94,7 +94,7 @@ export function WeekStrip() {
               >
                 {dayCol}
                 {/* Absence is information — kept visible, at the ghost weight. */}
-                <span className="text-[12px]" style={{ color: 'var(--ink-ghost)' }}>—</span>
+                <span className="text-[length:var(--text-md)]" style={{ color: 'var(--ink-ghost)' }}>—</span>
               </div>
             )
           }
@@ -112,10 +112,10 @@ export function WeekStrip() {
             >
               {dayCol}
               <div className="flex-1 min-w-0 px-2">
-                <div className="text-[13px] truncate" style={{ color: 'var(--ink-2)' }}>
+                <div className="text-[length:var(--text-base)] truncate" style={{ color: 'var(--ink-2)' }}>
                   {session.dayLabel}{session.focus ? ` · ${session.focus}` : ''}
                 </div>
-                <div className="text-[11px] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
+                <div className="text-[length:var(--text-sm)] uppercase tracking-widest" style={{ color: 'var(--dim)' }}>
                   {doneCount} exercise{doneCount === 1 ? '' : 's'}
                   {session.completedAt && <span style={{ color: 'var(--complete-text)' }}> · complete</span>}
                 </div>
