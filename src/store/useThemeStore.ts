@@ -2,10 +2,37 @@ import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
 
 export type ThemeId =
-  | 'noircut' | 'crimson' | 'void' | 'steel' | 'ember'
-  | 'amethyst' | 'cobalt' | 'raspberry' | 'lagoon'
+  | 'amethyst' | 'cobalt' | 'raspberry' | 'lagoon' | 'ember'
   | 'light'
   | 'amethyst-light' | 'cobalt-light' | 'raspberry-light' | 'lagoon-light'
+
+/** The default, and where a retired theme lands. */
+export const DEFAULT_THEME: ThemeId = 'amethyst'
+
+/**
+ * Themes that existed once and no longer do.
+ *
+ * The choice is stored, so removing a theme strands whoever had it selected:
+ * the id rehydrates into the store, matches no swatch, and the switcher shows
+ * nothing as active while the page renders the base tokens. Mapping them here
+ * keeps that from happening — same reasoning as `exercise-renames.ts`, and the
+ * entries are just as permanent.
+ *
+ * Violet was the default, so this is the migration most devices will take.
+ */
+const RETIRED_THEMES: Record<string, ThemeId> = {
+  noircut: 'amethyst',   // Violet — the closest surviving hue
+  void: 'amethyst',      // Void Purple, likewise
+  crimson: 'raspberry',  // the nearest thing left to a red
+  steel: 'cobalt',       // the nearest thing left to a blue
+}
+
+/** A usable theme id, whatever was stored — retired, unknown or current. */
+export function resolveThemeId(stored: string | undefined): ThemeId {
+  if (!stored) return DEFAULT_THEME
+  if (THEMES.some(t => t.id === stored)) return stored as ThemeId
+  return RETIRED_THEMES[stored] ?? DEFAULT_THEME
+}
 
 export interface ThemeMeta {
   id: ThemeId
@@ -25,18 +52,17 @@ export interface ThemeMeta {
  * A dark theme is defined by `--bg` and six accent steps and nothing else. A
  * light theme shares one restatement of the whole token set (see globals.css)
  * and likewise adds only its own ramp. Four families — Amethyst, Cobalt,
- * Raspberry, Lagoon — exist in both modes; the rest are one-offs.
+ * Raspberry, Lagoon — exist in both modes; Ember and Daylight are one-offs.
+ *
+ * Amethyst is the default and so defines the base ramp in `:root` rather than
+ * overriding it, which is why its block there only registers `color-scheme`.
  */
 export const THEMES: ThemeMeta[] = [
-  { id: 'noircut',   name: 'Violet',      mode: 'dark',  dot: '#1A1226', borderActive: '#8B5CF6', textActive: '#C4B5FD' },
-  { id: 'crimson',   name: 'Crimson',     mode: 'dark',  dot: '#1E0B0C', borderActive: '#DC2626', textActive: '#FCA5A5' },
-  { id: 'void',      name: 'Void Purple', mode: 'dark',  dot: '#150B1F', borderActive: '#9333EA', textActive: '#D8B4FE' },
-  { id: 'steel',     name: 'Steel Blue',  mode: 'dark',  dot: '#0A111C', borderActive: '#3B82F6', textActive: '#93C5FD' },
-  { id: 'ember',     name: 'Ember',       mode: 'dark',  dot: '#1C0E04', borderActive: '#F97316', textActive: '#FDBA74' },
   { id: 'amethyst',  name: 'Amethyst',    mode: 'dark',  dot: '#0A0611', borderActive: '#A945D4', textActive: '#E6C4F4' },
   { id: 'cobalt',    name: 'Cobalt',      mode: 'dark',  dot: '#05070E', borderActive: '#4B58DC', textActive: '#C3CAFF' },
   { id: 'raspberry', name: 'Raspberry',   mode: 'dark',  dot: '#0B0508', borderActive: '#D42E79', textActive: '#FBB8D6' },
   { id: 'lagoon',    name: 'Lagoon',      mode: 'dark',  dot: '#03080A', borderActive: '#0091AD', textActive: '#7FE9F8' },
+  { id: 'ember',     name: 'Ember',       mode: 'dark',  dot: '#1C0E04', borderActive: '#F97316', textActive: '#FDBA74' },
 
   { id: 'light',           name: 'Daylight',  mode: 'light', dot: '#F4F4F7', borderActive: '#7C3AED', textActive: '#16121F' },
   { id: 'amethyst-light',  name: 'Amethyst',  mode: 'light', dot: '#F6F3F8', borderActive: '#723C70', textActive: '#442656' },
@@ -50,30 +76,41 @@ interface ThemeState {
   setTheme: (id: ThemeId) => void
 }
 
+const STORAGE_KEY = 'obzen-theme-v2'
+
 export const useThemeStore = create<ThemeState>()(
   persist(
     (set) => ({
-      activeTheme: 'noircut',
+      activeTheme: DEFAULT_THEME,
       setTheme: (id) => {
         document.documentElement.setAttribute('data-theme', id)
         set({ activeTheme: id })
       },
     }),
-    { name: 'obzen-theme-v2' }
+    {
+      name: STORAGE_KEY,
+      version: 2,
+      /**
+       * Retired themes land on a survivor. Without this the store rehydrates an
+       * id nothing matches — no swatch reads as active, while the page renders
+       * whatever `:root` gives it. `applyStoredTheme` resolves the same way, so
+       * the DOM and the store cannot disagree about which theme is on.
+       */
+      migrate: (persisted) => {
+        const state = persisted as Partial<ThemeState> | undefined
+        return { ...state, activeTheme: resolveThemeId(state?.activeTheme) } as ThemeState
+      },
+    }
   )
 )
 
 // Apply stored theme immediately (called in main.tsx before first render)
 export function applyStoredTheme() {
   try {
-    const raw = localStorage.getItem('obzen-theme-v2')
-    if (raw) {
-      const parsed = JSON.parse(raw) as { state?: { activeTheme?: ThemeId } }
-      const candidate = parsed?.state?.activeTheme
-      // Guard: only apply if it's a known theme id
-      const theme = THEMES.some(t => t.id === candidate) ? candidate! : 'noircut'
-      document.documentElement.setAttribute('data-theme', theme)
-    }
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return
+    const parsed = JSON.parse(raw) as { state?: { activeTheme?: string } }
+    document.documentElement.setAttribute('data-theme', resolveThemeId(parsed?.state?.activeTheme))
   } catch {
     // ignore
   }

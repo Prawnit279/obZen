@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardHeader } from '@/components/ui/Card'
+import { CollapsibleCard } from '@/components/ui/CollapsibleCard'
 import { Button } from '@/components/ui/Button'
 import { ThemeSwitcher } from '@/components/ui/ThemeSwitcher'
+import { useThemeStore, THEMES } from '@/store/useThemeStore'
 import { StoragePanel } from '@/components/ui/StoragePanel'
 import { exportAllDataAsJSON, importAllDataFromJSON } from '@/lib/export'
 import { importWorkoutData } from '@/utils/importWorkoutData'
@@ -50,6 +52,11 @@ function useStorageEstimate() {
 export default function Settings() {
   const navigate = useNavigate()
   const { used, quota, persisted } = useStorageEstimate()
+
+  // The folded Appearance card still answers its own question.
+  const activeTheme = useThemeStore(s => s.activeTheme)
+  const themeMeta = THEMES.find(t => t.id === activeTheme)
+  const themeSummary = themeMeta && `${themeMeta.name} · ${themeMeta.mode}`
   const { activeId } = useProfileStore()
   const { name, dosha, trainingDays, setName, setDosha, setTrainingDays } = useProfileSettingsStore()
   const guidance = guidanceFor(dosha)
@@ -160,11 +167,6 @@ export default function Settings() {
         </div>
 
         <Card>
-          <CardHeader label="Appearance" />
-          <ThemeSwitcher />
-        </Card>
-
-        <Card>
           <CardHeader label="Profile" />
 
           {/* The two fields that describe the person rather than the plan. */}
@@ -243,6 +245,10 @@ export default function Settings() {
           </div>
         </Card>
 
+        <CollapsibleCard label="Appearance" summary={themeSummary}>
+          <ThemeSwitcher />
+        </CollapsibleCard>
+
         <Card>
           <CardHeader label="Data" />
           <div className="space-y-2">
@@ -293,13 +299,10 @@ export default function Settings() {
           </div>
         </Card>
 
-        <Card>
-          <CardHeader label="Image Cache" />
-          <StoragePanel />
-        </Card>
-
-        <Card>
-          <CardHeader label="Storage" />
+        <CollapsibleCard
+          label="Storage"
+          summary={used !== null ? formatBytes(used) : undefined}
+        >
           <div className="space-y-2 text-[length:var(--text-md)]">
             <div className="flex justify-between">
               <span className="text-[color:var(--ink-faint)]">Used</span>
@@ -316,12 +319,14 @@ export default function Settings() {
               </span>
             </div>
           </div>
-        </Card>
+        </CollapsibleCard>
 
+        <CollapsibleCard label="Image Cache">
+          <StoragePanel />
+        </CollapsibleCard>
 
         {/* ── One-time migration — remove this card after successful import ── */}
-        <Card>
-          <CardHeader label="Migration" />
+        <CollapsibleCard label="Migration">
           <div className="space-y-2">
             <p className="text-[length:var(--text-sm)] leading-relaxed" style={{ color: 'var(--ink-faint)' }}>
               Import historical workout data from{' '}
@@ -341,10 +346,9 @@ export default function Settings() {
               </p>
             )}
           </div>
-        </Card>
+        </CollapsibleCard>
 
-        <Card>
-          <CardHeader label="App" />
+        <CollapsibleCard label="App" summary="1.0.0">
           <div className="space-y-2 text-[length:var(--text-md)]">
             <div className="flex justify-between">
               <span className="text-[color:var(--ink-faint)]">Version</span>
@@ -359,7 +363,7 @@ export default function Settings() {
               <span className="text-[color:var(--ink-dim)]">PWA / Offline-first</span>
             </div>
           </div>
-        </Card>
+        </CollapsibleCard>
       </div>
     </div>
   )

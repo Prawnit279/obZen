@@ -29,10 +29,18 @@ is also the source of fifteen library exercises, so it cannot simply be deleted.
 - Vite 5 + React 18 + TypeScript strict, Tailwind + CSS custom properties
 - Dexie v4 — 24 tables, schema version 4. Non-indexed fields (`rpe`, `isAmrap`)
   were added without a version bump; only indexes are versioned.
-- **14 themes**, nine dark and five light. A dark theme is `--bg`, six accent
+- **10 themes**, five dark and five light. A dark theme is `--bg`, six accent
   steps and three accent channels, nothing more; the light themes share one
   restatement of the whole token set and add only their own ramp. Four
-  families — Amethyst, Cobalt, Raspberry, Lagoon — exist in both modes.
+  families — Amethyst, Cobalt, Raspberry, Lagoon — exist in both modes; Ember
+  and Daylight are one-offs.
+- **Amethyst is the default**, and so defines the base ramp in `:root` rather
+  than overriding it — its `[data-theme]` block only registers `color-scheme`.
+  Violet, Crimson, Void Purple and Steel Blue were retired. The choice is
+  persisted, so retiring one strands whoever had it selected: `RETIRED_THEMES`
+  in `useThemeStore` maps each to a survivor, and both the boot-time DOM apply
+  and the zustand `migrate` resolve through it so the two cannot disagree.
+  Violet was the default, so that migration is the one most devices take.
 - Tinted surfaces mix from `--accent-rgb` / `--accent-soft-rgb` /
   `--accent-deep-rgb` rather than literal violet rgba. Until they did, every
   theme wore a violet wash: a selected day tab came out lavender in the blue
@@ -42,7 +50,7 @@ is also the source of fifteen library exercises, so it cannot simply be deleted.
   bare hex — a chart fill survived the first pass that way.
 - PWA: service worker, manifest, offline-first
 - GitHub Pages deploy on every push to main, with the tests gating it
-- **750 tests**, `src/lib` at 96% of statements
+- **757 tests**, `src/lib` at 96% of statements
 - All type sizes come from `--text-*` tokens (globals.css) — no hardcoded
   `fontSize`/`text-[Npx]` anywhere, including SVG (which needs
   `style={{ fontSize: 'var(...)' }}`, not the `fontSize="N"` attribute — a
@@ -98,7 +106,14 @@ whole page.
 
 ### Everything else
 Drums (timer, 39 rudiments, songs, jams, book library, PDF viewer), Calendar,
-Meetings, Projects kanban, Settings (themes, profile, storage, backup).
+Meetings, Projects kanban.
+
+**Settings** is ordered by what you do with it: the two cards you edit
+(Profile, then Appearance) come first, then the one you act on (Data), then the
+ones you only read. Everything in that last group folds — Appearance, Storage,
+Image Cache, Migration, App — and each closed header carries its own answer, so
+Appearance reads "Amethyst · dark" and Storage reads "24.8 KB" without opening.
+A folded section that says nothing only costs a tap.
 
 ### Data
 - **JSON export and import** — every table plus weigh-ins, goal, name and

@@ -85,7 +85,10 @@ export function ThemeSwitcher() {
           >
             {group.label}
           </div>
-          <div className="flex items-center gap-4 flex-wrap">
+          {/* A grid rather than a wrapping row: the labels are different widths,
+              so wrapping broke one group after four swatches and the other after
+              three. Fixed columns make both groups break in the same place. */}
+          <div className="grid grid-cols-3 gap-x-2 gap-y-4 justify-items-center">
             {THEMES.filter(t => t.mode === group.mode).map(theme => (
               <Swatch
                 key={theme.id}
