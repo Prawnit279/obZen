@@ -5,7 +5,8 @@ const STAND: Pose = {
   knee: [100, 112], ankle: [100, 138], elbow: [100, 68], hand: [100, 86],
 }
 
-const pose = (over: Partial<Pose>): Pose => ({ ...STAND, ...over })
+/** A pose stated as its difference from standing. Shared with the extra table. */
+export const pose = (over: Partial<Pose>): Pose => ({ ...STAND, ...over })
 
 export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
   // ── Squat pattern ──────────────────────────────────────────────────────────

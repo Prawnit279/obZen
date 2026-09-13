@@ -41,9 +41,14 @@ export interface ExerciseMotion {
   view?: 'side'
 }
 
-import { EXERCISE_MOTIONS } from './exercise-motions-data'
+import { EXERCISE_MOTIONS as PROGRAMME_MOTIONS } from './exercise-motions-data'
+import { EXTRA_MOTIONS } from './exercise-motions-extra'
 
-export { EXERCISE_MOTIONS }
+/** Both tables as one lookup: the programme movements plus the free-weight set. */
+export const EXERCISE_MOTIONS: Record<string, ExerciseMotion> = {
+  ...PROGRAMME_MOTIONS,
+  ...EXTRA_MOTIONS,
+}
 
 /** Motion for an exercise id, if one exists. */
 export function motionFor(exerciseId: string): ExerciseMotion | undefined {

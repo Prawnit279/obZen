@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { barWeightLbFor, isBarLoaded, DEFAULT_BAR_LB } from '@/lib/barWeight'
+import { barWeightLbFor, isBarLoaded, DEFAULT_BAR_LB, EZ_BAR_LB } from '@/lib/barWeight'
 import { EXERCISE_MOTIONS } from '@/data/exercise-motions'
 import { trackingModeFor } from '@/data/obzen-program'
 import {
@@ -49,14 +49,31 @@ describe('barWeightLbFor', () => {
     expect(barWeightLbFor('')).toBe(0)
   })
 
-  it('covers exactly the bar lifts that are not excluded', () => {
+  it('gives the EZ bar its own weight rather than the Olympic one', () => {
+    // These are tagged `bar` because that is what the renderer should draw. The
+    // load maths must not read the tag as 45 lb: a curl logged on a 25 lb bar
+    // would gain twenty pounds it never had.
+    for (const id of ['ez-bar-curl', 'ez-bar-skull-crusher', 'ez-bar-upright-row']) {
+      expect(EXERCISE_MOTIONS[id].equipment).toBe('bar')
+      expect(barWeightLbFor(id)).toBe(EZ_BAR_LB)
+    }
+    expect(EZ_BAR_LB).toBeLessThan(DEFAULT_BAR_LB)
+  })
+
+  it('sorts every bar-tagged lift into exactly one weight', () => {
     const tagged = Object.entries(EXERCISE_MOTIONS)
       .filter(([, m]) => m.equipment === 'bar')
       .map(([id]) => id)
-    const loaded = tagged.filter(isBarLoaded)
+    const olympic = tagged.filter(id => barWeightLbFor(id) === DEFAULT_BAR_LB)
+    const ez = tagged.filter(id => barWeightLbFor(id) === EZ_BAR_LB)
+    const excluded = tagged.filter(id => !isBarLoaded(id))
 
-    expect(tagged).toHaveLength(22)
-    expect(loaded).toHaveLength(17)
+    expect(tagged).toHaveLength(34)
+    expect(olympic).toHaveLength(22)
+    expect(ez).toHaveLength(6)
+    expect(excluded).toHaveLength(6)
+    // No lift may fall into two of those, or none of them.
+    expect(olympic.length + ez.length + excluded.length).toBe(tagged.length)
   })
 })
 

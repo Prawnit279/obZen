@@ -6,6 +6,8 @@
  * drawn in MuscleFigure.
  */
 
+import { EXTRA_GUIDES } from './exercise-guides-extra'
+
 export type MuscleId =
   | 'glutes' | 'hamstrings' | 'quads' | 'calves' | 'adductors'
   | 'lats' | 'traps' | 'lowerBack' | 'rearDelts'
@@ -38,8 +40,11 @@ export interface ExerciseGuide {
 /**
  * Guides keyed by exercise id (see toExerciseId). Movements without an entry
  * fall back to their muscle group, so the UI degrades rather than breaking.
+ *
+ * The free-weight additions live in `exercise-guides-extra.ts` and are merged
+ * into `EXERCISE_GUIDES` below.
  */
-export const EXERCISE_GUIDES: Record<string, ExerciseGuide> = {
+const PROGRAMME_GUIDES: Record<string, ExerciseGuide> = {
   'hip-thrust-machine': {
     primary: ['glutes'], secondary: ['hamstrings', 'quads'],
     steps: [
@@ -376,6 +381,12 @@ export const EXERCISE_GUIDES: Record<string, ExerciseGuide> = {
 }
 
 /** Sensible fallback so every exercise shows something useful. */
+/** Both tables as one lookup. */
+export const EXERCISE_GUIDES: Record<string, ExerciseGuide> = {
+  ...PROGRAMME_GUIDES,
+  ...EXTRA_GUIDES,
+}
+
 const GROUP_FALLBACK: Record<string, MuscleId[]> = {
   legs: ['quads', 'glutes', 'hamstrings'],
   back: ['lats', 'traps'],
@@ -563,6 +574,10 @@ const DETAIL_ALIASES: Record<string, string> = {
   'band-assisted-pull-up': 'pull-ups',
   'dumbbell-bench-press': 'bench-press',
   'close-grip-bench-press': 'bench-press',
+  'incline-bench-press': 'bench-press',
+  'incline-dumbbell-press': 'bench-press',
+  'front-squat': 'barbell-squat',
+  't-bar-row': 'barbell-row',
   'weighted-push-ups': 'push-up',
   'seated-cable-row': 'barbell-row',
   'one-arm-db-row': 'barbell-row',

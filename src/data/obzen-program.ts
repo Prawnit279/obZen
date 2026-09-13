@@ -323,6 +323,64 @@ const EXTRA_LIBRARY: Omit<LibraryExercise, 'trackingMode' | 'isCompetitionLift'>
     swaps: ['Hammer Curls', 'Zottman Curl', 'Cable Bicep Curls'] },
   { name: 'Zottman Curl', muscle: 'arms', sets: 3, reps: '10–12', rest: '60s',
     swaps: ['Barbell Curls', 'Hammer Curls'] },
+
+  // EZ bar. Nothing in the catalog used one until now, and the cambered grip is
+  // the reason to reach for it — it takes the wrist out of a straight bar's
+  // forced supination, which matters on a day the forearms are already spent.
+  { name: 'EZ-Bar Curl', muscle: 'arms', sets: 3, reps: '10–12', rest: '60s',
+    swaps: ['Barbell Curls', 'Hammer Curls', 'Cable Bicep Curls'] },
+  { name: 'EZ-Bar Preacher Curl', muscle: 'arms', sets: 3, reps: '10–12', rest: '60s',
+    swaps: ['Concentration Curl', 'EZ-Bar Curl', 'Cable Bicep Curls'] },
+  { name: 'EZ-Bar Reverse Curl', muscle: 'arms', sets: 3, reps: '12–15', rest: '45s',
+    swaps: ['Zottman Curl', 'EZ-Bar Curl', 'Barbell Wrist Curl'] },
+  { name: 'EZ-Bar Skull Crusher', muscle: 'arms', sets: 3, reps: '10–12', rest: '60s',
+    swaps: ['EZ-Bar Overhead Triceps Extension', 'Close-Grip Bench Press', 'Cable Triceps'] },
+  { name: 'EZ-Bar Overhead Triceps Extension', muscle: 'arms', sets: 3, reps: '10–12', rest: '60s',
+    swaps: ['Dumbbell Overhead Triceps Extension', 'EZ-Bar Skull Crusher', 'Cable Triceps'] },
+  { name: 'EZ-Bar Upright Row', muscle: 'shoulders', sets: 3, reps: '10–12', rest: '60s',
+    swaps: ['Dumbbell Lateral Raises', 'Barbell Shrug', 'Face Pull'] },
+
+  // Barbell
+  { name: 'Front Squat', muscle: 'legs', sets: 3, reps: '5–8', rest: '2–3 min',
+    swaps: ['Barbell Squat', 'Zercher Squat', 'Goblet Squat'] },
+  { name: 'Incline Bench Press', muscle: 'chest', sets: 3, reps: '6–10', rest: '2 min',
+    swaps: ['Bench Press', 'Incline Dumbbell Press', 'Chest Press Machine'] },
+  { name: 'Barbell Push Press', muscle: 'shoulders', sets: 3, reps: '5', rest: '2 min',
+    swaps: ['Shoulder Press (Bar)', 'DB Shoulder Press', 'Landmine Press'] },
+  { name: 'Barbell Shrug', muscle: 'shoulders', sets: 3, reps: '10–12', rest: '60s',
+    swaps: ['Dumbbell Shrug', 'Trap Raises', 'EZ-Bar Upright Row'] },
+  { name: 'T-Bar Row', muscle: 'back', sets: 3, reps: '8–10', rest: '90s',
+    swaps: ['Barbell Row', 'Chest-Supported Row', 'One-Arm DB Row'] },
+  { name: 'Barbell Wrist Curl', muscle: 'arms', sets: 3, reps: '15–20', rest: '45s',
+    swaps: ['EZ-Bar Reverse Curl', 'Hammer Curls'] },
+
+  // Dumbbell
+  { name: 'Incline Dumbbell Press', muscle: 'chest', sets: 3, reps: '8–12', rest: '90s',
+    swaps: ['Dumbbell Bench Press', 'Incline Bench Press', 'Dumbbell Fly'] },
+  { name: 'Dumbbell Fly', muscle: 'chest', sets: 3, reps: '12–15', rest: '60s',
+    swaps: ['Cable Fly', 'Pec Deck', 'Dumbbell Bench Press'] },
+  { name: 'Dumbbell Pullover', muscle: 'chest', sets: 3, reps: '10–12', rest: '60s',
+    swaps: ['Dumbbell Fly', 'Lat Pulldown'] },
+  { name: 'Dumbbell Shrug', muscle: 'shoulders', sets: 3, reps: '12–15', rest: '60s',
+    swaps: ['Barbell Shrug', 'Trap Raises'] },
+  { name: 'Dumbbell Front Raise', muscle: 'shoulders', sets: 3, reps: '12–15', rest: '60s',
+    swaps: ['Barbell Front Raises', 'Dumbbell Lateral Raises', 'Cable Lateral Raises'] },
+  { name: 'Concentration Curl', muscle: 'arms', sets: 3, reps: '10–12', rest: '60s',
+    swaps: ['EZ-Bar Preacher Curl', 'Hammer Curls', 'Cable Bicep Curls'] },
+  { name: 'Dumbbell Overhead Triceps Extension', muscle: 'arms', sets: 3, reps: '10–12', rest: '60s',
+    swaps: ['EZ-Bar Overhead Triceps Extension', 'Cable Triceps', 'Dumbbell Triceps Kickback'] },
+  { name: 'Dumbbell Triceps Kickback', muscle: 'arms', sets: 3, reps: '12–15', rest: '45s',
+    swaps: ['Cable Triceps', 'Dumbbell Overhead Triceps Extension'] },
+  { name: 'Kettlebell Swing', muscle: 'legs', sets: 4, reps: '12–15', rest: '60s',
+    swaps: ['Kettlebell Deadlift', 'Cable Pull-Through', 'Romanian Deadlift'] },
+
+  // Cable and machine
+  { name: 'Cable Fly', muscle: 'chest', sets: 3, reps: '12–15', rest: '60s',
+    swaps: ['Pec Deck', 'Dumbbell Fly', 'Chest Press Machine'] },
+  { name: 'Pec Deck', muscle: 'chest', sets: 3, reps: '12–15', rest: '60s',
+    swaps: ['Cable Fly', 'Dumbbell Fly', 'Chest Press Machine'] },
+  { name: 'Seated Calf Raise', muscle: 'legs', sets: 3, reps: '15–20', rest: '45s',
+    swaps: ['Standing Calf Raises'] },
 ]
 
 /** Combined catalog — every movement from both programs is pickable. */
@@ -393,4 +451,7 @@ export const PULL_HEAVY_EXERCISES = [
 export const FOREARM_LOAD_EXERCISES = [
   'Deadlift', 'Romanian Deadlift', 'Dumbbell RDL', 'Assisted Pull-Up',
   'Seated Cable Row', 'One-Arm DB Row', 'Kettlebell Deadlift',
+  // Direct wrist and grip work: the first two load the forearm itself rather
+  // than merely hanging off it, so a drumming-fatigue day should see them.
+  'Barbell Wrist Curl', 'EZ-Bar Reverse Curl', 'T-Bar Row', 'Kettlebell Swing',
 ]

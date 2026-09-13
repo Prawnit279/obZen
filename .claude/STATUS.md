@@ -32,7 +32,7 @@ is also the source of fifteen library exercises, so it cannot simply be deleted.
 - 6 themes (violet default, plus Daylight, crimson, void, steel, ember)
 - PWA: service worker, manifest, offline-first
 - GitHub Pages deploy on every push to main, with the tests gating it
-- **728 tests**, `src/lib` at 96% of statements
+- **729 tests**, `src/lib` at 96% of statements
 - All type sizes come from `--text-*` tokens (globals.css) — no hardcoded
   `fontSize`/`text-[Npx]` anywhere, including SVG (which needs
   `style={{ fontSize: 'var(...)' }}`, not the `fontSize="N"` attribute — a
@@ -50,7 +50,13 @@ is also the source of fifteen library exercises, so it cannot simply be deleted.
   stored `dayLabel` is an opaque key, not the number on screen.
 - Three day templates (Pull/Legs/Arms, Zercher/Quad/Shoulders, Posterior/Delts)
   load as a starting point; slots beyond them start empty.
-- Set-by-set logging, drag-to-reorder, swap, add from a 95-exercise library
+- Set-by-set logging, drag-to-reorder, swap, add from a **119-exercise
+  library** (40 legs, 21 shoulders, 17 core, 14 arms, 14 back, 13 chest). The
+  catalog is derived from both programme templates plus their swaps and
+  `EXTRA_LIBRARY`; the free-weight set added there covers EZ bar (six
+  movements, the first in the app), barbell, dumbbell, and the cable, machine
+  and kettlebell work that came with them. Every entry has a movement
+  animation — a test enforces it, so a library addition without one fails.
 - Session RPE, and a per-set AMRAP flag that drives the 5/3/1 training max
 - Tabs: Program · History · Tools. The open tab lives in the URL.
 
@@ -87,9 +93,13 @@ Meetings, Projects kanban, Settings (themes, profile, storage, backup).
 
 ## Known and deliberate
 
-- **The bar counts.** Sets are logged as plates; 45 lb is added wherever load is
-  computed, for 17 bar-loaded lifts. Stored values are never rewritten, so it
-  cannot be applied twice.
+- **The bar counts.** Sets are logged as plates; the bar is added wherever load
+  is computed, for 22 Olympic-bar lifts at 45 lb and 6 EZ-bar lifts at 25 lb.
+  Stored values are never rewritten, so it cannot be applied twice. Which lifts
+  count comes from the motion table's `equipment` tag, with two id lists for the
+  exceptions: the EZ bar (drawn as a bar, but not a 45 lb one) and the six that
+  carry no free bar at all (cable stacks, the Smith machine, the landmine, the
+  T-bar).
 - **Bodyweight is in strength, not in records.** A weighted pull-up PR reads
   "25 lb × 5" — what went on the belt — while its estimated 1RM includes the
   lifter.
@@ -124,6 +134,9 @@ progress photos, analytics (external tool).
 ### Traps worth knowing
 - `exercise-motions-data.ts` type-imports from `exercise-motions.ts`, which
   value-imports the data back. Safe only because that import is `import type`.
+  The same shape now holds for `exercise-motions-extra.ts` and
+  `exercise-guides-extra.ts`, which exist because their parents were at the
+  file-size ceiling. Both tables are merged by the module that owns the types.
 - `epley1RM` exists twice with different units — `progress.ts` in kg,
   `strengthTools.ts` in lb. Correct today, easy to import the wrong one.
 - Tools has both a route and a Train tab, the same duplication the Progress tab
