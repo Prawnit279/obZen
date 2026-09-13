@@ -37,7 +37,11 @@ is also the source of fifteen library exercises, so it cannot simply be deleted.
   `fontSize`/`text-[Npx]` anywhere, including SVG (which needs
   `style={{ fontSize: 'var(...)' }}`, not the `fontSize="N"` attribute — a
   first sweep missed 41 of these because it only matched the CSS/Tailwind
-  forms)
+  forms, and left `.input` at a literal 15px until the scale moved under it)
+- The scale sits **one rung above the design's original**, on a ladder 1px
+  apart to 18px and 2px apart above it. It went two rungs up first and read
+  too large on a phone. The cost of coming back down is that `--text-3xs` and
+  `--text-2xs` are under 11px again; both are label-only.
 
 ### Train
 - 2–6 day week, set in Settings. Day N is the week's Nth logged session, and

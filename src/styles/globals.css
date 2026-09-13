@@ -71,27 +71,32 @@
      * values used to sit inline, which is why "make the text bigger" meant
      * editing 810 places instead of one.
      *
-     * These are the design's own rungs shifted two steps up. Small text gains
-     * proportionally the most, which is where it was tightest: 343 uses at
-     * 11px and 175 below that.
+     * One step up from the design's original rungs. The first pass went two
+     * steps and read too large on a phone, so every token has come down one
+     * rung on the same ladder — 1px apart to 18px, 2px apart above it — which
+     * keeps the hierarchy intact rather than flattening the top of the scale.
+     *
+     * The cost of that step is at the bottom: --text-3xs and --text-2xs are
+     * back under 11px, which the two-step version deliberately cleared. They
+     * are label-only tokens, never body copy.
      */
-    --text-3xs: 10px;
-    --text-2xs: 11px;
-    --text-xs: 12px;
-    --text-sm: 13px;
-    --text-md: 14px;
-    --text-base: 15px;
-    --text-lg: 16px;
-    --text-xl: 17px;
-    --text-2xl: 20px;
-    --text-3xl: 22px;
-    --text-4xl: 24px;
-    --text-5xl: 26px;
-    --text-6xl: 30px;
-    --text-7xl: 34px;
+    --text-3xs: 9px;
+    --text-2xs: 10px;
+    --text-xs: 11px;
+    --text-sm: 12px;
+    --text-md: 13px;
+    --text-base: 14px;
+    --text-lg: 15px;
+    --text-xl: 16px;
+    --text-2xl: 18px;
+    --text-3xl: 20px;
+    --text-4xl: 22px;
+    --text-5xl: 24px;
+    --text-6xl: 28px;
+    --text-7xl: 32px;
     /* Display numerals — a running timer and a BPM readout. */
-    --text-8xl: 40px;
-    --text-9xl: 64px;
+    --text-8xl: 38px;
+    --text-9xl: 62px;
 
     --t-fast:  160ms;
     --t-base:  200ms;
@@ -325,7 +330,11 @@
     border: 1px solid var(--hairline);
     color: var(--ink);
     border-radius: var(--r-control);
-    @apply px-3 py-2 text-[15px] focus:outline-none w-full;
+    /* The one size the token sweep missed: it was a literal 15px, which the
+       scale no longer contains, so every text field sat a rung above the text
+       around it. */
+    font-size: var(--text-base);
+    @apply px-3 py-2 focus:outline-none w-full;
   }
   .input:focus { border-color: rgba(167,139,250,0.45); }
   .input::placeholder { color: var(--ink-faint); }
