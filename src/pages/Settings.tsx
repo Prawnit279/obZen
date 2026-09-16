@@ -1,3 +1,4 @@
+import { ChevronRight } from 'lucide-react'
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Card, CardHeader } from '@/components/ui/Card'
@@ -17,6 +18,9 @@ import { useProfileStore } from '@/store/useProfileStore'
 import { useProfileSettingsStore } from '@/store/useProfileSettingsStore'
 import { DOSHAS, guidanceFor } from '@/data/doshas'
 import { TRAINING_DAY_CHOICES } from '@/lib/trainingWeek'
+import { useIntakeStore } from '@/store/useIntakeStore'
+import { answeredCount } from '@/lib/intake'
+import { INTAKE_QUESTIONS } from '@/data/intake-questions'
 
 function formatBytes(b: number) {
   if (b < 1024) return `${b} B`
@@ -59,6 +63,9 @@ export default function Settings() {
   const themeSummary = themeMeta && `${themeMeta.name} · ${themeMeta.mode}`
   const { activeId } = useProfileStore()
   const { name, dosha, trainingDays, setName, setDosha, setTrainingDays } = useProfileSettingsStore()
+  const intakeAnswers = useIntakeStore(st => st.answers)
+  const intakeDone = useIntakeStore(st => st.completedAt !== null)
+  const intakeAnswered = answeredCount(intakeAnswers)
 
   /**
    * The name field holds a draft, and the store only hears about it on blur.
@@ -184,6 +191,31 @@ export default function Settings() {
 
         <Card>
           <CardHeader label="Profile" />
+
+          {/* The questionnaire decides which programme gets recommended, so it
+              sits with the profile rather than buried under data tools. */}
+          <button
+            onClick={() => navigate('/intake')}
+            className="w-full text-left transition-opacity hover:opacity-80"
+            style={{
+              padding: '12px 14px', marginBottom: 14,
+              borderRadius: 'var(--r-control)', border: '1px solid var(--hairline)',
+            }}
+          >
+            <div className="flex items-center justify-between" style={{ gap: 12 }}>
+              <div>
+                <div style={{ fontSize: 'var(--text-lg)', color: 'var(--ink)' }}>
+                  {intakeDone ? 'Your goal' : 'Set your goal'}
+                </div>
+                <div style={{ fontSize: 'var(--text-md)', color: 'var(--ink-dim)', marginTop: 2 }}>
+                  {intakeDone
+                    ? `${intakeAnswered} of ${INTAKE_QUESTIONS.length} answered`
+                    : 'Twenty questions. Every one can be skipped.'}
+                </div>
+              </div>
+              <ChevronRight size={16} style={{ color: 'var(--ink-faint)', flexShrink: 0 }} />
+            </div>
+          </button>
 
           {/* The two fields that describe the person rather than the plan. */}
           <div className="space-y-3 pb-1">

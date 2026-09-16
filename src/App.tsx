@@ -10,6 +10,7 @@ import Projects from '@/pages/Projects'
 import Meetings from '@/pages/Meetings'
 import Ayurveda from '@/pages/Ayurveda'
 import VedicRemedies from '@/pages/VedicRemedies'
+import Intake from '@/pages/Intake'
 import Settings from '@/pages/Settings'
 import More from '@/pages/More'
 import SessionDetail from '@/pages/SessionDetail'
@@ -36,6 +37,7 @@ export default function App() {
         <Route path="/meetings" element={<Meetings />} />
         <Route path="/ayurveda" element={<Ayurveda />} />
         {SHOW_VEDIC && <Route path="/vedic" element={<VedicRemedies />} />}
+        <Route path="/intake" element={<Intake />} />
         <Route path="/settings" element={<Settings />} />
         <Route path="/more" element={<More />} />
         {/* A hidden module's route, or a typo, rendered an empty shell — nav
