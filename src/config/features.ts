@@ -22,3 +22,12 @@ export const SHOW_YOGA = false
  * Ayurveda (dosha, Pitta season) is a separate system and stays visible.
  */
 export const SHOW_ASTROLOGY = false
+
+/**
+ * Drums. Hidden from navigation, routing and the Home summary; the DrumStudio
+ * page, `lib/metronome.ts`, the rudiment and notation data and all seven drum
+ * Dexie tables (drumSessions, rudimentLogs, songs, jamSessions, drumBooks,
+ * drumNotations, drumPDFs) are untouched, so flipping this back to `true`
+ * restores the module with nothing lost.
+ */
+export const SHOW_DRUMS = false

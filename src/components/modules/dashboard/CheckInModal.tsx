@@ -130,7 +130,7 @@ export function CheckInModal({ open, existing, onClose, onSaved }: Props) {
         <div>
           <div className="text-[length:var(--text-xs)] uppercase tracking-widest text-noir-muted mb-2">
             Forearm / Wrist Fatigue
-            <span className="text-noir-dim ml-1">— drumming strain?</span>
+            <span className="text-noir-dim ml-1">— grip feeling worn?</span>
           </div>
           <div className="flex gap-2">
             {[false, true].map(val => (

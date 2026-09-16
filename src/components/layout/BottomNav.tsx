@@ -9,7 +9,7 @@ import {
   MoreHorizontal,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { SHOW_NUTRITION } from '@/config/features'
+import { SHOW_NUTRITION, SHOW_DRUMS } from '@/config/features'
 
 /**
  * One vocabulary, shared with the sidebar: a destination is called the same
@@ -23,7 +23,10 @@ const PRIMARY_NAV = [
   { path: '/calendar', label: 'Calendar', icon: CalendarDays },
   { path: '/nutrition', label: 'Food', icon: UtensilsCrossed },
   { path: '/more', label: 'More', icon: MoreHorizontal },
-].filter(item => SHOW_NUTRITION || item.path !== '/nutrition')
+].filter(item =>
+  (SHOW_NUTRITION || item.path !== '/nutrition') &&
+  (SHOW_DRUMS || item.path !== '/drum')
+)
 
 export function BottomNav() {
   const navigate = useNavigate()

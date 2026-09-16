@@ -12,7 +12,7 @@ import {
 } from '@/lib/utils'
 import { VEDIC_REMEDIES } from '@/data/vedic-remedies'
 import { getProgram, getScheduledDay } from '@/data/obzen-program'
-import { SHOW_NUTRITION, SHOW_VEDIC, SHOW_ASTROLOGY } from '@/config/features'
+import { SHOW_NUTRITION, SHOW_VEDIC, SHOW_ASTROLOGY, SHOW_DRUMS } from '@/config/features'
 import { useProfileName } from '@/store/useProfileSettingsStore'
 import { DoshaTip } from '@/components/modules/dashboard/DoshaTip'
 import { useProfileStore } from '@/store/useProfileStore'
@@ -393,7 +393,7 @@ function WeeklySummaryTab() {
         </div>
       )}
       <div className="p-4 border border-noir-border rounded-[2px] bg-noir-surface">
-        <DrumPieChart />
+        {SHOW_DRUMS && <DrumPieChart />}
       </div>
       <div className="p-4 border border-noir-border rounded-[2px] bg-noir-surface">
         <ProgressOverloadChart />

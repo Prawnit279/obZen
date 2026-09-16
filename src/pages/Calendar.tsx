@@ -22,8 +22,8 @@ const CATEGORIES: { value: Category; label: string }[] = [
   { value: 'work',      label: 'Work' },
   { value: 'meeting',   label: 'Meeting' },
   { value: 'workout',   label: 'Workout' },
-  { value: 'drum',      label: 'Drum' },
-  { value: 'jam',       label: 'Jam' },
+  // Drum and Jam are not offered while the Drums module is hidden. Events
+  // saved before that still carry them, so both keep a colour below.
   { value: 'ayurveda',  label: 'Ayurveda' },
 ]
 

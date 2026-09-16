@@ -14,7 +14,7 @@ import {
   Settings,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { SHOW_NUTRITION, SHOW_VEDIC, SHOW_YOGA } from '@/config/features'
+import { SHOW_NUTRITION, SHOW_VEDIC, SHOW_YOGA, SHOW_DRUMS } from '@/config/features'
 
 const NAV_ITEMS = [
   { path: '/', label: 'Home', icon: LayoutDashboard },
@@ -32,7 +32,8 @@ const NAV_ITEMS = [
 ].filter(item =>
   (SHOW_NUTRITION || item.path !== '/nutrition') &&
   (SHOW_VEDIC || item.path !== '/vedic') &&
-  (SHOW_YOGA || item.path !== '/yoga')
+  (SHOW_YOGA || item.path !== '/yoga') &&
+  (SHOW_DRUMS || item.path !== '/drum')
 )
 
 export function Sidebar() {
