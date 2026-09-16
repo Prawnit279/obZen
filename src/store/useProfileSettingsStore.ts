@@ -56,10 +56,22 @@ export const useProfileSettingsStore = create<ProfileSettingsState>()(
   persist(
     set => ({
       ...PROFILE_SETTINGS_DEFAULTS,
-      // An all-space name would render as a blank heading with no way to tell
-      // the app is working, so it falls back rather than being stored.
-      setName: (name: string) =>
-        set({ name: name.trim().length > 0 ? name : PROFILE_SETTINGS_DEFAULTS.name }),
+      /**
+       * A blank name is ignored, not substituted.
+       *
+       * It would render as an empty heading with no sign the app is working, so
+       * it is not stored — but the previous name is kept rather than reverting
+       * to the one in config, which would resurrect a name the user had moved
+       * away from, or on someone else's install a name that was never theirs.
+       *
+       * Callers commit on blur, never per keystroke. Applying this on every
+       * keystroke is what made the field impossible to clear and retype: the
+       * moment the last character went, the value snapped back.
+       */
+      setName: (name: string) => {
+        const trimmed = name.trim()
+        if (trimmed.length > 0) set({ name: trimmed })
+      },
       setDosha: (dosha: Dosha) => set({ dosha }),
       setWeightGoal: (weightGoal: WeightGoal | null) => set({ weightGoal }),
       setTrainingDays: (trainingDays: TrainingDays) => set({ trainingDays }),

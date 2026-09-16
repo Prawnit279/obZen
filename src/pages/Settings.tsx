@@ -59,6 +59,22 @@ export default function Settings() {
   const themeSummary = themeMeta && `${themeMeta.name} · ${themeMeta.mode}`
   const { activeId } = useProfileStore()
   const { name, dosha, trainingDays, setName, setDosha, setTrainingDays } = useProfileSettingsStore()
+
+  /**
+   * The name field holds a draft, and the store only hears about it on blur.
+   *
+   * Bound straight to the store it could not be cleared: deleting the last
+   * character produced a blank, the store rejected the blank, and the old name
+   * reappeared mid-word — so there was no way to type a different one.
+   */
+  const [nameDraft, setNameDraft] = useState(name)
+  useEffect(() => { setNameDraft(name) }, [name])
+
+  const commitName = () => {
+    // Blank is "no change", so the field goes back to what is stored.
+    if (nameDraft.trim()) setName(nameDraft)
+    else setNameDraft(name)
+  }
   const guidance = guidanceFor(dosha)
   const profile = PROFILES[activeId]
 
@@ -181,8 +197,10 @@ export default function Settings() {
               </label>
               <input
                 id="profile-name"
-                value={name}
-                onChange={e => setName(e.target.value)}
+                value={nameDraft}
+                onChange={e => setNameDraft(e.target.value)}
+                onBlur={commitName}
+                onKeyDown={e => { if (e.key === 'Enter') e.currentTarget.blur() }}
                 placeholder={profile.name}
                 className="w-full rounded-[var(--r-control)] border bg-transparent text-[length:var(--text-lg)] focus:outline-none transition-colors"
                 style={{ color: 'var(--ink)', borderColor: 'var(--hairline)', padding: '8px 10px' }}

@@ -124,6 +124,24 @@ describe('useProfileSettingsStore', () => {
     expect(useProfileSettingsStore.getState().name).toBe(PROFILES[PROFILE_ID].name)
   })
 
+  it('keeps the name you had rather than reviving the one from config', () => {
+    // Blanking the field is "no change", not "reset me to Pronit". Falling back
+    // to config would resurrect a name the user had deliberately moved away
+    // from — and on someone else's install, a name that was never theirs.
+    const store = () => useProfileSettingsStore.getState()
+    store().setName('Sam')
+    store().setName('')
+    expect(store().name).toBe('Sam')
+
+    store().setName('   ')
+    expect(store().name).toBe('Sam')
+  })
+
+  it('stores a name without its surrounding whitespace', () => {
+    useProfileSettingsStore.getState().setName('  Sam  ')
+    expect(useProfileSettingsStore.getState().name).toBe('Sam')
+  })
+
   it('keeps a name with internal spaces intact', () => {
     useProfileSettingsStore.getState().setName('Anna Maria')
     expect(useProfileSettingsStore.getState().name).toBe('Anna Maria')
