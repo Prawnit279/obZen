@@ -6,7 +6,7 @@ import { EXERCISE_MOTIONS } from '@/data/exercise-motions'
 import { trackingModeFor } from '@/data/obzen-program'
 import {
   bestE1RM, exerciseTonnage, loadedWeightLb, loadedWeightKg,
-  setWeightLb, setLoadKg, lbToKg, kgToLb,
+  setWeightLb, setLoadKg, lbToKg, kgToLb, sbdTotal,
 } from '@/lib/progress'
 
 describe('barWeightLbFor', () => {
@@ -164,5 +164,51 @@ describe('loadedWeightKg vs setLoadKg', () => {
     const set = { setNumber: 1, weight: 225, reps: 5, unit: 'lbs' as const, timestamp: '2026-08-01T10:00:00.000Z' }
     expect(kgToLb(loadedWeightKg('barbell-squat', set))).toBeCloseTo(270, 1)
     expect(kgToLb(loadedWeightKg('leg-press', set))).toBeCloseTo(225, 1)
+  })
+})
+
+// ── Reading the same lift both ways ──────────────────────────────────────────
+
+describe('plates-only mode', () => {
+  const set = { setNumber: 1, weight: 225, reps: 5, unit: 'lbs' as const, timestamp: '2026-08-01T10:00:00.000Z' }
+  const squat = { exerciseId: 'barbell-squat', status: 'complete' as const, sets: [set] }
+  const session = {
+    date: '2026-08-01', dayLabel: 'Day 1' as const, profileId: 'pronit',
+    exercises: [squat], order: ['barbell-squat'],
+  }
+
+  it('drops the bar from the reported weight', () => {
+    expect(barWeightLbFor('barbell-squat', 'plates-only')).toBe(0)
+    expect(kgToLb(loadedWeightKg('barbell-squat', set, 'plates-only'))).toBeCloseTo(225, 1)
+    expect(kgToLb(loadedWeightKg('barbell-squat', set, 'with-bar'))).toBeCloseTo(270, 1)
+  })
+
+  it('defaults to counting the bar when no mode is given', () => {
+    // Every existing caller relies on this — the default must stay with-bar.
+    expect(barWeightLbFor('barbell-squat')).toBe(DEFAULT_BAR_LB)
+    expect(loadedWeightKg('barbell-squat', set)).toBe(loadedWeightKg('barbell-squat', set, 'with-bar'))
+  })
+
+  it('changes an estimated max by the bar scaled through the reps', () => {
+    // Not a flat 45: Epley multiplies the load by (1 + reps/30), so at 5 reps
+    // the bar is worth 45 × 7/6 = 52.5 lb of estimated max. This is why the
+    // mode has to reach the arithmetic rather than being subtracted after.
+    const withBar = kgToLb(bestE1RM(squat, 0, 'with-bar'))
+    const plates = kgToLb(bestE1RM(squat, 0, 'plates-only'))
+    expect(withBar - plates).toBeCloseTo(45 * (1 + 5 / 30), 1)
+  })
+
+  it('carries through to the SBD total', () => {
+    const withBar = sbdTotal([session], ['barbell-squat'], 'with-bar')
+    const plates = sbdTotal([session], ['barbell-squat'], 'plates-only')
+    expect(kgToLb(withBar.totalKg - plates.totalKg)).toBeCloseTo(45 * (1 + 5 / 30), 1)
+    // Both still count the lift as logged — the mode changes the number, not
+    // whether there is one.
+    expect(plates.loggedCount).toBe(withBar.loggedCount)
+  })
+
+  it('leaves a lift that never had a bar identical either way', () => {
+    const legPress = { exerciseId: 'leg-press', status: 'complete' as const, sets: [set] }
+    expect(bestE1RM(legPress, 0, 'plates-only')).toBe(bestE1RM(legPress, 0, 'with-bar'))
   })
 })

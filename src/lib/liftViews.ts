@@ -13,6 +13,7 @@
 
 import type { WorkoutDaySession } from '@/db/dexie'
 import { realSets, loadedWeightKg, bestE1RM, kgToLb } from '@/lib/progress'
+import type { BarMode } from '@/lib/barWeight'
 import type { TrendPoint } from '@/lib/bodyweight'
 
 export type LiftMeasure = 'e1rm' | 'topSet' | 'perBw' | 'percent'
@@ -87,7 +88,8 @@ export function liftPoints(
   measure: LiftMeasure,
   trend: TrendPoint[],
   range: LiftRange,
-  todayISO: string
+  todayISO: string,
+  barMode: BarMode = 'with-bar'
 ): LiftPoint[] {
   const from = rangeStart(range, todayISO)
 
@@ -100,11 +102,11 @@ export function liftPoints(
 
       if (measure === 'topSet') {
         // What actually went on the bar — no bodyweight, no rep estimate.
-        const heaviest = Math.max(...realSets(ex).map(set => loadedWeightKg(exerciseId, set)))
+        const heaviest = Math.max(...realSets(ex).map(set => loadedWeightKg(exerciseId, set, barMode)))
         return heaviest > 0 ? [{ date: s.date, value: kgToLb(heaviest) }] : []
       }
 
-      const e1rm = bestE1RM(ex, bodyweightKg)
+      const e1rm = bestE1RM(ex, bodyweightKg, barMode)
       if (e1rm <= 0) return []
 
       if (measure === 'perBw') {

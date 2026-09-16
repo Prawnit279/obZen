@@ -15,6 +15,7 @@
 import type { WorkoutDaySession, ExerciseSessionState, LoggedSet } from '@/db/dexie'
 import { trackingModeFor, bodyweightFactorFor, exerciseNameFor } from '@/data/obzen-program'
 import { barWeightLbFor } from '@/lib/barWeight'
+import type { BarMode } from '@/lib/barWeight'
 import type { TrackingMode } from '@/data/obzen-program'
 
 const LB_PER_KG = 2.2046226218
@@ -54,7 +55,12 @@ export function displayLb(kg: number, decimals = 0): string {
  * Callers reporting *strength* pass the real bodyweight. Use `loadedWeightKg`
  * when you mean the former, so the intent is visible at the call site.
  */
-export function setLoadKg(exerciseId: string, s: LoggedSet, bodyweightKg = 0): number {
+export function setLoadKg(
+  exerciseId: string,
+  s: LoggedSet,
+  bodyweightKg = 0,
+  barMode: BarMode = 'with-bar'
+): number {
   const logged = toKg(s.weight, s.unit)
   // Portion of bodyweight this movement actually moves — 0 for barbell and
   // machine work, ~1 for a pull-up, ~0.65 for a push-up.
@@ -65,7 +71,7 @@ export function setLoadKg(exerciseId: string, s: LoggedSet, bodyweightKg = 0): n
   if (trackingModeFor(exerciseId) === 'assisted') {
     return Math.max(0, bodyweightLoad - logged)
   }
-  return logged + lbToKg(barWeightLbFor(exerciseId)) + bodyweightLoad
+  return logged + lbToKg(barWeightLbFor(exerciseId, barMode)) + bodyweightLoad
 }
 
 /** A set's logged weight in pounds, before the bar is added back. */
@@ -81,8 +87,12 @@ export function setWeightLb(s: LoggedSet): number {
  * was loaded, not the lifter's contribution to it. Assistance-tracked movements
  * carry no bar, so their assistance figure passes through unchanged.
  */
-export function loadedWeightLb(exerciseId: string, s: LoggedSet): number {
-  return setWeightLb(s) + barWeightLbFor(exerciseId)
+export function loadedWeightLb(
+  exerciseId: string,
+  s: LoggedSet,
+  barMode: BarMode = 'with-bar'
+): number {
+  return setWeightLb(s) + barWeightLbFor(exerciseId, barMode)
 }
 
 /**
@@ -92,8 +102,12 @@ export function loadedWeightLb(exerciseId: string, s: LoggedSet): number {
  * PR reads "25 lb × 5" because that is what you hang off the belt; folding in
  * bodyweight would make the row unreproducible.
  */
-export function loadedWeightKg(exerciseId: string, s: LoggedSet): number {
-  return toKg(s.weight, s.unit) + lbToKg(barWeightLbFor(exerciseId))
+export function loadedWeightKg(
+  exerciseId: string,
+  s: LoggedSet,
+  barMode: BarMode = 'with-bar'
+): number {
+  return toKg(s.weight, s.unit) + lbToKg(barWeightLbFor(exerciseId, barMode))
 }
 
 /** A set actually performed — placeholder rows from the logger are excluded. */
@@ -124,9 +138,13 @@ export function epley1RM(weightKg: number, reps: number, addedBodyweightKg = 0):
  * Note: the logged data has no warmup flag, so every real set is a candidate —
  * taking the max means warmups can never beat a true working set anyway.
  */
-export function bestE1RM(ex: ExerciseSessionState, bodyweightKg = 0): number {
+export function bestE1RM(
+  ex: ExerciseSessionState,
+  bodyweightKg = 0,
+  barMode: BarMode = 'with-bar'
+): number {
   return realSets(ex).reduce((best, s) => {
-    const e1rm = epley1RM(setLoadKg(ex.exerciseId, s, bodyweightKg), s.reps)
+    const e1rm = epley1RM(setLoadKg(ex.exerciseId, s, bodyweightKg, barMode), s.reps)
     return e1rm > best ? e1rm : best
   }, 0)
 }
@@ -140,13 +158,14 @@ export interface E1RMPoint {
 export function e1rmSeries(
   sessions: WorkoutDaySession[],
   exerciseId: string,
-  bodyweightKg = 0
+  bodyweightKg = 0,
+  barMode: BarMode = 'with-bar'
 ): E1RMPoint[] {
   return sessions
     .flatMap(session => {
       const ex = session.exercises.find(e => e.exerciseId === exerciseId)
       if (!ex) return []
-      const e1rm = bestE1RM(ex, bodyweightKg)
+      const e1rm = bestE1RM(ex, bodyweightKg, barMode)
       return e1rm > 0 ? [{ date: session.date, e1rm }] : []
     })
     .sort((a, b) => a.date.localeCompare(b.date))
@@ -156,9 +175,10 @@ export function e1rmSeries(
 export function bestCurrentE1RM(
   sessions: WorkoutDaySession[],
   exerciseId: string,
-  bodyweightKg = 0
+  bodyweightKg = 0,
+  barMode: BarMode = 'with-bar'
 ): number {
-  return e1rmSeries(sessions, exerciseId, bodyweightKg)
+  return e1rmSeries(sessions, exerciseId, bodyweightKg, barMode)
     .reduce((max, p) => (p.e1rm > max ? p.e1rm : max), 0)
 }
 
@@ -175,11 +195,15 @@ export interface SbdTotal {
  * Total of the best e1RM for each of the given lifts. Callers pass the ids they
  * mean — `COMPETITION_LIFT_IDS` for a true squat/bench/deadlift total.
  */
-export function sbdTotal(sessions: WorkoutDaySession[], competitionLiftIds: string[]): SbdTotal {
+export function sbdTotal(
+  sessions: WorkoutDaySession[],
+  competitionLiftIds: string[],
+  barMode: BarMode = 'with-bar'
+): SbdTotal {
   const lifts = competitionLiftIds.map(exerciseId => ({
     exerciseId,
     name: exerciseNameFor(exerciseId),
-    e1rm: bestCurrentE1RM(sessions, exerciseId),
+    e1rm: bestCurrentE1RM(sessions, exerciseId, 0, barMode),
   }))
   return {
     lifts,

@@ -25,6 +25,21 @@ import { EXERCISE_MOTIONS } from '@/data/exercise-motions'
 import { canonicalExerciseId } from '@/data/exercise-renames'
 
 /** A standard Olympic barbell. */
+/**
+ * Whether a reported number counts the bar.
+ *
+ * `with-bar` is what was lifted, and is the default everywhere. `plates-only`
+ * answers the different question of what went on the bar — useful for checking
+ * a figure against what you actually loaded, and meaningless for anything
+ * calibrated against real load, which is why DOTS and the strength standards
+ * never offer it.
+ *
+ * Handled here rather than threaded through the arithmetic above it. This is
+ * the one place the bar is ever added, so it is the only place that needs to
+ * know the difference.
+ */
+export type BarMode = 'with-bar' | 'plates-only'
+
 export const DEFAULT_BAR_LB = 45
 
 /**
@@ -70,7 +85,8 @@ export const NOT_BAR_LOADED: ReadonlySet<string> = new Set([
  * of — get 0, because guessing a bar onto an unknown movement would silently
  * inflate it.
  */
-export function barWeightLbFor(exerciseId: string): number {
+export function barWeightLbFor(exerciseId: string, mode: BarMode = 'with-bar'): number {
+  if (mode === 'plates-only') return 0
   // Resolved first: all three lookups below are keyed by current id, and a set
   // logged before a rename carries the old one. Without this, renaming a
   // bar-loaded lift would quietly drop 45 lb from every set in its history.

@@ -5,6 +5,7 @@ import { DOSHAS } from '@/data/doshas'
 import type { Dosha } from '@/data/doshas'
 import { isWeightGoal } from '@/lib/bodyweight'
 import { isTrainingDays, DEFAULT_TRAINING_DAYS } from '@/lib/trainingWeek'
+import type { BarMode } from '@/lib/barWeight'
 import type { TrainingDays } from '@/lib/trainingWeek'
 import type { WeightGoal } from '@/lib/bodyweight'
 
@@ -36,6 +37,8 @@ export const PROFILE_SETTINGS_DEFAULTS = {
   dosha: (PROFILES[PROFILE_ID].dosha ?? 'Pitta') as Dosha,
   weightGoal: null as WeightGoal | null,
   trainingDays: DEFAULT_TRAINING_DAYS as TrainingDays,
+  /** What the SBD total and the lift trend count. Never DOTS or standards. */
+  barMode: 'with-bar' as BarMode,
 }
 
 interface ProfileSettingsState {
@@ -45,10 +48,13 @@ interface ProfileSettingsState {
   weightGoal: WeightGoal | null
   /** How many days a week the plan calls for. Decides the slots Train shows. */
   trainingDays: TrainingDays
+  /** Whether the SBD total and lift trend count the bar. */
+  barMode: BarMode
   setName: (name: string) => void
   setDosha: (dosha: Dosha) => void
   setWeightGoal: (goal: WeightGoal | null) => void
   setTrainingDays: (days: TrainingDays) => void
+  setBarMode: (mode: BarMode) => void
   reset: () => void
 }
 
@@ -75,6 +81,7 @@ export const useProfileSettingsStore = create<ProfileSettingsState>()(
       setDosha: (dosha: Dosha) => set({ dosha }),
       setWeightGoal: (weightGoal: WeightGoal | null) => set({ weightGoal }),
       setTrainingDays: (trainingDays: TrainingDays) => set({ trainingDays }),
+      setBarMode: (barMode: BarMode) => set({ barMode }),
       reset: () => set({ ...PROFILE_SETTINGS_DEFAULTS }),
     }),
     {
@@ -100,6 +107,9 @@ export const useProfileSettingsStore = create<ProfileSettingsState>()(
           trainingDays: isTrainingDays(saved.trainingDays)
             ? saved.trainingDays
             : current.trainingDays,
+          barMode: saved.barMode === 'plates-only' || saved.barMode === 'with-bar'
+            ? saved.barMode
+            : current.barMode,
         }
       },
     }

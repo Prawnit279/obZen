@@ -6,6 +6,7 @@ import {
   liftPoints, LIFT_MEASURES, LIFT_RANGES, MEASURE_AXIS_LABEL,
 } from '@/lib/liftViews'
 import type { LiftMeasure, LiftRange } from '@/lib/liftViews'
+import type { BarMode } from '@/lib/barWeight'
 import { Card } from '@/components/ui/Card'
 import { SegmentedPill } from '@/components/ui/SegmentedPill'
 import { LineChart, ChartEmpty } from './Charts'
@@ -23,6 +24,8 @@ interface Props {
   trend: TrendPoint[]
   signals: LiftSignal[]
   todayISO: string
+  /** Whether plotted weights count the bar. Follows the SBD toggle. */
+  barMode?: BarMode
 }
 
 const ALL = '__all__'
@@ -35,7 +38,7 @@ const ALL = '__all__'
  * light lift against a heavy one, and none of it separates getting stronger
  * from getting heavier. Each control changes what is plotted, not how it looks.
  */
-export function LiftTrendCard({ sessions, lifts, trend, signals, todayISO }: Props) {
+export function LiftTrendCard({ sessions, lifts, trend, signals, todayISO, barMode = 'with-bar' }: Props) {
   const [measure, setMeasure] = useState<LiftMeasure>('e1rm')
   const [range, setRange] = useState<LiftRange>('all')
   const [focus, setFocus] = useState<string>(ALL)
@@ -45,7 +48,7 @@ export function LiftTrendCard({ sessions, lifts, trend, signals, todayISO }: Pro
   const series = shown
     .map(l => ({
       label: l.name,
-      points: liftPoints(sessions, l.id, measure, trend, range, todayISO),
+      points: liftPoints(sessions, l.id, measure, trend, range, todayISO, barMode),
     }))
     .filter(s => s.points.length > 0)
 

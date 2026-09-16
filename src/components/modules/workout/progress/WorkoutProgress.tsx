@@ -19,6 +19,8 @@ import {
 import { todayISO } from '@/lib/utils'
 import { Card } from '@/components/ui/Card'
 import { SegmentedPill } from '@/components/ui/SegmentedPill'
+import { useProfileSettingsStore } from '@/store/useProfileSettingsStore'
+import type { BarMode } from '@/lib/barWeight'
 import { LiftTrendCard } from './LiftTrendCard'
 import { LineChart, BarChart, ChartEmpty, liftHue } from './Charts'
 import {
@@ -95,6 +97,11 @@ export function WorkoutProgress() {
     setSearchParams(params, { replace: true })
   }
 
+  // Read before the loading and empty-state returns below — a hook after an
+  // early return runs on some renders and not others.
+  const barMode = useProfileSettingsStore(st => st.barMode)
+  const setBarMode = useProfileSettingsStore(st => st.setBarMode)
+
   const { activeId } = useProfileStore()
   const profile = PROFILES[activeId]
   const cfg = profile.progress
@@ -153,9 +160,16 @@ export function WorkoutProgress() {
 
   // The SBD total is the three competition lifts by definition — not whichever
   // lifts this profile happens to chart, which are configured separately.
-  const total = sbdTotal(mine, COMPETITION_LIFT_IDS)
+  const total = sbdTotal(mine, COMPETITION_LIFT_IDS, barMode)
+
+  // DOTS and the strength standards are calibrated against real lifted load, so
+  // they always read the with-bar total. Letting them follow the toggle would
+  // not show the same strength a second way — it would show a wrong score.
+  const scored = barMode === 'with-bar'
+    ? total
+    : sbdTotal(mine, COMPETITION_LIFT_IDS, 'with-bar')
   const dots = cfg.showPowerlifting && profile.sex
-    ? dotsScore(total.totalKg, bodyweightKg, profile.sex)
+    ? dotsScore(scored.totalKg, bodyweightKg, profile.sex)
     : 0
 
   // Bodyweight matters here: assisted and bodyweight work are scored on the
@@ -237,6 +251,25 @@ export function WorkoutProgress() {
 
       {/* The summary stays put; the tabs divide the detail beneath it. Stacked,
           this screen ran to nearly six phone screens on a 375px display. */}
+      {/* Sits with the total it changes. Only the SBD figure and the lift
+          trend follow it — DOTS and the standards stay on real load. */}
+      {cfg.showPowerlifting && (
+        <div className="card-grid-full print-hide flex items-center flex-wrap" style={{ gap: 10 }}>
+          <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)' }}>
+            Total &amp; trend count
+          </span>
+          <SegmentedPill
+            label="Whether the SBD total counts the bar"
+            value={barMode}
+            onChange={(m: BarMode) => setBarMode(m)}
+            options={[
+              { value: 'with-bar' as BarMode, label: 'With bar' },
+              { value: 'plates-only' as BarMode, label: 'Plates only' },
+            ]}
+          />
+        </div>
+      )}
+
       <SegmentedPill
         className="print-hide"
         label="Progress view"
@@ -254,6 +287,7 @@ export function WorkoutProgress() {
         trend={bodyTrend}
         signals={signals}
         todayISO={todayISO()}
+        barMode={barMode}
       />
 
       {/* ── Lifts that have stopped moving ─────────────────────────────── */}
@@ -266,8 +300,8 @@ export function WorkoutProgress() {
       {cfg.showPowerlifting && profile.sex && (
         <Card label="Strength standards (est.)">
           <div className="space-y-3">
-            {[...total.lifts.map(l => ({ key: l.exerciseId, name: l.name, value: l.e1rm })),
-              { key: 'total', name: 'Total', value: total.totalKg }].map((row, i) => {
+            {[...scored.lifts.map(l => ({ key: l.exerciseId, name: l.name, value: l.e1rm })),
+              { key: 'total', name: 'Total', value: scored.totalKg }].map((row, i) => {
               const std = strengthStandard(row.key, row.value, bodyweightKg, profile.sex!)
               if (!std) return null
               // Scale each row against its own Elite threshold, so a full bar
