@@ -207,6 +207,25 @@ export interface ExerciseSessionState {
   sets: LoggedSet[]
   note?: string
   addedFrom?: DayLabel | 'library' | 'custom'
+  /**
+   * The circuit this belongs to, if any. Non-indexed, so it needs no schema
+   * version — Dexie versions indexes, not fields, and rows saved before this
+   * simply have no value.
+   */
+  circuitId?: string
+}
+
+/**
+ * A group of exercises worked in rounds rather than one at a time.
+ *
+ * Rounds live here rather than on each exercise so the members cannot disagree
+ * about how many there are.
+ */
+export interface Circuit {
+  id: string
+  name: string
+  /** How many times through. */
+  rounds: number
 }
 
 /**
@@ -248,6 +267,11 @@ export interface WorkoutDaySession {
    * only versions the indexes, and rows saved before this simply have no value.
    */
   rpe?: number
+  /**
+   * Circuits in this session. Non-indexed, like `rpe` above, so no schema
+   * version is needed and older rows simply carry none.
+   */
+  circuits?: Circuit[]
 }
 
 // --- Drum Library ---
