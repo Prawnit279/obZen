@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom'
+import { Routes, Route, Navigate } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
 import Dashboard from '@/pages/Dashboard'
 import Workout from '@/pages/Workout'
@@ -16,7 +16,7 @@ import SessionDetail from '@/pages/SessionDetail'
 import Progress from '@/pages/Progress'
 import Tools from '@/pages/Tools'
 import FiveThreeOneGuide from '@/pages/FiveThreeOneGuide'
-import { SHOW_NUTRITION, SHOW_VEDIC, SHOW_YOGA } from '@/config/features'
+import { SHOW_NUTRITION, SHOW_VEDIC, SHOW_YOGA, SHOW_DRUMS } from '@/config/features'
 
 export default function App() {
   return (
@@ -28,7 +28,7 @@ export default function App() {
         <Route path="/workout/tools" element={<Tools />} />
         <Route path="/workout/tools/guide" element={<FiveThreeOneGuide />} />
         <Route path="/workout/session/:id" element={<SessionDetail />} />
-        <Route path="/drum" element={<DrumStudio />} />
+        {SHOW_DRUMS && <Route path="/drum" element={<DrumStudio />} />}
         {SHOW_YOGA && <Route path="/yoga" element={<Yoga />} />}
         <Route path="/calendar" element={<Calendar />} />
         {SHOW_NUTRITION && <Route path="/nutrition" element={<Nutrition />} />}
@@ -38,6 +38,11 @@ export default function App() {
         {SHOW_VEDIC && <Route path="/vedic" element={<VedicRemedies />} />}
         <Route path="/settings" element={<Settings />} />
         <Route path="/more" element={<More />} />
+        {/* A hidden module's route, or a typo, rendered an empty shell — nav
+            and chrome with nothing in it and no way to tell that was not a
+            loading failure. Anything unmatched goes Home instead. `replace`
+            so Back does not bounce straight into the same dead route. */}
+        <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </AppShell>
   )
