@@ -25,6 +25,7 @@ import type { BarMode } from '@/lib/barWeight'
 import { LiftTrendCard } from './LiftTrendCard'
 import { BlockCard } from './BlockCard'
 import { AmrapHistoryCard } from './AmrapHistoryCard'
+import { WeeklyVolumeCard } from './WeeklyVolumeCard'
 import { LineChart, BarChart, ChartEmpty, liftHue } from './Charts'
 import {
   liftSignals, prFeed, sessionLoads, acwr, deloadAdvice, adherence, liftBalance,
@@ -534,13 +535,7 @@ export function WorkoutProgress() {
       {/* ── Sets per muscle ───────────────────────────────────────────── */}
       <MuscleVolumeCard readings={muscles} />
 
-      <Card label="Weekly volume (tonnage)">
-        <BarChart
-          data={fillWeeks(volume, todayISO(), 8)
-            .map(v => ({ label: v.week.slice(-3), value: kgToLb(v.tonnageKg) }))}
-          unit="lb"
-        />
-      </Card>
+      <WeeklyVolumeCard volume={volume} todayISO={todayISO()} />
 
       {/* ── Plan vs actual ─────────────────────────────────────────────── */}
       <AdherenceCard data={attendance} />
