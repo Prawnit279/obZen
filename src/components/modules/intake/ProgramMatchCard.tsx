@@ -4,6 +4,9 @@ import { recommendProgram } from '@/lib/programs'
 import type { ProgramMatch } from '@/lib/programs'
 import type { IntakeAnswers } from '@/lib/intake'
 import { Card } from '@/components/ui/Card'
+import { useBlockStore } from '@/store/useBlockStore'
+import { useSeedTrainingMaxes } from './useSeedTrainingMaxes'
+import { todayISO } from '@/lib/utils'
 
 interface Props {
   answers: IntakeAnswers
@@ -21,6 +24,9 @@ interface Props {
 export function ProgramMatchCard({ answers }: Props) {
   const navigate = useNavigate()
   const { matches, missing, undecidable } = recommendProgram(answers)
+  const running = useBlockStore(st => st.block)
+  const startBlock = useBlockStore(st => st.start)
+  const seedTrainingMaxes = useSeedTrainingMaxes()
 
   if (undecidable) {
     return (
@@ -41,6 +47,42 @@ export function ProgramMatchCard({ answers }: Props) {
   return (
     <Card label="Your programme">
       <Recommendation match={best} lead />
+
+      {best.program.status === 'available' && (
+        running?.programId === best.program.id ? (
+          <p style={{ fontSize: 'var(--text-md)', color: 'var(--ok)', marginTop: 12 }}>
+            Running since {running.startedOn}.
+          </p>
+        ) : (best.program.templates?.length ?? 0) > 0 ? (
+          // Reachable only once a templated programme becomes followable. It
+          // says so rather than starting one, because which template is the
+          // lifter's call and there is nowhere yet to make it.
+          <p style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)', marginTop: 12 }}>
+            Pick one of the {best.program.templates!.length} templates to start this block.
+          </p>
+        ) : (
+          <button
+            onClick={() => startBlock({
+              programId: best.program.id,
+              // Null, never the first template. A programme that offers a
+              // choice has to be asked for one — picking Operator on the
+              // lifter's behalf is exactly the decision they wanted. No
+              // available programme has templates yet, so this is null today
+              // regardless; the guard below is what keeps it honest when one
+              // does.
+              templateId: null,
+              startedOn: todayISO(),
+              // Seeded from the training maxes already on record; the block
+              // card says which lifts are missing one rather than inventing it.
+              trainingMaxLb: seedTrainingMaxes(),
+            })}
+            className="w-full py-2.5 rounded-[var(--r-control)] text-[length:var(--text-md)] uppercase tracking-widest transition-opacity hover:opacity-80"
+            style={{ background: 'var(--accent)', color: 'var(--on-accent)', marginTop: 14 }}
+          >
+            {running ? 'Switch to this block' : 'Start this block'}
+          </button>
+        )
+      )}
 
       {missing.length > 0 && (
         <p
