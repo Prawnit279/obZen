@@ -20,8 +20,10 @@ import { todayISO } from '@/lib/utils'
 import { Card } from '@/components/ui/Card'
 import { SegmentedPill } from '@/components/ui/SegmentedPill'
 import { useProfileSettingsStore } from '@/store/useProfileSettingsStore'
+import { useBlockStore } from '@/store/useBlockStore'
 import type { BarMode } from '@/lib/barWeight'
 import { LiftTrendCard } from './LiftTrendCard'
+import { BlockCard } from './BlockCard'
 import { LineChart, BarChart, ChartEmpty, liftHue } from './Charts'
 import {
   liftSignals, prFeed, sessionLoads, acwr, deloadAdvice, adherence, liftBalance,
@@ -100,6 +102,8 @@ export function WorkoutProgress() {
   // Read before the loading and empty-state returns below — a hook after an
   // early return runs on some renders and not others.
   const trainingDays = useProfileSettingsStore(st => st.trainingDays)
+  const block = useBlockStore(st => st.block)
+  const endBlock = useBlockStore(st => st.end)
   const barMode = useProfileSettingsStore(st => st.barMode)
   const setBarMode = useProfileSettingsStore(st => st.setBarMode)
 
@@ -282,6 +286,10 @@ export function WorkoutProgress() {
 
       <Panel view="strength" open={view}>
       {/* ── Lift trend, however you want to read it ────────────────────── */}
+      {block && (
+        <BlockCard block={block} todayISO={todayISO()} onEnd={endBlock} />
+      )}
+
       <LiftTrendCard
         sessions={mine}
         lifts={keyLifts.map(l => ({ id: l.id, name: l.name }))}
