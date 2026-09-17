@@ -172,12 +172,15 @@ export interface AmrapAttempt {
 /**
  * Every top set logged under this block for one lift, against what was asked.
  *
- * The AMRAP set is read as the heaviest set of that lift on the day, which is
- * what the wave makes it — the third set is the heaviest of the three, and
- * Boring But Big's supplemental sits well below all of them. Joker sets are the
- * exception: taken and logged, they would outweigh the top set and be reported
- * in its place. The weight is returned alongside the reps so such a row reads
- * as the heavier set it was.
+ * Reads only sets flagged AMRAP in the logger — the heaviest of them, when a
+ * day has more than one. Taking the heaviest set of the day instead would pick
+ * up jokers and, worse, would report any prescribed set as though its rep count
+ * had been a limit. `lib/amrap.ts` draws the same line for the same reason, so
+ * the two cannot disagree about the same session.
+ *
+ * The cost is that unflagged history is invisible here, which is the right way
+ * round: a missing row prompts the flag to be set, while a wrong row quietly
+ * becomes evidence.
  *
  * Deload weeks are absent because the deload prescribes no AMRAP, and so is a
  * lift the block carries no training max for — without one there is no wave and
@@ -202,7 +205,13 @@ export function amrapHistory(
 
     const ex = s.exercises.find(e => e.exerciseId === exerciseId)
     if (!ex) continue
-    const sets = realSets(ex)
+    // Only sets the lifter flagged as AMRAP, which is the same rule
+    // `lib/amrap.ts` applies and for the same reason: five reps at the
+    // prescribed weight is either "did the five it asked for" or "got five and
+    // no more", and nothing in an unflagged set tells the two apart. Since the
+    // whole card is reps against target, reading one as the other would invent
+    // the finding rather than report it.
+    const sets = realSets(ex).filter(set => set.isAmrap === true)
     if (sets.length === 0) continue
 
     const waveWeek = waveWeekFor(position.week, program.deloadWeek)

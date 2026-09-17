@@ -159,9 +159,11 @@ describe('amrapHistory', () => {
       exercises: [{
         exerciseId,
         status: 'complete' as const,
+        // The last set carries the AMRAP flag, as the logger's toggle sets it.
         sets: sets.map(([weight, reps], i) => ({
           setNumber: i + 1, weight, reps,
           unit: 'lbs' as const, timestamp: `${date}T10:0${i}:00.000Z`,
+          isAmrap: i === sets.length - 1,
         })),
       }],
     }
@@ -171,10 +173,50 @@ describe('amrapHistory', () => {
   const weekOne = (date: string, topReps: number) =>
     session(date, 'barbell-squat', [[160, 5], [190, 5], [225, topReps]])
 
-  it('reads the heaviest set of the day as the top set', () => {
+  it('reads the set the lifter flagged as the top set', () => {
     const [attempt] = amrapHistory(block(), [weekOne(wk(1), 8)], 'barbell-squat')
     expect(attempt.reps).toBe(8)
     // 225 logged as plates, plus the 45 lb bar.
+    expect(attempt.weightLb).toBeCloseTo(270, 0)
+  })
+
+  it('ignores a session where nothing was flagged, heavy or not', () => {
+    // The rule `lib/amrap.ts` already applies: five reps at the prescribed
+    // weight is either the five it asked for or five and no more, and an
+    // unflagged set cannot say which. A missing row asks for the flag; a
+    // guessed one would quietly become evidence.
+    const unflagged = {
+      ...weekOne(wk(1), 8),
+      exercises: [{
+        exerciseId: 'barbell-squat',
+        status: 'complete' as const,
+        sets: [{
+          setNumber: 1, weight: 225, reps: 8,
+          unit: 'lbs' as const, timestamp: `${wk(1)}T10:00:00.000Z`,
+        }],
+      }],
+    }
+    expect(amrapHistory(block(), [unflagged], 'barbell-squat')).toEqual([])
+  })
+
+  it('takes the heaviest flagged set when a day has more than one', () => {
+    const twice = session(wk(1), 'barbell-squat', [[225, 8], [245, 3]])
+    // Both flagged by the fixture would be wrong — only the last is. Flag both
+    // explicitly to pin which one wins.
+    twice.exercises[0].sets = twice.exercises[0].sets.map(s => ({ ...s, isAmrap: true }))
+    const [attempt] = amrapHistory(block(), [twice], 'barbell-squat')
+    expect(attempt.reps).toBe(3)
+    expect(attempt.weightLb).toBeCloseTo(290, 0)   // 245 plates plus the bar
+  })
+
+  it('does not let a heavier unflagged set displace the flagged one', () => {
+    // A joker single above the top set is heavier and is not the AMRAP.
+    const withJoker = session(wk(1), 'barbell-squat', [[225, 8], [275, 1]])
+    withJoker.exercises[0].sets = withJoker.exercises[0].sets.map((s, i) => ({
+      ...s, isAmrap: i === 0,
+    }))
+    const [attempt] = amrapHistory(block(), [withJoker], 'barbell-squat')
+    expect(attempt.reps).toBe(8)
     expect(attempt.weightLb).toBeCloseTo(270, 0)
   })
 

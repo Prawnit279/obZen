@@ -40,7 +40,11 @@ function squatDay(date: string, reps: number, plates = 225): WorkoutDaySession {
     exercises: [{
       exerciseId: 'barbell-squat',
       status: 'complete',
-      sets: [{ setNumber: 1, weight: plates, reps, unit: 'lbs', timestamp: `${date}T10:00:00.000Z` }],
+      // Flagged, because `amrapHistory` reads only sets the lifter marked.
+      sets: [{
+        setNumber: 1, weight: plates, reps,
+        unit: 'lbs', timestamp: `${date}T10:00:00.000Z`, isAmrap: true,
+      }],
     }],
   } as WorkoutDaySession
 }
