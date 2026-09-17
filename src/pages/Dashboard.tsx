@@ -13,7 +13,7 @@ import {
 import { VEDIC_REMEDIES } from '@/data/vedic-remedies'
 import { getProgram, getScheduledDay } from '@/data/obzen-program'
 import { SHOW_NUTRITION, SHOW_VEDIC, SHOW_ASTROLOGY, SHOW_DRUMS } from '@/config/features'
-import { useProfileName } from '@/store/useProfileSettingsStore'
+import { useProfileName, useProfileSettingsStore } from '@/store/useProfileSettingsStore'
 import { DoshaTip } from '@/components/modules/dashboard/DoshaTip'
 import { useProfileStore } from '@/store/useProfileStore'
 import { Card, CardHeader } from '@/components/ui/Card'
@@ -36,8 +36,8 @@ function getDailyRemedy() {
   return VEDIC_REMEDIES[day % VEDIC_REMEDIES.length]
 }
 
-function getProgramDay(profileId: string): { label: string; isRest: boolean } {
-  const scheduled = getScheduledDay(profileId)
+function getProgramDay(daysPerWeek: number): { label: string; isRest: boolean } {
+  const scheduled = getScheduledDay(daysPerWeek)
   return scheduled.kind === 'train'
     ? { label: scheduled.dayLabel, isRest: false }
     : { label: scheduled.label, isRest: true }
@@ -52,6 +52,7 @@ export default function Dashboard() {
   const [checkInOpen, setCheckInOpen] = useState(false)
   const [dashTab, setDashTab] = useState<DashTab>('today')
   const { activeId } = useProfileStore()
+  const trainingDays = useProfileSettingsStore(st => st.trainingDays)
   const profileName = useProfileName()
 
   useEffect(() => { checkAndReset(today) }, [checkAndReset, today])
@@ -91,7 +92,7 @@ export default function Dashboard() {
 
   const planetaryDay = getPlanetaryDay()
   const dailyRemedy = getDailyRemedy()
-  const { label: programDayLabel, isRest } = getProgramDay(activeId)
+  const { label: programDayLabel, isRest } = getProgramDay(trainingDays)
   const program = isRest ? null : getProgram(activeId)[programDayLabel]
 
   const targets = isTrainingDay

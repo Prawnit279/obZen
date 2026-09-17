@@ -54,19 +54,50 @@ describe('Obzen Program', () => {
     expect(PRONIT_PROGRAM['Day 1'].focus).not.toBe(AISHWARYA_PROGRAM['Day 1'].focus)
   })
 
-  it('rests Sunday and Thursday, and rotates the days otherwise', () => {
-    // The fixed per-profile schedule table went with the second profile; this
-    // rotation is what everyone gets now. 2026-08-10 is a Monday.
-    const monday = new Date(2026, 7, 10)
-    const at = (offset: number) => {
-      const d = new Date(monday)
-      d.setDate(monday.getDate() + offset)
-      return getScheduledDay(undefined, d)
+  // 2026-08-10 is a Monday.
+  const monday = new Date(2026, 7, 10)
+  const at = (days: number, offset: number) => {
+    const d = new Date(monday)
+    d.setDate(monday.getDate() + offset)
+    return getScheduledDay(days, d)
+  }
+  /** Offsets from Monday that are training days, for a given plan. */
+  const trainingOffsets = (days: number) =>
+    [0, 1, 2, 3, 4, 5, 6].filter(o => at(days, o).kind === 'train')
+
+  it('schedules exactly as many training days as the plan asks for', () => {
+    // It used to ignore the setting and call five days a week training whatever
+    // the plan said, reporting two missed sessions a week to anyone on three.
+    for (const days of [2, 3, 4, 5, 6]) {
+      expect(trainingOffsets(days), `${days} days`).toHaveLength(days)
     }
-    expect(at(6).kind).toBe('off')                                 // Sun
-    expect(at(3).kind).toBe('off')                                 // Thu
-    for (const day of [0, 1, 2, 4, 5]) {
-      expect(at(day).kind).toBe('train')
+  })
+
+  it('spreads them rather than stacking them', () => {
+    // Rest between sessions is the point of choosing fewer of them. Three days
+    // go Mon/Wed/Fri, not Mon/Tue/Wed.
+    expect(trainingOffsets(3)).toEqual([0, 2, 4])
+    expect(trainingOffsets(2)).toEqual([0, 3])
+  })
+
+  it('keeps Sunday free until the week is nearly full', () => {
+    for (const days of [2, 3, 4, 5]) {
+      expect(trainingOffsets(days), `${days} days`).not.toContain(6)
+    }
+  })
+
+  it('falls back to three days for a count it does not recognise', () => {
+    // Storage can hand back anything; a plan of zero days is not a rest week.
+    expect(trainingOffsets(0)).toEqual(trainingOffsets(3))
+    expect(trainingOffsets(99)).toEqual(trainingOffsets(3))
+  })
+
+  it('names a programme day for every training day it schedules', () => {
+    for (const days of [2, 3, 4, 5, 6]) {
+      for (const offset of trainingOffsets(days)) {
+        const entry = at(days, offset)
+        expect(entry.kind === 'train' && entry.dayLabel, `${days}d +${offset}`).toMatch(/^Day \d$/)
+      }
     }
   })
 

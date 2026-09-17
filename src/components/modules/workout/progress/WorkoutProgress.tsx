@@ -99,6 +99,7 @@ export function WorkoutProgress() {
 
   // Read before the loading and empty-state returns below — a hook after an
   // early return runs on some renders and not others.
+  const trainingDays = useProfileSettingsStore(st => st.trainingDays)
   const barMode = useProfileSettingsStore(st => st.barMode)
   const setBarMode = useProfileSettingsStore(st => st.setBarMode)
 
@@ -205,7 +206,7 @@ export function WorkoutProgress() {
   // each other. Both read from what is already computed above.
   const attendance = adherence(
     mine,
-    date => getScheduledDay(activeId, date).kind === 'train',
+    date => getScheduledDay(trainingDays, date).kind === 'train',
     todayISO(),
   )
   const balance = liftBalance(total.lifts)

@@ -170,11 +170,41 @@ export function getProgram(_profileId?: string): Record<string, ProgramDay> {
  * against three — a pre-existing mismatch, left as it was rather than changed
  * silently here.
  */
-export function getScheduledDay(_profileId?: string, date = new Date()): ScheduleEntry {
+/**
+ * Which weekdays a given number of training days falls on.
+ *
+ * Spread rather than stacked: three days go Monday, Wednesday, Friday, not
+ * Monday, Tuesday, Wednesday. Rest between sessions is the point of choosing
+ * fewer of them, and a plan that ran them back to back would be a different
+ * plan from the one asked for.
+ *
+ * Sunday is the last day to be given away, at six.
+ */
+const WEEKDAYS_BY_COUNT: Record<number, number[]> = {
+  2: [1, 4],                 // Mon, Thu
+  3: [1, 3, 5],              // Mon, Wed, Fri
+  4: [1, 2, 4, 5],           // Mon, Tue, Thu, Fri
+  5: [1, 2, 3, 5, 6],        // Mon, Tue, Wed, Fri, Sat
+  6: [1, 2, 3, 4, 5, 6],     // Mon–Sat
+}
+
+/**
+ * What is scheduled on `date` for a plan of `daysPerWeek` training days.
+ *
+ * Takes the day count rather than reading it, so this stays a pure function of
+ * its arguments and can be tested without a store. It used to ignore the
+ * setting entirely and call five days a week training whatever the plan said,
+ * which reported two missed sessions a week to anyone training three.
+ */
+export function getScheduledDay(daysPerWeek = 3, date = new Date()): ScheduleEntry {
+  const training = WEEKDAYS_BY_COUNT[daysPerWeek] ?? WEEKDAYS_BY_COUNT[3]
   const weekday = date.getDay()
-  if (weekday === 0 || weekday === 4) return { kind: 'off', label: 'Rest Day' }
+  const index = training.indexOf(weekday)
+  if (index === -1) return { kind: 'off', label: 'Rest Day' }
+
+  // Rotate through the programme's day templates in order.
   const days = Object.keys(PRONIT_PROGRAM)
-  return { kind: 'train', dayLabel: days[weekday % days.length] }
+  return { kind: 'train', dayLabel: days[index % days.length] }
 }
 
 /**
