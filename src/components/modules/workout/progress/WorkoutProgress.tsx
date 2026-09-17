@@ -24,6 +24,7 @@ import { useBlockStore } from '@/store/useBlockStore'
 import type { BarMode } from '@/lib/barWeight'
 import { LiftTrendCard } from './LiftTrendCard'
 import { BlockCard } from './BlockCard'
+import { AmrapHistoryCard } from './AmrapHistoryCard'
 import { LineChart, BarChart, ChartEmpty, liftHue } from './Charts'
 import {
   liftSignals, prFeed, sessionLoads, acwr, deloadAdvice, adherence, liftBalance,
@@ -289,6 +290,8 @@ export function WorkoutProgress() {
       {block && (
         <BlockCard block={block} todayISO={todayISO()} onEnd={endBlock} />
       )}
+
+      {block && <AmrapHistoryCard block={block} sessions={mine} />}
 
       <LiftTrendCard
         sessions={mine}

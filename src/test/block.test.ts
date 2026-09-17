@@ -7,7 +7,7 @@
  * its own tests, rather than being restated here.
  */
 import { describe, it, expect } from 'vitest'
-import { weekPrescription, blockProgress } from '@/lib/block'
+import { weekPrescription, blockProgress, amrapHistory } from '@/lib/block'
 import type { ActiveBlock } from '@/store/useBlockStore'
 import { fiveThreeOneWave, bbbSet } from '@/lib/strengthTools'
 import { programById } from '@/data/programs'
@@ -143,5 +143,127 @@ describe('blockProgress', () => {
 
   it('reports nothing before the block began', () => {
     expect(blockProgress(block(), '2026-09-01')).toBeNull()
+  })
+})
+
+// ── Top sets against what was asked for ──────────────────────────────────────
+
+describe('amrapHistory', () => {
+  /** A session holding one lift's sets, weights in pounds as they are logged. */
+  function session(date: string, exerciseId: string, sets: [number, number][]) {
+    return {
+      date,
+      dayLabel: 'Day 1' as const,
+      profileId: 'pronit',
+      order: [exerciseId],
+      exercises: [{
+        exerciseId,
+        status: 'complete' as const,
+        sets: sets.map(([weight, reps], i) => ({
+          setNumber: i + 1, weight, reps,
+          unit: 'lbs' as const, timestamp: `${date}T10:0${i}:00.000Z`,
+        })),
+      }],
+    }
+  }
+
+  /** Week one off a 315 training max: 205, 235, 270 — the last one an AMRAP. */
+  const weekOne = (date: string, topReps: number) =>
+    session(date, 'barbell-squat', [[160, 5], [190, 5], [225, topReps]])
+
+  it('reads the heaviest set of the day as the top set', () => {
+    const [attempt] = amrapHistory(block(), [weekOne(wk(1), 8)], 'barbell-squat')
+    expect(attempt.reps).toBe(8)
+    // 225 logged as plates, plus the 45 lb bar.
+    expect(attempt.weightLb).toBeCloseTo(270, 0)
+  })
+
+  it('compares the reps against the week, not against a fixed number', () => {
+    // Five-plus in week one, three-plus in week two, one-plus in week three.
+    const history = amrapHistory(block(), [
+      weekOne(wk(1), 7), weekOne(wk(2), 5), weekOne(wk(3), 3),
+    ], 'barbell-squat')
+    expect(history.map(a => a.targetReps)).toEqual([5, 3, 1])
+    expect(history.map(a => a.repsVsTarget)).toEqual([2, 2, 2])
+  })
+
+  it('takes the rep target from the wave rather than restating it', () => {
+    // The same source the prescription uses, so the two cannot disagree.
+    for (const week of [1, 2, 3] as const) {
+      const amrap = fiveThreeOneWave(315, week).find(s => s.isAmrap)!
+      const [attempt] = amrapHistory(block(), [weekOne(wk(week), 4)], 'barbell-squat')
+      expect(attempt.targetReps).toBe(Number(amrap.reps.replace('+', '')))
+    }
+  })
+
+  it('reports coming up short as a negative', () => {
+    const [attempt] = amrapHistory(block(), [weekOne(wk(1), 3)], 'barbell-squat')
+    expect(attempt.repsVsTarget).toBe(-2)
+  })
+
+  it('skips the deload week, which has no top set to beat', () => {
+    expect(amrapHistory(block(), [weekOne(wk(4), 5)], 'barbell-squat')).toEqual([])
+  })
+
+  it('ignores anything logged before the block began', () => {
+    // Four consecutive days, so they cover all four positions in the cycle. A
+    // single date could be excluded for landing on a deload rather than for
+    // predating the block, and would still pass with the start date ignored.
+    const before = ['2026-09-03', '2026-09-04', '2026-09-05', '2026-09-06']
+    expect(amrapHistory(block(), before.map(d => weekOne(d, 9)), 'barbell-squat')).toEqual([])
+  })
+
+  it('counts the first day of the block itself', () => {
+    // The boundary the test above leans on: excluded up to the start, included
+    // from it.
+    expect(amrapHistory(block(), [weekOne(START, 6)], 'barbell-squat')).toHaveLength(1)
+  })
+
+  it('ignores other lifts', () => {
+    const history = amrapHistory(block(), [
+      weekOne(wk(1), 6),
+      session(wk(1), 'bench-press', [[185, 4]]),
+    ], 'barbell-squat')
+    expect(history).toHaveLength(1)
+    expect(history[0].exerciseId).toBe('barbell-squat')
+  })
+
+  it('gives nothing for a lift the block carries no training max for', () => {
+    // The same rule the prescription follows: absent beats guessed. Without a
+    // training max there is no wave, so there is no target to have missed.
+    const history = amrapHistory(block(), [session(wk(1), 'deadlift', [[315, 5]])], 'deadlift')
+    expect(history).toEqual([])
+  })
+
+  it('skips a session where the lift was only warmed up, never logged', () => {
+    const empty = { ...session(wk(1), 'barbell-squat', []), exercises: [
+      { exerciseId: 'barbell-squat', status: 'skipped' as const, sets: [] },
+    ] }
+    expect(amrapHistory(block(), [empty], 'barbell-squat')).toEqual([])
+  })
+
+  it('returns attempts oldest first, whatever order the sessions arrive in', () => {
+    const history = amrapHistory(block(), [
+      weekOne(wk(3), 1), weekOne(wk(1), 5), weekOne(wk(2), 3),
+    ], 'barbell-squat')
+    expect(history.map(a => a.date)).toEqual([wk(1), wk(2), wk(3)])
+  })
+
+  it('says what the week prescribed, so a mismatched weight is visible', () => {
+    const [attempt] = amrapHistory(block(), [weekOne(wk(1), 5)], 'barbell-squat')
+    const amrap = fiveThreeOneWave(315, 1).find(s => s.isAmrap)!
+    expect(attempt.prescribedWeightLb).toBe(amrap.weight)
+  })
+
+  it('estimates a max from the set, so a rep PR shows as a strength gain', () => {
+    const [five, eight] = [5, 8].map(
+      r => amrapHistory(block(), [weekOne(wk(1), r)], 'barbell-squat')[0]
+    )
+    expect(eight.e1rmLb).toBeGreaterThan(five.e1rmLb)
+  })
+
+  it('gives nothing for a programme with no wave encoded', () => {
+    const tb = block({ programId: 'tactical-barbell', templateId: 'operator' })
+    expect(amrapHistory(tb, [weekOne(wk(1), 5)], 'barbell-squat')).toEqual([])
   })
 })
