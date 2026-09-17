@@ -585,3 +585,88 @@ describe('suggestProgression — her plan\'s add-load rule', () => {
     expect(topOfRepRange('5')).toBe(5)
   })
 })
+
+// ── Main work against assistance ─────────────────────────────────────────────
+
+describe('splitting main work from supplemental', () => {
+  /** A set marked supplemental, as the logger's toggle marks it. */
+  const supp = (weight: number, reps: number): LoggedSet =>
+    ({ ...set(weight, reps), isSupplemental: true })
+
+  /** Three heavy singles and fifty light reps — a Boring But Big day. */
+  const bbbDay = session('2026-08-10', 'deadlift', [
+    set(100, 1), set(100, 1), set(100, 1),
+    supp(50, 10), supp(50, 10), supp(50, 10), supp(50, 10), supp(50, 10),
+  ])
+
+  it('counts everything by default, exactly as before', () => {
+    const [week] = weeklyVolume([bbbDay])
+    expect(week.sets).toBe(8)
+    expect(week.tonnageKg).toBeCloseTo((100 + BAR) * 3 + (50 + BAR) * 50, 2)
+  })
+
+  it('counts only the working sets as main', () => {
+    const [week] = weeklyVolume([bbbDay], 0, 'main')
+    expect(week.sets).toBe(3)
+    expect(week.tonnageKg).toBeCloseTo((100 + BAR) * 3, 2)
+  })
+
+  it('counts only the assistance as supplemental', () => {
+    const [week] = weeklyVolume([bbbDay], 0, 'supplemental')
+    expect(week.sets).toBe(5)
+    expect(week.tonnageKg).toBeCloseTo((50 + BAR) * 50, 2)
+  })
+
+  it('adds back up to the whole', () => {
+    // The split is a partition, not two overlapping filters.
+    const [all] = weeklyVolume([bbbDay])
+    const [main] = weeklyVolume([bbbDay], 0, 'main')
+    const [supplemental] = weeklyVolume([bbbDay], 0, 'supplemental')
+    expect(main.sets + supplemental.sets).toBe(all.sets)
+    expect(main.tonnageKg + supplemental.tonnageKg).toBeCloseTo(all.tonnageKg, 6)
+  })
+
+  it('shows why one total was not enough', () => {
+    // Fifty reps at half the weight outweigh the three sets they hang off, so
+    // a single figure describes the assistance rather than the training.
+    const [main] = weeklyVolume([bbbDay], 0, 'main')
+    const [supplemental] = weeklyVolume([bbbDay], 0, 'supplemental')
+    expect(supplemental.tonnageKg).toBeGreaterThan(main.tonnageKg * 2)
+  })
+
+  it('reads an unmarked set as main work, never as supplemental', () => {
+    // Everything logged before the marker existed has no value at all. Main is
+    // the safe reading: an unmarked history keeps counting as it always did.
+    const old = session('2026-08-10', 'deadlift', [set(100, 5)])
+    expect(weeklyVolume([old], 0, 'main')[0].sets).toBe(1)
+    expect(weeklyVolume([old], 0, 'supplemental')[0].sets).toBe(0)
+  })
+
+  it('keeps a trained week with no assistance distinct from a week off', () => {
+    // The filter empties a week without removing it, which is the distinction
+    // worth keeping: trained-and-did-none reads as a zero, while a week that
+    // was never trained stays absent entirely, as it does for any other
+    // reading.
+    const trained = session('2026-08-10', 'deadlift', [set(100, 5)])
+    const supplemental = weeklyVolume([trained], 0, 'supplemental')
+
+    expect(supplemental).toHaveLength(1)
+    expect(supplemental[0].week).toBe(isoWeekKey('2026-08-10'))
+    expect(supplemental[0]).toMatchObject({ sets: 0, tonnageKg: 0 })
+    expect(supplemental.find(v => v.week === isoWeekKey('2026-08-24'))).toBeUndefined()
+  })
+
+  it('splits a single exercise entry, since that is where both kinds live', () => {
+    // A session holds each exercise once, so the supplemental sets of a lift
+    // sit in the same entry as its main work. A split per exercise could not
+    // have worked.
+    expect(bbbDay.exercises).toHaveLength(1)
+    expect(exerciseTonnage(bbbDay.exercises[0], 0, 'main'))
+      .toBeCloseTo((100 + BAR) * 3, 2)
+  })
+
+  it('still ignores placeholder rows in either half', () => {
+    const withPlaceholder = session('2026-08-10', 'deadlift', [set(100, 5), placeholder])
+    expect(weeklyVolume([withPlaceholder], 0, 'main')[0].sets).toBe(1)
+  })
+})

@@ -245,10 +245,14 @@ export function isoWeekKey(dateISO: string): string {
  * `bodyweightKg` defaults to 0, which leaves pure barbell and machine work
  * exactly as it was.
  */
-export function exerciseTonnage(ex: ExerciseSessionState, bodyweightKg = 0): number {
+export function exerciseTonnage(
+  ex: ExerciseSessionState,
+  bodyweightKg = 0,
+  kind: SetKind = 'all'
+): number {
   if (trackingModeFor(ex.exerciseId) === 'timed') return 0
 
-  return realSets(ex).reduce(
+  return realSets(ex).filter(s => isSetKind(s, kind)).reduce(
     (sum, s) => sum + setLoadKg(ex.exerciseId, s, bodyweightKg) * s.reps,
     0
   )
@@ -261,21 +265,49 @@ export interface WeeklyVolume {
 }
 
 /**
+ * Which half of a session's work to count.
+ *
+ * Supplemental is assistance volume — Boring But Big's five sets of ten and
+ * its like — and it swamps the main sets it hangs off: fifty reps at half a
+ * training max outweighs fifteen heavy ones, so a single total says more about
+ * the assistance than about the training. A set is supplemental only if it was
+ * marked so in the logger; everything else, including every set logged before
+ * the marker existed, is main work. That asymmetry is deliberate — an
+ * unmarked history reads as it always did rather than being reinterpreted.
+ */
+export type SetKind = 'all' | 'main' | 'supplemental'
+
+export function isSetKind(s: LoggedSet, kind: SetKind): boolean {
+  if (kind === 'all') return true
+  const supplemental = s.isSupplemental === true
+  return kind === 'supplemental' ? supplemental : !supplemental
+}
+
+/**
  * Total tonnage and set count per ISO week, oldest first.
  *
  * Only weeks that were actually trained appear — a week off is absent rather
  * than zero, so callers must look the current week up by key instead of taking
  * the last entry. `fillWeeks` expands a range for charting.
+ *
+ * `kind` narrows what counts without changing which weeks appear: a week that
+ * was trained but held no supplemental work comes back as a zero, while a week
+ * off is still absent. The two mean different things and the caller can tell
+ * them apart.
  */
-export function weeklyVolume(sessions: WorkoutDaySession[], bodyweightKg = 0): WeeklyVolume[] {
+export function weeklyVolume(
+  sessions: WorkoutDaySession[],
+  bodyweightKg = 0,
+  kind: SetKind = 'all'
+): WeeklyVolume[] {
   const byWeek = new Map<string, WeeklyVolume>()
   for (const session of sessions) {
     const week = isoWeekKey(session.date)
     const prev = byWeek.get(week) ?? { week, tonnageKg: 0, sets: 0 }
     const totals = session.exercises.reduce(
       (acc, ex) => ({
-        tonnageKg: acc.tonnageKg + exerciseTonnage(ex, bodyweightKg),
-        sets: acc.sets + realSets(ex).length,
+        tonnageKg: acc.tonnageKg + exerciseTonnage(ex, bodyweightKg, kind),
+        sets: acc.sets + realSets(ex).filter(s => isSetKind(s, kind)).length,
       }),
       { tonnageKg: prev.tonnageKg, sets: prev.sets }
     )

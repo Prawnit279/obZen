@@ -17,11 +17,23 @@ afterEach(cleanup)
 
 const TODAY = '2026-09-17'
 
-/** 10,000 lb across 8 sets, in the week containing today. */
-const volume = [{ week: isoWeekKey(TODAY), tonnageKg: lbToKg(10_000), sets: 8 }]
+const WEEK = isoWeekKey(TODAY)
 
-function show() {
-  render(<WeeklyVolumeCard volume={volume} todayISO={TODAY} />)
+/** 10,000 lb across 8 sets, in the week containing today. */
+const volume = [{ week: WEEK, tonnageKg: lbToKg(10_000), sets: 8 }]
+/** Of which 6,000 lb over 3 sets is main work and 4,000 lb over 5 is assistance. */
+const main = [{ week: WEEK, tonnageKg: lbToKg(6_000), sets: 3 }]
+const supplemental = [{ week: WEEK, tonnageKg: lbToKg(4_000), sets: 5 }]
+
+function show(split = { main, supplemental }) {
+  render(
+    <WeeklyVolumeCard
+      volume={volume}
+      main={split.main}
+      supplemental={split.supplemental}
+      todayISO={TODAY}
+    />
+  )
   return {
     tonnage: screen.getByRole('button', { name: 'Tonnage' }),
     sets: screen.getByRole('button', { name: 'Sets' }),
@@ -53,5 +65,29 @@ describe('WeeklyVolumeCard', () => {
     await userEvent.click(sets)
     await userEvent.click(tonnage)
     expect(screen.getByText(/10k lb/)).toBeInTheDocument()
+  })
+})
+
+describe('the main/supplemental split', () => {
+  it('breaks this week down once assistance has been marked', () => {
+    show()
+    expect(screen.getByText('6,000 lb')).toBeInTheDocument()
+    expect(screen.getByText('4,000 lb')).toBeInTheDocument()
+  })
+
+  it('follows the toggle into set counts', async () => {
+    const { sets } = show()
+    await userEvent.click(sets)
+    expect(screen.getByText('3 sets')).toBeInTheDocument()
+    expect(screen.getByText('5 sets')).toBeInTheDocument()
+  })
+
+  it('stays away entirely when nothing has been marked supplemental', () => {
+    // Every set is main work by definition until something is marked, and a
+    // row reading "supplemental 0" would suggest the assistance had gone
+    // missing rather than never having been distinguished.
+    show({ main: volume, supplemental: [{ week: WEEK, tonnageKg: 0, sets: 0 }] })
+    expect(screen.queryByText('Main work')).not.toBeInTheDocument()
+    expect(screen.queryByText('Supplemental')).not.toBeInTheDocument()
   })
 })
