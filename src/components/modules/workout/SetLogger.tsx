@@ -17,15 +17,18 @@ interface SetRowProps {
   saved: boolean
 }
 
+/** The optional markers a set can carry. */
+type SetFlag = 'isAmrap' | 'isSupplemental'
+
 /**
- * Carry the AMRAP flag onto a set, leaving the key off entirely when it is not
- * one — every stored row and every backup would otherwise gain a `false` that
- * says nothing.
+ * Carry a flag onto a set, leaving the key off entirely when it is not set —
+ * every stored row and every backup would otherwise gain a `false` that says
+ * nothing.
  */
-function withAmrap(base: LoggedSet, isAmrap: boolean): LoggedSet {
-  if (isAmrap) return { ...base, isAmrap: true }
+function withFlag(base: LoggedSet, flag: SetFlag, on: boolean): LoggedSet {
+  if (on) return { ...base, [flag]: true }
   const next = { ...base }
-  delete next.isAmrap
+  delete next[flag]
   return next
 }
 
@@ -34,6 +37,7 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
   const [reps, setReps] = useState(set.reps > 0 ? String(set.reps) : '')
   const [unit, setUnit] = useState<'lbs' | 'kg'>(set.unit)
   const [isAmrap, setIsAmrap] = useState(set.isAmrap === true)
+  const [isSupplemental, setIsSupplemental] = useState(set.isSupplemental === true)
   const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const [showDelete, setShowDelete] = useState(false)
 
@@ -42,7 +46,7 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
     const r = parseInt(reps, 10)
     if (isNaN(w) || isNaN(r) || r <= 0) return
     const saved: LoggedSet = { ...set, weight: w, reps: r, unit, timestamp: new Date().toISOString() }
-    onSave(withAmrap(saved, isAmrap))
+    onSave(withFlag(withFlag(saved, 'isAmrap', isAmrap), 'isSupplemental', isSupplemental))
   }
 
   const handlePressStart = () => {
@@ -129,6 +133,24 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
           {units.countLabel}{isAmrap ? '+' : ''}
         </button>
       )}
+
+      {/* Assistance volume — the five-by-ten sort — kept apart from the main
+          working sets. It has to be recorded here because nothing downstream
+          can tell the two apart: they share an exercise entry, and a
+          supplemental set at half the training max weighs the same as a
+          warm-up. Off by default, so a set nobody marks counts as main work. */}
+      <button
+        onClick={() => setIsSupplemental(v => !v)}
+        aria-pressed={isSupplemental}
+        aria-label={`Mark set ${set.setNumber} as supplemental volume`}
+        className="shrink-0 transition-colors"
+        style={{
+          fontSize: 'var(--text-sm)',
+          color: isSupplemental ? 'var(--complete-text)' : 'var(--ink-faint)',
+        }}
+      >
+        supp
+      </button>
 
       {/* Save or delete */}
       {showDelete ? (
@@ -218,8 +240,15 @@ export function SetLogger({ exerciseId, sets, onAddSet, onUpdateSet, onRemoveSet
         {barLb > 0 && (
           <span style={{ color: 'var(--ink-dim)' }}> · plates only, {barLb} lb bar added</span>
         )}
-        {!units.isDuration && (
-          <span style={{ color: 'var(--ink-faint)' }}> · tap “{units.countLabel}” for an AMRAP</span>
+        {/* The AMRAP toggle needs saying because it is disguised as a label —
+            the count doubles as the control. "supp" is a control on its face,
+            so it rides along in the same clause rather than earning another. */}
+        {!units.isDuration ? (
+          <span style={{ color: 'var(--ink-faint)' }}>
+            {' '}· tap “{units.countLabel}” for an AMRAP, “supp” for assistance
+          </span>
+        ) : (
+          <span style={{ color: 'var(--ink-faint)' }}> · tap “supp” for assistance</span>
         )}
       </div>
 

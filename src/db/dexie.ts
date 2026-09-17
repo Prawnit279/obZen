@@ -188,6 +188,21 @@ export interface LoggedSet {
    * indexes, and sets logged before this simply have no value.
    */
   isAmrap?: boolean
+  /**
+   * Marked as supplemental — assistance volume such as Boring But Big's five
+   * sets of ten, as opposed to the main working sets.
+   *
+   * Recorded rather than inferred because it cannot be inferred: a session
+   * keys its exercises by id and holds each one once, so the supplemental sets
+   * of a lift sit in the same entry as its main work, and the warm-ups at
+   * 40–60% of a training max overlap the 50% supplemental weight exactly.
+   * Weight and reps together still cannot separate them reliably, and a volume
+   * split built on a guess would be a wrong number rather than a missing one.
+   *
+   * Non-indexed, so this needs no schema version, and sets logged before it
+   * simply have no value — which reads as main work, the safer default.
+   */
+  isSupplemental?: boolean
 }
 
 export interface ExerciseSessionState {
