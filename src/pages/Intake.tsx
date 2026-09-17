@@ -6,6 +6,7 @@ import { useIntakeStore } from '@/store/useIntakeStore'
 import { answeredCount } from '@/lib/intake'
 import { INTAKE_QUESTIONS } from '@/data/intake-questions'
 import { Card } from '@/components/ui/Card'
+import { ProgramMatchCard } from '@/components/modules/intake/ProgramMatchCard'
 import { Button } from '@/components/ui/Button'
 
 /**
@@ -62,6 +63,8 @@ export default function Intake() {
             <Button variant="ghost" onClick={() => navigate('/settings')}>Done</Button>
           </div>
         </Card>
+
+        <ProgramMatchCard answers={answers} />
       </div>
     )
   }
