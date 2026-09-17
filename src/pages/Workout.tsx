@@ -20,6 +20,7 @@ import { useWorkoutDayStore, selectDaySession, selectOrderedExercises } from '@/
 import type { ExerciseSessionState } from '@/db/dexie'
 import { DaySummaryBar } from '@/components/modules/workout/DaySummaryBar'
 import { SortableExerciseList } from '@/components/modules/workout/SortableExerciseList'
+import { CircuitsCard } from '@/components/modules/workout/CircuitsCard'
 import { AddExerciseSheet } from '@/components/modules/workout/AddExerciseSheet'
 import { WorkoutHistory } from '@/components/modules/workout/WorkoutHistory'
 import { SegmentedPill } from '@/components/ui/SegmentedPill'
@@ -268,6 +269,20 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
           progressions={progressions}
         />
       )}
+
+      {/* Circuits, built from what is already in the day. */}
+      <CircuitsCard
+        session={session}
+        onCreate={(name, rounds, exerciseIds) => store.createCircuit(
+          dayLabel,
+          { id: `c-${Date.now().toString(36)}`, name, rounds },
+          exerciseIds,
+          sessionDate
+        )}
+        onDrop={id => store.dropCircuit(dayLabel, id, sessionDate)}
+        onRounds={(id, rounds) => store.changeCircuitRounds(dayLabel, id, rounds, sessionDate)}
+        onPullOut={exerciseId => store.pullFromCircuit(dayLabel, exerciseId, sessionDate)}
+      />
 
       {/* Add Exercise button */}
       <button

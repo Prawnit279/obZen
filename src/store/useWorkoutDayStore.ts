@@ -1,8 +1,11 @@
 import { create } from 'zustand'
 import { db } from '@/db/dexie'
-import type { WorkoutDaySession, ExerciseSessionState, LoggedSet, DayLabel } from '@/db/dexie'
+import type { WorkoutDaySession, ExerciseSessionState, LoggedSet, DayLabel, Circuit } from '@/db/dexie'
 import { todayISO } from '@/lib/utils'
 import { getProgram, formatTarget, toExerciseId, LIBRARY_BY_ID } from '@/data/obzen-program'
+import {
+  addCircuit, removeCircuit, setCircuitRounds, removeFromCircuit, emptyCircuitIds,
+} from '@/lib/circuits'
 import { useProfileStore } from '@/store/useProfileStore'
 import { sessionProfile } from '@/lib/workoutSession'
 
@@ -58,6 +61,12 @@ interface WorkoutDayState {
   removeExercise: (dayLabel: DayLabel, exerciseId: string, date?: string) => Promise<void>
   swapExercise: (dayLabel: DayLabel, exerciseId: string, toName: string, date?: string) => Promise<void>
   setExerciseNote: (dayLabel: DayLabel, exerciseId: string, note: string, date?: string) => Promise<void>
+  /** Groups exercises already in the session into a circuit. */
+  createCircuit: (dayLabel: DayLabel, circuit: Circuit, exerciseIds: string[], date?: string) => Promise<void>
+  /** Ungroups a circuit. The exercises and their sets stay in the session. */
+  dropCircuit: (dayLabel: DayLabel, circuitId: string, date?: string) => Promise<void>
+  changeCircuitRounds: (dayLabel: DayLabel, circuitId: string, rounds: number, date?: string) => Promise<void>
+  pullFromCircuit: (dayLabel: DayLabel, exerciseId: string, date?: string) => Promise<void>
   updateExerciseUnit: (dayLabel: DayLabel, exerciseId: string, unit: 'lbs' | 'kg', date?: string) => Promise<void>
 }
 
@@ -281,6 +290,31 @@ export const useWorkoutDayStore = create<WorkoutDayState>((set, get) => {
           exercises: s.exercises.map(e => (e.exerciseId === exerciseId ? replacement : e)),
           order: s.order.map(id => (id === exerciseId ? newId : id)),
         }
+      })
+    },
+
+    createCircuit: async (dayLabel, circuit, exerciseIds, date = todayISO()) => {
+      const key = `${activeProfile()}::${dayLabel}::${date}`
+      await mutate(key, sess => addCircuit(sess, circuit, exerciseIds))
+    },
+
+    dropCircuit: async (dayLabel, circuitId, date = todayISO()) => {
+      const key = `${activeProfile()}::${dayLabel}::${date}`
+      await mutate(key, sess => removeCircuit(sess, circuitId))
+    },
+
+    changeCircuitRounds: async (dayLabel, circuitId, rounds, date = todayISO()) => {
+      const key = `${activeProfile()}::${dayLabel}::${date}`
+      await mutate(key, sess => setCircuitRounds(sess, circuitId, rounds))
+    },
+
+    pullFromCircuit: async (dayLabel, exerciseId, date = todayISO()) => {
+      const key = `${activeProfile()}::${dayLabel}::${date}`
+      // Sweeping any circuit this empties, so none is left as a heading with
+      // nothing under it.
+      await mutate(key, sess => {
+        const without = removeFromCircuit(sess, exerciseId)
+        return emptyCircuitIds(without).reduce(removeCircuit, without)
       })
     },
 
