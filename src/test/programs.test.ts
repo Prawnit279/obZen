@@ -10,7 +10,7 @@ import { describe, it, expect } from 'vitest'
 import {
   recommendProgram, cyclePosition, recoveryHeadroom, SELECTION_QUESTIONS,
 } from '@/lib/programs'
-import { PROGRAMS, programById, AVAILABLE_PROGRAMS } from '@/data/programs'
+import { PROGRAMS, programById, AVAILABLE_PROGRAMS, templatesFor, isTemplateReady } from '@/data/programs'
 import type { IntakeAnswers } from '@/lib/intake'
 
 const single = (value: string) => ({ kind: 'single' as const, value })
@@ -215,5 +215,59 @@ describe('recoveryHeadroom', () => {
 
   it('will judge on one answer rather than refusing', () => {
     expect(recoveryHeadroom({ sleep: single('under-5') })).toBe('low')
+  })
+})
+
+// ── Templates ────────────────────────────────────────────────────────────────
+
+describe('programme templates', () => {
+  it('offers four templates to choose between for the concurrent programme', () => {
+    const tb = programById('tactical-barbell')!
+    expect(tb.templates?.map(t => t.id)).toEqual(['operator', 'fighter', 'zulu', 'gladiator'])
+    expect(templatesFor('tactical-barbell')).toHaveLength(4)
+  })
+
+  it('leaves programmes with one shape without templates', () => {
+    expect(programById('five-three-one')?.templates).toBeUndefined()
+    expect(templatesFor('five-three-one')).toEqual([])
+  })
+
+  it('holds no template numbers that were not supplied', () => {
+    // The guard this whole structure exists for. A percentage invented here
+    // would read exactly like one from the book.
+    for (const t of templatesFor('tactical-barbell')) {
+      expect(t.weeks, t.id).toBeNull()
+      expect(t.daysPerWeek, t.id).toBeNull()
+      expect(t.worksFrom, t.id).toBeNull()
+      expect(t.progression, t.id).toBeNull()
+    }
+  })
+
+  it('reports every template as not yet followable', () => {
+    for (const t of templatesFor('tactical-barbell')) {
+      expect(isTemplateReady(t), t.id).toBe(false)
+    }
+  })
+
+  it('recognises a template as ready once its numbers are there', () => {
+    // What supplying them looks like, and the check that will flip.
+    const filled = {
+      id: 'operator', name: 'Operator', blurb: '',
+      daysPerWeek: 3, liftCount: 3, worksFrom: 'training max',
+      progression: 'add weight each block',
+      weeks: [
+        { week: 1, sets: 5, reps: '5', percentOfMax: 70 },
+        { week: 2, sets: 5, reps: '5', percentOfMax: 80 },
+        { week: 3, sets: 5, reps: '5', percentOfMax: 90 },
+      ],
+    }
+    expect(isTemplateReady(filled)).toBe(true)
+  })
+
+  it('names each template and says who it is for', () => {
+    for (const t of templatesFor('tactical-barbell')) {
+      expect(t.name.length, t.id).toBeGreaterThan(2)
+      expect(t.blurb.length, t.id).toBeGreaterThan(20)
+    }
   })
 })

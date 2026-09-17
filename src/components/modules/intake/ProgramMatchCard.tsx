@@ -95,6 +95,12 @@ export function ProgramMatchCard({ answers }: Props) {
               <p style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)', marginTop: 2 }}>
                 Needs {m.program.needs}
               </p>
+              {m.program.templates && (
+                <p style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-ghost)', marginTop: 4 }}>
+                  {m.program.templates.length} templates ready to fill:{' '}
+                  {m.program.templates.map(t => t.name).join(', ')}
+                </p>
+              )}
             </div>
           ))}
         </div>
