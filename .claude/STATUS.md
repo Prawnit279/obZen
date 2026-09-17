@@ -1,5 +1,5 @@
 # obZen — Build Status
-Last updated: 2026-09-13 | SHA: 9290ef8a
+Last updated: 2026-09-17 | SHA: 0b6360f4
 
 Local-first training and drum-practice PWA. One profile, one device, no
 account, no server. Everything lives in IndexedDB and localStorage, and a JSON
@@ -9,7 +9,9 @@ backup is the only way data leaves the phone.
 
 ## Shape of the app
 
-**Navigation:** Home · Train · Progress · Drums · Calendar · More.
+**Navigation:** Home · Train · Progress · Calendar · More. Drums is hidden
+behind `SHOW_DRUMS`, off — the section is intact in the tree, not deleted, so
+turning the flag back on restores it whole.
 
 **One profile.** The two-person switcher is gone. The id string `'pronit'`
 survives as an internal key — sessions are stamped with it, and the bodyweight
@@ -18,8 +20,10 @@ are. Name, Ayurvedic type and training days are editable in Settings; key lifts
 and which Progress panels appear stay in `config/profiles.ts` as programme data.
 
 **Feature flags** (`config/features.ts`), all currently off: Nutrition, Yoga,
-Vedic, Astrology. Yoga's screens and data are still in the tree — its programme
-is also the source of fifteen library exercises, so it cannot simply be deleted.
+Vedic, Astrology, Drums. Yoga's screens and data are still in the tree — its
+programme is also the source of fifteen library exercises, so it cannot simply
+be deleted. Drums is the same shape and for the same reason: the flag gates the
+route, both nav surfaces and the dashboard chart, and nothing was removed.
 
 ---
 
@@ -27,8 +31,9 @@ is also the source of fifteen library exercises, so it cannot simply be deleted.
 
 ### Infrastructure
 - Vite 5 + React 18 + TypeScript strict, Tailwind + CSS custom properties
-- Dexie v4 — 24 tables, schema version 4. Non-indexed fields (`rpe`, `isAmrap`)
-  were added without a version bump; only indexes are versioned.
+- Dexie v4 — 24 tables, schema version 4. Non-indexed fields (`rpe`, `isAmrap`,
+  `isSupplemental`, `circuitId`, `circuits`) were added without a version bump;
+  only indexes are versioned.
 - **10 themes**, five dark and five light. A dark theme is `--bg`, six accent
   steps and three accent channels, nothing more; the light themes share one
   restatement of the whole token set and add only their own ramp. Four
@@ -50,7 +55,7 @@ is also the source of fifteen library exercises, so it cannot simply be deleted.
   bare hex — a chart fill survived the first pass that way.
 - PWA: service worker, manifest, offline-first
 - GitHub Pages deploy on every push to main, with the tests gating it
-- **757 tests**, `src/lib` at 96% of statements
+- **917 tests**, `src/lib` at 96% of statements
 - All type sizes come from `--text-*` tokens (globals.css) — no hardcoded
   `fontSize`/`text-[Npx]` anywhere, including SVG (which needs
   `style={{ fontSize: 'var(...)' }}`, not the `fontSize="N"` attribute — a
@@ -83,7 +88,14 @@ is also the source of fifteen library exercises, so it cannot simply be deleted.
   Tests hold both directions — nothing in the library is unfiled, nothing is
   filed twice, no family names a movement the library lacks, and no family
   spans two muscle groups, which the filter chips assume.
-- Session RPE, and a per-set AMRAP flag that drives the 5/3/1 training max
+- Session RPE, and two per-set flags: **AMRAP**, which drives the 5/3/1 training
+  max and the top-set history, and **supplemental**, which separates assistance
+  volume from main work. Both are recorded rather than inferred — a session
+  holds each exercise once, so a lift's five-by-ten sits in the same entry as
+  its working sets and nothing downstream could tell them apart.
+- **Circuits** — group the day's own exercises into rounds, up to five
+  movements and three or four deep. Ungrouping never deletes. The set logger
+  does not yet know about rounds.
 - Tabs: Program · History · Tools. The open tab lives in the URL.
 
 ### Progress
@@ -100,9 +112,42 @@ whole page.
 - SBD total, DOTS, strength standards, PRs, recent breaks, lift balance
 - **Weight check** — weigh-in log, smoothed trend, read against a goal you set,
   and strength against bodyweight
-- Load & recovery (ACWR), sets per muscle against MEV/MAV/MRV, weekly tonnage,
-  plan vs actual, progression ladders
+- Load & recovery (ACWR), sets per muscle against MEV/MAV/MRV, plan vs actual,
+  progression ladders
+- **Weekly volume**, counted as tonnage or as sets — heavy triples and light
+  tens can land on a similar total while being nothing alike. Once sets are
+  marked supplemental it also splits main work from assistance, which on a
+  five-by-ten week is the difference between 5,110 lb and 10,000 lb.
+- **Current block** — which programme, which week of the cycle, which cycle,
+  whether it is a deload, and the sets this week asks for, supplemental
+  included. Percentages come from `strengthTools`, never restated.
+- **Top sets** — the AMRAP reps against what the week called for, over time.
+  Reads only sets flagged in the logger, the same rule `lib/amrap.ts` applies:
+  an unflagged rep count cannot say whether the lifter stopped by instruction
+  or by limit.
+- **Bar mode** — every total and trend can be read with the bar or as plates
+  only. DOTS and the strength standards never follow it: they are calibrated
+  against real load, so plates-only there would be a wrong score rather than
+  the same strength read differently.
 - Print to PDF through the browser's own dialog
+
+### Programmes
+- `data/programs.ts` holds four: **5/3/1** and **Boring But Big** are
+  `available` and fully encoded; **Tactical Barbell** and **Bigger Leaner
+  Stronger** are `needs-source` and prescribe nothing. Tactical Barbell's four
+  templates — Operator, Fighter, Zulu, Gladiator — are declared with every
+  number `null`, and `isTemplateReady` reports all four as not yet followable.
+  A test pins that none holds a number nobody supplied.
+- **A 20-question intake** (`data/intake-questions.ts`) across six sections,
+  each question recording what it drives. A skipped question is absent, never
+  defaulted.
+- `recommendProgram` scores rather than filters: unanswered questions count
+  neither way, and a programme that cannot be followed never leads. The card
+  shows the reasons for *and* against, and what the recommendation is based on.
+- **Starting a block** records programme, start date and the training maxes it
+  began with, seeded from logged history via `bestCurrentE1RM`. A lift with
+  nothing logged gets no entry rather than a guessed one. `templateId` is
+  always null — a programme offering a choice says so instead of picking one.
 
 ### Everything else
 Drums (timer, 39 rudiments, songs, jams, book library, PDF viewer), Calendar,
@@ -160,9 +205,18 @@ the last review land there.
 | Calendar | Week / day tabs exist, only month renders |
 | Projects | Board cards show a task count of 0 |
 
+### Waiting on numbers
+**Tactical Barbell** cannot prescribe until three things are supplied: the set
+counts and reps per template, the percentages and what they are of (a training
+max and a true max give different weights off the same percentage), and how
+weight moves between blocks. Which templates to offer is settled — all four.
+Nothing here will be guessed; the container holds `null` until the numbers
+arrive. **Bigger Leaner Stronger** is untouched, per instruction.
+
 ### Deferred
 Yoga pose animation rewrite, streaks, focus timer, weekly review, global search,
-progress photos, analytics (external tool).
+progress photos, analytics (external tool). Circuits exist but the set logger
+does not yet know about rounds.
 
 ### Traps worth knowing
 - `exercise-motions-data.ts` type-imports from `exercise-motions.ts`, which
@@ -180,5 +234,12 @@ progress photos, analytics (external tool).
   template.
 - `epley1RM` exists twice with different units — `progress.ts` in kg,
   `strengthTools.ts` in lb. Correct today, easy to import the wrong one.
+- **A rule stated twice is a rule half-tested.** The top-set history guarded the
+  deload both explicitly and through the wave's own `isAmrap` flag; either half
+  could be deleted with every test still passing. Derive the guard once and let
+  the mutation fail.
+- **Set flags are omitted, never `false`.** `isAmrap` and `isSupplemental` are
+  deleted from the object when off, so no stored row or backup gains a key that
+  says nothing. `withFlag` in `SetLogger` is the only place that rule lives.
 - Tools has both a route and a Train tab, the same duplication the Progress tab
   had before it was removed.
