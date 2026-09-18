@@ -1,5 +1,5 @@
 # obZen — Build Status
-Last updated: 2026-09-17 | SHA: 0b6360f4
+Last updated: 2026-09-18 | SHA: 5a952f18
 
 Local-first training and drum-practice PWA. One profile, one device, no
 account, no server. Everything lives in IndexedDB and localStorage, and a JSON
@@ -55,7 +55,7 @@ route, both nav surfaces and the dashboard chart, and nothing was removed.
   bare hex — a chart fill survived the first pass that way.
 - PWA: service worker, manifest, offline-first
 - GitHub Pages deploy on every push to main, with the tests gating it
-- **917 tests**, `src/lib` at 96% of statements
+- **951 tests**, `src/lib` at 96% of statements
 - All type sizes come from `--text-*` tokens (globals.css) — no hardcoded
   `fontSize`/`text-[Npx]` anywhere, including SVG (which needs
   `style={{ fontSize: 'var(...)' }}`, not the `fontSize="N"` attribute — a
@@ -129,6 +129,14 @@ whole page.
   only. DOTS and the strength standards never follow it: they are calibrated
   against real load, so plates-only there would be a wrong score rather than
   the same strength read differently.
+- **Worth knowing** — six readings drawn from what is already recorded: an
+  unkept plan, low recovery against a heavy week, a trained lift the block has
+  no training max for, no marked top set since the block began, an unfinished
+  questionnaire, a weigh-in gone stale behind a goal. Every tip prints what it
+  was read from, none prescribes training, and the card is absent entirely when
+  there is nothing to say. Sits above the view tabs because the tips span all
+  three. Thresholds in `lib/guidance.ts` are reporting thresholds, documented as
+  such — they decide when something is worth mentioning, never what to lift.
 - Print to PDF through the browser's own dialog
 
 ### Programmes
