@@ -21,16 +21,19 @@ import { Card } from '@/components/ui/Card'
 import { SegmentedPill } from '@/components/ui/SegmentedPill'
 import { useProfileSettingsStore } from '@/store/useProfileSettingsStore'
 import { useBlockStore } from '@/store/useBlockStore'
+import { useIntakeStore } from '@/store/useIntakeStore'
 import type { BarMode } from '@/lib/barWeight'
 import { LiftTrendCard } from './LiftTrendCard'
 import { BlockCard } from './BlockCard'
 import { AmrapHistoryCard } from './AmrapHistoryCard'
 import { WeeklyVolumeCard } from './WeeklyVolumeCard'
+import { GuidanceCard } from './GuidanceCard'
 import { LineChart, BarChart, ChartEmpty, liftHue } from './Charts'
 import {
   liftSignals, prFeed, sessionLoads, acwr, deloadAdvice, adherence, liftBalance,
 } from '@/lib/progressTrends'
 import { tmAdvice } from '@/lib/amrap'
+import { guidance } from '@/lib/guidance'
 import { muscleReadings } from '@/lib/muscleVolume'
 import { Stat } from './Stat'
 import { StallCard } from './TrendCards'
@@ -108,6 +111,8 @@ export function WorkoutProgress() {
   const endBlock = useBlockStore(st => st.end)
   const barMode = useProfileSettingsStore(st => st.barMode)
   const setBarMode = useProfileSettingsStore(st => st.setBarMode)
+  const weightGoal = useProfileSettingsStore(st => st.weightGoal)
+  const intakeAnswers = useIntakeStore(st => st.answers)
 
   const { activeId } = useProfileStore()
   const profile = PROFILES[activeId]
@@ -221,6 +226,19 @@ export function WorkoutProgress() {
   )
   const balance = liftBalance(total.lifts)
 
+  // Read from what the cards below already computed, so this cannot disagree
+  // with them about the same week.
+  const tips = guidance({
+    settings: { trainingDays, weightGoal },
+    answers: intakeAnswers,
+    block,
+    sessions: mine,
+    lastWeighInISO: weighIns.length > 0 ? weighIns[weighIns.length - 1].date : null,
+    adherence: attendance,
+    load,
+    todayISO: todayISO(),
+  })
+
   // ── Bodyweight-mode movements this profile has actually logged ─────────────
   const loggedIds = [...new Set(mine.flatMap(s => s.exercises.map(e => e.exerciseId)))]
   const bodyweightMovements = loggedIds
@@ -280,6 +298,12 @@ export function WorkoutProgress() {
           />
         </div>
       )}
+
+      {/* Above the tabs deliberately. The tips span all three views — a stale
+          weigh-in is Body, an unkept plan is Workload, a missing training max
+          is Strength — so filing them under one would hide each from the view
+          it belongs to. */}
+      <GuidanceCard tips={tips} />
 
       <SegmentedPill
         className="print-hide"
