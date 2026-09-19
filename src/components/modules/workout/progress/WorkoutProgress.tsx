@@ -470,6 +470,18 @@ export function WorkoutProgress() {
         </Card>
       )}
 
+      </Panel>
+
+      <Panel view="body" open={view}>
+        {weightCard}
+
+      {/* Moved here from Strength, which carried eleven cards while this
+          view carried one. The line is what supplies the resistance: a
+          barbell lift is Strength, and a movement where your own body is
+          the load belongs beside the weight that body is. Records and
+          standards stayed in Strength — they are readings about the lifts,
+          and filing them here to even the numbers up would have been
+          tidying rather than categorising. */}
       {/* ── Bodyweight-mode cards ──────────────────────────────────────── */}
       {bodyweightMovements.map(({ id, entry }) => {
         // Assistance is a weight, so convert it for display; seconds and reps
@@ -547,10 +559,6 @@ export function WorkoutProgress() {
           }
         />
       ))}
-      </Panel>
-
-      <Panel view="body" open={view}>
-        {weightCard}
       </Panel>
 
       <Panel view="workload" open={view}>
