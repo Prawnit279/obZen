@@ -4,7 +4,7 @@ import {
   Dumbbell,
   TrendingUp,
   Music2,
-  CalendarDays,
+  ClipboardList,
   UtensilsCrossed,
   MoreHorizontal,
 } from 'lucide-react'
@@ -18,9 +18,9 @@ import { SHOW_NUTRITION, SHOW_DRUMS } from '@/config/features'
 const PRIMARY_NAV = [
   { path: '/', label: 'Home', icon: LayoutDashboard },
   { path: '/workout', label: 'Train', icon: Dumbbell },
+  { path: '/plan', label: 'Plan', icon: ClipboardList },
   { path: '/workout/progress', label: 'Progress', icon: TrendingUp },
   { path: '/drum', label: 'Drums', icon: Music2 },
-  { path: '/calendar', label: 'Calendar', icon: CalendarDays },
   { path: '/nutrition', label: 'Food', icon: UtensilsCrossed },
   { path: '/more', label: 'More', icon: MoreHorizontal },
 ].filter(item =>

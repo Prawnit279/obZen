@@ -1,8 +1,9 @@
 import { useNavigate } from 'react-router-dom'
-import { PersonStanding, Flame, Star, FolderKanban, Users, Settings } from 'lucide-react'
+import { CalendarDays, PersonStanding, Flame, Star, FolderKanban, Users, Settings } from 'lucide-react'
 import { SHOW_VEDIC, SHOW_YOGA } from '@/config/features'
 
 const MORE_ITEMS = [
+  { path: '/calendar', label: 'Calendar', sub: 'Month view, events, sessions', icon: CalendarDays },
   { path: '/yoga', label: 'Yoga', sub: '30-day progression + sequences', icon: PersonStanding },
   { path: '/ayurveda', label: 'Ayurveda', sub: 'Pitta routine, remedies', icon: Flame },
   { path: '/vedic', label: 'Vedic Remedies', sub: 'Planetary practices', icon: Star },

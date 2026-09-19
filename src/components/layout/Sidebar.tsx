@@ -5,6 +5,7 @@ import {
   TrendingUp,
   Music2,
   CalendarDays,
+  ClipboardList,
   UtensilsCrossed,
   FolderKanban,
   Users,
@@ -19,6 +20,7 @@ import { SHOW_NUTRITION, SHOW_VEDIC, SHOW_YOGA, SHOW_DRUMS } from '@/config/feat
 const NAV_ITEMS = [
   { path: '/', label: 'Home', icon: LayoutDashboard },
   { path: '/workout', label: 'Train', icon: Dumbbell },
+  { path: '/plan', label: 'Plan', icon: ClipboardList },
   { path: '/workout/progress', label: 'Progress', icon: TrendingUp },
   { path: '/drum', label: 'Drums', icon: Music2 },
   { path: '/calendar', label: 'Calendar', icon: CalendarDays },

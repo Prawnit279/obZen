@@ -24,7 +24,6 @@ import { useBlockStore } from '@/store/useBlockStore'
 import { useIntakeStore } from '@/store/useIntakeStore'
 import type { BarMode } from '@/lib/barWeight'
 import { LiftTrendCard } from './LiftTrendCard'
-import { BlockCard } from './BlockCard'
 import { AmrapHistoryCard } from './AmrapHistoryCard'
 import { WeeklyVolumeCard } from './WeeklyVolumeCard'
 import { GuidanceCard } from './GuidanceCard'
@@ -108,7 +107,6 @@ export function WorkoutProgress() {
   // early return runs on some renders and not others.
   const trainingDays = useProfileSettingsStore(st => st.trainingDays)
   const block = useBlockStore(st => st.block)
-  const endBlock = useBlockStore(st => st.end)
   const barMode = useProfileSettingsStore(st => st.barMode)
   const setBarMode = useProfileSettingsStore(st => st.setBarMode)
   const weightGoal = useProfileSettingsStore(st => st.weightGoal)
@@ -316,10 +314,9 @@ export function WorkoutProgress() {
 
       <Panel view="strength" open={view}>
       {/* ── Lift trend, however you want to read it ────────────────────── */}
-      {block && (
-        <BlockCard block={block} todayISO={todayISO()} onEnd={endBlock} />
-      )}
-
+      {/* The block itself moved to Plan — it says what to do, which is not what
+          this screen is for. Its top-set history stays: that is a record of how
+          the prescription went, which is exactly what this screen is for. */}
       {block && <AmrapHistoryCard block={block} sessions={mine} />}
 
       <LiftTrendCard

@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
 import Dashboard from '@/pages/Dashboard'
 import Workout from '@/pages/Workout'
+import Plan from '@/pages/Plan'
 import DrumStudio from '@/pages/DrumStudio'
 import Yoga from '@/pages/Yoga'
 import Calendar from '@/pages/Calendar'
@@ -25,6 +26,7 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Dashboard />} />
         <Route path="/workout" element={<Workout />} />
+        <Route path="/plan" element={<Plan />} />
         <Route path="/workout/progress" element={<Progress />} />
         <Route path="/workout/tools" element={<Tools />} />
         <Route path="/workout/tools/guide" element={<FiveThreeOneGuide />} />
