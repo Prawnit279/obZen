@@ -12,24 +12,19 @@ import {
 } from '@/lib/utils'
 import { VEDIC_REMEDIES } from '@/data/vedic-remedies'
 import { getProgram, getScheduledDay } from '@/data/obzen-program'
-import { SHOW_NUTRITION, SHOW_VEDIC, SHOW_ASTROLOGY, SHOW_DRUMS } from '@/config/features'
+import { SHOW_NUTRITION, SHOW_VEDIC, SHOW_ASTROLOGY } from '@/config/features'
 import { useProfileName, useProfileSettingsStore } from '@/store/useProfileSettingsStore'
 import { DoshaTip } from '@/components/modules/dashboard/DoshaTip'
+import { GuidanceCard } from '@/components/modules/workout/progress/GuidanceCard'
+import { useGuidance } from '@/hooks/useGuidance'
 import { useProfileStore } from '@/store/useProfileStore'
 import { Card, CardHeader } from '@/components/ui/Card'
-import { SegmentedPill } from '@/components/ui/SegmentedPill'
 import { ProgressBar } from '@/components/ui/ProgressBar'
 import { Badge } from '@/components/ui/Badge'
 import { CheckInModal } from '@/components/modules/dashboard/CheckInModal'
-import { WeeklyVolumeChart } from '@/components/modules/dashboard/WeeklyVolumeChart'
 import { WeekStrip } from '@/components/modules/dashboard/WeekStrip'
-import { DrumPieChart } from '@/components/modules/dashboard/DrumPieChart'
-import { MacroComplianceChart } from '@/components/modules/dashboard/MacroComplianceChart'
-import { ProgressOverloadChart } from '@/components/modules/dashboard/ProgressOverloadChart'
 import { useNavigate } from 'react-router-dom'
 import { Zap, AlertTriangle, Flame, Plus, Edit2 } from 'lucide-react'
-
-type DashTab = 'today' | 'weekly'
 
 function getDailyRemedy() {
   const day = new Date().getDate()
@@ -50,10 +45,10 @@ export default function Dashboard() {
   const { streaks, updateStreak } = useAppStore()
   const { isTrainingDay } = useNutritionStore()
   const [checkInOpen, setCheckInOpen] = useState(false)
-  const [dashTab, setDashTab] = useState<DashTab>('today')
   const { activeId } = useProfileStore()
   const trainingDays = useProfileSettingsStore(st => st.trainingDays)
   const profileName = useProfileName()
+  const tips = useGuidance()
 
   useEffect(() => { checkAndReset(today) }, [checkAndReset, today])
 
@@ -145,22 +140,10 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Tab selector */}
-        <SegmentedPill
-          className="card-grid-full"
-          label="Dashboard range"
-          value={dashTab}
-          onChange={setDashTab}
-          grow
-          options={[
-            { value: 'today' as DashTab, label: 'Today' },
-            { value: 'weekly' as DashTab, label: 'Weekly' },
-          ]}
-        />
-
-        {dashTab === 'weekly' && <WeeklySummaryTab />}
-
-        {dashTab === 'today' && <>
+        {/* What is worth knowing, before what there is to do about it. Read
+            from the same log Progress reads, through one shared hook, so the
+            two screens cannot tell different stories about the same week. */}
+        <GuidanceCard tips={tips} />
 
         {/* Smart warnings */}
         {(showForearmWarning || showRestWarning || (SHOW_ASTROLOGY && isSaturday())) && (
@@ -367,7 +350,6 @@ export default function Dashboard() {
           </Card>
         )}
 
-        </>}
 
       </div>
 
@@ -378,32 +360,6 @@ export default function Dashboard() {
         onClose={() => setCheckInOpen(false)}
         onSaved={() => setCheckInOpen(false)}
       />
-    </div>
-  )
-}
-
-function WeeklySummaryTab() {
-  return (
-    <div className="space-y-6">
-      <div className="p-4 border border-noir-border rounded-[2px] bg-noir-surface">
-        <WeeklyVolumeChart />
-      </div>
-      {SHOW_NUTRITION && (
-        <div className="p-4 border border-noir-border rounded-[2px] bg-noir-surface">
-          <MacroComplianceChart />
-        </div>
-      )}
-      {/* The gate has to sit outside the frame, not inside it: hiding only the
-          chart left its bordered box behind, an empty 34px rectangle on the
-          Weekly tab for as long as Drums has been switched off. */}
-      {SHOW_DRUMS && (
-        <div className="p-4 border border-noir-border rounded-[2px] bg-noir-surface">
-          <DrumPieChart />
-        </div>
-      )}
-      <div className="p-4 border border-noir-border rounded-[2px] bg-noir-surface">
-        <ProgressOverloadChart />
-      </div>
     </div>
   )
 }
