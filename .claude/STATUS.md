@@ -1,5 +1,5 @@
 # obZen — Build Status
-Last updated: 2026-09-18 | SHA: 5a952f18
+Last updated: 2026-09-18 | SHA: f307928f
 
 Local-first training and drum-practice PWA. One profile, one device, no
 account, no server. Everything lives in IndexedDB and localStorage, and a JSON
@@ -9,9 +9,21 @@ backup is the only way data leaves the phone.
 
 ## Shape of the app
 
-**Navigation:** Home · Train · Progress · Calendar · More. Drums is hidden
-behind `SHOW_DRUMS`, off — the section is intact in the tree, not deleted, so
-turning the flag back on restores it whole.
+**Navigation:** Home · Train · **Plan** · Progress · More. Plan took the slot
+Drums vacated and Calendar stepped back into More — it is a month grid you
+visit deliberately, not something consulted between sets. The sidebar has the
+room and keeps both. Drums is hidden behind `SHOW_DRUMS`, off — the section is
+intact in the tree, not deleted, so turning the flag back on restores it whole.
+
+**Home is the day.** What is worth knowing, then the check-in, today's workout,
+the week strip, what is coming up. Its Weekly tab was removed: the charts on it
+duplicated Progress, so two screens answered "how is it going" and neither was
+authoritative.
+
+**Plan is what the training is meant to be** — the running block, the
+recommendation and its start/switch actions, the questionnaire. Progress is
+what it has been. The top-set history stayed in Progress deliberately: it
+records how the prescription went.
 
 **One profile.** The two-person switcher is gone. The id string `'pronit'`
 survives as an internal key — sessions are stamped with it, and the bodyweight
@@ -101,7 +113,11 @@ route, both nav surfaces and the dashboard chart, and nothing was removed.
 ### Progress
 Three views, in the URL as `?view=`: **Strength · Body · Workload**. Closed
 views stay mounted and are hidden only on screen, so Print still captures the
-whole page.
+whole page. The line between the first two is what supplies the resistance —
+a barbell lift is Strength, and a movement where your own body is the load
+(push-ups, planks, the assisted progressions and their ladders) sits in Body
+beside the weight that body is. Before that, Strength carried eleven cards and
+Body carried one.
 
 - **Lift trend** — Est. 1RM, top set, ×BW, or % change; 8 weeks / 6 months /
   all; one lift or every lift. One shared axis with rounded gridlines
@@ -220,6 +236,13 @@ max and a true max give different weights off the same percentage), and how
 weight moves between blocks. Which templates to offer is settled — all four.
 Nothing here will be guessed; the container holds `null` until the numbers
 arrive. **Bigger Leaner Stronger** is untouched, per instruction.
+
+### Orphaned, not deleted
+`WeeklyVolumeChart`, `ProgressOverloadChart`, `MacroComplianceChart` and
+`DrumPieChart` in `components/modules/dashboard/` lost their only caller when
+Home's Weekly tab went. Left in the tree rather than removed — two still have
+smoke tests, and the overload and volume charts may be worth a home in Progress
+rather than a deletion.
 
 ### Deferred
 Yoga pose animation rewrite, streaks, focus timer, weekly review, global search,
