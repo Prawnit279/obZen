@@ -167,11 +167,21 @@ export function CircuitsCard({ session, onCreate, onDrop, onRounds, onPullOut }:
               onClick={build}
               disabled={picked.length === 0}
               className="flex-1 py-2.5 rounded-[var(--r-control)] text-[length:var(--text-md)] uppercase tracking-widest transition-opacity"
-              style={{
-                background: picked.length > 0 ? 'var(--accent)' : 'transparent',
-                color: picked.length > 0 ? 'var(--on-accent)' : 'var(--ink-ghost)',
-                border: picked.length > 0 ? 'none' : '1px solid var(--hairline)',
-              }}
+              // The enabled fill goes through the same accent gradient the rest
+              // of the app uses. It previously read `var(--accent)`, the legacy
+              // alias for `var(--ink)`, so an enabled button was near-white
+              // carrying white text.
+              style={picked.length > 0
+                ? {
+                    background: 'linear-gradient(140deg, var(--violet-400), var(--violet-900))',
+                    color: 'var(--on-accent)',
+                    border: 'none',
+                  }
+                : {
+                    background: 'transparent',
+                    color: 'var(--ink-ghost)',
+                    border: '1px solid var(--hairline)',
+                  }}
             >
               Create circuit
             </button>

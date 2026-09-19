@@ -4,6 +4,7 @@ import { recommendProgram } from '@/lib/programs'
 import type { ProgramMatch } from '@/lib/programs'
 import type { IntakeAnswers } from '@/lib/intake'
 import { Card } from '@/components/ui/Card'
+import { Button } from '@/components/ui/Button'
 import { useBlockStore } from '@/store/useBlockStore'
 import { useSeedTrainingMaxes } from './useSeedTrainingMaxes'
 import { todayISO } from '@/lib/utils'
@@ -61,7 +62,14 @@ export function ProgramMatchCard({ answers }: Props) {
             Pick one of the {best.program.templates!.length} templates to start this block.
           </p>
         ) : (
-          <button
+          // `Button`'s primary variant, not a hand-rolled fill. The first
+          // version set `background: var(--accent)`, which is a legacy noircut
+          // alias for `var(--ink)` — the *text* colour — so the button came out
+          // near-white and its `--on-accent` white label was invisible on it.
+          <Button
+            variant="primary"
+            fullWidth
+            style={{ marginTop: 14 }}
             onClick={() => startBlock({
               programId: best.program.id,
               // Null, never the first template. A programme that offers a
@@ -78,11 +86,9 @@ export function ProgramMatchCard({ answers }: Props) {
               // the lifts that have one.
               trainingMaxLb: seedTrainingMaxes(),
             })}
-            className="w-full py-2.5 rounded-[var(--r-control)] text-[length:var(--text-md)] uppercase tracking-widest transition-opacity hover:opacity-80"
-            style={{ background: 'var(--accent)', color: 'var(--on-accent)', marginTop: 14 }}
           >
             {running ? 'Switch to this block' : 'Start this block'}
-          </button>
+          </Button>
         )
       )}
 

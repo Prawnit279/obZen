@@ -58,7 +58,7 @@ export function BlockCard({ block, todayISO, onEnd }: Props) {
             style={{
               width: `${Math.min(100, fraction * 100)}%`, height: '100%',
               borderRadius: 'var(--r-bar)',
-              background: p.isDeload ? 'var(--ink-faint)' : 'var(--accent)',
+              background: p.isDeload ? 'var(--ink-faint)' : 'var(--violet-400)',
               transition: 'width var(--t-base) var(--ease-out)',
             }}
           />

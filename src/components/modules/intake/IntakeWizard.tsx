@@ -66,7 +66,7 @@ export function IntakeWizard({ answers, onAnswer, onSeen, onFinish, onClose, pre
         <div
           style={{
             width: `${((index + 1) / total) * 100}%`, height: '100%',
-            borderRadius: 'var(--r-bar)', background: 'var(--accent)',
+            borderRadius: 'var(--r-bar)', background: 'var(--violet-400)',
             transition: 'width var(--t-base) var(--ease-out)',
           }}
         />
