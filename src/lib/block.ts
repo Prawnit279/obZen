@@ -14,7 +14,7 @@ import { cyclePosition } from '@/lib/programs'
 import { fiveThreeOneWave, bbbSet } from '@/lib/strengthTools'
 import type { WaveSet, WaveWeek, BBBPercent } from '@/lib/strengthTools'
 import { exerciseNameFor } from '@/data/obzen-program'
-import { realSets, loadedWeightKg, epley1RM, kgToLb } from '@/lib/progress'
+import { realSets, loadedWeightKg, kgToLb } from '@/lib/progress'
 import type { WorkoutDaySession } from '@/db/dexie'
 import type { ActiveBlock } from '@/store/useBlockStore'
 
@@ -33,23 +33,42 @@ export interface SupplementalPrescription {
   weightLb: number
 }
 
-export interface WeekPrescription {
+/** Where in the block you are, which is knowable even when the sets are not. */
+interface WeekPosition {
   program: Program
   template: ProgramTemplate | null
   /** 1-based week within the cycle, and which cycle. */
   week: number
   cycle: number
   isDeload: boolean
-  lifts: LiftPrescription[]
-  /** Null when the programme carries no supplemental work. */
-  supplemental: SupplementalPrescription[] | null
-  /**
-   * Set when the block cannot be turned into sets, saying why. A block on a
-   * programme whose numbers were never supplied is a real state, and reporting
-   * it beats filling the gap in.
-   */
-  unavailable: string | null
 }
+
+/**
+ * What this week asks for, or why it cannot say.
+ *
+ * A union rather than one flat shape with an `unavailable` field hanging off
+ * it. Flat, nothing stopped a future edit producing a reason *and* a list of
+ * lifts at the same time — the two were only ever kept apart by every early
+ * return in `weekPrescription` happening to fire before the lifts were built,
+ * and `BlockCard` read them as two independent truthy checks that could both
+ * pass. The combination is now unrepresentable, and the card branches once.
+ *
+ * A block on a programme whose numbers were never supplied is a real state,
+ * and reporting it beats filling the gap in — which is why `unavailable`
+ * carries a reason rather than just being a flag.
+ */
+export type WeekPrescription =
+  | (WeekPosition & {
+      status: 'ready'
+      lifts: LiftPrescription[]
+      /** Null when the programme carries no supplemental work. */
+      supplemental: SupplementalPrescription[] | null
+    })
+  | (WeekPosition & {
+      status: 'unavailable'
+      /** What it is waiting for, in the programme's own words. */
+      reason: string
+    })
 
 /** The 5/3/1 wave week for a position in a four-week cycle. */
 function waveWeekFor(week: number, deloadWeek: number): WaveWeek {
@@ -75,27 +94,29 @@ export function weekPrescription(
 
   const template = program.templates?.find(t => t.id === block.templateId) ?? null
 
-  const base = {
+  const where: WeekPosition = {
     program,
     template,
     week: position.week,
     cycle: position.cycle,
     isDeload: position.isDeload,
-    lifts: [] as LiftPrescription[],
-    supplemental: null as SupplementalPrescription[] | null,
   }
 
   // A programme whose template numbers were never supplied cannot prescribe.
   if (program.status === 'needs-source' || (template !== null && !isTemplateReady(template))) {
     return {
-      ...base,
-      unavailable: program.needs
-        ?? 'This template is still waiting for its numbers.',
+      ...where,
+      status: 'unavailable',
+      reason: program.needs ?? 'This template is still waiting for its numbers.',
     }
   }
 
   if (!WAVE_PROGRAMS.has(program.id)) {
-    return { ...base, unavailable: 'No week-by-week prescription is encoded for this programme.' }
+    return {
+      ...where,
+      status: 'unavailable',
+      reason: 'No week-by-week prescription is encoded for this programme.',
+    }
   }
 
   const waveWeek = waveWeekFor(position.week, program.deloadWeek)
@@ -125,7 +146,7 @@ export function weekPrescription(
       })
     : null
 
-  return { ...base, lifts, supplemental, unavailable: null }
+  return { ...where, status: 'ready', lifts, supplemental }
 }
 
 /**
@@ -172,7 +193,6 @@ export interface AmrapAttempt {
    * stand on their own.
    */
   prescribedWeightLb: number
-  e1rmLb: number
 }
 
 /**
@@ -243,7 +263,6 @@ export function amrapHistory(
       repsVsTarget: top.reps - Number(prescribed.reps.replace('+', '')),
       weightLb: kgToLb(loadedWeightKg(exerciseId, top)),
       prescribedWeightLb: prescribed.weight,
-      e1rmLb: kgToLb(epley1RM(loadedWeightKg(exerciseId, top), top.reps)),
     })
   }
 

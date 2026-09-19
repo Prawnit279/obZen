@@ -99,7 +99,7 @@ export function ProgramMatchCard({ answers }: Props) {
         >
           <AlertCircle size={14} style={{ flexShrink: 0, marginTop: 2 }} />
           <span>
-            Based on {matches.length > 0 ? best.reasons.length + best.against.length : 0} of
+            Based on {best.reasons.length + best.against.length} of
             {' '}{best.reasons.length + best.against.length + missing.length} questions.{' '}
             <button
               onClick={() => navigate('/intake')}

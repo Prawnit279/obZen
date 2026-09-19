@@ -48,7 +48,28 @@ export function AmrapHistoryCard({ block, sessions }: Props) {
   )
 }
 
+/**
+ * Whether the set was taken at a weight the week did not ask for.
+ *
+ * Prescribed weights are already rounded to the nearest five, so anything
+ * inside half a step is the same weight reached by a different rounding rather
+ * than a different decision.
+ */
+function offPrescription(a: AmrapAttempt): boolean {
+  return Math.abs(a.weightLb - a.prescribedWeightLb) >= 2.5
+}
+
 function LiftHistory({ attempts }: { attempts: AmrapAttempt[] }) {
+  // Its own guard rather than a debt owed to the caller. `attempts[0].name`
+  // below is safe today only because `AmrapHistoryCard` filters empties out
+  // first, and `noUncheckedIndexedAccess` is off, so nothing would catch that
+  // filter being loosened — the component would simply throw.
+  //
+  // Unreachable as things stand, and deliberately so: deleting it passes every
+  // test, which is the honest state of a guard kept for a caller that does not
+  // yet exist.
+  if (attempts.length === 0) return null
+
   const shown = attempts.slice(-SHOWN)
   const hit = attempts.filter(a => a.repsVsTarget >= 0).length
 
@@ -81,6 +102,15 @@ function LiftHistory({ attempts }: { attempts: AmrapAttempt[] }) {
           <span style={{ fontSize: 'var(--text-md)', color: 'var(--ink-2)', flex: 1 }}>
             {Math.round(a.weightLb)} lb × {a.reps}
             <span style={{ color: 'var(--ink-faint)' }}> / {a.targetReps}+</span>
+            {/* Only when it diverges. A row taken at some other weight is not
+                really a hit or a miss against this week's target, and without
+                this the tally counted it as one with nothing on screen to say
+                so. Silent on the usual case, so the column stays readable. */}
+            {offPrescription(a) && (
+              <span style={{ color: 'var(--ink-faint)' }}>
+                {' '}· asked {a.prescribedWeightLb}
+              </span>
+            )}
           </span>
           <Delta value={a.repsVsTarget} />
         </div>

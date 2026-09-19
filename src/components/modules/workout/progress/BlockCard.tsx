@@ -65,18 +65,21 @@ export function BlockCard({ block, todayISO, onEnd }: Props) {
         </div>
       )}
 
-      {/* A block on a programme whose numbers were never supplied is a real
-          state. Saying what is missing beats filling the gap in. */}
-      {p.unavailable && (
+      {/* One branch, not two independent truthy checks. A block on a programme
+          whose numbers were never supplied is a real state, and saying what is
+          missing beats filling the gap in — but it is also the *whole* state:
+          there is nothing to prescribe alongside the explanation, and the type
+          no longer lets there be. */}
+      {p.status === 'unavailable' ? (
         <p
           className="flex items-start"
           style={{ gap: 8, fontSize: 'var(--text-md)', color: 'var(--ink-faint)', marginTop: 14 }}
         >
           <Info size={14} style={{ flexShrink: 0, marginTop: 3 }} />
-          <span>Needs {p.unavailable}</span>
+          <span>Needs {p.reason}</span>
         </p>
-      )}
-
+      ) : (
+        <>
       {p.lifts.length > 0 && (
         <div style={{ marginTop: 16 }}>
           <div
@@ -136,6 +139,8 @@ export function BlockCard({ block, todayISO, onEnd }: Props) {
             </div>
           ))}
         </div>
+      )}
+        </>
       )}
     </Card>
   )

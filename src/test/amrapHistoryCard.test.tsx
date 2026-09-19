@@ -95,6 +95,32 @@ describe('AmrapHistoryCard', () => {
     expect(screen.queryByText(/270 lb/)).not.toBeInTheDocument()
   })
 
+  it('names what the week asked for when the set was taken at another weight', () => {
+    // The field existed for this and nothing rendered it, so a set taken well
+    // off the prescription was counted in the tally with nothing on screen to
+    // say it had not really been that week's set.
+    render(<AmrapHistoryCard block={block} sessions={[squatDay(wk(1), 6, 235)]} />)
+    expect(screen.getByText(/asked 270/)).toBeInTheDocument()
+  })
+
+  it('stays quiet about the prescription when the set matched it', () => {
+    // 225 plates plus the bar is exactly the prescribed 270, so repeating it
+    // would be noise on every ordinary row.
+    render(<AmrapHistoryCard block={block} sessions={[squatDay(wk(1), 8)]} />)
+    expect(screen.queryByText(/asked/)).not.toBeInTheDocument()
+  })
+
+  it('renders nothing when no lift has an attempt', () => {
+    // This covers the card, not `LiftHistory`'s own guard: the filter above it
+    // means the row component is never reached with an empty list, so removing
+    // that guard passes every test here. It is kept as defence against the
+    // filter being loosened later — `noUncheckedIndexedAccess` is off, so the
+    // compiler would say nothing and the component would simply throw — but it
+    // is unreachable today and is not pretended otherwise.
+    const { container } = render(<AmrapHistoryCard block={block} sessions={[]} />)
+    expect(container).toBeEmptyDOMElement()
+  })
+
   it('counts how many met the target', () => {
     render(<AmrapHistoryCard block={block} sessions={[
       squatDay(wk(1), 8), squatDay(wk(2), 3), squatDay(wk(3), 0),

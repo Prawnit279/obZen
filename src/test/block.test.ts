@@ -8,6 +8,7 @@
  */
 import { describe, it, expect } from 'vitest'
 import { weekPrescription, blockProgress, amrapHistory } from '@/lib/block'
+import type { WeekPrescription } from '@/lib/block'
 import type { ActiveBlock } from '@/store/useBlockStore'
 import { fiveThreeOneWave, bbbSet } from '@/lib/strengthTools'
 import { programById } from '@/data/programs'
@@ -26,6 +27,24 @@ function block(over: Partial<ActiveBlock> = {}): ActiveBlock {
     trainingMaxLb: { 'barbell-squat': 315, 'bench-press': 225 },
     ...over,
   }
+}
+
+/**
+ * Narrows to a week that actually prescribes.
+ *
+ * The union exists so "has a reason" and "has lifts" cannot both be true, and
+ * a cast here would walk straight past the thing it is protecting — so this
+ * asserts the discriminant before narrowing.
+ */
+function ready(p: WeekPrescription | null) {
+  expect(p?.status).toBe('ready')
+  return p as Extract<WeekPrescription, { status: 'ready' }>
+}
+
+/** The mirror of `ready`, for a week that cannot prescribe. */
+function unavailable(p: WeekPrescription | null) {
+  expect(p?.status).toBe('unavailable')
+  return p as Extract<WeekPrescription, { status: 'unavailable' }>
 }
 
 // ── Where in the cycle ───────────────────────────────────────────────────────
@@ -55,7 +74,7 @@ describe('the week it reports', () => {
 
 describe('what it prescribes', () => {
   it('gives each lift the wave for that week, off its own training max', () => {
-    const p = weekPrescription(block(), wk(1))!
+    const p = ready(weekPrescription(block(), wk(1)))
     const squat = p.lifts.find(l => l.exerciseId === 'barbell-squat')!
     // Deferred to strengthTools rather than restated — if the wave changes
     // there, this follows rather than disagreeing.
@@ -64,27 +83,28 @@ describe('what it prescribes', () => {
   })
 
   it('changes the wave as the weeks pass', () => {
-    const week1 = weekPrescription(block(), wk(1))!.lifts[0].sets
-    const week3 = weekPrescription(block(), wk(3))!.lifts[0].sets
+    const week1 = ready(weekPrescription(block(), wk(1))).lifts[0].sets
+    const week3 = ready(weekPrescription(block(), wk(3))).lifts[0].sets
     expect(week1).not.toEqual(week3)
     expect(week3[week3.length - 1].reps).toMatch(/1\+?/)
   })
 
   it('drops to the deload wave in week four', () => {
-    const p = weekPrescription(block(), wk(4))!
+    const p = ready(weekPrescription(block(), wk(4)))
     expect(p.lifts[0].sets).toEqual(fiveThreeOneWave(315, 'deload'))
     expect(p.lifts[0].sets.every(s => !s.isAmrap)).toBe(true)
   })
 
   it('leaves out a lift with no training max rather than guessing one', () => {
-    const p = weekPrescription(block({ trainingMaxLb: { 'barbell-squat': 315, deadlift: 0 } }), wk(1))!
+    const p = ready(weekPrescription(block({ trainingMaxLb: { 'barbell-squat': 315, deadlift: 0 } }), wk(1)))
     expect(p.lifts.map(l => l.exerciseId)).toEqual(['barbell-squat'])
   })
 
   it('prescribes nothing at all when no training max is set', () => {
-    const p = weekPrescription(block({ trainingMaxLb: {} }), wk(1))!
+    // The block is fine; it just has no maxes — so this is a `ready` week with
+    // an empty list, not an unavailable one. The union keeps those apart.
+    const p = ready(weekPrescription(block({ trainingMaxLb: {} }), wk(1)))
     expect(p.lifts).toEqual([])
-    expect(p.unavailable).toBeNull()   // the block is fine; it just has no maxes
   })
 })
 
@@ -92,11 +112,11 @@ describe('what it prescribes', () => {
 
 describe('supplemental volume', () => {
   it('is absent on the programme that carries none', () => {
-    expect(weekPrescription(block(), wk(1))?.supplemental).toBeNull()
+    expect(ready(weekPrescription(block(), wk(1))).supplemental).toBeNull()
   })
 
   it('is five sets of ten on the one that does', () => {
-    const p = weekPrescription(block({ programId: 'bbb' }), wk(1))!
+    const p = ready(weekPrescription(block({ programId: 'bbb' }), wk(1)))
     expect(p.supplemental).toHaveLength(2)
     const squat = p.supplemental!.find(s => /squat/i.test(s.label))!
     expect(squat).toMatchObject({ sets: 5, reps: 10, weightLb: bbbSet(315, 50).weight })
@@ -104,7 +124,7 @@ describe('supplemental volume', () => {
 
   it('is dropped in the deload week', () => {
     // A deload carrying five sets of ten is not a deload.
-    expect(weekPrescription(block({ programId: 'bbb' }), wk(4))?.supplemental).toBeNull()
+    expect(ready(weekPrescription(block({ programId: 'bbb' }), wk(4))).supplemental).toBeNull()
   })
 })
 
@@ -112,13 +132,15 @@ describe('supplemental volume', () => {
 
 describe('a programme whose numbers were never supplied', () => {
   it('says what it is waiting for, not merely that it cannot', () => {
-    const p = weekPrescription(block({ programId: 'tactical-barbell', templateId: 'operator' }), wk(1))!
-    expect(p.lifts).toEqual([])
+    const p = unavailable(weekPrescription(block({ programId: 'tactical-barbell', templateId: 'operator' }), wk(1)))
+    // No `lifts` to assert empty any more — the type does not carry them on
+    // this branch at all, which is the point of the union.
+    //
     // The specific message matters. "No prescription encoded" is true of any
     // programme without a wave; this one has to name the numbers it wants, or
     // there is nothing to act on.
-    expect(p.unavailable).toMatch(/set counts|percentages|blocks/i)
-    expect(p.unavailable).toBe(programById('tactical-barbell')!.needs)
+    expect(p.reason).toMatch(/set counts|percentages|blocks/i)
+    expect(p.reason).toBe(programById('tactical-barbell')!.needs)
   })
 
   it('still reports where in the cycle you are', () => {
@@ -297,11 +319,13 @@ describe('amrapHistory', () => {
     expect(attempt.prescribedWeightLb).toBe(amrap.weight)
   })
 
-  it('estimates a max from the set, so a rep PR shows as a strength gain', () => {
-    const [five, eight] = [5, 8].map(
-      r => amrapHistory(block(), [weekOne(wk(1), r)], 'barbell-squat')[0]
-    )
-    expect(eight.e1rmLb).toBeGreaterThan(five.e1rmLb)
+  it('says what the week prescribed even when the set matched it', () => {
+    // `e1rmLb` used to be asserted here. It was computed for every attempt and
+    // never read by anything, so it was dropped rather than kept warm by its
+    // own test — `lib/amrap.ts` already derives an estimated max from flagged
+    // sets, and that one has a consumer.
+    const [attempt] = amrapHistory(block(), [weekOne(wk(1), 5)], 'barbell-squat')
+    expect(attempt.prescribedWeightLb).toBe(fiveThreeOneWave(315, 1).find(s => s.isAmrap)!.weight)
   })
 
   it('gives nothing for a programme with no wave encoded', () => {

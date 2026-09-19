@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { fillWeeks, kgToLb } from '@/lib/progress'
+import { fillWeeks, kgToLb, isoWeekKey } from '@/lib/progress'
 import type { WeeklyVolume } from '@/lib/progress'
 import { Card } from '@/components/ui/Card'
 import { SegmentedPill } from '@/components/ui/SegmentedPill'
@@ -39,9 +39,14 @@ export function WeeklyVolumeCard({ volume, main, supplemental, todayISO }: Props
    *  the app. A set count is a count and converts to nothing. */
   const read = (v: WeeklyVolume) => (metric === 'tonnage' ? kgToLb(v.tonnageKg) : v.sets)
 
+  // Looked up by key rather than by padding the series out to eight weeks and
+  // taking the last entry. `weeklyVolume` omits untrained weeks, so the lookup
+  // is the documented way to ask about a particular one; filling first built
+  // seven rows to throw away.
+  const thisWeekKey = isoWeekKey(todayISO)
   const thisWeek = (series: WeeklyVolume[]) => {
-    const filled = fillWeeks(series, todayISO, WEEKS)
-    return read(filled[filled.length - 1])
+    const week = series.find(v => v.week === thisWeekKey)
+    return week ? read(week) : 0
   }
   const mainNow = thisWeek(main)
   const suppNow = thisWeek(supplemental)
