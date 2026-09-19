@@ -72,8 +72,10 @@ export function ProgramMatchCard({ answers }: Props) {
               // does.
               templateId: null,
               startedOn: todayISO(),
-              // Seeded from the training maxes already on record; the block
-              // card says which lifts are missing one rather than inventing it.
+              // Seeded from the training maxes already on record rather than
+              // invented. A lift with nothing logged gets no entry; the tip on
+              // Home is what names it, not the block card, which shows only
+              // the lifts that have one.
               trainingMaxLb: seedTrainingMaxes(),
             })}
             className="w-full py-2.5 rounded-[var(--r-control)] text-[length:var(--text-md)] uppercase tracking-widest transition-opacity hover:opacity-80"

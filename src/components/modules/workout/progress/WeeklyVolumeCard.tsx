@@ -45,6 +45,7 @@ export function WeeklyVolumeCard({ volume, main, supplemental, todayISO }: Props
   }
   const mainNow = thisWeek(main)
   const suppNow = thisWeek(supplemental)
+  const everMarked = supplemental.some(v => v.sets > 0)
 
   return (
     <Card label="Weekly volume">
@@ -61,11 +62,22 @@ export function WeeklyVolumeCard({ volume, main, supplemental, todayISO }: Props
         unit={metric === 'tonnage' ? 'lb' : ''}
       />
 
-      {/* The split only appears once something has been marked supplemental.
-          Until then every set is main work by definition, and a row reading
-          "supplemental 0" would suggest the assistance had gone missing rather
-          than never having been distinguished. */}
-      {suppNow > 0 && (
+      {/* The split appears once assistance has *ever* been marked, not once it
+          was marked this week. Until the first time, every set is main work by
+          definition and a row reading "supplemental 0" would suggest the
+          assistance had gone missing rather than never having been
+          distinguished — but after it, a quiet week is information rather than
+          a reason to hide the breakdown.
+
+          Gating on the current week hid the whole section, the real non-zero
+          main-work row included, every time a week carried no assistance. On
+          Boring But Big that is every fourth week by design: `weekPrescription`
+          drops the five-by-ten on the deload.
+
+          Counted in sets because that is metric-independent. Gating on the
+          displayed value would have made the split appear under one toggle and
+          vanish under the other. */}
+      {everMarked && (
         <div style={{ paddingTop: 10, borderTop: '1px solid var(--hairline-soft)' }}>
           <Split label="Main work" value={mainNow} metric={metric} />
           <Split label="Supplemental" value={suppNow} metric={metric} />

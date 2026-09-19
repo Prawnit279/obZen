@@ -106,6 +106,25 @@ describe('plan against actual', () => {
     expect(tip.action).toMatch(/fewer days|lower/i)
   })
 
+  it('reports the figure it actually judged on', () => {
+    // The threshold counts trained + extra; printing `trained` alone meant the
+    // tip could fire on eleven sessions and report eight, so the reader could
+    // not reproduce the decision from the line meant to justify it.
+    const withExtra = reading({
+      adherence: { weeks: [], trained: 8, planned: 24, extra: 3 },
+    })
+    const tip = guidance(withExtra).find(t => t.id === 'under-plan')!
+    expect(tip).toBeDefined()
+    expect(tip.basis).toMatch(/11 in all/)
+    expect(tip.basis).toMatch(/3 unplanned/)
+  })
+
+  it('leaves the basis plain when nothing was unplanned', () => {
+    const tip = guidance(missing).find(t => t.id === 'under-plan')!
+    expect(tip.basis).toMatch(/^9 of 24 planned sessions over the window/)
+    expect(tip.basis).not.toMatch(/unplanned|in all/)
+  })
+
   it('says nothing when the plan is being kept', () => {
     const kept = reading({ adherence: { weeks: [], trained: 22, planned: 24, extra: 0 } })
     expect(ids(kept)).not.toContain('under-plan')

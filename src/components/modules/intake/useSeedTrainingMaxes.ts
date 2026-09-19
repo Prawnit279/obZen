@@ -10,9 +10,13 @@ import { COMPETITION_LIFT_IDS } from '@/data/obzen-program'
 /**
  * Training maxes to start a block with, from what has actually been lifted.
  *
- * A lift with nothing logged gets no entry at all rather than a guessed one —
- * the block card then shows it as missing, which is true and fixable, instead
- * of prescribing percentages of a number nobody ever lifted.
+ * A lift with nothing logged gets no entry at all rather than a guessed one,
+ * instead of prescribing percentages of a number nobody ever lifted.
+ *
+ * Nothing on the block card says so — it renders only the lifts that have a
+ * training max, so a missing one is simply absent there. What names it is the
+ * `block-lift-missing-tm` tip in `lib/guidance.ts`, on Home, and then only for
+ * a lift that has actually been trained.
  */
 export function useSeedTrainingMaxes(): () => Record<string, number> {
   const { activeId } = useProfileStore()

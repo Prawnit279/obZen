@@ -124,8 +124,16 @@ export function guidance(r: GuidanceReading): Tip[] {
       action: 'Either add a session back, or set the plan to fewer days so it '
         + 'matches what you actually do — a plan nobody keeps is worse than a '
         + 'smaller one that gets done.',
-      basis: `${r.adherence.trained} of ${r.adherence.planned} planned sessions `
-        + `over the window, on a ${r.settings.trainingDays}-day plan.`,
+      // Reports the figure the threshold actually used. Printing `trained`
+      // alone while judging on `trained + extra` meant the tip could fire on
+      // eleven sessions and report eight, leaving the reader unable to
+      // reproduce the decision — which is precisely what a basis is for.
+      basis: r.adherence.extra > 0
+        ? `${r.adherence.trained} of ${r.adherence.planned} planned sessions, `
+          + `plus ${r.adherence.extra} unplanned — ${kept} in all, `
+          + `on a ${r.settings.trainingDays}-day plan.`
+        : `${r.adherence.trained} of ${r.adherence.planned} planned sessions `
+          + `over the window, on a ${r.settings.trainingDays}-day plan.`,
     })
   }
 
@@ -167,7 +175,10 @@ export function guidance(r: GuidanceReading): Tip[] {
           : `${missing.join(' and ')} have no training max, so the block prescribes nothing for them.`,
         action: 'Log a top set for it and start the block again, or set the '
           + 'training max by hand.',
-        basis: `Trained in this window, but absent from the block's training maxes.`,
+        // Not "in this window": `sessions` is the profile's whole history, and
+        // only `adherence` and `load` above carry one. A lift trained once
+        // long ago and never since still counts as trained here.
+        basis: `Trained at some point, but absent from the block's training maxes.`,
       })
     }
 

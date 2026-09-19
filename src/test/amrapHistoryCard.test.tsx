@@ -55,6 +55,15 @@ describe('AmrapHistoryCard', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
+  it('describes itself as reading marked sets, not simply the last one', () => {
+    // The copy said "the last set of each lift" for as long as the card read
+    // the heaviest set of the day. Once it narrowed to flagged sets only, the
+    // sentence became untrue and nothing pinned it — this is what pins it.
+    render(<AmrapHistoryCard block={block} sessions={[squatDay(wk(1), 5)]} />)
+    expect(screen.getByText(/marked top set/i)).toBeInTheDocument()
+    expect(screen.queryByText(/the last set of each lift/i)).not.toBeInTheDocument()
+  })
+
   it('reads an exact hit as met, not as zero', () => {
     // Week one asks for five-plus. Five is a pass, and "0" next to it would
     // look like a failure.

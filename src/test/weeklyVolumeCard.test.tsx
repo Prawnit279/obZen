@@ -90,4 +90,40 @@ describe('the main/supplemental split', () => {
     expect(screen.queryByText('Main work')).not.toBeInTheDocument()
     expect(screen.queryByText('Supplemental')).not.toBeInTheDocument()
   })
+
+  it('keeps the breakdown through a week that carried no assistance', () => {
+    // The case the test above cannot reach: assistance was marked in an
+    // earlier week and none this one. Gating on the current week hid the whole
+    // section — taking the real, non-zero main-work row with it — which on
+    // Boring But Big happened every fourth week, since the deload drops the
+    // five-by-ten by design.
+    const PRIOR = isoWeekKey('2026-09-07')
+    show({
+      main: [
+        { week: PRIOR, tonnageKg: lbToKg(5_000), sets: 4 },
+        { week: WEEK, tonnageKg: lbToKg(6_000), sets: 3 },
+      ],
+      supplemental: [
+        { week: PRIOR, tonnageKg: lbToKg(8_000), sets: 10 },
+        { week: WEEK, tonnageKg: 0, sets: 0 },
+      ],
+    })
+    expect(screen.getByText('Main work')).toBeInTheDocument()
+    expect(screen.getByText('6,000 lb')).toBeInTheDocument()
+    expect(screen.getByText('0 lb')).toBeInTheDocument()
+  })
+
+  it('shows the split under both toggles or neither, never one', async () => {
+    // `everMarked` counts sets, which is metric-independent. Gating on the
+    // displayed value would let the breakdown appear under Sets and vanish
+    // under Tonnage for assistance that moved no measurable load.
+    const { sets } = show({
+      main,
+      supplemental: [{ week: WEEK, tonnageKg: 0, sets: 5 }],
+    })
+    expect(screen.getByText('Supplemental')).toBeInTheDocument()
+    await userEvent.click(sets)
+    expect(screen.getByText('Supplemental')).toBeInTheDocument()
+    expect(screen.getByText('5 sets')).toBeInTheDocument()
+  })
 })

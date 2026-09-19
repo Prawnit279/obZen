@@ -38,7 +38,7 @@ export function AmrapHistoryCard({ block, sessions }: Props) {
   return (
     <Card label="Top sets">
       <p style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)', marginTop: -4 }}>
-        The last set of each lift, against the reps the week called for.
+        Each marked top set, against the reps the week called for.
       </p>
 
       {byLift.map(({ id, attempts }) => (

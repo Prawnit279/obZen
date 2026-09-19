@@ -140,9 +140,9 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* What is worth knowing, before what there is to do about it. Read
-            from the same log Progress reads, through one shared hook, so the
-            two screens cannot tell different stories about the same week. */}
+        {/* What is worth knowing, before what there is to do about it. This is
+            the only screen that renders it — Progress reports the past, and a
+            tip is about what to do next. */}
         <GuidanceCard tips={tips} />
 
         {/* Smart warnings */}

@@ -19,10 +19,12 @@ const NO_WEIGH_INS: never[] = []
 /**
  * The guidance readings, gathered from the stores and the log.
  *
- * Extracted so Home and Progress cannot disagree. Both screens want the same
- * sentence — an unkept plan is an unkept plan wherever it is read — and the
- * inputs are assembled in enough steps that a second assembly would drift from
- * the first without anyone noticing which was right.
+ * Home is the only caller. The assembly lives here rather than in the page
+ * because it reaches into five stores and the session log, and a page that
+ * does that is a page doing two jobs — but it is a single-consumer hook, not a
+ * shared one. (An earlier version of this comment claimed it existed so Home
+ * and Progress could not disagree; Progress stopped rendering the card in the
+ * same commit that created this file, so that was never true.)
  *
  * Returns an empty list while the log is still loading, so the card is absent
  * rather than briefly wrong: with no sessions yet read, adherence would show a

@@ -159,11 +159,17 @@ export interface AmrapAttempt {
   /** What was lifted, bar included. */
   weightLb: number
   /**
-   * What the week called for at the block's current training max. Shown so a
-   * row lifted at some other weight is visible as one rather than silently
-   * counted as a hit or a miss — and note "current": raising the training max
-   * mid-block re-bases this for earlier rows, while `reps`, `targetReps` and
-   * the comparison between them stand on their own.
+   * What the week called for at the block's current training max.
+   *
+   * Carried so a row lifted at some other weight *can* be shown as one, but
+   * nothing renders it yet: `AmrapHistoryCard` prints the weight actually
+   * lifted and counts every attempt in its tally regardless of what it was
+   * done at. Until it is displayed, a set taken well above or below the
+   * prescription still reads as a plain hit or miss.
+   *
+   * Note "current": raising the training max mid-block re-bases this for
+   * earlier rows, while `reps`, `targetReps` and the comparison between them
+   * stand on their own.
    */
   prescribedWeightLb: number
   e1rmLb: number
