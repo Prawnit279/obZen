@@ -393,9 +393,14 @@ function WeeklySummaryTab() {
           <MacroComplianceChart />
         </div>
       )}
-      <div className="p-4 border border-noir-border rounded-[2px] bg-noir-surface">
-        {SHOW_DRUMS && <DrumPieChart />}
-      </div>
+      {/* The gate has to sit outside the frame, not inside it: hiding only the
+          chart left its bordered box behind, an empty 34px rectangle on the
+          Weekly tab for as long as Drums has been switched off. */}
+      {SHOW_DRUMS && (
+        <div className="p-4 border border-noir-border rounded-[2px] bg-noir-surface">
+          <DrumPieChart />
+        </div>
+      )}
       <div className="p-4 border border-noir-border rounded-[2px] bg-noir-surface">
         <ProgressOverloadChart />
       </div>
