@@ -12,7 +12,14 @@ function categorize(focusArea: string): string {
   return 'Groove / Free'
 }
 
-const SLICE_COLORS = ['#d4d4d4', '#a0a0a0', '#777777', '#444444']
+/**
+ * The chart series tokens, not a hardcoded grey ramp. The four literals here
+ * before were the same in all ten themes, and a donut is exactly where that
+ * shows — four flat greys beside an accented page.
+ */
+const SLICE_COLORS = [
+  'var(--series-1)', 'var(--series-2)', 'var(--series-3)', 'var(--series-4)',
+]
 const CATEGORIES = ['Rudiment', 'Lesson', 'Song', 'Groove / Free']
 
 function polar(cx: number, cy: number, r: number, deg: number) {

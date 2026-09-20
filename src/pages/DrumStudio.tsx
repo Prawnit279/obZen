@@ -4,6 +4,7 @@ import { RUDIMENTS, getRudimentsByFamily } from '@/data/rudiments'
 import { DRUM_BOOKS } from '@/data/drum-lessons'
 import { db } from '@/db/dexie'
 import { SegmentedPill } from '@/components/ui/SegmentedPill'
+import { DrumPieChart } from '@/components/modules/dashboard/DrumPieChart'
 import type { Song } from '@/db/dexie'
 import { deleteSong } from '@/lib/drum'
 import { MetronomeEngine } from '@/lib/metronome'
@@ -40,6 +41,16 @@ export default function DrumStudio() {
           Drums
         </h1>
       </div>
+
+      {/* What the last month of practice actually went on. It summarises every
+          tab rather than belonging to one of them, so it sits above the strip
+          instead of inside a section. Stranded on Home's Weekly tab until
+          that tab went. */}
+      {/* No Card label: the chart titles itself "Practice breakdown · last 30
+          days · N total", so a label above it said "last 30 days" twice. */}
+      <Card>
+        <DrumPieChart />
+      </Card>
 
       {/* Five segments at 375px leaves roughly 66px each, so the strip scrolls
           rather than squeezing the labels away. */}

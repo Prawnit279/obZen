@@ -3,6 +3,7 @@ import { useLiveQuery } from 'dexie-react-hooks'
 import { useNutritionStore } from '@/store/useNutritionStore'
 import { PITTA_NUTRITION } from '@/data/ayurveda'
 import { Card, CardHeader } from '@/components/ui/Card'
+import { MacroComplianceChart } from '@/components/modules/dashboard/MacroComplianceChart'
 import { cn } from '@/lib/utils'
 import { Plus, X, Trash2, ChevronLeft, ChevronRight, Star } from 'lucide-react'
 import { db } from '@/db/dexie'
@@ -443,6 +444,17 @@ export default function Nutrition() {
         </div>
         <div className="mt-3 text-[length:var(--text-xs)] border-l pl-3" style={{ color: 'var(--dim)', borderColor: 'var(--border)' }}>
           {targets.ayurvedicNote}
+        </div>
+      </Card>
+
+      {/* The week behind today's numbers. It was stranded on Home's Weekly tab
+          and scored against hardcoded targets of its own; it now reads the same
+          `targets` and colours as the bars above, so the two cannot disagree
+          about what a full day looks like. */}
+      <Card>
+        <CardHeader label="Last 7 days" />
+        <div className="mt-3">
+          <MacroComplianceChart targets={targets} colors={MACRO_CLR} />
         </div>
       </Card>
 

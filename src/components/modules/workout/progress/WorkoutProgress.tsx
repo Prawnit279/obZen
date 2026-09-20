@@ -39,6 +39,7 @@ import { BalanceCard } from './BalanceCard'
 import { ProgressionLadder } from './ProgressionLadder'
 import { AmrapCard } from './AmrapCard'
 import { MuscleVolumeCard } from './MuscleVolumeCard'
+import { WeeklyVolumeChart } from '@/components/modules/dashboard/WeeklyVolumeChart'
 import { WeightCheckCard } from './WeightCheckCard'
 
 /** Shared so the store selector returns a stable reference when empty. */
@@ -544,6 +545,14 @@ export function WorkoutProgress() {
 
       {/* ── Sets per muscle ───────────────────────────────────────────── */}
       <MuscleVolumeCard readings={muscles} />
+
+      {/* Tonnage per muscle per day, which is a different question from the
+          card above it (sets per muscle for the week) and from the one below
+          (tonnage for the week, undivided). It was stranded on Home's Weekly
+          tab when that tab went; this is the view it belongs to. */}
+      <Card label="Load by muscle, last 7 days">
+        <WeeklyVolumeChart />
+      </Card>
 
       <WeeklyVolumeCard
         volume={volume}

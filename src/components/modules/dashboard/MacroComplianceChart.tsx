@@ -1,10 +1,21 @@
 import { useLiveQuery } from 'dexie-react-hooks'
 import { db } from '@/db/dexie'
 
-const TARGETS = { protein: 150, carbs: 270, fat: 59 }
-const MACRO_COLORS = { protein: '#d4d4d4', carbs: '#888888', fat: '#555555' }
 const MACROS = ['protein', 'carbs', 'fat'] as const
 type Macro = typeof MACROS[number]
+
+/** The top of a macro's target range, which is what a bar is measured against. */
+export interface MacroTarget {
+  min: number
+  max: number
+}
+
+interface Props {
+  /** The day's real targets, from the page. */
+  targets: Record<Macro, MacroTarget>
+  /** The same colours the macro bars above use, so the two agree. */
+  colors: Record<Macro, string>
+}
 
 function getLast7Days(): string[] {
   const days: string[] = []
@@ -16,7 +27,22 @@ function getLast7Days(): string[] {
   return days
 }
 
-export function MacroComplianceChart() {
+/**
+ * Seven days of macros against the day's targets.
+ *
+ * Targets and colours are passed in rather than held here. They used to be
+ * hardcoded — `{ protein: 150, carbs: 270, fat: 59 }`, roughly the midpoints of
+ * the training-day ranges — so every bar was scored against a number nobody
+ * set, while the page above it was using the real `PITTA_NUTRITION` ranges and
+ * swapping them on training days.
+ *
+ * One honest limitation: the targets are today's, applied across the whole
+ * window. Nothing records whether a past day was a training day — the flag is a
+ * single toggle for now, not history — so a rest day in the window is measured
+ * against training-day numbers. Bars are drawn against the top of the range,
+ * which is the more forgiving end.
+ */
+export function MacroComplianceChart({ targets, colors }: Props) {
   const days = getLast7Days()
   const logs = useLiveQuery(
     () => db.nutritionLogs.where('date').between(days[0], days[6], true, true).toArray(),
@@ -85,7 +111,7 @@ export function MacroComplianceChart() {
           return (
             <g key={d}>
               {MACROS.map((macro, mi) => {
-                const bh = pctH(byDay[d][macro], TARGETS[macro])
+                const bh = pctH(byDay[d][macro], targets[macro].max)
                 const x = cx + mi * (barW + barGap)
                 return (
                   <rect key={macro}
@@ -93,7 +119,7 @@ export function MacroComplianceChart() {
                     y={mt + ch - bh}
                     width={barW}
                     height={bh}
-                    fill={isLogged ? MACRO_COLORS[macro] : '#2a2a2a'}
+                    fill={isLogged ? colors[macro] : 'var(--hairline)'}
                   />
                 )
               })}
@@ -109,7 +135,7 @@ export function MacroComplianceChart() {
       <div className="flex gap-4 mt-1">
         {MACROS.map(m => (
           <div key={m} className="flex items-center gap-1">
-            <div className="w-2 h-2" style={{ background: MACRO_COLORS[m] }} />
+            <div className="w-2 h-2" style={{ background: colors[m] }} />
             <span className="text-[length:var(--text-3xs)] uppercase tracking-widest text-noir-dim">{m}</span>
           </div>
         ))}

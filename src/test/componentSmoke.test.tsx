@@ -491,7 +491,9 @@ describe('WeeklyVolumeChart — renders without crashing', () => {
     ])
 
     const { container } = render(<WeeklyVolumeChart />)
-    await screen.findByText(/weekly volume/i)
+    // Waits on the legend rather than a heading: the chart no longer titles
+    // itself, because the Card it now sits in does that instead.
+    await screen.findByText(/^legs$/i)
 
     await waitFor(() => expect(container.querySelectorAll('rect').length).toBeGreaterThan(0))
     expect(screen.queryByText(/no workout data this week/i)).not.toBeInTheDocument()
@@ -521,7 +523,9 @@ describe('WeeklyVolumeChart — renders without crashing', () => {
       { exerciseId: 'barbell-squat', name: 'Barbell Squat', muscle: 'legs', weight: 225, reps: 5 },
     ])
     render(<WeeklyVolumeChart />)
-    await screen.findByText(/weekly volume/i)
+    // Same re-anchoring as above — the legend is the chart's own, the title is
+    // the Card's.
+    await screen.findByText(/^legs$/i)
 
     for (const muscle of ['legs', 'back', 'shoulders', 'arms', 'chest', 'core']) {
       expect(screen.getByText(muscle)).toBeInTheDocument()

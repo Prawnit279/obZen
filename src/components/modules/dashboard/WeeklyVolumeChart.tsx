@@ -82,7 +82,6 @@ export function WeeklyVolumeChart() {
 
   return (
     <div>
-      <div className="text-[length:var(--text-2xs)] uppercase tracking-widest text-noir-dim mb-2">Weekly Volume · lbs lifted</div>
       <svg width="100%" viewBox={`0 0 ${W} ${H}`}>
         {[0, 0.5, 1].map(t => {
           const y = mt + ch * (1 - t)
