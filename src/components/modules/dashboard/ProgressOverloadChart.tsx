@@ -5,6 +5,7 @@ import { belongsToProfile } from '@/lib/workoutSession'
 import { useProfileStore } from '@/store/useProfileStore'
 import { PROFILES } from '@/config/profiles'
 import { realSets, loadedWeightLb } from '@/lib/progress'
+import { SERIES_DASHES } from '@/components/modules/workout/progress/Charts'
 
 const LINE_COLORS = ['var(--series-1)', 'var(--series-2)', 'var(--series-3)']
 
@@ -98,7 +99,16 @@ export function ProgressOverloadChart() {
           ).join(' ')
           return (
             <g key={ex}>
-              <path d={pathD} fill="none" stroke={color} strokeWidth="1.5" />
+              {/* Dash as well as colour. The lift-trend card directly above
+                  this one cycles `SERIES_DASHES` for the same reason, and three
+                  series told apart by hue alone were genuinely hard to read
+                  side by side — the repo's rule is that meaning never rests on
+                  colour. Same source as that card, so the two cannot drift. */}
+              <path
+                d={pathD} fill="none" stroke={color} strokeWidth="1.5"
+                strokeDasharray={SERIES_DASHES[li % SERIES_DASHES.length]}
+                strokeLinecap="round" strokeLinejoin="round"
+              />
               {pts.map(([date, w]) => (
                 <circle key={date} cx={toX(date)} cy={toY(w)} r="3" fill={color} />
               ))}
@@ -123,7 +133,14 @@ export function ProgressOverloadChart() {
       <div className="flex gap-4 flex-wrap mt-1">
         {activeSeries.map(ex => (
           <div key={ex} className="flex items-center gap-1">
-            <div className="w-4 h-[2px]" style={{ background: LINE_COLORS[keyLiftIds.indexOf(ex)] }} />
+            <svg width="16" height="3" aria-hidden>
+              <line
+                x1="0" y1="1.5" x2="16" y2="1.5"
+                stroke={LINE_COLORS[keyLiftIds.indexOf(ex)]}
+                strokeWidth="2"
+                strokeDasharray={SERIES_DASHES[keyLiftIds.indexOf(ex) % SERIES_DASHES.length]}
+              />
+            </svg>
             <span className="text-[length:var(--text-3xs)] uppercase tracking-widest text-noir-dim">
               {exerciseNameFor(ex)}
             </span>

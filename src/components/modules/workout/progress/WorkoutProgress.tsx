@@ -40,6 +40,7 @@ import { ProgressionLadder } from './ProgressionLadder'
 import { AmrapCard } from './AmrapCard'
 import { MuscleVolumeCard } from './MuscleVolumeCard'
 import { WeeklyVolumeChart } from '@/components/modules/dashboard/WeeklyVolumeChart'
+import { ProgressOverloadChart } from '@/components/modules/dashboard/ProgressOverloadChart'
 import { WeightCheckCard } from './WeightCheckCard'
 
 /** Shared so the store selector returns a stable reference when empty. */
@@ -305,6 +306,18 @@ export function WorkoutProgress() {
         todayISO={todayISO()}
         barMode={barMode}
       />
+
+      {/* Every key lift's heaviest working set on one axis, all of it at once.
+          It overlaps the card above — that card's "Top set" measure plots the
+          same numbers, with a range selector and a lift filter this one has
+          not got — and it is mounted here deliberately anyway: a single fixed
+          all-time view of the three lifts together takes no choosing, which is
+          the one thing the configurable card cannot offer.
+
+          It titles itself, so the Card around it carries no label. */}
+      <Card>
+        <ProgressOverloadChart />
+      </Card>
 
       {/* ── Lifts that have stopped moving ─────────────────────────────── */}
       {stalled.length > 0 && <StallCard signals={stalled} />}
