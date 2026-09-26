@@ -471,7 +471,18 @@ export interface BarDatum {
   value: number
 }
 
-export function BarChart({ data, unit = '' }: { data: BarDatum[]; unit?: string }) {
+interface BarChartProps {
+  data: BarDatum[]
+  unit?: string
+  /**
+   * Told which bar is lit, when a caller needs to show more about that period
+   * than a bar can hold. Optional, and the chart keeps owning the selection
+   * either way — this reports, it does not control.
+   */
+  onSelect?: (index: number) => void
+}
+
+export function BarChart({ data, unit = '', onSelect }: BarChartProps) {
   const [selected, setSelected] = useState<number | null>(null)
   if (data.length === 0) return <ChartEmpty text="No volume logged yet." />
 
@@ -514,7 +525,15 @@ export function BarChart({ data, unit = '' }: { data: BarDatum[]; unit?: string 
           return (
             <button
               key={d.label}
-              onClick={() => setSelected(selected === i ? null : i)}
+              onClick={() => {
+                // Tapping the lit bar clears the selection, which falls back to
+                // the latest period with data — so the caller is told that
+                // index rather than "nothing", and never has to render a
+                // readout with no period behind it.
+                const next = selected === i ? null : i
+                setSelected(next)
+                onSelect?.(next ?? lastWithValue)
+              }}
               aria-pressed={on}
               aria-label={`${d.label}: ${fmt(d.value)}${unit ? ` ${unit}` : ''}`}
               className="flex-1 flex flex-col items-center justify-end"

@@ -182,10 +182,6 @@ export function WorkoutProgress() {
   // Bodyweight matters here: assisted and bodyweight work are scored on the
   // load actually moved, not on the number in the weight field.
   const volume = weeklyVolume(mine, bodyweightKg)
-  // Main work and assistance counted apart, so five-by-ten volume does not
-  // stand in for the training it hangs off.
-  const mainVolume = weeklyVolume(mine, bodyweightKg, 'main')
-  const suppVolume = weeklyVolume(mine, bodyweightKg, 'supplemental')
   // Look the current week up by key — `volume` only contains weeks that were
   // trained, so its last entry is the most recent *trained* week, which is not
   // the current one after any week off.
@@ -568,9 +564,8 @@ export function WorkoutProgress() {
       </Card>
 
       <WeeklyVolumeCard
-        volume={volume}
-        main={mainVolume}
-        supplemental={suppVolume}
+        sessions={mine}
+        bodyweightKg={bodyweightKg}
         todayISO={todayISO()}
       />
 
