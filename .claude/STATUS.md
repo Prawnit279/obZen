@@ -1,5 +1,5 @@
 # obZen — Build Status
-Last updated: 2026-09-18 | SHA: f307928f
+Last updated: 2026-09-26 | SHA: 06a8b48c
 
 Local-first training and drum-practice PWA. One profile, one device, no
 account, no server. Everything lives in IndexedDB and localStorage, and a JSON
@@ -67,7 +67,7 @@ route, both nav surfaces and the dashboard chart, and nothing was removed.
   bare hex — a chart fill survived the first pass that way.
 - PWA: service worker, manifest, offline-first
 - GitHub Pages deploy on every push to main, with the tests gating it
-- **951 tests**, `src/lib` at 96% of statements
+- **979 tests**, `src/lib` at 96% of statements
 - All type sizes come from `--text-*` tokens (globals.css) — no hardcoded
   `fontSize`/`text-[Npx]` anywhere, including SVG (which needs
   `style={{ fontSize: 'var(...)' }}`, not the `fontSize="N"` attribute — a
@@ -130,10 +130,23 @@ Body carried one.
   and strength against bodyweight
 - Load & recovery (ACWR), sets per muscle against MEV/MAV/MRV, plan vs actual,
   progression ladders
-- **Weekly volume**, counted as tonnage or as sets — heavy triples and light
-  tens can land on a similar total while being nothing alike. Once sets are
-  marked supplemental it also splits main work from assistance, which on a
-  five-by-ten week is the difference between 5,110 lb and 10,000 lb.
+- **Volume**, week by week, counted as tonnage or as sets — heavy triples and
+  light tens can land on a similar total while being nothing alike. Tap any bar
+  and the whole readout moves to that week: total, the main/assistance split,
+  and the change against the week before. Range opens to six months or the
+  whole log. `lib/volumeWeeks.ts` assembles it, and unlike `weeklyVolume` it
+  keeps untrained weeks as zeroes — a fortnight off is the point of a history,
+  and a series that skips it reads as continuous training. The chart and the
+  figures come from one call, so the bar tapped and the numbers read cannot
+  describe different weeks.
+- **Load by muscle, last 7 days** — tonnage per muscle per day, stacked, with a
+  legend. A different question from the two cards around it (sets per muscle
+  for the week; tonnage for the week, undivided).
+- **Progressive overload** — every key lift's heaviest working set on one axis,
+  all of it at once. Overlaps the lift trend's "Top set" measure deliberately:
+  a single fixed all-time view takes no choosing, which the configurable card
+  cannot offer. Distinguished by dash as well as colour, from the same
+  `SERIES_DASHES` the trend card uses.
 - **Current block** — which programme, which week of the cycle, which cycle,
   whether it is a deload, and the sets this week asks for, supplemental
   included. Percentages come from `strengthTools`, never restated.
@@ -237,12 +250,22 @@ weight moves between blocks. Which templates to offer is settled — all four.
 Nothing here will be guessed; the container holds `null` until the numbers
 arrive. **Bigger Leaner Stronger** is untouched, per instruction.
 
-### Orphaned, not deleted
-`WeeklyVolumeChart`, `ProgressOverloadChart`, `MacroComplianceChart` and
-`DrumPieChart` in `components/modules/dashboard/` lost their only caller when
-Home's Weekly tab went. Left in the tree rather than removed — two still have
-smoke tests, and the overload and volume charts may be worth a home in Progress
-rather than a deletion.
+### Rehomed
+All four charts that lost their caller when Home's Weekly tab went now have
+one. `WeeklyVolumeChart` and `ProgressOverloadChart` went to Progress —
+Workload and Strength respectively — `MacroComplianceChart` to Nutrition and
+`DrumPieChart` to Drums, above the tabs, since it summarises all of them.
+
+Two needed correcting before they were honest in their new homes. The macro
+chart scored against hardcoded targets of its own (`{ protein: 150, carbs: 270,
+fat: 59 }`, roughly the midpoints of the training-day ranges) while the page
+above it used the real `PITTA_NUTRITION` ranges and swapped them on training
+days; it now takes both targets and colours from that page. The drum donut used
+four literal greys, identical in all ten themes, and now uses `--series-*`.
+
+One limitation stands: the macro chart applies today's targets across its whole
+seven-day window, because nothing records whether a past day was a training
+day — the flag is a single toggle for now, not history.
 
 ### Deferred
 Yoga pose animation rewrite, streaks, focus timer, weekly review, global search,
@@ -272,5 +295,27 @@ does not yet know about rounds.
 - **Set flags are omitted, never `false`.** `isAmrap` and `isSupplemental` are
   deleted from the object when off, so no stored row or backup gains a key that
   says nothing. `withFlag` in `SetLogger` is the only place that rule lives.
+- **`--accent` is not the accent colour.** It is a legacy noircut alias declared
+  `--accent: var(--ink)` — the primary *text* colour. Filling a surface with it
+  and labelling with `--on-accent` (white) gives white on white, silently, in
+  every theme; it cost two illegible buttons and two ink-coloured progress bars
+  before anything noticed. The real fills are `violet-200 → violet-700` with
+  dark text (the `primary` Button variant), `violet-400 → violet-900` with
+  `--on-accent`, or a flat `--violet-400` for a bar.
+  `src/test/accentAlias.test.ts` guards it, ternary spelling included.
+- **A guard the type could enforce instead.** `WeekPrescription` was one flat
+  shape until a review pointed out nothing stopped `unavailable` and a list of
+  lifts existing together — they were kept apart only by every early return
+  happening to fire first. It is a discriminated union now and the combination
+  does not compile. Worth reaching for when two fields are only ever valid
+  apart.
+- **The status bar is translucent.** `black-translucent` plus
+  `viewport-fit=cover` means the clock is painted onto the page, and
+  `.page-container` is the scroller — so content scrolls under it. `AppShell`
+  paints a scrim over the top inset, as `BottomNav` always has at its end.
 - Tools has both a route and a Train tab, the same duplication the Progress tab
   had before it was removed.
+- **Four charts live under `components/modules/dashboard/` but three are no
+  longer dashboard components** — they moved to Progress, Nutrition and Drums
+  when Home's Weekly tab went. The directory name is now wrong for them; a
+  rename was left for a deliberate decision rather than taken in passing.
