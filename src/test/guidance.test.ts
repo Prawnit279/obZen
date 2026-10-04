@@ -18,6 +18,8 @@ import type { GuidanceReading } from '@/lib/guidance'
 import type { WorkoutDaySession } from '@/db/dexie'
 import type { IntakeAnswers } from '@/lib/intake'
 import type { ActiveBlock } from '@/store/useBlockStore'
+import { adherence } from '@/lib/progressTrends'
+import { getScheduledDay } from '@/data/obzen-program'
 
 const TODAY = '2026-09-18'
 
@@ -74,6 +76,7 @@ describe('a reading with nothing behind it', () => {
     // One missed week is not a pattern, and calling it one would train the
     // reader to ignore the card.
     const barely = reading({
+      sessions: [squatDay('2026-07-13'), squatDay('2026-09-14')],
       adherence: { weeks: [], trained: 1, planned: MIN_PLANNED_FOR_ADHERENCE - 1, extra: 0 },
     })
     expect(ids(barely)).not.toContain('under-plan')
@@ -89,9 +92,16 @@ describe('a reading with nothing behind it', () => {
 // ── Training against the plan ────────────────────────────────────────────────
 
 describe('plan against actual', () => {
-  const missing = reading({
-    adherence: { weeks: [], trained: 9, planned: 24, extra: 0 },
-  })
+  /**
+   * Enough history for the gap to be judgeable. The tip is gated on weeks
+   * logged, not on `planned` — see `MIN_WEEKS_LOGGED` — so a fixture with no
+   * sessions is a fixture the tip will correctly ignore.
+   */
+  const logged = [squatDay('2026-07-13'), squatDay('2026-09-14')]
+  const withPlan = (adherence: GuidanceReading['adherence']) =>
+    reading({ sessions: logged, adherence })
+
+  const missing = withPlan({ weeks: [], trained: 9, planned: 24, extra: 0 })
 
   it('names the gap once there is enough of a window to mean something', () => {
     const tip = guidance(missing).find(t => t.id === 'under-plan')!
@@ -110,9 +120,7 @@ describe('plan against actual', () => {
     // The threshold counts trained + extra; printing `trained` alone meant the
     // tip could fire on eleven sessions and report eight, so the reader could
     // not reproduce the decision from the line meant to justify it.
-    const withExtra = reading({
-      adherence: { weeks: [], trained: 8, planned: 24, extra: 3 },
-    })
+    const withExtra = withPlan({ weeks: [], trained: 8, planned: 24, extra: 3 })
     const tip = guidance(withExtra).find(t => t.id === 'under-plan')!
     expect(tip).toBeDefined()
     expect(tip.basis).toMatch(/11 in all/)
@@ -126,13 +134,13 @@ describe('plan against actual', () => {
   })
 
   it('says nothing when the plan is being kept', () => {
-    const kept = reading({ adherence: { weeks: [], trained: 22, planned: 24, extra: 0 } })
+    const kept = withPlan({ weeks: [], trained: 22, planned: 24, extra: 0 })
     expect(ids(kept)).not.toContain('under-plan')
   })
 
   it('counts unplanned sessions as credit, never against', () => {
     // Training more than planned must not read as being off-plan.
-    const extra = reading({ adherence: { weeks: [], trained: 12, planned: 24, extra: 10 } })
+    const extra = withPlan({ weeks: [], trained: 12, planned: 24, extra: 10 })
     expect(ids(extra)).not.toContain('under-plan')
   })
 })
@@ -337,7 +345,7 @@ describe('every tip, whatever it says', () => {
       'life-stress': { kind: 'single', value: 'high' },
     },
     block,
-    sessions: [squatDay('2026-09-08'), squatDay('2026-09-15')],
+    sessions: [squatDay('2026-07-13'), squatDay('2026-09-08'), squatDay('2026-09-15')],
     lastWeighInISO: '2026-06-01',
     adherence: { weeks: [], trained: 9, planned: 24, extra: 0 },
     load: { acute: 9, chronic: 4, ratio: 2.1, verdict: 'spike', ratedSessions: 6 },
@@ -402,5 +410,46 @@ describe('every tip, whatever it says', () => {
     })
     const found = guidance(noteBeforeSuggest).map(t => t.id)
     expect(found).toEqual(['no-weigh-in', 'no-amrap-flagged'])
+  })
+})
+
+// ── Against the real adherence, not a hand-built one ─────────────────────────
+
+describe('a log that has only just started', () => {
+  /**
+   * Every other test in this file hands `guidance` an `Adherence` built by
+   * hand, which let a production defect hide: `adherence()` derives `planned`
+   * from the calendar window, not from how long the lifter has been training,
+   * so on a four-day plan it is roughly 32 whatever the log holds. The
+   * threshold meant to stop a short history reading as a collapse never
+   * engaged. These go through the real function.
+   */
+  const trains = (d: Date) => getScheduledDay(4, d).kind === 'train'
+
+  it('does not accuse a lifter one session in of missing sessions', () => {
+    const first = squatDay('2026-09-17')
+    const real = adherence([first], trains, TODAY)
+
+    // The fixture is only honest if `planned` really is large.
+    expect(real.planned).toBeGreaterThan(MIN_PLANNED_FOR_ADHERENCE * 2)
+
+    const tips = guidance(reading({
+      sessions: [first],
+      adherence: real,
+      settings: { trainingDays: 4, weightGoal: null },
+    }))
+    expect(tips.map(t => t.id)).not.toContain('under-plan')
+  })
+
+  it('still names a real gap once there is enough history to judge', () => {
+    // Ten weeks of training, four days planned a week, two sessions kept.
+    const sessions = ['2026-07-13', '2026-08-20'].map(d => squatDay(d))
+    const real = adherence(sessions, trains, TODAY)
+    const tips = guidance(reading({
+      sessions,
+      adherence: real,
+      settings: { trainingDays: 4, weightGoal: null },
+    }))
+    expect(tips.map(t => t.id)).toContain('under-plan')
   })
 })

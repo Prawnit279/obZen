@@ -1,9 +1,13 @@
 import { defineConfig } from 'vitest/config'
 import react from '@vitejs/plugin-react'
 import path from 'path'
+import { buildDefines } from './build-id'
 
 export default defineConfig({
   plugins: [react()],
+  // Same stamps as the build. Without these, any component reading them
+  // throws at render time rather than failing at config time.
+  define: buildDefines(),
   test: {
     environment: 'jsdom',
     globals: true,

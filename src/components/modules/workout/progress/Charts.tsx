@@ -526,13 +526,21 @@ export function BarChart({ data, unit = '', onSelect }: BarChartProps) {
             <button
               key={d.label}
               onClick={() => {
-                // Tapping the lit bar clears the selection, which falls back to
-                // the latest period with data — so the caller is told that
+                // Tapping the lit bar clears the selection, which falls back
+                // to the latest period with data — so the caller is told that
                 // index rather than "nothing", and never has to render a
                 // readout with no period behind it.
+                //
+                // Except when there is no such period: `lastWithValue` is -1
+                // on all-zero data, and reporting that had callers index their
+                // own list with -1 and render `undefined`. Falling back to the
+                // bar actually tapped keeps the report a real index — the
+                // period is empty, which is a fine thing to show, rather than
+                // absent, which is not.
                 const next = selected === i ? null : i
                 setSelected(next)
-                onSelect?.(next ?? lastWithValue)
+                const reported = next ?? lastWithValue
+                onSelect?.(reported >= 0 ? reported : i)
               }}
               aria-pressed={on}
               aria-label={`${d.label}: ${fmt(d.value)}${unit ? ` ${unit}` : ''}`}

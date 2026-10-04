@@ -398,11 +398,17 @@ export default function Settings() {
           </div>
         </CollapsibleCard>
 
-        <CollapsibleCard label="App" summary="1.0.0">
+        <CollapsibleCard label="App" summary={__BUILD_ID__}>
           <div className="space-y-2 text-[length:var(--text-md)]">
+            {/* The commit, not a hand-written version. An installed PWA can
+                serve a cached build for days, and "1.0.0" said the same thing
+                whether it was yesterday's copy or today's — so there was no way
+                to tell from inside the app whether an update had landed. */}
             <div className="flex justify-between">
-              <span className="text-[color:var(--ink-faint)]">Version</span>
-              <span className="text-[color:var(--ink-dim)]">1.0.0</span>
+              <span className="text-[color:var(--ink-faint)]">Build</span>
+              <span className="text-[color:var(--ink-dim)]" style={{ fontVariantNumeric: 'tabular-nums' }}>
+                {__BUILD_ID__} · {__BUILD_DATE__}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-[color:var(--ink-faint)]">Storage</span>

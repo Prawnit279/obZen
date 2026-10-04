@@ -76,8 +76,25 @@ export interface GuidanceReading {
  *
  * A reporting threshold, not a training rule: two weeks of a four-day plan is
  * eight sessions, and below that a single illness reads as a collapse.
+ *
+ * On its own this never engaged. `adherence` derives `planned` from the
+ * calendar window rather than from how long anyone has been training, so on a
+ * four-day plan it is roughly 32 whatever the log holds — including for
+ * someone who installed the app yesterday. The intent above is about history,
+ * not arithmetic, so `MIN_WEEKS_LOGGED` below is what actually holds it; this
+ * stays as the floor it was always meant to be.
  */
 export const MIN_PLANNED_FOR_ADHERENCE = 8
+
+/**
+ * Weeks of training behind the log before an adherence gap is named.
+ *
+ * Two, matching the sentence above. A lifter one session in has not missed
+ * anything — there is no stretch to have fallen short over — and telling them
+ * otherwise in a warning tone is exactly the confident wrong reading this
+ * module exists to avoid.
+ */
+export const MIN_WEEKS_LOGGED = 2
 
 /**
  * The share of planned sessions below which the gap is named. Chosen so that
@@ -113,8 +130,17 @@ export function guidance(r: GuidanceReading): Tip[] {
   // `extra` is credit: training off-plan counts as kept, never as missed, which
   // is the same rule `adherence` itself applies.
   const kept = r.adherence.trained + r.adherence.extra
+  // How long there has actually been a log, which is the thing the threshold
+  // was always about. `planned` cannot answer it: it counts calendar days.
+  const firstLogged = r.sessions.reduce<string | null>(
+    (acc, s) => (acc === null || s.date < acc ? s.date : acc),
+    null
+  )
+  const weeksLogged = firstLogged === null ? null : weeksBetween(firstLogged, r.todayISO)
   if (
-    r.adherence.planned >= MIN_PLANNED_FOR_ADHERENCE
+    weeksLogged !== null
+    && weeksLogged >= MIN_WEEKS_LOGGED
+    && r.adherence.planned >= MIN_PLANNED_FOR_ADHERENCE
     && kept < r.adherence.planned * UNDER_PLAN_RATIO
   ) {
     tips.push({

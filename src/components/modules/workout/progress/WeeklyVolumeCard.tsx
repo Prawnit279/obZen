@@ -71,8 +71,11 @@ export function WeeklyVolumeCard({ sessions, bodyweightKg, todayISO }: Props) {
   // the end does not leave the card reading zero.
   const lastWithData = weeks.reduce((acc, w, i) => (w.total.sets > 0 ? i : acc), -1)
   const fallback = lastWithData >= 0 ? lastWithData : weeks.length - 1
-  // Clamped: the range can shrink under a selection made in a longer one.
-  const index = Math.min(picked ?? fallback, weeks.length - 1)
+  // Clamped at both ends. The upper bound is for a range shrinking under a
+  // selection made in a longer one; the lower is because the index arrives
+  // from the chart, and an index out of range here renders `undefined` and
+  // throws on the first field read rather than failing anywhere visible.
+  const index = Math.max(0, Math.min(picked ?? fallback, weeks.length - 1))
   const week = weeks[index]
   const previous = index > 0 ? weeks[index - 1] : null
 

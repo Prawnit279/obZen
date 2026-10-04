@@ -84,7 +84,7 @@ export function Sidebar() {
           className="uppercase"
           style={{ fontSize: 'var(--text-sm)', letterSpacing: '0.08em', color: 'var(--ink-dim)' }}
         >
-          v1.0.0
+          {__BUILD_ID__}
         </div>
       </div>
     </aside>

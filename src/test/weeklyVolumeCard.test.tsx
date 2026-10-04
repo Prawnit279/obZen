@@ -273,3 +273,27 @@ describe('the exercise breakdown', () => {
     expect(screen.getByText(/tap a week to read it/i)).toBeInTheDocument()
   })
 })
+
+describe('a range containing no training at all', () => {
+  // Reachable for anyone returning from a layoff longer than the window: there
+  // are sessions, so the empty-state return does not fire, but every week on
+  // screen is zero.
+  const longAgo = session('2026-06-04', [set(250, 2)])
+
+  it('still renders', () => {
+    show([longAgo])
+    expect(screen.getByText(/Week of/)).toBeInTheDocument()
+  })
+
+  it('survives clearing a selection, which has no week to fall back to', async () => {
+    // `BarChart` reports the index it falls back to when a selection is
+    // cleared, and that fallback is -1 when no bar has a value. Indexing the
+    // week list with -1 gave `undefined` and the card threw on the first field
+    // it read.
+    show([longAgo])
+    const bar = screen.getAllByRole('button', { name: /^W\d+: 0 lb$/ })[0]
+    await userEvent.click(bar)      // select
+    await userEvent.click(bar)      // clear — this is what crashed
+    expect(screen.getByText(/Week of/)).toBeInTheDocument()
+  })
+})
