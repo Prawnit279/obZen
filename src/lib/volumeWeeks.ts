@@ -80,8 +80,13 @@ export function volumeWeeks(
   // start date would give one more, because the start lands mid-week; the label
   // would then be a lie and the list would be a row longer than the chart.
   // `all` is inclusive instead: it runs from the first week actually trained.
+  // Rounded, not floored. `mondayOf` works in local time, so two Mondays
+  // across a spring-forward are 167 hours apart rather than 168 — flooring
+  // that lost a week, and in the `all` branch the week it lost was `weeks[0]`,
+  // which is by construction the first week the lifter ever trained. One hour
+  // in 168 cannot survive rounding.
   const count = range === 'all'
-    ? Math.floor((lastMonday.getTime() - mondayOf(from).getTime()) / (7 * DAY_MS)) + 1
+    ? Math.round((lastMonday.getTime() - mondayOf(from).getTime()) / (7 * DAY_MS)) + 1
     : Math.round((Date.parse(`${todayISO}T12:00:00`) - Date.parse(`${from}T12:00:00`)) / (7 * DAY_MS))
   if (count <= 0) return []
 

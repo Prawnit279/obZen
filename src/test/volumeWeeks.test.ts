@@ -251,3 +251,34 @@ describe('weekByExercise', () => {
     expect(weekByExercise([empty], 0, isoWeekKey(TODAY))).toEqual([])
   })
 })
+
+// ── Clocks that do not run at one hour per hour ──────────────────────────────
+
+describe('across a daylight-saving boundary', () => {
+  /**
+   * `mondayOf` works in local time, so two Mondays either side of a
+   * spring-forward are 167 hours apart, not 168. Flooring that count dropped a
+   * week — and in the `all` range the dropped row is `weeks[0]`, which is the
+   * first week the lifter ever trained.
+   *
+   * `vitest.config.ts` pins a DST-observing zone, so this test means something
+   * wherever it runs. Under UTC it would pass against the broken code.
+   */
+  const spring = [session('2026-02-02', [set(100, 5)]), session('2026-05-07', [set(100, 5)])]
+
+  it('keeps the first trained week', () => {
+    const weeks = volumeWeeks(spring, 0, 'all', '2026-05-07')
+    expect(weeks[0].week).toBe(isoWeekKey('2026-02-02'))
+    expect(weeks[0].total.sets).toBe(1)
+  })
+
+  it('still ends on the week containing today', () => {
+    const weeks = volumeWeeks(spring, 0, 'all', '2026-05-07')
+    expect(weeks[weeks.length - 1].week).toBe(isoWeekKey('2026-05-07'))
+  })
+
+  it('counts every week between the two, with none duplicated', () => {
+    const keys = volumeWeeks(spring, 0, 'all', '2026-05-07').map(w => w.week)
+    expect(new Set(keys).size).toBe(keys.length)
+  })
+})
