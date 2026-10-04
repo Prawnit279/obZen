@@ -194,3 +194,82 @@ describe('the main/supplemental split', () => {
     expect(screen.getByText('0 lb')).toBeInTheDocument()
   })
 })
+
+describe('the exercise breakdown', () => {
+  /** A week on two different lifts, so there is something to break into. */
+  const twoLifts: WorkoutDaySession = {
+    date: TODAY,
+    dayLabel: 'Day 1',
+    profileId: 'pronit',
+    order: ['leg-press', 'lat-pulldown'],
+    exercises: [
+      { exerciseId: 'leg-press', status: 'complete', sets: [set(200, 5), set(200, 5)] },
+      { exerciseId: 'lat-pulldown', status: 'complete', sets: [set(100, 5)] },
+    ],
+  } as WorkoutDaySession
+
+  it('says how many exercises the week held, without opening', () => {
+    show([twoLifts])
+    expect(screen.getByRole('button', { name: /2 exercises/i })).toBeInTheDocument()
+    expect(screen.queryByText('Leg Press')).not.toBeInTheDocument()
+  })
+
+  it('lists them heaviest first once opened', async () => {
+    show([twoLifts])
+    await userEvent.click(screen.getByRole('button', { name: /2 exercises/i }))
+
+    const legPress = screen.getByText('Leg Press')
+    const pulldown = screen.getByText('Lat Pulldown')
+    expect(legPress).toBeInTheDocument()
+    expect(pulldown).toBeInTheDocument()
+    // 2,000 lb of leg press against 500 lb of pulldown.
+    expect(legPress.compareDocumentPosition(pulldown) & Node.DOCUMENT_POSITION_FOLLOWING).toBeTruthy()
+  })
+
+  it('folds away again', async () => {
+    show([twoLifts])
+    const toggle = screen.getByRole('button', { name: /2 exercises/i })
+    await userEvent.click(toggle)
+    expect(screen.getByText('Leg Press')).toBeInTheDocument()
+    await userEvent.click(toggle)
+    expect(screen.queryByText('Leg Press')).not.toBeInTheDocument()
+  })
+
+  it('follows the metric toggle', async () => {
+    const { sets } = show([twoLifts])
+    await userEvent.click(screen.getByRole('button', { name: /2 exercises/i }))
+    expect(screen.getByText('2,000 lb')).toBeInTheDocument()
+    await userEvent.click(sets)
+    expect(screen.getByText('2 sets')).toBeInTheDocument()
+  })
+
+  it('moves to the week whose bar is tapped', async () => {
+    const earlier: WorkoutDaySession = {
+      ...twoLifts,
+      date: LAST_WEEK,
+      order: ['lat-pulldown'],
+      exercises: [{ exerciseId: 'lat-pulldown', status: 'complete', sets: [set(100, 5)] }],
+    } as WorkoutDaySession
+
+    show([earlier, twoLifts])
+    expect(screen.getByRole('button', { name: /2 exercises/i })).toBeInTheDocument()
+
+    await userEvent.click(screen.getByRole('button', { name: /^W37: 500 lb$/ }))
+    expect(screen.getByRole('button', { name: /^1 exercise\b/i })).toBeInTheDocument()
+  })
+
+  it('stays away entirely for a week with nothing in it', async () => {
+    show([twoLifts])
+    // An untrained week has no parts; a disclosure promising a breakdown that
+    // turns out to be blank is worse than none.
+    await userEvent.click(screen.getByRole('button', { name: /^W31: 0 lb$/ }))
+    expect(screen.queryByRole('button', { name: /^\d+ exercises?\b/i })).not.toBeInTheDocument()
+  })
+
+  it('tells the reader the chart can be tapped at all', () => {
+    // The feature existed for a release and went unused because nothing said
+    // the bars were interactive.
+    show([twoLifts])
+    expect(screen.getByText(/tap a week to read it/i)).toBeInTheDocument()
+  })
+})

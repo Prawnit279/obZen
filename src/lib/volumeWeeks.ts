@@ -19,7 +19,8 @@
 
 import type { WorkoutDaySession } from '@/db/dexie'
 import type { WeeklyVolume } from '@/lib/progress'
-import { weeklyVolume, isoWeekKey } from '@/lib/progress'
+import { weeklyVolume, isoWeekKey, realSets, exerciseTonnage } from '@/lib/progress'
+import { exerciseNameFor } from '@/data/obzen-program'
 import type { LiftRange } from '@/lib/liftViews'
 import { rangeStart } from '@/lib/liftViews'
 
@@ -107,4 +108,66 @@ export function volumeWeeks(
       supplemental: byKind.supplemental.get(week) ?? blank(week),
     }
   })
+}
+
+// ── What a week was made of ──────────────────────────────────────────────────
+
+export interface ExerciseVolume {
+  exerciseId: string
+  /** Resolved for display, so a row is readable without knowing ids. */
+  name: string
+  tonnageKg: number
+  sets: number
+  /** Of those sets, how many were marked assistance. */
+  supplementalSets: number
+}
+
+/**
+ * One week broken into the exercises that made it.
+ *
+ * Ordered by tonnage, heaviest first: the question a breakdown answers is what
+ * drove the week, and alphabetical order buries that under whatever happens to
+ * start with A.
+ *
+ * Tonnage comes from `exerciseTonnage`, the same leaf the weekly totals use, so
+ * the rows sum to the header above them — a breakdown that does not add up to
+ * its own total is worse than no breakdown. The test asserts that directly.
+ *
+ * An untrained week returns an empty list rather than rows of zeroes: it has no
+ * parts, and inventing some would name exercises that were never done.
+ */
+export function weekByExercise(
+  sessions: WorkoutDaySession[],
+  bodyweightKg: number,
+  weekKey: string
+): ExerciseVolume[] {
+  const byExercise = new Map<string, ExerciseVolume>()
+
+  for (const s of sessions) {
+    if (isoWeekKey(s.date) !== weekKey) continue
+    for (const ex of s.exercises) {
+      const sets = realSets(ex)
+      // Opened but never logged. `realSets` already drops the logger's
+      // placeholder rows, so this is a genuinely empty entry.
+      if (sets.length === 0) continue
+
+      const row = byExercise.get(ex.exerciseId) ?? {
+        exerciseId: ex.exerciseId,
+        name: exerciseNameFor(ex.exerciseId),
+        tonnageKg: 0,
+        sets: 0,
+        supplementalSets: 0,
+      }
+      byExercise.set(ex.exerciseId, {
+        ...row,
+        // The same leaf the week totals go through, including the bar and the
+        // assisted-lift handling, so the two cannot disagree.
+        tonnageKg: row.tonnageKg + exerciseTonnage(ex, bodyweightKg),
+        sets: row.sets + sets.length,
+        supplementalSets: row.supplementalSets + sets.filter(set => set.isSupplemental === true).length,
+      })
+    }
+  }
+
+  return [...byExercise.values()].sort((a, b) => b.tonnageKg - a.tonnageKg)
 }

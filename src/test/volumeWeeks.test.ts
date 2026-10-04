@@ -11,7 +11,7 @@
  * pass so a row cannot disagree with itself about its own week.
  */
 import { describe, it, expect } from 'vitest'
-import { volumeWeeks } from '@/lib/volumeWeeks'
+import { volumeWeeks, weekByExercise } from '@/lib/volumeWeeks'
 import type { WorkoutDaySession, LoggedSet } from '@/db/dexie'
 import { isoWeekKey, lbToKg, kgToLb } from '@/lib/progress'
 import { DEFAULT_BAR_LB } from '@/lib/barWeight'
@@ -147,5 +147,107 @@ describe('volumeWeeks', () => {
     const weeks = volumeWeeks([session(TODAY, [set(100, 5)])], 0, '8w', TODAY)
     const kg = weeks[weeks.length - 1].total.tonnageKg
     expect(kgToLb(kg)).toBeGreaterThan(kg)
+  })
+})
+
+// ── What a week was made of ──────────────────────────────────────────────────
+
+describe('weekByExercise', () => {
+  /** A session holding several lifts, so a week has parts to break into. */
+  function mixed(date: string): WorkoutDaySession {
+    return {
+      date,
+      dayLabel: 'Day 1',
+      profileId: 'pronit',
+      order: ['leg-press', 'deadlift'],
+      exercises: [
+        {
+          exerciseId: 'leg-press', status: 'complete',
+          sets: [set(100, 10), set(100, 10)],
+        },
+        {
+          exerciseId: 'deadlift', status: 'complete',
+          sets: [set(140, 3), set(60, 10, true)],
+        },
+      ],
+    } as WorkoutDaySession
+  }
+
+  it('lists every exercise trained that week', () => {
+    const rows = weekByExercise([mixed(TODAY)], 0, isoWeekKey(TODAY))
+    expect(rows.map(r => r.exerciseId).sort()).toEqual(['deadlift', 'leg-press'])
+  })
+
+  it('names them, so a row is readable without knowing ids', () => {
+    const rows = weekByExercise([mixed(TODAY)], 0, isoWeekKey(TODAY))
+    expect(rows.find(r => r.exerciseId === 'leg-press')!.name).toMatch(/leg press/i)
+  })
+
+  it('orders by tonnage, heaviest first — the question is what drove the week', () => {
+    const rows = weekByExercise([mixed(TODAY)], 0, isoWeekKey(TODAY))
+    const tonnages = rows.map(r => r.tonnageKg)
+    expect(tonnages).toEqual([...tonnages].sort((a, b) => b - a))
+  })
+
+  it('counts the bar on lifts that carry one, and not on those that do not', () => {
+    const rows = weekByExercise([mixed(TODAY)], 0, isoWeekKey(TODAY))
+    const legPress = rows.find(r => r.exerciseId === 'leg-press')!
+    const deadlift = rows.find(r => r.exerciseId === 'deadlift')!
+    // Leg press is a machine: the logged number is the whole load.
+    expect(legPress.tonnageKg).toBeCloseTo(100 * 20, 4)
+    // The deadlift carries a bar on both its sets.
+    expect(deadlift.tonnageKg).toBeCloseTo((140 + BAR) * 3 + (60 + BAR) * 10, 4)
+  })
+
+  it('splits each exercise into main work and assistance', () => {
+    const rows = weekByExercise([mixed(TODAY)], 0, isoWeekKey(TODAY))
+    const deadlift = rows.find(r => r.exerciseId === 'deadlift')!
+    expect(deadlift.sets).toBe(2)
+    expect(deadlift.supplementalSets).toBe(1)
+  })
+
+  it('adds back up to the week it came from', () => {
+    // The breakdown and the total are two views of one week, so they have to
+    // agree — a list that does not sum to its own header is worse than none.
+    const sessions = [mixed(TODAY)]
+    const week = volumeWeeks(sessions, 0, '8w', TODAY).find(w => w.week === isoWeekKey(TODAY))!
+    const rows = weekByExercise(sessions, 0, isoWeekKey(TODAY))
+
+    expect(rows.reduce((a, r) => a + r.sets, 0)).toBe(week.total.sets)
+    expect(rows.reduce((a, r) => a + r.tonnageKg, 0)).toBeCloseTo(week.total.tonnageKg, 6)
+  })
+
+  it('gathers the same exercise across several days of the week', () => {
+    const rows = weekByExercise(
+      [mixed('2026-09-21'), mixed('2026-09-23')], 0, isoWeekKey('2026-09-21')
+    )
+    // Two sessions, still two exercises — not four rows.
+    expect(rows).toHaveLength(2)
+    const legPress = rows.find(r => r.exerciseId === 'leg-press')!
+    expect(legPress.sets).toBe(4)
+    // Tonnage has to accumulate too, not just the set count. Asserting only
+    // the count let an implementation that overwrote the load on each session
+    // pass — a lift trained twice in a week would have reported the second
+    // session alone.
+    expect(legPress.tonnageKg).toBeCloseTo(100 * 10 * 4, 4)
+  })
+
+  it('ignores weeks other than the one asked for', () => {
+    const rows = weekByExercise([mixed('2026-08-05'), mixed(TODAY)], 0, isoWeekKey(TODAY))
+    expect(rows.find(r => r.exerciseId === 'leg-press')!.sets).toBe(2)
+  })
+
+  it('returns nothing for a week that was not trained', () => {
+    // A zero week has no parts. An empty list says so; a row of zeroes would
+    // invent exercises that were never done.
+    expect(weekByExercise([mixed(TODAY)], 0, isoWeekKey('2026-08-05'))).toEqual([])
+  })
+
+  it('leaves out an exercise that was opened but never logged', () => {
+    const empty = {
+      ...mixed(TODAY),
+      exercises: [{ exerciseId: 'plank', status: 'skipped' as const, sets: [] }],
+    } as WorkoutDaySession
+    expect(weekByExercise([empty], 0, isoWeekKey(TODAY))).toEqual([])
   })
 })

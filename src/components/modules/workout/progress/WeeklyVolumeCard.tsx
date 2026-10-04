@@ -1,9 +1,10 @@
 import { useState } from 'react'
+import { ChevronDown } from 'lucide-react'
 import type { WorkoutDaySession } from '@/db/dexie'
 import { kgToLb } from '@/lib/progress'
 import type { WeeklyVolume } from '@/lib/progress'
-import { volumeWeeks } from '@/lib/volumeWeeks'
-import type { VolumeWeek } from '@/lib/volumeWeeks'
+import { volumeWeeks, weekByExercise } from '@/lib/volumeWeeks'
+import type { VolumeWeek, ExerciseVolume } from '@/lib/volumeWeeks'
 import type { LiftRange } from '@/lib/liftViews'
 import { LIFT_RANGES } from '@/lib/liftViews'
 import { Card } from '@/components/ui/Card'
@@ -103,24 +104,32 @@ export function WeeklyVolumeCard({ sessions, bodyweightKg, todayISO }: Props) {
         onSelect={setPicked}
       />
 
+      {/* The lift trend has always said this about its own chart; this one
+          never did, so the per-week reading sat there unused and unfindable. */}
+      <p style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)', marginTop: -4 }}>
+        Tap a week to read it.
+      </p>
+
       <WeekReadout
         week={week}
         change={previous ? read(week.total) - read(previous.total) : null}
         metric={metric}
         read={read}
         showSplit={everMarked}
+        exercises={weekByExercise(sessions, bodyweightKg, week.week)}
       />
     </Card>
   )
 }
 
 /** Everything about the week whose bar is lit. */
-function WeekReadout({ week, change, metric, read, showSplit }: {
+function WeekReadout({ week, change, metric, read, showSplit, exercises }: {
   week: VolumeWeek
   change: number | null
   metric: VolumeMetric
   read: (v: WeeklyVolume) => number
   showSplit: boolean
+  exercises: ExerciseVolume[]
 }) {
   return (
     <div style={{ paddingTop: 10, borderTop: '1px solid var(--hairline-soft)' }}>
@@ -162,6 +171,83 @@ function WeekReadout({ week, change, metric, read, showSplit }: {
         <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--hairline-soft)' }}>
           <Split label="Main work" value={read(week.main)} metric={metric} />
           <Split label="Supplemental" value={read(week.supplemental)} metric={metric} />
+        </div>
+      )}
+
+      <ExerciseBreakdown rows={exercises} metric={metric} />
+    </div>
+  )
+}
+
+/**
+ * What the week was actually made of, heaviest lift first.
+ *
+ * Folded away by default. The summary above answers most visits and the list
+ * can run to a dozen rows on a full week, which would push every card below it
+ * off the screen for a detail most readings do not need.
+ *
+ * Absent rather than empty for an untrained week: there are no parts to show,
+ * and a disclosure promising a breakdown that turns out to be blank is worse
+ * than no disclosure.
+ */
+function ExerciseBreakdown({ rows, metric }: { rows: ExerciseVolume[]; metric: VolumeMetric }) {
+  const [open, setOpen] = useState(false)
+  if (rows.length === 0) return null
+
+  return (
+    <div style={{ marginTop: 8, paddingTop: 8, borderTop: '1px solid var(--hairline-soft)' }}>
+      <button
+        onClick={() => setOpen(v => !v)}
+        aria-expanded={open}
+        className="w-full flex items-center justify-between transition-opacity hover:opacity-80"
+        style={{ gap: 10, background: 'transparent', border: 'none', padding: 0, cursor: 'pointer' }}
+      >
+        <span style={{ fontSize: 'var(--text-md)', color: 'var(--ink-dim)' }}>
+          {rows.length} {rows.length === 1 ? 'exercise' : 'exercises'}
+        </span>
+        <span className="flex items-center" style={{ gap: 4, fontSize: 'var(--text-sm)', color: 'var(--ink-faint)' }}>
+          {open ? 'Hide' : 'Show'}
+          <ChevronDown
+            size={13}
+            style={{
+              transform: open ? 'rotate(180deg)' : 'none',
+              transition: 'transform var(--t-fast) var(--ease-out)',
+            }}
+          />
+        </span>
+      </button>
+
+      {open && (
+        <div style={{ marginTop: 8 }}>
+          {rows.map(row => (
+            <div
+              key={row.exerciseId}
+              className="flex items-baseline justify-between"
+              style={{ gap: 10, marginTop: 5 }}
+            >
+              <span style={{ fontSize: 'var(--text-md)', color: 'var(--ink-2)', minWidth: 0 }}>
+                {row.name}
+                {/* Only when some of it was assistance, and only the share —
+                    "3 of 8" says more than a flag, and a lift that was all main
+                    work needs no annotation at all. */}
+                {row.supplementalSets > 0 && (
+                  <span style={{ fontSize: 'var(--text-sm)', color: 'var(--ink-faint)' }}>
+                    {' '}· {row.supplementalSets} of {row.sets} assistance
+                  </span>
+                )}
+              </span>
+              <span
+                style={{
+                  fontSize: 'var(--text-md)', color: 'var(--ink-dim)', flexShrink: 0,
+                  fontVariantNumeric: 'tabular-nums',
+                }}
+              >
+                {metric === 'tonnage'
+                  ? fmt(kgToLb(row.tonnageKg), 'tonnage')
+                  : fmt(row.sets, 'sets')}
+              </span>
+            </div>
+          ))}
         </div>
       )}
     </div>
