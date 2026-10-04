@@ -524,7 +524,12 @@ export function BarChart({ data, unit = '', onSelect }: BarChartProps) {
           const pct = Math.max(3, Math.round((d.value / max) * 100))
           return (
             <button
-              key={d.label}
+              // Keyed by position, not by label. Labels are week numbers, and
+              // a range longer than a year contains two "W23" — React treats
+              // duplicate keys as undefined behaviour and warns on every
+              // render. The series is positional and never reordered, so the
+              // index is the stable identity here.
+              key={i}
               onClick={() => {
                 // Tapping the lit bar clears the selection, which falls back
                 // to the latest period with data — so the caller is told that

@@ -144,9 +144,15 @@ describe('volumeWeeks', () => {
 
   it('reports tonnage in kilos, leaving the pound conversion to the caller', () => {
     // Same contract as `weeklyVolume`, so a caller cannot convert twice.
+    //
+    // Asserted as the kilo figure itself. The previous form — `kgToLb(kg) >
+    // kg` — is true of any positive number, so it held just as well if the
+    // module had already returned pounds, which is the one thing it was
+    // written to rule out.
     const weeks = volumeWeeks([session(TODAY, [set(100, 5)])], 0, '8w', TODAY)
     const kg = weeks[weeks.length - 1].total.tonnageKg
-    expect(kgToLb(kg)).toBeGreaterThan(kg)
+    expect(kg).toBeCloseTo((100 + BAR) * 5, 4)
+    expect(kg).toBeLessThan(kgToLb(kg))
   })
 })
 

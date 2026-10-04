@@ -135,3 +135,31 @@ describe('AmrapHistoryCard', () => {
     expect(screen.queryByText('Bench Press')).not.toBeInTheDocument()
   })
 })
+
+describe('a history longer than the card shows', () => {
+  /**
+   * Twelve weeks of flagged top sets, reps climbing so the ends are
+   * distinguishable at a glance.
+   *
+   * Twelve, not eight: every fourth week is a deload and carries no AMRAP, so
+   * eight weeks yields exactly six attempts — precisely `SHOWN`, and nothing
+   * would truncate. Twelve gives nine.
+   */
+  const eight = Array.from({ length: 12 }, (_, i) => squatDay(wk(i + 1), 3 + i))
+
+  it('shows the newest six, not the oldest six', () => {
+    // `slice(0, SHOWN)` passed every test here, because no fixture had more
+    // than three attempts — a lifter two cycles in would have been reading the
+    // wrong end of their own history.
+    render(<AmrapHistoryCard block={block} sessions={eight} />)
+    // The newest attempt is week 11, at 13 reps; the oldest is week 1, at 3.
+    expect(screen.getByText(/270 lb × 13/)).toBeInTheDocument()
+    expect(screen.queryByText(/270 lb × 3\b/)).not.toBeInTheDocument()
+  })
+
+  it('says how many it left out, and still counts them in the tally', () => {
+    render(<AmrapHistoryCard block={block} sessions={eight} />)
+    expect(screen.getByText(/3 earlier sets counted in the tally above/)).toBeInTheDocument()
+    expect(screen.getByText(/of 9 on target/)).toBeInTheDocument()
+  })
+})

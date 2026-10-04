@@ -12,7 +12,7 @@
  * its own weeks. A fixture of pre-computed rows could disagree with what the
  * real pipeline produces and the test would never notice.
  */
-import { describe, it, expect, afterEach } from 'vitest'
+import { describe, it, expect, afterEach, vi } from 'vitest'
 import { render, screen, cleanup } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { WeeklyVolumeCard } from '@/components/modules/workout/progress/WeeklyVolumeCard'
@@ -295,5 +295,97 @@ describe('a range containing no training at all', () => {
     await userEvent.click(bar)      // select
     await userEvent.click(bar)      // clear — this is what crashed
     expect(screen.getByText(/Week of/)).toBeInTheDocument()
+  })
+})
+
+// ── Things the other tests here could not tell apart ─────────────────────────
+
+describe('what the bars actually plot', () => {
+  it('charts the week total, not just its main work', () => {
+    // Every other fixture's asserted bar sits in a week with no assistance, so
+    // `main` and `total` are the same number there and plotting either passed.
+    // This week is 1,000 of main work and 500 of assistance.
+    show()
+    expect(screen.getByRole('button', { name: /^W38: 1\.5k lb$/ })).toBeInTheDocument()
+  })
+})
+
+describe('bodyweight reaches the numbers', () => {
+  /** Push-ups carry 0.65 of the lifter; nothing is typed into the weight field. */
+  const pushUps: WorkoutDaySession = {
+    date: TODAY,
+    dayLabel: 'Day 1',
+    profileId: 'pronit',
+    order: ['push-up'],
+    exercises: [{
+      exerciseId: 'push-up', status: 'complete',
+      sets: [{ setNumber: 1, weight: 0, reps: 20, unit: 'lbs', timestamp: `${TODAY}T10:00:00.000Z` }],
+    }],
+  } as WorkoutDaySession
+
+  it('counts a bodyweight lift as the body that lifted it', () => {
+    // Every other test here passes `bodyweightKg={0}`, so hardcoding zero in
+    // place of the prop passed the whole file — while in the app a log of
+    // push-ups would have collapsed to nothing.
+    render(<WeeklyVolumeCard sessions={[pushUps]} bodyweightKg={70} todayISO={TODAY} />)
+    // 70 kg × 0.65 × 20 reps = 910 kg, which is a little over 2,006 lb.
+    expect(screen.getByText('2,006 lb')).toBeInTheDocument()
+  })
+
+  it('reads as nothing at all when no bodyweight is known', () => {
+    // The honest consequence of the same arithmetic, and the reason the prop
+    // has to be wired rather than defaulted.
+    render(<WeeklyVolumeCard sessions={[pushUps]} bodyweightKg={0} todayISO={TODAY} />)
+    expect(screen.getByText('0 lb')).toBeInTheDocument()
+  })
+})
+
+describe('which week it opens on', () => {
+  it('opens on the last week trained, not the last week in range', () => {
+    // In every other fixture those are the same week, so taking the end of the
+    // range passed — and the case the code comments describe, a quiet stretch
+    // at the end leaving the card reading zero, was never exercised.
+    show([session(LAST_WEEK, [set(250, 2)])])
+    expect(screen.getByText(/Week of 7 Sep/)).toBeInTheDocument()
+    expect(screen.queryByText(/Week of 14 Sep/)).not.toBeInTheDocument()
+  })
+})
+
+describe('the chart and the readout cannot disagree', () => {
+  const twoWeeks = [session(LAST_WEEK, [set(100, 2)]), thisWeek]
+
+  it('clears the chart’s own highlight when the range changes', async () => {
+    // The card resets its selection on a range change, but `BarChart` keeps a
+    // separate one of its own. Without clearing that too, its floating pill
+    // went on naming the old index into the new, longer list — a week months
+    // back, reading zero — while the figures below described this week. The
+    // card's doc comment says the two cannot describe different weeks; this is
+    // what holds it.
+    const { sixMonths } = show(twoWeeks)
+    await userEvent.click(screen.getByRole('button', { name: /^W37: 200 lb$/ }))
+    await userEvent.click(sixMonths)
+
+    // The chart's floating readout is the symptom: no bar stays visibly
+    // pressed, because the stale index lands on an empty week, but the pill
+    // goes on naming it. It should name the week the figures below describe.
+    expect(screen.getByText(/^W38 · /)).toBeInTheDocument()
+    expect(screen.queryByText(/^W1[0-9] · /)).not.toBeInTheDocument()
+  })
+})
+
+describe('a range longer than a year', () => {
+  it('does not give two different weeks the same identity', async () => {
+    // Bar labels are the week number alone, so `All` across a year boundary
+    // produced two bars called "W23". React keyed on the label and warned
+    // about duplicates, which it treats as undefined behaviour.
+    const errors: string[] = []
+    const spy = vi.spyOn(console, 'error').mockImplementation((...a) => { errors.push(String(a[0])) })
+    try {
+      show([session('2025-06-02', [set(100, 2)]), thisWeek])
+      await userEvent.click(screen.getByRole('button', { name: 'All' }))
+    } finally {
+      spy.mockRestore()
+    }
+    expect(errors.filter(e => /same key/.test(e))).toEqual([])
   })
 })

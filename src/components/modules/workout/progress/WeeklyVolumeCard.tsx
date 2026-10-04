@@ -102,6 +102,14 @@ export function WeeklyVolumeCard({ sessions, bodyweightKg, todayISO }: Props) {
       />
 
       <BarChart
+        // Keyed by range so a range change remounts it. The card resets its
+        // own selection there, but the chart keeps a separate one, and a stale
+        // index into a longer list left its floating readout naming a week
+        // months back while the figures below described this one.
+        //
+        // Not keyed by metric: switching tonnage and sets describes the same
+        // weeks, and losing the selection there would be a different bug.
+        key={range}
         data={weeks.map(w => ({ label: w.week.slice(-3), value: read(w.total) }))}
         unit={metric === 'tonnage' ? 'lb' : ''}
         onSelect={setPicked}

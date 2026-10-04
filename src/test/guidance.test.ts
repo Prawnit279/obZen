@@ -13,7 +13,8 @@
  * cannot see.
  */
 import { describe, it, expect } from 'vitest'
-import { guidance, MIN_PLANNED_FOR_ADHERENCE, STALE_WEIGH_IN_WEEKS } from '@/lib/guidance'
+import { guidance, MIN_PLANNED_FOR_ADHERENCE, STALE_WEIGH_IN_WEEKS, UNDER_PLAN_RATIO } from '@/lib/guidance'
+import { recoveryHeadroom } from '@/lib/programs'
 import type { GuidanceReading } from '@/lib/guidance'
 import type { WorkoutDaySession } from '@/db/dexie'
 import type { IntakeAnswers } from '@/lib/intake'
@@ -39,6 +40,12 @@ function reading(over: Partial<GuidanceReading> = {}): GuidanceReading {
 }
 
 const ids = (r: GuidanceReading) => guidance(r).map(t => t.id)
+
+/** Enough history for the adherence tip to speak, with the counts under test. */
+const withPlanAnd = (
+  sessions: WorkoutDaySession[],
+  a: { trained: number; planned: number; extra: number }
+) => reading({ sessions, adherence: { weeks: [], ...a } })
 
 /** A session with one squat set, optionally flagged. */
 function squatDay(date: string, flags: Partial<{ isAmrap: boolean }> = {}): WorkoutDaySession {
@@ -451,5 +458,105 @@ describe('a log that has only just started', () => {
       settings: { trainingDays: 4, weightGoal: null },
     }))
     expect(tips.map(t => t.id)).toContain('under-plan')
+  })
+})
+
+// ── Boundaries and branches the fixtures above walked past ───────────────────
+
+describe('the thresholds, at their actual edges', () => {
+  const logged = [squatDay('2026-07-13'), squatDay('2026-09-14')]
+
+  it('reads the ratio it documents, not merely something between the fixtures', () => {
+    // The only cases were 9/24 (0.375) and 22/24 (0.917), so any constant
+    // between them passed — 0.4 and 0.9 both did, and the documented 0.7 was
+    // pinned by nothing. These two straddle it by one session.
+    const quiet = withPlanAnd(logged, { trained: 17, planned: 24, extra: 0 })  // 0.708
+    const loud = withPlanAnd(logged, { trained: 16, planned: 24, extra: 0 })   // 0.667
+    expect(17 / 24).toBeGreaterThan(UNDER_PLAN_RATIO)
+    expect(16 / 24).toBeLessThan(UNDER_PLAN_RATIO)
+    expect(ids(quiet)).not.toContain('under-plan')
+    expect(ids(loud)).toContain('under-plan')
+  })
+
+  it('treats the planned floor as inclusive', () => {
+    // `>=` against `>` was untested: the fixtures were one below and far above.
+    const atFloor = withPlanAnd(logged, {
+      trained: 0, planned: MIN_PLANNED_FOR_ADHERENCE, extra: 0,
+    })
+    expect(ids(atFloor)).toContain('under-plan')
+  })
+
+  it('treats a weigh-in exactly at the threshold as stale', () => {
+    const goal = { direction: 'lose' as const, pace: 'steady' as const }
+    const exactly = new Date(Date.UTC(2026, 8, 18) - STALE_WEIGH_IN_WEEKS * 7 * 86_400_000)
+    const at = reading({
+      settings: { trainingDays: 4, weightGoal: goal },
+      lastWeighInISO: exactly.toISOString().slice(0, 10),
+    })
+    expect(ids(at)).toContain('stale-weigh-in')
+  })
+})
+
+describe('recovery against load, on the band below a spike', () => {
+  const lowRecovery: IntakeAnswers = {
+    sleep: { kind: 'single', value: 'under-5' },
+    'life-stress': { kind: 'single', value: 'high' },
+    soreness: { kind: 'scale', value: 5 },
+  }
+
+  it('speaks on an elevated week, not only on a spike', () => {
+    // Every fixture used `spike`, so the `elevated` half of the condition
+    // could be deleted without failing anything — silencing the tip on the
+    // more common of the two bands.
+    const elevated = reading({
+      answers: lowRecovery,
+      load: { acute: 6, chronic: 4.5, ratio: 1.33, verdict: 'elevated', ratedSessions: 6 },
+    })
+    const tip = guidance(elevated).find(t => t.id === 'recovery-vs-load')!
+    expect(tip).toBeDefined()
+    // And says which band it was, rather than overstating it.
+    expect(tip.basis).toMatch(/above your recent average/)
+    expect(tip.basis).not.toMatch(/well above/)
+  })
+
+  it('stays quiet on moderate recovery, however heavy the week', () => {
+    // The low-recovery fixture sets all three answers to their worst value, so
+    // the headroom is 0 against a threshold of 1 — widening the condition to
+    // include `moderate` passed every test and would turn the tip on for
+    // ordinary weeks.
+    const moderate: IntakeAnswers = {
+      sleep: { kind: 'single', value: '6-7' },
+      'life-stress': { kind: 'single', value: 'moderate' },
+      soreness: { kind: 'scale', value: 3 },
+    }
+    const reading_ = reading({
+      answers: moderate,
+      load: { acute: 9, chronic: 4, ratio: 2.25, verdict: 'spike', ratedSessions: 6 },
+    })
+    expect(recoveryHeadroom(moderate)).toBe('moderate')
+    expect(ids(reading_)).not.toContain('recovery-vs-load')
+  })
+})
+
+describe('a lift opened but never logged', () => {
+  it('does not count as trained', () => {
+    // The logger seeds placeholder rows, so an exercise can be present with no
+    // real sets. Without the `realSets` filter, merely opening bench press and
+    // walking away would have the block tip naming it as missing a training
+    // max.
+    const placeholderOnly = {
+      date: '2026-09-08',
+      dayLabel: 'Day 1' as const,
+      profileId: 'pronit',
+      order: ['bench-press'],
+      exercises: [{
+        exerciseId: 'bench-press',
+        status: 'pending' as const,
+        sets: [{ setNumber: 1, weight: 0, reps: 0, unit: 'lbs' as const, timestamp: '' }],
+      }],
+    } as WorkoutDaySession
+
+    const tips = ids(reading({ block, sessions: [placeholderOnly] }))
+    expect(tips).not.toContain('block-lift-missing-tm')
   })
 })
