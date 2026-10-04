@@ -20,8 +20,8 @@ import { useProfileStore } from '@/store/useProfileStore'
 import { ExerciseAnimation } from '@/components/modules/workout/ExerciseAnimation'
 import { MuscleFigure } from '@/components/modules/workout/MuscleFigure'
 import { ExerciseDetailSheet } from '@/components/modules/workout/ExerciseDetailSheet'
-import { ProgressOverloadChart } from '@/components/modules/dashboard/ProgressOverloadChart'
-import { WeeklyVolumeChart } from '@/components/modules/dashboard/WeeklyVolumeChart'
+import { ProgressOverloadChart } from '@/components/modules/workout/progress/ProgressOverloadChart'
+import { DailyMuscleLoadChart } from '@/components/modules/workout/progress/DailyMuscleLoadChart'
 import { NotationViewer } from '@/components/modules/drum/NotationViewer'
 import { FiveThreeOneCard } from '@/components/modules/workout/tools/FiveThreeOneCard'
 import { OneRmCard } from '@/components/modules/workout/tools/OneRmCard'
@@ -476,11 +476,11 @@ describe('ProgressOverloadChart — renders without crashing', () => {
   })
 })
 
-// ── WeeklyVolumeChart ────────────────────────────────────────────────────────
+// ── DailyMuscleLoadChart ────────────────────────────────────────────────────────
 
-describe('WeeklyVolumeChart — renders without crashing', () => {
+describe('DailyMuscleLoadChart — renders without crashing', () => {
   it('shows the empty state for a week with no training', async () => {
-    render(<WeeklyVolumeChart />)
+    render(<DailyMuscleLoadChart />)
     expect(await screen.findByText(/no workout data this week/i)).toBeInTheDocument()
   })
 
@@ -490,7 +490,7 @@ describe('WeeklyVolumeChart — renders without crashing', () => {
       { exerciseId: 'bench-press', name: 'Bench Press', muscle: 'chest', weight: 155, reps: 5 },
     ])
 
-    const { container } = render(<WeeklyVolumeChart />)
+    const { container } = render(<DailyMuscleLoadChart />)
     // Waits on the legend rather than a heading: the chart no longer titles
     // itself, because the Card it now sits in does that instead.
     await screen.findByText(/^legs$/i)
@@ -503,7 +503,7 @@ describe('WeeklyVolumeChart — renders without crashing', () => {
     await seedSession('aishwarya', todayIso(), [
       { exerciseId: 'hip-thrust-machine', name: 'Hip Thrust Machine', muscle: 'legs', weight: 135, reps: 12 },
     ])
-    render(<WeeklyVolumeChart />)
+    render(<DailyMuscleLoadChart />)
     expect(await screen.findByText(/no workout data this week/i)).toBeInTheDocument()
   })
 
@@ -514,7 +514,7 @@ describe('WeeklyVolumeChart — renders without crashing', () => {
     await seedSession('pronit', oldIso, [
       { exerciseId: 'barbell-squat', name: 'Barbell Squat', muscle: 'legs', weight: 225, reps: 5 },
     ])
-    render(<WeeklyVolumeChart />)
+    render(<DailyMuscleLoadChart />)
     expect(await screen.findByText(/no workout data this week/i)).toBeInTheDocument()
   })
 
@@ -522,7 +522,7 @@ describe('WeeklyVolumeChart — renders without crashing', () => {
     await seedSession('pronit', todayIso(), [
       { exerciseId: 'barbell-squat', name: 'Barbell Squat', muscle: 'legs', weight: 225, reps: 5 },
     ])
-    render(<WeeklyVolumeChart />)
+    render(<DailyMuscleLoadChart />)
     // Same re-anchoring as above — the legend is the chart's own, the title is
     // the Card's.
     await screen.findByText(/^legs$/i)

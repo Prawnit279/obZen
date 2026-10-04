@@ -39,8 +39,8 @@ import { BalanceCard } from './BalanceCard'
 import { ProgressionLadder } from './ProgressionLadder'
 import { AmrapCard } from './AmrapCard'
 import { MuscleVolumeCard } from './MuscleVolumeCard'
-import { WeeklyVolumeChart } from '@/components/modules/dashboard/WeeklyVolumeChart'
-import { ProgressOverloadChart } from '@/components/modules/dashboard/ProgressOverloadChart'
+import { DailyMuscleLoadChart } from './DailyMuscleLoadChart'
+import { ProgressOverloadChart } from './ProgressOverloadChart'
 import { WeightCheckCard } from './WeightCheckCard'
 
 /** Shared so the store selector returns a stable reference when empty. */
@@ -560,7 +560,7 @@ export function WorkoutProgress() {
           (tonnage for the week, undivided). It was stranded on Home's Weekly
           tab when that tab went; this is the view it belongs to. */}
       <Card label="Load by muscle, last 7 days">
-        <WeeklyVolumeChart />
+        <DailyMuscleLoadChart />
       </Card>
 
       <WeeklyVolumeCard

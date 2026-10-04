@@ -38,7 +38,7 @@ function fmtVol(v: number): string {
   return v >= 1000 ? `${(v / 1000).toFixed(1)}k` : String(Math.round(v))
 }
 
-export function WeeklyVolumeChart() {
+export function DailyMuscleLoadChart() {
   const days = getLast7Days()
   const { activeId } = useProfileStore()
   const latestBodyweight = useProgressStore(s => s.latestBodyweight)
