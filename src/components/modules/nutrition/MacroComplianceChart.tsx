@@ -11,8 +11,9 @@ export interface MacroTarget {
 }
 
 interface Props {
-  /** The day's real targets, from the page. */
-  targets: Record<Macro, MacroTarget>
+  /** Both sets, so each day can be scored against the ones that applied to it. */
+  trainingTargets: Record<Macro, MacroTarget>
+  restTargets: Record<Macro, MacroTarget>
   /** The same colours the macro bars above use, so the two agree. */
   colors: Record<Macro, string>
 }
@@ -36,13 +37,17 @@ function getLast7Days(): string[] {
  * set, while the page above it was using the real `PITTA_NUTRITION` ranges and
  * swapping them on training days.
  *
- * One honest limitation: the targets are today's, applied across the whole
- * window. Nothing records whether a past day was a training day — the flag is a
- * single toggle for now, not history — so a rest day in the window is measured
- * against training-day numbers. Bars are drawn against the top of the range,
- * which is the more forgiving end.
+ * Each day is scored against the targets that applied to *it*. Every
+ * `nutritionLog` already records whether it was a training day — the field has
+ * been required since the table was written — so the chart reads the day's own
+ * flag rather than today's toggle. Before, a rest day sitting in the window
+ * while today happened to be a training day was measured against training-day
+ * numbers and read as a shortfall it never was.
+ *
+ * Bars are drawn against the top of each range, which is the more forgiving
+ * end of a target that is a band rather than a number.
  */
-export function MacroComplianceChart({ targets, colors }: Props) {
+export function MacroComplianceChart({ trainingTargets, restTargets, colors }: Props) {
   const days = getLast7Days()
   const logs = useLiveQuery(
     () => db.nutritionLogs.where('date').between(days[0], days[6], true, true).toArray(),
@@ -52,9 +57,12 @@ export function MacroComplianceChart({ targets, colors }: Props) {
   if (!logs) return <Empty text="Loading…" />
 
   const byDay: Record<string, Record<Macro, number>> = {}
+  /** Which targets applied to each day, from that day's own record. */
+  const trainingDay: Record<string, boolean> = {}
   for (const d of days) byDay[d] = { protein: 0, carbs: 0, fat: 0 }
   for (const log of logs) {
     if (!byDay[log.date]) continue
+    trainingDay[log.date] = log.isTrainingDay
     byDay[log.date].protein = log.totalProtein
     byDay[log.date].carbs = log.totalCarbs
     byDay[log.date].fat = log.totalFat
@@ -111,6 +119,7 @@ export function MacroComplianceChart({ targets, colors }: Props) {
           return (
             <g key={d}>
               {MACROS.map((macro, mi) => {
+                const targets = trainingDay[d] ? trainingTargets : restTargets
                 const bh = pctH(byDay[d][macro], targets[macro].max)
                 const x = cx + mi * (barW + barGap)
                 return (

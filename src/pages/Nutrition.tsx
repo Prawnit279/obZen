@@ -48,6 +48,20 @@ async function persistEntry(date: string, isTrainingDay: boolean, entry: TypedEn
   }
 }
 
+/**
+ * Carry a change of the training-day switch onto the day it was changed on.
+ *
+ * The flag is written when a day's log is created and was never written again,
+ * so toggling after the first meal left the stored value saying one thing and
+ * the screen another — and the seven-day chart reads the stored one. Nothing
+ * to do when the day has no log yet: `persistEntry` stamps the current value
+ * when it creates one.
+ */
+async function persistTrainingDay(date: string, isTrainingDay: boolean) {
+  const existing = await db.nutritionLogs.where('date').equals(date).first()
+  if (existing) await db.nutritionLogs.update(existing.id!, { isTrainingDay })
+}
+
 async function dropEntry(logId: number, entryId: string, allEntries: TypedEntry[]) {
   const next = allEntries.filter(m => m.id !== entryId)
   await db.nutritionLogs.update(logId, { meals: next, ...sumMacros(next) })
@@ -395,7 +409,12 @@ export default function Nutrition() {
           <div className="text-[length:var(--text-3xl)] uppercase tracking-wide text-noir-white">Nutrition</div>
         </div>
         <button
-          onClick={toggleTrainingDay}
+          onClick={() => {
+            // The store drives the screen; the log row is what the chart
+            // reads. Both, or they disagree about the same day.
+            toggleTrainingDay()
+            void persistTrainingDay(date, !isTrainingDay)
+          }}
           className={cn(
             'px-3 py-1.5 border rounded-[2px] text-[length:var(--text-xs)] uppercase tracking-widest transition-colors',
             isTrainingDay
@@ -454,7 +473,11 @@ export default function Nutrition() {
       <Card>
         <CardHeader label="Last 7 days" />
         <div className="mt-3">
-          <MacroComplianceChart targets={targets} colors={MACRO_CLR} />
+          <MacroComplianceChart
+            trainingTargets={PITTA_NUTRITION.trainingDay}
+            restTargets={PITTA_NUTRITION.restDay}
+            colors={MACRO_CLR}
+          />
         </div>
       </Card>
 
