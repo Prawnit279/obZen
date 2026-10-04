@@ -255,6 +255,7 @@ function DayView({ dayLabel, forearmFatigue, lowReadiness, sessionDate }: DayVie
       {/* Sortable exercise list */}
       {orderedExercises.length > 0 && (
         <SortableExerciseList
+          session={session}
           exercises={orderedExercises}
           programMap={programMap}
           forearmFatigue={forearmFatigue}

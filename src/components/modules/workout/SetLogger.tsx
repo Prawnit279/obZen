@@ -1,15 +1,18 @@
 import { useState, useRef } from 'react'
 import { Check, Plus, Trash2 } from 'lucide-react'
-import type { LoggedSet } from '@/db/dexie'
+import type { Circuit, LoggedSet } from '@/db/dexie'
 import { cn } from '@/lib/utils'
 import { setUnitsFor } from '@/lib/setUnits'
 import { barWeightLbFor } from '@/lib/barWeight'
+import { roundLabels } from '@/lib/circuits'
 import type { SetUnits } from '@/lib/setUnits'
 
 const MAX_SETS = 10
 
 interface SetRowProps {
   set: LoggedSet
+  /** What to call this row. "Set 3" normally, "Round 3" inside a circuit. */
+  label: string
   /** What this movement's two numbers mean — reps or seconds, load or assistance. */
   units: SetUnits
   onSave: (set: LoggedSet) => void
@@ -32,7 +35,7 @@ function withFlag(base: LoggedSet, flag: SetFlag, on: boolean): LoggedSet {
   return next
 }
 
-function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
+function SetRow({ set, label, units, onSave, onDelete, saved }: SetRowProps) {
   const [weight, setWeight] = useState(set.weight > 0 ? String(set.weight) : '')
   const [reps, setReps] = useState(set.reps > 0 ? String(set.reps) : '')
   const [unit, setUnit] = useState<'lbs' | 'kg'>(set.unit)
@@ -69,7 +72,7 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
         className="uppercase shrink-0 w-9"
         style={{ fontSize: 'var(--text-sm)', letterSpacing: '0.08em', color: 'var(--ink-faint)' }}
       >
-        Set {set.setNumber}
+        {label}
       </span>
 
       {/* Weight input */}
@@ -78,7 +81,7 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
         inputMode="decimal"
         value={weight}
         onChange={e => setWeight(e.target.value)}
-        aria-label={`${units.weightAria}, set ${set.setNumber}`}
+        aria-label={`${units.weightAria}, ${label.toLowerCase()}`}
         placeholder="—"
         className="w-16 text-center rounded-[var(--r-control)] border text-[length:var(--text-base)] bg-transparent focus:outline-none transition-colors"
         style={{
@@ -104,7 +107,7 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
         inputMode="numeric"
         value={reps}
         onChange={e => setReps(e.target.value)}
-        aria-label={`${units.countAria}, set ${set.setNumber}`}
+        aria-label={`${units.countAria}, ${label.toLowerCase()}`}
         placeholder="—"
         className="w-12 text-center rounded-[var(--r-control)] border text-[length:var(--text-base)] bg-transparent focus:outline-none transition-colors"
         style={{
@@ -126,7 +129,7 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
         <button
           onClick={() => setIsAmrap(v => !v)}
           aria-pressed={isAmrap}
-          aria-label={`Mark set ${set.setNumber} as AMRAP — as many reps as possible`}
+          aria-label={`Mark ${label.toLowerCase()} as AMRAP — as many reps as possible`}
           className="shrink-0 transition-colors"
           style={{ fontSize: 'var(--text-sm)', color: isAmrap ? 'var(--complete-text)' : 'var(--ink-faint)' }}
         >
@@ -142,7 +145,7 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
       <button
         onClick={() => setIsSupplemental(v => !v)}
         aria-pressed={isSupplemental}
-        aria-label={`Mark set ${set.setNumber} as supplemental volume`}
+        aria-label={`Mark ${label.toLowerCase()} as supplemental volume`}
         className="shrink-0 transition-colors"
         style={{
           fontSize: 'var(--text-sm)',
@@ -184,12 +187,20 @@ function SetRow({ set, units, onSave, onDelete, saved }: SetRowProps) {
 interface Props {
   exerciseId: string
   sets: LoggedSet[]
+  /**
+   * The circuit this exercise sits in, when it sits in one.
+   *
+   * A set inside a circuit is a time through it, so the rows are rounds — and
+   * the circuit declares how many, which is how many rows to offer before
+   * anything is logged. Absent for an ordinary exercise, which keeps its sets.
+   */
+  circuit?: Circuit | null
   onAddSet: (set: LoggedSet) => void
   onUpdateSet: (index: number, set: LoggedSet) => void
   onRemoveSet: (index: number) => void
 }
 
-export function SetLogger({ exerciseId, sets, onAddSet, onUpdateSet, onRemoveSet }: Props) {
+export function SetLogger({ exerciseId, sets, circuit, onAddSet, onUpdateSet, onRemoveSet }: Props) {
   // A plank logs seconds and an assisted pull-up logs assistance; the inputs
   // say so, because `lib/progress.ts` reads them that way.
   const units = setUnitsFor(exerciseId)
@@ -218,9 +229,21 @@ export function SetLogger({ exerciseId, sets, onAddSet, onUpdateSet, onRemoveSet
     onAddSet(newSet)
   }
 
-  const rows = sets.length > 0 ? sets : [{
-    setNumber: 1, weight: 0, reps: 0, unit: 'lbs' as const, timestamp: ''
-  }]
+  const blank = (n: number) => ({
+    setNumber: n, weight: 0, reps: 0, unit: 'lbs' as const, timestamp: '',
+  })
+  // A circuit says how many times through, so that many rows are offered from
+  // the start — otherwise every round after the first is a tap on "add set"
+  // for something the circuit already declared. An ordinary exercise still
+  // opens on one row, because nothing has said how many it wants.
+  const rows = sets.length > 0
+    ? sets
+    : Array.from({ length: circuit ? circuit.rounds : 1 }, (_, i) => blank(i + 1))
+
+  // Rows are rounds inside a circuit and sets outside one.
+  const labels = circuit
+    ? roundLabels(rows.length)
+    : rows.map(r => `Set ${r.setNumber}`)
 
   return (
     <div
@@ -235,6 +258,13 @@ export function SetLogger({ exerciseId, sets, onAddSet, onUpdateSet, onRemoveSet
         }}
       >
         Log Today
+        {/* Named, because a row called "Round 3" with nothing explaining why
+            reads as a mislabelled set. */}
+        {circuit && (
+          <span style={{ color: 'var(--ink-faint)' }}>
+            {' '}· {circuit.name}, {circuit.rounds} rounds
+          </span>
+        )}
         {units.isDuration && <span style={{ color: 'var(--ink-dim)' }}> · hold in seconds</span>}
         {units.isAssistance && <span style={{ color: 'var(--ink-dim)' }}> · assistance weight</span>}
         {barLb > 0 && (
@@ -257,6 +287,7 @@ export function SetLogger({ exerciseId, sets, onAddSet, onUpdateSet, onRemoveSet
           <SetRow
             key={i}
             set={s}
+            label={labels[i]}
             units={units}
             saved={!!s.timestamp}
             onSave={updated => handleSave(i, updated)}

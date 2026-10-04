@@ -3,7 +3,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { ChevronDown, ChevronUp, GripVertical, Zap, Trash2, BookOpen } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import type { ExerciseSessionState, LoggedSet, DayLabel } from '@/db/dexie'
+import type { Circuit, ExerciseSessionState, LoggedSet, DayLabel } from '@/db/dexie'
 import type { ProgramExercise } from '@/data/obzen-program'
 import { PULL_HEAVY_EXERCISES, FOREARM_LOAD_EXERCISES } from '@/data/obzen-program'
 import { ExerciseHistory } from './ExerciseHistory'
@@ -41,10 +41,13 @@ interface Props {
   presentExerciseIds?: string[]
   /** Add-load suggestion when the plan's progression rule is met. */
   progression?: ProgressionSuggestion
+  /** The circuit this exercise sits in, when it sits in one. */
+  circuit?: Circuit | null
 }
 
 export function ExerciseCard({
   exerciseState,
+  circuit,
   programExercise,
   forearmFatigue,
   dayLabel: _dayLabel,
@@ -333,6 +336,7 @@ export function ExerciseCard({
       {/* Set logger (hidden when skipped) */}
       {status !== 'skipped' && (
         <SetLogger
+          circuit={circuit}
           exerciseId={exerciseState.exerciseId}
           sets={exerciseState.sets}
           onAddSet={onAddSet}

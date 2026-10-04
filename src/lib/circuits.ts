@@ -98,3 +98,37 @@ export function removeFromCircuit(
       e.exerciseId === exerciseId ? { ...e, circuitId: undefined } : e),
   }
 }
+
+/**
+ * The circuit an exercise belongs to, or null when it stands on its own.
+ *
+ * Null rather than a circuit of one: standing alone is the ordinary case, and
+ * the logger changes what it says only when there really are rounds to count.
+ *
+ * A dangling `circuitId` — a member whose circuit has been removed but which
+ * has not been swept yet — also reads as null. Storage outlives the grouping,
+ * and an exercise pointing at nothing is ungrouped in every way that matters.
+ */
+export function circuitFor(
+  session: WorkoutDaySession,
+  exerciseId: string
+): Circuit | null {
+  const entry = session.exercises.find(e => e.exerciseId === exerciseId)
+  if (!entry?.circuitId) return null
+  return (session.circuits ?? []).find(c => c.id === entry.circuitId) ?? null
+}
+
+/**
+ * What to call each row of a circuit exercise.
+ *
+ * A set inside a circuit is a time through it, so the rows are rounds. The
+ * labels follow the rows that exist rather than the rounds declared: logging a
+ * fifth set in a four-round circuit is a fifth time through, not an error, and
+ * capping the label there would leave two rows both reading "Round 4".
+ *
+ * Which is why the declared round count is not a parameter — it would only
+ * ever have been ignored.
+ */
+export function roundLabels(rowCount: number): string[] {
+  return Array.from({ length: rowCount }, (_, i) => `Round ${i + 1}`)
+}

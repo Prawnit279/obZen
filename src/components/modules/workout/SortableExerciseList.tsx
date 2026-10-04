@@ -13,7 +13,8 @@ import {
   verticalListSortingStrategy,
   arrayMove,
 } from '@dnd-kit/sortable'
-import type { ExerciseSessionState, LoggedSet, DayLabel } from '@/db/dexie'
+import type { ExerciseSessionState, LoggedSet, DayLabel, WorkoutDaySession } from '@/db/dexie'
+import { circuitFor } from '@/lib/circuits'
 import type { ProgressionSuggestion } from '@/lib/progress'
 import type { ProgramExercise } from '@/data/obzen-program'
 import { ExerciseCard } from './ExerciseCard'
@@ -31,10 +32,19 @@ interface Props {
   onRemoveExercise: (exerciseId: string) => void
   onSwapExercise?: (exerciseId: string, toName: string) => void
   progressions?: Record<string, ProgressionSuggestion>
+  /**
+   * The day itself, for resolving which circuit an exercise is in.
+   *
+   * The list already has every exercise, but a circuit's round count lives on
+   * the session beside them, not on the entries — so the session is what has
+   * to come down here.
+   */
+  session?: WorkoutDaySession
 }
 
 export function SortableExerciseList({
   exercises,
+  session,
   programMap,
   forearmFatigue,
   dayLabel,
@@ -92,6 +102,7 @@ export function SortableExerciseList({
         <div className="space-y-2">
           {exercises.map(ex => (
             <ExerciseCard
+              circuit={session ? circuitFor(session, ex.exerciseId) : null}
               key={ex.exerciseId}
               exerciseState={ex}
               programExercise={programMap[ex.exerciseId]}

@@ -10,6 +10,7 @@ import {
   isValidRounds, circuitMembers, canAddToCircuit, emptyCircuitIds,
   addCircuit, removeCircuit, setCircuitRounds, removeFromCircuit,
   MAX_CIRCUIT_EXERCISES, MIN_CIRCUIT_ROUNDS, MAX_CIRCUIT_ROUNDS,
+  circuitFor, roundLabels,
 } from '@/lib/circuits'
 import type { WorkoutDaySession, LoggedSet } from '@/db/dexie'
 
@@ -175,5 +176,63 @@ describe('emptyCircuitIds', () => {
 
   it('is empty for a session with no circuits at all', () => {
     expect(emptyCircuitIds(session())).toEqual([])
+  })
+})
+
+// ── What the logger needs to know ────────────────────────────────────────────
+
+describe('circuitFor', () => {
+  const grouped = session({
+    circuits: [{ id: 'c1', name: 'Abs', rounds: 4 }],
+    exercises: [ex('plank', 'c1'), ex('dead-bug', 'c1'), ex('deadlift')],
+  })
+
+  it('finds the circuit an exercise belongs to', () => {
+    expect(circuitFor(grouped, 'plank')).toMatchObject({ id: 'c1', rounds: 4 })
+  })
+
+  it('returns nothing for an exercise outside any circuit', () => {
+    // The common case, and it has to read as "no circuit" rather than as a
+    // circuit of one — the logger labels rounds only when there are rounds.
+    expect(circuitFor(grouped, 'deadlift')).toBeNull()
+  })
+
+  it('returns nothing for an exercise the session does not hold', () => {
+    expect(circuitFor(grouped, 'bench-press')).toBeNull()
+  })
+
+  it('returns nothing when the id points at a circuit that is gone', () => {
+    // Storage outlives the grouping: removing a circuit leaves its members
+    // carrying a stale id until they are swept. A dangling reference has to
+    // read as ungrouped, not crash the logger.
+    const orphaned = session({
+      circuits: [],
+      exercises: [ex('plank', 'c1')],
+    })
+    expect(circuitFor(orphaned, 'plank')).toBeNull()
+  })
+
+  it('survives a session with no circuits at all', () => {
+    expect(circuitFor(session({ exercises: [ex('deadlift')] }), 'deadlift')).toBeNull()
+  })
+})
+
+describe('roundLabels', () => {
+  it('names a round for each time through', () => {
+    expect(roundLabels(3)).toEqual(['Round 1', 'Round 2', 'Round 3'])
+  })
+
+  it('keeps counting past the rounds the circuit declares', () => {
+    // Five rows in a four-round circuit.
+    // An extra set is not an error — it is a fifth time through. Capping the
+    // label at the declared count would leave two rows both called "Round 4".
+    expect(roundLabels(5)).toEqual([
+      'Round 1', 'Round 2', 'Round 3', 'Round 4', 'Round 5',
+    ])
+  })
+
+  it('names only the rows that exist, inventing none', () => {
+    // Three rows against a four-round circuit.
+    expect(roundLabels(3)).toEqual(['Round 1', 'Round 2', 'Round 3'])
   })
 })
