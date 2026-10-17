@@ -19,6 +19,13 @@ import { useProfileSettingsStore, PROFILE_SETTINGS_DEFAULTS } from '@/store/useP
 import { WEIGH_IN_LB, isWeightGoal } from '@/lib/bodyweight'
 import type { WeighIn, WeightGoal } from '@/lib/bodyweight'
 import { lbToKg } from '@/lib/progress'
+import { useIntakeStore } from '@/store/useIntakeStore'
+import { useBlockStore } from '@/store/useBlockStore'
+import type { ActiveBlock } from '@/store/useBlockStore'
+import type { IntakeAnswers } from '@/lib/intake'
+import { isTrainingDays } from '@/lib/trainingWeek'
+import type { TrainingDays } from '@/lib/trainingWeek'
+import type { BarMode } from '@/lib/barWeight'
 
 export interface PersonalSection {
   bodyweight?: WeighIn[]
@@ -28,7 +35,23 @@ export interface PersonalSection {
     name?: string
     dosha?: Dosha
     weightGoal?: WeightGoal | null
+    trainingDays?: TrainingDays
+    barMode?: BarMode
   }
+  /**
+   * The goal questionnaire.
+   *
+   * Twenty answers given once, and the single most tedious thing to lose — it
+   * was absent from the backup entirely, so a restored phone came back with
+   * every workout and an empty questionnaire.
+   */
+  intake?: {
+    answers?: IntakeAnswers
+    seen?: string[]
+    completedAt?: string | null
+  }
+  /** The running programme, start date and training maxes. Null when none. */
+  block?: ActiveBlock | null
 }
 
 /** A generous ceiling — the longest ladder in the programme is far shorter. */
@@ -55,10 +78,23 @@ function isCalendarDate(date: string): boolean {
 export function collectPersonal(): PersonalSection {
   const progress = useProgressStore.getState()
   const settings = useProfileSettingsStore.getState()
+  const intake = useIntakeStore.getState()
   return {
     bodyweight: progress.getBodyweight(PROFILE_ID).map(e => ({ date: e.date, kg: e.kg })),
     ladderRungs: { ...progress.rungs },
-    profile: { name: settings.name, dosha: settings.dosha, weightGoal: settings.weightGoal },
+    profile: {
+      name: settings.name,
+      dosha: settings.dosha,
+      weightGoal: settings.weightGoal,
+      trainingDays: settings.trainingDays,
+      barMode: settings.barMode,
+    },
+    intake: {
+      answers: intake.answers,
+      seen: intake.seen,
+      completedAt: intake.completedAt,
+    },
+    block: useBlockStore.getState().block,
   }
 }
 
@@ -138,13 +174,114 @@ export function validatePersonal(raw: unknown): PersonalSection {
       }
       profile.weightGoal = p.weightGoal
     }
+    if (p.trainingDays !== undefined) {
+      if (!isTrainingDays(p.trainingDays)) {
+        throw new Error('"personal.profile.trainingDays" must be a day count the plan offers.')
+      }
+      profile.trainingDays = p.trainingDays as TrainingDays
+    }
+    if (p.barMode !== undefined) {
+      if (p.barMode !== 'with-bar' && p.barMode !== 'plates-only') {
+        throw new Error('"personal.profile.barMode" must be "with-bar" or "plates-only".')
+      }
+      profile.barMode = p.barMode as BarMode
+    }
     out.profile = profile
   }
+
+  if (raw.intake !== undefined) out.intake = validateIntake(raw.intake)
+  if (raw.block !== undefined) out.block = validateBlock(raw.block)
 
   return out
 }
 
 // ── Restore ──────────────────────────────────────────────────────────────────
+
+/** The answer shapes `lib/intake.ts` declares. A file may carry no others. */
+const ANSWER_KINDS = new Set(['single', 'multi', 'scale', 'number', 'date', 'lifts'])
+
+/**
+ * Check a questionnaire from a file.
+ *
+ * These answers feed the programme recommendation, so a malformed one is
+ * rejected whole rather than half-read — a half-read questionnaire would
+ * recommend off a subset without anything saying so, which is the one failure
+ * the recommendation is built to avoid.
+ *
+ * Ids are not checked against the current question set: the store's own
+ * rehydration already drops unknown ones, and rejecting a whole backup because
+ * a question was renamed since it was written would lose far more than it
+ * saved.
+ */
+function validateIntake(raw: unknown): PersonalSection['intake'] {
+  if (!isPlainObject(raw)) throw new Error('Backup "personal.intake" must be an object.')
+  const out: NonNullable<PersonalSection['intake']> = {}
+
+  if (raw.answers !== undefined) {
+    if (!isPlainObject(raw.answers)) throw new Error('"personal.intake.answers" must be an object.')
+    const answers: IntakeAnswers = {}
+    for (const [id, a] of Object.entries(raw.answers)) {
+      if (!isPlainObject(a) || typeof a.kind !== 'string' || !ANSWER_KINDS.has(a.kind)) {
+        throw new Error(`"personal.intake.answers.${id}" is not an answer.`)
+      }
+      answers[id] = a as IntakeAnswers[string]
+    }
+    out.answers = answers
+  }
+
+  if (raw.seen !== undefined) {
+    if (!Array.isArray(raw.seen) || raw.seen.some(id => typeof id !== 'string')) {
+      throw new Error('"personal.intake.seen" must be a list of question ids.')
+    }
+    out.seen = raw.seen as string[]
+  }
+
+  if (raw.completedAt !== undefined) {
+    // Null is carried through rather than dropped. "Never finished" is a value
+    // the store holds, not the absence of one, and a backup that quietly lost
+    // the difference would not survive its own round trip.
+    if (raw.completedAt !== null && typeof raw.completedAt !== 'string') {
+      throw new Error('"personal.intake.completedAt" must be a timestamp or null.')
+    }
+    out.completedAt = raw.completedAt
+  }
+
+  return out
+}
+
+/**
+ * Check a running block from a file.
+ *
+ * The same fields `useBlockStore` validates on rehydration, and for the same
+ * reason — except that the programme id is deliberately not checked against
+ * this build's list here. The store drops a block naming a programme it does
+ * not have, so a file written against a later build restores cleanly and is
+ * swept on the next load rather than rejecting the whole backup.
+ */
+function validateBlock(raw: unknown): ActiveBlock | null {
+  if (raw === null) return null
+  if (!isPlainObject(raw)) throw new Error('Backup "personal.block" must be an object or null.')
+  if (typeof raw.programId !== 'string' || raw.programId === '') {
+    throw new Error('"personal.block.programId" is required.')
+  }
+  if (typeof raw.startedOn !== 'string' || !isCalendarDate(raw.startedOn)) {
+    throw new Error('"personal.block.startedOn" must be a real YYYY-MM-DD date.')
+  }
+  if (!isPlainObject(raw.trainingMaxLb)) {
+    throw new Error('"personal.block.trainingMaxLb" must be an object.')
+  }
+  for (const [id, lb] of Object.entries(raw.trainingMaxLb)) {
+    if (typeof lb !== 'number' || !Number.isFinite(lb) || lb <= 0) {
+      throw new Error(`"personal.block.trainingMaxLb.${id}" must be a positive number.`)
+    }
+  }
+  return {
+    programId: raw.programId,
+    templateId: typeof raw.templateId === 'string' ? raw.templateId : null,
+    startedOn: raw.startedOn,
+    trainingMaxLb: raw.trainingMaxLb as Record<string, number>,
+  }
+}
 
 /** Fill what this device lacks. Returns how many values were actually added. */
 export function restorePersonal(section: PersonalSection): number {
@@ -172,18 +309,44 @@ export function restorePersonal(section: PersonalSection): number {
 
   if (section.profile) {
     const s = useProfileSettingsStore.getState()
-    const { name, dosha, weightGoal } = section.profile
+    const { name, dosha, weightGoal, trainingDays, barMode } = section.profile
     // "Untouched" means still at the default: only those are safe to fill.
     const patch = {
       ...(name && s.name === PROFILE_SETTINGS_DEFAULTS.name ? { name } : {}),
       ...(dosha && s.dosha === PROFILE_SETTINGS_DEFAULTS.dosha ? { dosha } : {}),
       ...(weightGoal && s.weightGoal === null ? { weightGoal } : {}),
+      ...(trainingDays && s.trainingDays === PROFILE_SETTINGS_DEFAULTS.trainingDays
+        ? { trainingDays } : {}),
+      ...(barMode && s.barMode === PROFILE_SETTINGS_DEFAULTS.barMode ? { barMode } : {}),
     }
     const fields = Object.keys(patch).length
     if (fields > 0) {
       useProfileSettingsStore.setState(patch)
       restored += fields
     }
+  }
+
+  // Only onto a questionnaire that has not been started here. Gaps are filled,
+  // nothing is replaced — the same rule the fields above follow, and the one
+  // that matters most here: restoring an old backup onto a phone in use must
+  // not quietly swap out answers given on it since.
+  if (section.intake?.answers && Object.keys(section.intake.answers).length > 0) {
+    const here = useIntakeStore.getState()
+    if (Object.keys(here.answers).length === 0) {
+      useIntakeStore.setState({
+        answers: section.intake.answers,
+        seen: section.intake.seen ?? Object.keys(section.intake.answers),
+        completedAt: section.intake.completedAt ?? here.completedAt,
+      })
+      restored += Object.keys(section.intake.answers).length
+    }
+  }
+
+  // Likewise: a block already running here is the current one, whatever a file
+  // from another device says.
+  if (section.block && useBlockStore.getState().block === null) {
+    useBlockStore.setState({ block: section.block })
+    restored += 1
   }
 
   return restored

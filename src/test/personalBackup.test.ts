@@ -11,6 +11,8 @@ import { importAllDataFromJSON, exportAllDataAsJSON } from '@/lib/export'
 import { useProgressStore } from '@/store/useProgressStore'
 import { useProfileSettingsStore, PROFILE_SETTINGS_DEFAULTS } from '@/store/useProfileSettingsStore'
 import { PROFILE_ID } from '@/config/profiles'
+import { useIntakeStore } from '@/store/useIntakeStore'
+import { useBlockStore } from '@/store/useBlockStore'
 import { lbToKg } from '@/lib/progress'
 
 beforeEach(async () => {
@@ -49,7 +51,9 @@ describe('collectPersonal', () => {
     const p = collectPersonal()
     expect(p.bodyweight).toEqual([{ date: '2026-09-01', kg: 75 }, { date: '2026-09-08', kg: 75.4 }])
     expect(p.ladderRungs).toEqual({ [`${PROFILE_ID}::assisted-pull-up`]: 2 })
-    expect(p.profile).toEqual({ name: 'Pronit', dosha: 'Vata', weightGoal: { direction: 'gain', pace: 'gentle' } })
+    expect(p.profile).toMatchObject({
+      name: 'Pronit', dosha: 'Vata', weightGoal: { direction: 'gain', pace: 'gentle' },
+    })
   })
 
   it('survives a trip through JSON unchanged', () => {
@@ -251,6 +255,43 @@ async function exportedText(): Promise<string> {
 }
 
 describe('a backup, end to end', () => {
+  it('carries the questionnaire, the block and the settings through a wipe', async () => {
+    // The complaint this answers: a phone taken off and put back on came back
+    // with every workout and an unanswered questionnaire, because none of this
+    // was in the file at all.
+    const answers = {
+      'primary-goal': { kind: 'single' as const, value: 'strength' },
+      sleep: { kind: 'single' as const, value: '7-8' },
+      soreness: { kind: 'scale' as const, value: 3 },
+    }
+    const block = {
+      programId: 'five-three-one', templateId: null, startedOn: '2026-09-07',
+      trainingMaxLb: { 'barbell-squat': 315, 'bench-press': 225 },
+    }
+    useIntakeStore.setState({ answers, seen: Object.keys(answers), completedAt: '2026-10-01T09:00:00.000Z' })
+    useBlockStore.setState({ block })
+    settings().setTrainingDays(5)
+    settings().setBarMode('plates-only')
+
+    const text = await exportedText()
+
+    // The reinstall: storage gone, stores back at their defaults.
+    await db.delete()
+    await db.open()
+    useIntakeStore.setState({ answers: {}, seen: [], completedAt: null })
+    useBlockStore.setState({ block: null })
+    useProfileSettingsStore.setState({ ...PROFILE_SETTINGS_DEFAULTS })
+
+    // jsdom's File has no `text()`, so the same stand-in the other cases use.
+    await importAllDataFromJSON({ text: async () => text } as unknown as File)
+
+    expect(useIntakeStore.getState().answers).toEqual(answers)
+    expect(useIntakeStore.getState().completedAt).toBe('2026-10-01T09:00:00.000Z')
+    expect(useBlockStore.getState().block).toEqual(block)
+    expect(useProfileSettingsStore.getState().trainingDays).toBe(5)
+    expect(useProfileSettingsStore.getState().barMode).toBe('plates-only')
+  })
+
   it('carries weigh-ins, goal and name through export, a wiped phone, and import', async () => {
     // The case this section exists for: before it, a restored backup came back
     // with every workout and not a single weigh-in.
@@ -297,5 +338,119 @@ describe('when storage refuses the personal half', () => {
       useProgressStore.setState = setState
       useProgressStore.setState({ logBodyweight: real })
     }
+  })
+})
+
+// ── The things a reinstall used to lose ──────────────────────────────────────
+
+describe('the questionnaire, the block, and the rest of the settings', () => {
+  /**
+   * These were absent from the backup entirely. A phone wiped and restored came
+   * back with every workout, every weigh-in — and an unanswered questionnaire,
+   * no running programme, and the training-days setting back at its default.
+   * The one thing a reinstall most obviously costs was the one thing the
+   * backup did not carry.
+   */
+  const answers = {
+    'primary-goal': { kind: 'single' as const, value: 'strength' },
+    sleep: { kind: 'single' as const, value: '7-8' },
+  }
+
+  it('carries the questionnaire out', () => {
+    useIntakeStore.setState({ answers, seen: ['primary-goal', 'sleep'], completedAt: '2026-10-01T09:00:00.000Z' })
+    const section = collectPersonal()
+    expect(section.intake?.answers).toEqual(answers)
+    expect(section.intake?.seen).toEqual(['primary-goal', 'sleep'])
+    expect(section.intake?.completedAt).toBe('2026-10-01T09:00:00.000Z')
+  })
+
+  it('puts it back on a device that has never been asked', () => {
+    useIntakeStore.setState({ answers: {}, seen: [], completedAt: null })
+    restorePersonal(validatePersonal({
+      intake: { answers, seen: ['primary-goal'], completedAt: '2026-10-01T09:00:00.000Z' },
+    }))
+    expect(useIntakeStore.getState().answers).toEqual(answers)
+    expect(useIntakeStore.getState().completedAt).toBe('2026-10-01T09:00:00.000Z')
+  })
+
+  it('never overwrites answers already given here', () => {
+    // The same rule the rest of the restore follows: fill gaps, replace
+    // nothing. Someone restoring an old backup onto a phone they have been
+    // using must not lose the answers they gave on it.
+    const mine = { 'primary-goal': { kind: 'single' as const, value: 'size' } }
+    useIntakeStore.setState({ answers: mine, seen: ['primary-goal'], completedAt: '2026-10-10T09:00:00.000Z' })
+    restorePersonal(validatePersonal({ intake: { answers, seen: [], completedAt: '2026-01-01T00:00:00.000Z' } }))
+    expect(useIntakeStore.getState().answers).toEqual(mine)
+    expect(useIntakeStore.getState().completedAt).toBe('2026-10-10T09:00:00.000Z')
+  })
+
+  it('carries the running block, training maxes and all', () => {
+    const block = {
+      programId: 'five-three-one', templateId: null, startedOn: '2026-09-07',
+      trainingMaxLb: { 'barbell-squat': 315 },
+    }
+    useBlockStore.setState({ block })
+    expect(collectPersonal().block).toEqual(block)
+
+    useBlockStore.setState({ block: null })
+    restorePersonal(validatePersonal({ block }))
+    expect(useBlockStore.getState().block).toEqual(block)
+  })
+
+  it('leaves a block already running alone', () => {
+    const mine = {
+      programId: 'bbb', templateId: null, startedOn: '2026-10-05',
+      trainingMaxLb: { 'bench-press': 225 },
+    }
+    useBlockStore.setState({ block: mine })
+    restorePersonal(validatePersonal({
+      block: { programId: 'five-three-one', templateId: null, startedOn: '2026-01-01', trainingMaxLb: {} },
+    }))
+    expect(useBlockStore.getState().block).toEqual(mine)
+  })
+
+  it('carries the training days and bar mode', () => {
+    useProfileSettingsStore.setState({ trainingDays: 5, barMode: 'plates-only' })
+    const section = collectPersonal()
+    expect(section.profile?.trainingDays).toBe(5)
+    expect(section.profile?.barMode).toBe('plates-only')
+
+    useProfileSettingsStore.setState({ ...PROFILE_SETTINGS_DEFAULTS })
+    restorePersonal(validatePersonal({ profile: { trainingDays: 5, barMode: 'plates-only' } }))
+    expect(useProfileSettingsStore.getState().trainingDays).toBe(5)
+    expect(useProfileSettingsStore.getState().barMode).toBe('plates-only')
+  })
+
+  it('refuses a questionnaire that is not one', () => {
+    // A backup file is untrusted input, and these answers feed the programme
+    // recommendation — a malformed one must be rejected whole, not half-read.
+    expect(() => validatePersonal({ intake: { answers: 'nope' } })).toThrow(/intake/i)
+    expect(() => validatePersonal({ intake: { answers: { q: 7 } } })).toThrow(/intake/i)
+    expect(() => validatePersonal({ intake: { completedAt: 42 } })).toThrow(/intake/i)
+    // An object shaped like an answer but of a kind the app cannot read. The
+    // case above is caught by the plain-object check before the kind is ever
+    // looked at, so without this one the kind check could be deleted.
+    expect(() => validatePersonal({ intake: { answers: { q: { kind: 'telepathy', value: 'x' } } } }))
+      .toThrow(/intake/i)
+    expect(() => validatePersonal({ intake: { answers: { q: { value: 'no kind at all' } } } }))
+      .toThrow(/intake/i)
+  })
+
+  it('refuses a block that is not one', () => {
+    expect(() => validatePersonal({ block: { startedOn: '2026-09-07' } })).toThrow(/block/i)
+    expect(() => validatePersonal({ block: { programId: 'x', startedOn: 'last tuesday', trainingMaxLb: {} } })).toThrow(/block/i)
+    expect(() => validatePersonal({ block: { programId: 'x', startedOn: '2026-09-07', trainingMaxLb: { squat: 'heavy' } } })).toThrow(/block/i)
+  })
+
+  it('refuses settings that are out of range', () => {
+    expect(() => validatePersonal({ profile: { trainingDays: 9 } })).toThrow(/trainingDays/i)
+    expect(() => validatePersonal({ profile: { barMode: 'sideways' } })).toThrow(/barMode/i)
+  })
+
+  it('survives a backup written before any of this existed', () => {
+    // Older files simply have no such sections, which must read as "nothing to
+    // restore" rather than as a malformed file.
+    expect(() => validatePersonal({ bodyweight: [] })).not.toThrow()
+    expect(validatePersonal({ bodyweight: [] }).intake).toBeUndefined()
   })
 })
